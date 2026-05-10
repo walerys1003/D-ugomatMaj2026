@@ -1,0 +1,18 @@
+export {
+  decide,
+  can,
+  expandRoles,
+  matchResourcePattern,
+  matchActionPattern,
+  evalCondition,
+  loadPoliciesForResource,
+  listAllPolicies,
+  upsertPolicy,
+  deletePolicy,
+  clearDecisionCache,
+  type PolicyRule,
+  type PolicyEffect,
+  type Subject,
+  type Resource,
+  type Decision,
+} from "./policy-engine";
