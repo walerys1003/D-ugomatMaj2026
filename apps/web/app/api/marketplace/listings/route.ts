@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { createListing, listListings, ListingType, ListingStatus, PricingModel } from "@/lib/marketplace/listings";
 
 async function getSupabase() {
-  const { createServerSupabase } = await import("@/lib/supabase/server");
-  return createServerSupabase();
+  const { createSupabaseServerClient } = await import("@/lib/db/supabase-server");
+  return createSupabaseServerClient();
 }
 
 export async function GET(req: NextRequest) {

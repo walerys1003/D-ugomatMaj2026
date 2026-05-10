@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { applyToPartnerProgram, approvePartner, listPartners, promoteTier, PartnerStatus, PartnerTier } from "@/lib/marketplace/partner-program";
 
 async function getSupabase() {
-  const { createServerSupabase } = await import("@/lib/supabase/server");
-  return createServerSupabase();
+  const { createSupabaseServerClient } = await import("@/lib/db/supabase-server");
+  return createSupabaseServerClient();
 }
 
 async function isAdmin(supabase: any, userId: string): Promise<boolean> {

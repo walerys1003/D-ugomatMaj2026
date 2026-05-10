@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { listFeatured } from "@/lib/marketplace/featured";
 
 export async function GET(_req: NextRequest) {
-  const { createServerSupabase } = await import("@/lib/supabase/server");
-  const supabase = await createServerSupabase();
+  const { createSupabaseServerClient } = await import("@/lib/db/supabase-server");
+  const supabase = await createSupabaseServerClient();
   try {
     const slots = await listFeatured(supabase);
     return NextResponse.json({ slots });

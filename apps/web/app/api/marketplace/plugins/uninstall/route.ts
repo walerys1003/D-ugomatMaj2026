@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { uninstallPlugin, updatePlugin, listInstalledPlugins } from "@/lib/marketplace/plugin-lifecycle";
 
 export async function GET(req: NextRequest) {
-  const { createServerSupabase } = await import("@/lib/supabase/server");
-  const supabase = await createServerSupabase();
+  const { createSupabaseServerClient } = await import("@/lib/db/supabase-server");
+  const supabase = await createSupabaseServerClient();
   const orgId = req.nextUrl.searchParams.get("orgId");
   if (!orgId) return NextResponse.json({ error: "orgId_required" }, { status: 400 });
   try {
@@ -15,8 +15,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const { createServerSupabase } = await import("@/lib/supabase/server");
-  const supabase = await createServerSupabase();
+  const { createSupabaseServerClient } = await import("@/lib/db/supabase-server");
+  const supabase = await createSupabaseServerClient();
   const body = await req.json().catch(() => ({}));
   if (!body.installationId || !body.orgId) return NextResponse.json({ error: "missing_fields" }, { status: 400 });
   try {
@@ -28,8 +28,8 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  const { createServerSupabase } = await import("@/lib/supabase/server");
-  const supabase = await createServerSupabase();
+  const { createSupabaseServerClient } = await import("@/lib/db/supabase-server");
+  const supabase = await createSupabaseServerClient();
   const body = await req.json().catch(() => ({}));
   if (!body.installationId || !body.orgId || !body.manifest) {
     return NextResponse.json({ error: "missing_fields" }, { status: 400 });

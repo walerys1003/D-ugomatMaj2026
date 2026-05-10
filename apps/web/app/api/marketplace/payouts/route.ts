@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { computePendingPayouts, createPayoutBatch } from "@/lib/marketplace/payouts";
 
 async function getSupabase() {
-  const { createServerSupabase } = await import("@/lib/supabase/server");
-  return createServerSupabase();
+  const { createSupabaseServerClient } = await import("@/lib/db/supabase-server");
+  return createSupabaseServerClient();
 }
 
 async function requireAdmin(supabase: any) {

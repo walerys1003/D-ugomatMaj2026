@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { submitReview, listReviews } from "@/lib/marketplace/reviews";
 
 export async function GET(req: NextRequest) {
-  const { createServerSupabase } = await import("@/lib/supabase/server");
-  const supabase = await createServerSupabase();
+  const { createSupabaseServerClient } = await import("@/lib/db/supabase-server");
+  const supabase = await createSupabaseServerClient();
   const listingId = req.nextUrl.searchParams.get("listingId");
   if (!listingId) return NextResponse.json({ error: "listingId_required" }, { status: 400 });
   try {
@@ -15,8 +15,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const { createServerSupabase } = await import("@/lib/supabase/server");
-  const supabase = await createServerSupabase();
+  const { createSupabaseServerClient } = await import("@/lib/db/supabase-server");
+  const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 

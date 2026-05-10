@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { installPlugin } from "@/lib/marketplace/plugin-lifecycle";
 
 export async function POST(req: NextRequest) {
-  const { createServerSupabase } = await import("@/lib/supabase/server");
-  const supabase = await createServerSupabase();
+  const { createSupabaseServerClient } = await import("@/lib/db/supabase-server");
+  const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 

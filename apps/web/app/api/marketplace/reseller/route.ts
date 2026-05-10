@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { createReseller, activateReseller, ResellerTier, validateSubdomain } from "@/lib/marketplace/reseller";
 
 async function getSupabase() {
-  const { createServerSupabase } = await import("@/lib/supabase/server");
-  return createServerSupabase();
+  const { createSupabaseServerClient } = await import("@/lib/db/supabase-server");
+  return createSupabaseServerClient();
 }
 
 export async function POST(req: NextRequest) {
