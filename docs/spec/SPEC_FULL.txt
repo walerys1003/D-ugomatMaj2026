@@ -1,0 +1,2605 @@
+DŁUGOMAT — Pełna Specyfikacja Techniczno-Wdrożeniowa
+Dokument referencyjny do implementacji w Genspark AI Developer / Kilo Code
+Model kodowania: Claude Opus 4.6 via APIPod.ai(http://apipod.ai/)
+SPIS TREŚCI
+1. Wizja produktu i analiza rynku
+2. Architektura systemu (high-level)
+3. Stack technologiczny — uzasadnienie każdego wyboru
+4. Struktura monorepo i konwencje
+5. Frontend — architektura, routing, komponenty, design system
+6. Backend — API Routes, middleware, logika biznesowa
+7. Baza danych — schemat, tabele, indeksy, RLS, migracje
+8. Supabase self-hosting — konfiguracja, bezpieczeństwo, backup
+9. System OCR — pipeline rozpoznawania dokumentów
+10. AI Engine — prompty, RAG, walidacja, pipeline generowania pism
+11. Moduły biznesowe (D1–D10) — specyfikacja każdego modułu
+12. System płatności — Stripe, faktury, modele cenowe
+13. System powiadomień — e-mail, SMS, push, deadline tracker
+14. Szata graficzna — design system, paleta, typografia, komponenty UI
+15. Bezpieczeństwo — RODO, szyfrowanie, audyt, penetration testing
+16. Deployment — CI/CD, GitHub Actions, infrastruktura
+17. Monitoring i analityka
+18. Roadmap wdrożeniowa — fazy, kamienie milowe, estymacje tokenów
+19. Instrukcja dla Kilo Code / Genspark — podział na prompty
+1. WIZJA PRODUKTU I ANALIZA RYNKU
+1.1 Problem
+W Polsce rocznie wydawanych jest ponad 2,5 miliona elektronicznych nakazów zapłaty (EPU) przez e-Sąd w Lublinie. Znaczna część z nich dotyczy przedawnionych lub wadliwych roszczeń skupowanych przez fundusze sekurytyzacyjne za ułamek wartości nominalnej. Osoby zadłużone — często bez wykształcenia prawniczego, w trudnej sytuacji finansowej — otrzymują nakaz i mają tylko 14 dni na złożenie sprzeciwu. Większość tego nie robi, bo nie wie jak, nie stać ich na prawnika (1 500–3 000 zł za samo sporządzenie sprzeciwu), lub nie rozumie procedury.
+Jednocześnie egzekucja komornicza dotyka setki tysięcy osób, z czego znaczna część dotyczy kwot, które powinny być zwolnione z egzekucji (świadczenia 500+, alimenty, zasiłki). Dłużnicy nie składają wniosków, bo nie wiedzą, że mają do tego prawo.
+1.2 Rozwiązanie
+Długomat to inteligentna platforma legal-tech, która za pomocą sztucznej inteligencji (Claude Sonnet 4.6) automatycznie generuje profesjonalne pisma procesowe dla osób zadłużonych. Użytkownik uploaduje dokument (nakaz zapłaty, pismo komornicze, raport BIK), system rozpoznaje tekst przez OCR, identyfikuje kluczowe dane (sygnatura, kwota, data, wierzyciel), a następnie prowadzi użytkownika przez inteligentny formularz, po czym generuje gotowe pismo w formacie PDF — poprawne formalnie, spersonalizowane, gotowe do wysłania.
+1.3 Rynek (TAM/SAM/SOM)
+TAM (Total Addressable Market): 2,5 mln nakazów EPU + ~800 tys. aktywnych egzekucji komorniczych + ~400 tys. osób z negatywnym BIK + ~200 tys. spraw cesji rocznie. Potencjalnie 3,5–4 mln osób rocznie. Przy ARPU 159 zł, TAM = 556–636 mln zł.
+SAM (Serviceable Available Market): osoby z dostępem do internetu, świadome problemu, szukające rozwiązania online — szacunkowo 15–20% TAM → 525–800 tys. osób. SAM = 83–127 mln zł.
+SOM (Serviceable Obtainable Market): realistyczny cel w pierwszych 12–18 miesiącach przy budżecie bootstrapowym — 0,1–0,3% SAM → 525–2 400 użytkowników płacących rocznie. SOM = 83–382 tys. zł. Cel: 300 płacących dokumentów miesięcznie (MRR ~47 700 zł) w ciągu 12 miesięcy.
+1.4 Przewaga konkurencyjna
+Bezpośredni konkurenci w Polsce nie istnieją w tym segmencie w formie SaaS. Istnieją: darmowe wzory pism (niskiej jakości, nieaktualne, generyczne), kancelarie prawne (drogie, wolne, nieosiągalne dla osoby z 2 000 zł miesięcznego dochodu), portale poradnikowe (edukacja, ale zero automatyzacji). Długomat wypełnia lukę między darmowymi wzorami a kosztownymi usługami prawniczymi — oferując jakość zbliżoną do prawnika za 5–10% jego ceny.
+2. ARCHITEKTURA SYSTEMU (HIGH-LEVEL)
+2.1 Diagram architektury
+┌─────────────────────────────────────────────────────────────────┐
+│                        UŻYTKOWNIK                                │
+│                   (przeglądarka / mobile)                        │
+└──────────────────────────┬──────────────────────────────────────┘
+                           │ HTTPS
+                           ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    VERCEL EDGE NETWORK                           │
+│              (Next.js 14 App Router, SSR/ISR)                   │
+│                                                                  │
+│  ┌─────────────┐  ┌──────────────┐  ┌────────────────────────┐  │
+│  │  Landing     │  │  Dashboard   │  │  Wizard (formularz     │  │
+│  │  Pages       │  │  (/panel)    │  │  krok po kroku)        │  │
+│  │  (ISR/SSG)   │  │  (SSR+CSR)  │  │  (CSR + React Hook    │  │
+│  │              │  │              │  │   Form + Zod)          │  │
+│  └─────────────┘  └──────────────┘  └────────────────────────┘  │
+│                                                                  │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │              API ROUTES (Next.js Route Handlers)          │   │
+│  │  /api/auth/*  /api/cases/*  /api/ai/*  /api/payments/*   │   │
+│  │  /api/ocr/*   /api/documents/*  /api/notifications/*     │   │
+│  └──────────────────────────┬───────────────────────────────┘   │
+└─────────────────────────────┼───────────────────────────────────┘
+                              │
+          ┌───────────────────┼───────────────────────┐
+          │                   │                       │
+          ▼                   ▼                       ▼
+┌──────────────┐  ┌────────────────────┐  ┌──────────────────────┐
+│  SUPABASE    │  │  CLAUDE API        │  │  USŁUGI ZEWNĘTRZNE   │
+│  (self-host) │  │  (via APIPod.ai)   │  │                      │
+│              │  │                    │  │  • Stripe (płatn.)   │
+│  • PostgreSQL│  │  • Sonnet 4.6      │  │  • AWS SES (email)   │
+│  • Auth      │  │    (generowanie)   │  │  • SMSAPI.pl         │
+│  • Storage   │  │  • Haiku 4.5       │  │  • Tesseract.js      │
+│  • Realtime  │  │    (walidacja)     │  │  • Puppeteer (PDF)   │
+│  • Edge Fn   │  │  • Opus 4.6        │  │  • Fakturownia       │
+│              │  │    (edge cases)    │  │  • PostHog (analyt.) │
+└──────────────┘  └────────────────────┘  └──────────────────────┘
+
+2.2 Zasady architektoniczne
+Separation of Concerns: każda warstwa (prezentacja, logika, dane, AI) jest izolowana i komunikuje się przez zdefiniowane interfejsy. Fail-safe AI: jeśli Claude nie odpowiada lub odpowiedź jest nieadekwatna, system wyświetla fallback (predefiniowany szablon + ostrzeżenie), nigdy nie generuje pustego lub błędnego pisma. Security-first: dane prawne są wrażliwe — szyfrowanie at-rest (AES-256), in-transit (TLS 1.3), RLS na poziomie bazy, RBAC na poziomie API. Mobile-first responsive: 70%+ użytkowników Długomatu będzie korzystać z telefonu — interfejs musi być perfekcyjny na ekranach 375–428px.
+3. STACK TECHNOLOGICZNY — UZASADNIENIE
+3.1 Frontend
+Next.js 14 (App Router) — wybrany zamiast czystego React/Vite ze względu na SSR/ISR (krytyczny dla SEO — frazy takie jak „sprzeciw od nakazu zapłaty EPU" muszą indeksować się natychmiast), wbudowane API Routes (eliminuje potrzebę osobnego backendu), Image Optimization (optymalizacja LCP), oraz Middleware (geolokalizacja, rate limiting na edge).
+Tailwind CSS 3.4 — utility-first CSS zapewnia spójność designu, szybki development (Kilo Code generuje Tailwind lepiej niż custom CSS), mały bundle (purging nieużywanych klas), oraz łatwość tworzenia dark mode.
+shadcn/ui — kolekcja niestyled komponentów opartych na Radix UI. Wybrany zamiast MUI/Ant Design, ponieważ: zero vendor lock-in (kopiujesz komponenty do projektu, nie instalujesz paczki), pełna kontrola nad stylem, doskonała dostępność (Radix), oraz mniejszy bundle niż MUI o ~60%.
+React Hook Form + Zod — formularze są sercem Długomatu (wielokrokowe wizardy, walidacja w czasie rzeczywistym, dynamiczne pola zależne od kontekstu sprawy). RHF ma najniższy narzut na re-rendery, a Zod pozwala na runtime type-checking z automatycznym wnioskowaniem typów TypeScript.
+Framer Motion — mikroanimacje zwiększające perceived quality: przejścia między krokami wizarda, animacje ładowania podczas OCR, celebracyjna animacja po wygenerowaniu pisma.
+3.2 Backend
+Next.js Route Handlers — eliminują potrzebę osobnego serwera Express/Fastify. Dla projektu solo-founder i AI-assisted development, mniejsza liczba repozytoriów i technologii oznacza mniej punktów awarii.
+tRPC (opcjonalnie, V2) — typesafe API layer, auto-generowanie typów klient-serwer. W V1 używamy zwykłych Route Handlers z Zod validacją; w V2 migrujemy do tRPC dla lepszego DX.
+3.3 Baza danych
+Supabase (PostgreSQL 15) — wybrany ze względu na: natywny Auth (magic link, OAuth, email+password) bez implementacji od zera, Storage z politykami dostępu (upload nakazów, pism), RLS (Row Level Security) — krytyczny dla multi-tenant legal data, Realtime subscriptions (powiadomienia o statusie sprawy), Edge Functions (serverless computing blisko użytkownika), oraz self-hosting (pełna kontrola nad danymi prawnymi, zgodność z RODO).
+Alternatywy rozważone i odrzucone: Firebase (vendor lock-in, brak Postgres, słabe RLS), PlanetScale (MySQL, brak storage/auth, droższe), Neon (dobry Postgres, ale brak integrated storage/auth/realtime).
+3.4 AI Engine
+Claude Sonnet 4.6 (via APIPod.ai(http://apipod.ai/)) — główny model do generowania pism. Wybrany zamiast GPT-5 ze względu na: lepszą jakość polskiego tekstu prawnego (testowane empirycznie), niższą cenę przez APIPod ($1/M input, $7/M output vs. Anthropic direct $3/$15), dłuższe okno kontekstowe (200k tokenów — mieści cały RAG prawny), oraz lepszą instrukcjonalność (Claude precyzyjniej trzyma się formatu pisma procesowego).
+Claude Haiku 4.5 — walidacja wygenerowanych pism (sprawdzanie kompletności, spójności dat, obecności wymaganych elementów formalnych). Tańszy ($0.20/$1.00 via APIPod), szybszy (latencja ~0.5s vs ~2s dla Sonnet).
+Claude Opus 4.6 — zastrzeżony dla edge cases: skomplikowane stany faktyczne, wiele wierzycieli, nietypowe zarzuty. Używany w <5% przypadków.
+3.5 OCR
+Tesseract.js (client-side) — pierwsza warstwa OCR, działa w przeglądarce (Web Worker), zero kosztów serwerowych. Dokładność 85–92% na skanach nakazów zapłaty.
+AWS Textract (server-side fallback) — gdy Tesseract.js zwraca confidence <80%, automatyczne przesłanie do Textract. Koszt ~$1.50/1000 stron. Dokładność 95–99%.
+3.6 PDF Generation
+Puppeteer (headless Chrome) — renderowanie HTML → PDF. Wybrany zamiast bibliotek jak jsPDF/PDFKit, ponieważ: pixel-perfect rendering (pismo procesowe musi wyglądać profesjonalnie), obsługa polskich znaków i formatowania prawnego, łatwiejszy templating (HTML/CSS zamiast niskopoziomowego PDF API).
+4. STRUKTURA MONOREPO I KONWENCJE
+4.1 Struktura katalogów
+dlugomat/
+├── .github/
+│   ├── workflows/
+│   │   ├── ci.yml                    # lint + test + type-check
+│   │   ├── deploy-preview.yml        # deploy preview na Vercel
+│   │   └── deploy-production.yml     # deploy production
+│   └── CODEOWNERS
+├── .vscode/
+│   ├── settings.json
+│   ├── extensions.json               # rekomendowane rozszerzenia
+│   └── launch.json
+├── spec/                             # dokumentacja specyfikacji
+│   ├── 00-index.md
+│   ├── 01-architektura.md
+│   ├── 02-core.md
+│   ├── 05-dlugomat.md
+│   ├── 07-api.md
+│   └── 08-db-schema.md
+├── src/
+│   ├── app/                          # Next.js App Router
+│   │   ├── (marketing)/              # route group: landing, cennik, blog
+│   │   │   ├── page.tsx              # strona główna
+│   │   │   ├── cennik/page.tsx
+│   │   │   ├── jak-to-dziala/page.tsx
+│   │   │   ├── blog/
+│   │   │   │   ├── page.tsx
+│   │   │   │   └── [slug]/page.tsx
+│   │   │   └── layout.tsx            # marketing layout (navbar, footer)
+│   │   ├── (auth)/                   # route group: login, register
+│   │   │   ├── login/page.tsx
+│   │   │   ├── register/page.tsx
+│   │   │   ├── reset-password/page.tsx
+│   │   │   └── layout.tsx
+│   │   ├── (dashboard)/              # route group: panel użytkownika
+│   │   │   ├── panel/
+│   │   │   │   ├── page.tsx          # dashboard główny
+│   │   │   │   ├── sprawy/
+│   │   │   │   │   ├── page.tsx      # lista spraw
+│   │   │   │   │   ├── [id]/page.tsx # szczegóły sprawy
+│   │   │   │   │   └── nowa/page.tsx # kreator nowej sprawy
+│   │   │   │   ├── dokumenty/
+│   │   │   │   │   ├── page.tsx
+│   │   │   │   │   └── [id]/page.tsx
+│   │   │   │   ├── terminy/page.tsx
+│   │   │   │   ├── profil/page.tsx
+│   │   │   │   └── platnosci/page.tsx
+│   │   │   └── layout.tsx            # dashboard layout (sidebar, header)
+│   │   ├── (wizards)/                # route group: kreatory pism
+│   │   │   ├── sprzeciw-epu/
+│   │   │   │   ├── page.tsx          # start wizarda
+│   │   │   │   ├── [step]/page.tsx   # dynamiczne kroki
+│   │   │   │   └── podsumowanie/page.tsx
+│   │   │   ├── komornik-shield/
+│   │   │   │   ├── page.tsx
+│   │   │   │   └── [step]/page.tsx
+│   │   │   ├── bik-fix/
+│   │   │   │   ├── page.tsx
+│   │   │   │   └── [step]/page.tsx
+│   │   │   ├── cesja-check/
+│   │   │   │   ├── page.tsx
+│   │   │   │   └── [step]/page.tsx
+│   │   │   ├── ugodo-mat/
+│   │   │   │   ├── page.tsx
+│   │   │   │   └── [step]/page.tsx
+│   │   │   ├── upadlosc-lite/
+│   │   │   │   ├── page.tsx
+│   │   │   │   └── [step]/page.tsx
+│   │   │   └── potracenia-stop/
+│   │   │       ├── page.tsx
+│   │   │       └── [step]/page.tsx
+│   │   ├── api/                      # Route Handlers
+│   │   │   ├── auth/
+│   │   │   │   ├── callback/route.ts
+│   │   │   │   └── [...supabase]/route.ts
+│   │   │   ├── cases/
+│   │   │   │   ├── route.ts          # GET (list), POST (create)
+│   │   │   │   └── [id]/
+│   │   │   │       ├── route.ts      # GET, PATCH, DELETE
+│   │   │   │       └── documents/route.ts
+│   │   │   ├── ai/
+│   │   │   │   ├── generate/route.ts # POST — generowanie pisma
+│   │   │   │   ├── validate/route.ts # POST — walidacja Haiku
+│   │   │   │   ├── chat/route.ts     # POST — AI asystent "Co dalej?"
+│   │   │   │   └── analyze-ocr/route.ts
+│   │   │   ├── ocr/
+│   │   │   │   ├── upload/route.ts   # POST — upload i OCR
+│   │   │   │   └── status/[id]/route.ts
+│   │   │   ├── documents/
+│   │   │   │   ├── route.ts
+│   │   │   │   ├── [id]/route.ts
+│   │   │   │   └── [id]/pdf/route.ts # GET — render PDF
+│   │   │   ├── payments/
+│   │   │   │   ├── create-session/route.ts
+│   │   │   │   ├── webhook/route.ts  # Stripe webhook
+│   │   │   │   └── status/[id]/route.ts
+│   │   │   ├── notifications/
+│   │   │   │   ├── deadlines/route.ts
+│   │   │   │   └── send/route.ts
+│   │   │   └── admin/
+│   │   │       ├── stats/route.ts
+│   │   │       └── users/route.ts
+│   │   ├── globals.css
+│   │   ├── layout.tsx                # root layout
+│   │   └── not-found.tsx
+│   ├── components/
+│   │   ├── ui/                       # shadcn/ui primitives
+│   │   │   ├── button.tsx
+│   │   │   ├── card.tsx
+│   │   │   ├── dialog.tsx
+│   │   │   ├── dropdown-menu.tsx
+│   │   │   ├── form.tsx
+│   │   │   ├── input.tsx
+│   │   │   ├── label.tsx
+│   │   │   ├── progress.tsx
+│   │   │   ├── select.tsx
+│   │   │   ├── separator.tsx
+│   │   │   ├── sheet.tsx
+│   │   │   ├── skeleton.tsx
+│   │   │   ├── table.tsx
+│   │   │   ├── tabs.tsx
+│   │   │   ├── textarea.tsx
+│   │   │   ├── toast.tsx
+│   │   │   └── tooltip.tsx
+│   │   ├── layout/
+│   │   │   ├── marketing-navbar.tsx
+│   │   │   ├── marketing-footer.tsx
+│   │   │   ├── dashboard-sidebar.tsx
+│   │   │   ├── dashboard-header.tsx
+│   │   │   └── mobile-nav.tsx
+│   │   ├── wizards/
+│   │   │   ├── wizard-shell.tsx      # wspólny shell dla wszystkich wizardów
+│   │   │   ├── step-indicator.tsx
+│   │   │   ├── wizard-navigation.tsx
+│   │   │   ├── ocr-upload-step.tsx
+│   │   │   ├── data-review-step.tsx
+│   │   │   ├── arguments-step.tsx
+│   │   │   ├── preview-step.tsx
+│   │   │   ├── payment-step.tsx
+│   │   │   └── download-step.tsx
+│   │   ├── dashboard/
+│   │   │   ├── case-card.tsx
+│   │   │   ├── deadline-widget.tsx
+│   │   │   ├── stats-overview.tsx
+│   │   │   ├── recent-documents.tsx
+│   │   │   └── ai-chat-widget.tsx
+│   │   ├── marketing/
+│   │   │   ├── hero-section.tsx
+│   │   │   ├── how-it-works.tsx
+│   │   │   ├── pricing-table.tsx
+│   │   │   ├── testimonials.tsx
+│   │   │   ├── faq-section.tsx
+│   │   │   ├── trust-badges.tsx
+│   │   │   └── cta-section.tsx
+│   │   └── shared/
+│   │       ├── ocr-viewer.tsx
+│   │       ├── pdf-preview.tsx
+│   │       ├── document-editor.tsx
+│   │       ├── deadline-countdown.tsx
+│   │       ├── loading-spinner.tsx
+│   │       └── error-boundary.tsx
+│   ├── lib/
+│   │   ├── supabase/
+│   │   │   ├── client.ts             # browser client
+│   │   │   ├── server.ts             # server client
+│   │   │   ├── admin.ts              # service role client
+│   │   │   └── middleware.ts         # auth middleware
+│   │   ├── ai/
+│   │   │   ├── claude-client.ts      # APIPod wrapper
+│   │   │   ├── prompts/
+│   │   │   │   ├── sprzeciw-epu.ts
+│   │   │   │   ├── komornik-shield.ts
+│   │   │   │   ├── bik-fix.ts
+│   │   │   │   ├── cesja-check.ts
+│   │   │   │   ├── ugodo-mat.ts
+│   │   │   │   ├── upadlosc-lite.ts
+│   │   │   │   ├── potracenia-stop.ts
+│   │   │   │   └── validation.ts     # prompt walidacyjny Haiku
+│   │   │   ├── rag/
+│   │   │   │   ├── legal-context.ts  # baza orzecznictwa
+│   │   │   │   ├── embeddings.ts     # generowanie embeddingów
+│   │   │   │   └── retriever.ts      # wyszukiwanie kontekstu
+│   │   │   └── pipeline.ts           # orchestrator generowania
+│   │   ├── ocr/
+│   │   │   ├── tesseract-worker.ts
+│   │   │   ├── textract-client.ts
+│   │   │   ├── parser.ts             # ekstrakcja danych z OCR
+│   │   │   └── nakaz-parser.ts       # specjalizowany parser nakazów
+│   │   ├── pdf/
+│   │   │   ├── generator.ts          # Puppeteer PDF render
+│   │   │   ├── templates/
+│   │   │   │   ├── sprzeciw.html
+│   │   │   │   ├── wniosek-komornik.html
+│   │   │   │   ├── reklamacja-bik.html
+│   │   │   │   ├── odpowiedz-cesja.html
+│   │   │   │   ├── ugoda.html
+│   │   │   │   ├── wniosek-upadlosc.html
+│   │   │   │   └── base-layout.html  # wspólny layout
+│   │   │   └── styles/
+│   │   │       └── legal-document.css
+│   │   ├── payments/
+│   │   │   ├── stripe-client.ts
+│   │   │   ├── pricing.ts            # cennik i logika zniżek
+│   │   │   └── invoice.ts            # integracja Fakturownia
+│   │   ├── notifications/
+│   │   │   ├── email-client.ts       # AWS SES
+│   │   │   ├── sms-client.ts         # SMSAPI.pl
+│   │   │   ├── templates/
+│   │   │   │   ├── welcome.html
+│   │   │   │   ├── document-ready.html
+│   │   │   │   ├── deadline-reminder.html
+│   │   │   │   ├── payment-confirmation.html
+│   │   │   │   └── deadline-urgent.html
+│   │   │   └── scheduler.ts          # CRON dla deadline'ów
+│   │   ├── calculators/
+│   │   │   ├── przedawnienie.ts      # kalkulator przedawnienia
+│   │   │   ├── kwota-wolna.ts        # kalkulator kwoty wolnej
+│   │   │   ├── potracenia.ts         # kalkulator potrąceń
+│   │   │   └── budzet-domowy.ts      # kalkulator budżetu
+│   │   ├── validators/
+│   │   │   ├── case-schema.ts        # Zod schemas dla spraw
+│   │   │   ├── document-schema.ts
+│   │   │   ├── payment-schema.ts
+│   │   │   └── user-schema.ts
+│   │   ├── utils/
+│   │   │   ├── dates.ts              # polskie formaty dat
+│   │   │   ├── currency.ts           # formatowanie PLN
+│   │   │   ├── legal-terms.ts        # słownik terminów prawnych
+│   │   │   └── analytics.ts          # PostHog wrapper
+│   │   └── constants/
+│   │       ├── deadlines.ts          # terminy procesowe
+│   │       ├── courts.ts             # lista sądów
+│   │       ├── pricing.ts            # cennik produktów
+│   │       └── legal-bases.ts        # podstawy prawne
+│   ├── hooks/
+│   │   ├── use-wizard.ts             # zarządzanie stanem wizarda
+│   │   ├── use-ocr.ts                # hook OCR
+│   │   ├── use-deadline.ts           # countdown do terminu
+│   │   ├── use-ai-generate.ts        # hook generowania AI
+│   │   ├── use-case.ts               # CRUD sprawy
+│   │   └── use-payment.ts            # hook płatności
+│   ├── stores/
+│   │   ├── wizard-store.ts           # Zustand — stan wizarda
+│   │   ├── case-store.ts             # Zustand — bieżąca sprawa
+│   │   └── ui-store.ts               # Zustand — stan UI
+│   └── types/
+│       ├── database.ts               # auto-generated z Supabase
+│       ├── ai.ts                     # typy dla promptów/odpowiedzi
+│       ├── wizard.ts                 # typy wizarda
+│       ├── case.ts                   # typy spraw
+│       └── document.ts               # typy dokumentów
+├── supabase/
+│   ├── config.toml                   # konfiguracja self-hosted
+│   ├── migrations/
+│   │   ├── 20260401000000_init.sql
+│   │   ├── 20260401000001_auth.sql
+│   │   ├── 20260401000002_cases.sql
+│   │   ├── 20260401000003_documents.sql
+│   │   ├── 20260401000004_payments.sql
+│   │   ├── 20260401000005_deadlines.sql
+│   │   ├── 20260401000006_ocr.sql
+│   │   ├── 20260401000007_notifications.sql
+│   │   ├── 20260401000008_rls_policies.sql
+│   │   └── 20260401000009_indexes.sql
+│   ├── seed.sql                      # dane testowe
+│   └── functions/
+│       ├── deadline-checker/index.ts  # Edge Function — CRON
+│       └── ocr-processor/index.ts     # Edge Function — OCR
+├── public/
+│   ├── images/
+│   │   ├── logo.svg
+│   │   ├── logo-dark.svg
+│   │   ├── og-image.jpg
+│   │   ├── hero-illustration.svg
+│   │   └── icons/
+│   ├── fonts/
+│   │   ├── inter-var.woff2
+│   │   └── space-grotesk-var.woff2
+│   └── legal/
+│       ├── regulamin.pdf
+│       └── polityka-prywatnosci.pdf
+├── tests/
+│   ├── unit/
+│   │   ├── calculators/
+│   │   ├── validators/
+│   │   └── parsers/
+│   ├── integration/
+│   │   ├── api/
+│   │   └── ai/
+│   └── e2e/
+│       ├── wizard-flow.spec.ts
+│       ├── payment-flow.spec.ts
+│       └── ocr-flow.spec.ts
+├── scripts/
+│   ├── generate-types.ts             # Supabase type generation
+│   ├── seed-legal-data.ts            # import orzecznictwa
+│   └── test-ai-prompts.ts            # testowanie promptów
+├── .env.local.example
+├── .kilocodeignore                   # ignoruje spec/ i tests/ w kontekście
+├── next.config.js
+├── tailwind.config.ts
+├── tsconfig.json
+├── package.json
+└── README.md
+
+4.2 Konwencje kodowania
+Nazewnictwo plików: kebab-case dla plików (case-card.tsx), PascalCase dla komponentów (CaseCard), camelCase dla funkcji i zmiennych. Schemat bazy danych: snake_case (case_type, created_at).
+Importy: aliasy ścieżek (@/components/, @/lib/, @/hooks/, @/types/, @/stores/). Kolejność importów: 1) React/Next, 2) biblioteki zewnętrzne, 3) wewnętrzne moduły, 4) typy, 5) style.
+Typy: strict TypeScript — strict: true, noUncheckedIndexedAccess: true. Zero any. Wszystkie API responses typowane. Zod schemas jako single source of truth (typy generowane z walidatorów).
+Obsługa błędów: Every async function wrapped w try/catch z typowanymi błędami. API zwraca standaryzowany format: { success: boolean, data?: T, error?: { code: string, message: string } }.
+Komentarze: JSDoc dla każdej eksportowanej funkcji. Inline comments tylko dla nieintuicyjnej logiki prawnej (np. wyjaśnienie dlaczego termin to 14 dni a nie 30).
+5. FRONTEND — ARCHITEKTURA, ROUTING, DESIGN SYSTEM
+Below is the new subsection to be inserted into the Długomat specification.
+5.A Panel użytkownika – Długomat (Dashboard)
+(Wstawiamy bezpośrednio po podrozdziale 5. Frontend – komponenty, strony, UX/UI i przed istniejącym podrozdziałem 6. Panel użytkownika (Dashboard) dotyczącym Mandatomatu)
+5.A.1 Czym jest Długomat
+Długomat to moduł ekosystemu LexMate24 przeznaczony do automatyzacji obsługi zadłużeń konsumenckich: windykacyjnych, komorniczych, bankowych, telekomunikacyjnych i publicznoprawnych (ZUS, US, mandaty nieuregulowane). Platforma prowadzi użytkownika od analizy zadłużenia i oceny przedawnienia, przez generowanie pism (sprzeciwy, zarzuty, skargi, wnioski o rozłożenie na raty), aż po monitoring postępowania i harmonogram spłat.
+5.A.2 Zakres funkcjonalny modułu
+Długomat oferuje siedem obszarów:
+1. Analiza zadłużenia – OCR lub ręczne wprowadzenie danych z wezwania / nakazu / tytułu wykonawczego; automatyczna klasyfikacja typu długu i wierzyciela.
+2. Scoring przedawnienia – algorytm obliczający czy roszczenie jest przedawnione na podstawie daty wymagalności, typu zobowiązania, przerwań biegu przedawnienia i zmian legislacyjnych (np. nowelizacja k.c. 2018).
+3. Generator pism – AI (Claude Sonnet 4.6) generuje dokumenty procesowe na bazie dynamicznego formularza i kontekstu RAG; walidacja Haiku 4.5; podgląd markdown → PDF.
+4. Kalkulator zadłużenia – naliczanie odsetek ustawowych, umownych, maksymalnych; kapitalizacja; tabela amortyzacyjna; porównanie kosztów spłaty jednorazowej vs ratalnej.
+5. Harmonogram i monitoring – kalendarz terminów procesowych z powiadomieniami e-mail/SMS (Resend + SMSAPI); integracja z CRON /api/deadlines/check.
+6. Baza wiedzy – artykuły, checklisty, e-booki o tematyce oddłużeniowej; dostępne bez logowania jako lead-magnety SEO.
+7. AI Chat – asystent prawny (streaming SSE) z kontekstem RAG i historią konwersacji.
+5.A.3 Katalog pism Długomat
+Typy dokumentów podzielone na kategorie:
+Windykacja pozasądowa – odpowiedź na wezwanie do zapłaty, zarzut przedawnienia do wierzyciela, reklamacja cesji wierzytelności, wniosek o zaprzestanie nękania, skarga do UOKiK na praktyki windykacyjne.
+Postępowanie sądowe – sprzeciw od nakazu zapłaty (postępowanie upominawcze), zarzuty od nakazu zapłaty (postępowanie nakazowe), odpowiedź na pozew o zapłatę, wniosek o przywrócenie terminu, wniosek o zwolnienie z kosztów sądowych, skarga na orzeczenie referendarza.
+Postępowanie egzekucyjne – skarga na czynności komornika, wniosek o ograniczenie egzekucji, wniosek o zawieszenie egzekucji, powództwo przeciwegzekucyjne (opozycyjne), wniosek o umorzenie egzekucji.
+Restrukturyzacja długu – wniosek o rozłożenie na raty (do wierzyciela), wniosek o rozłożenie na raty (do US/ZUS), wniosek o umorzenie zaległości podatkowej, wniosek o odroczenie terminu płatności, propozycja ugody pozasądowej.
+Długi bankowe i telekomunikacyjne – reklamacja wypowiedzenia umowy kredytowej, odwołanie od BIK/BIG, sprzeciw wobec cesji do funduszu sekurytyzacyjnego, reklamacja rachunku telefonicznego, odwołanie od naliczenia kary umownej.
+Długi publicznoprawne – odwołanie od decyzji ZUS, wniosek o układ ratalny ZUS, odwołanie od decyzji US, wniosek o umorzenie mandatu karnego, odwołanie od opłaty dodatkowej (komunikacja miejska, e-TOLL).
+Łącznie: ~32 typy pism, każdy z osobnym JSON Schema formularza, branching rules, dedykowanym promptem AI, ceną (49–149 zł), informacją o opłacie sądowej i terminie.
+5.A.4 Struktura nawigacji w sidebarze
+Sidebar Długomatu (desktop) i bottom-nav (mobile) zawierają pozycje:
+---------------------------------------------
+| |Ikona | |Etykieta | |Ścieżka | |Opis |
+---------------------------------------------
+| |LayoutDashboard | |Pulpit | |/app/dashboard | |Podsumowanie: liczba spraw, najbliższe terminy, scoring, rekomendacje AI |
+---------------------------------------------
+| |FilePlus2 | |Nowa sprawa | |/app/new-case | |Kreator: wybór kategorii → typ pisma → dynamiczny formularz → podgląd → płatność → PDF |
+---------------------------------------------
+| |FolderOpen | |Moje sprawy | |/app/cases | |Lista spraw z filtrami (status, kategoria, data), wyszukiwarka, sortowanie |
+---------------------------------------------
+| |FileText | |Dokumenty | |/app/documents | |Wszystkie wygenerowane pisma, wersje, pobieranie PDF |
+---------------------------------------------
+| |CalendarClock | |Terminy | |/app/deadlines | |Kalendarz (widok miesięczny/tygodniowy), lista nadchodzących terminów z countdown |
+---------------------------------------------
+| |Calculator | |Kalkulatory | |/app/calculators | |Kalkulator przedawnienia, kalkulator odsetek, kalkulator rat, symulator kosztów |
+---------------------------------------------
+| |MessageSquare | |AI Asystent | |/app/chat | |Chat prawny ze streamingiem |
+---------------------------------------------
+| |BookOpen | |Baza wiedzy | |/app/knowledge | |Artykuły, checklisty, e-booki |
+---------------------------------------------
+| |User | |Profil | |/app/profile | |Dane osobowe, historia płatności, pakiet |
+---------------------------------------------
+| |Settings | |Ustawienia | |/app/settings | |Powiadomienia, preferencje, usunięcie konta |
+5.A.5 Widok główny – Pulpit Długomat
+Układ pulpitu dzieli się na strefy:
+Strefa powitalna – imię użytkownika, krótki komunikat kontekstowy („Masz 2 terminy w tym tygodniu"), przycisk „+ Nowa sprawa".
+Alert urgentny – jeśli istnieje termin procesowy < 72 h, wyświetla się czerwony banner z odliczaniem i przyciskiem akcji.
+Scoring długów – karta podsumowująca łączne zadłużenie, liczbę spraw, procent przedawnionych roszczeń (gauge chart 0–100 %, gradient zielony–czerwony), szacowane możliwe oszczędności.
+Karty statystyk – cztery karty: Sprawy aktywne (liczba, ikona, trend), Dokumenty wygenerowane, Terminy nadchodzące, Szacowana wartość umorzonego długu.
+Rekomendacje AI – do trzech kart „Sugerowany kolejny krok" z priorytetem (wysoki / średni / niski), opisem, przyciskiem przejścia.
+Lista ostatnich spraw – tabela lub lista kart: nazwa sprawy, kategoria (badge kolorowy), status (badge), data utworzenia, kwota roszczenia, przycisk „Kontynuuj" / „Podgląd".
+Nadchodzące terminy – lista do 5 najbliższych terminów z ikoną typu, nazwą, datą, countdown, przyciskiem „Zobacz sprawę".
+Ostatnia aktywność – timeline ostatnich 10 zdarzeń (event sourcing) z ikonami i timestampami.
+5.A.6 Widok szczegółów sprawy
+Nagłówek zawiera: nazwę sprawy, badge kategorii i statusu, kwotę roszczenia, scoring przedawnienia (okrągły wskaźnik procentowy), przyciski akcji (Pobierz PDF, Edytuj, Duplikuj, Wyślij ePUAP).
+Treść podzielona na zakładki:
+Dokument – podgląd wygenerowanego pisma (markdown renderowany do HTML), przełącznik edycja/podgląd, przycisk regeneracji AI, historia wersji.
+Załączniki – lista wymaganych załączników (checklist generowana przez AI na podstawie typu pisma), upload drag-and-drop, status OCR (badge: oczekuje / przetworzone / błąd), podgląd miniatur.
+Instrukcja – krok po kroku: jak złożyć pismo, do jakiego sądu / organu, jakie opłaty uiścić, termin, format wysyłki (osobisty / poczta / ePUAP).
+Terminy – lista terminów powiązanych ze sprawą, możliwość dodania własnego, toggle powiadomienia e-mail / SMS.
+Kalkulator – jeśli sprawa dotyczy zadłużenia finansowego: wbudowany kalkulator odsetek i przedawnienia z danymi wstępnie wypełnionymi z formularza.
+Rekomendacje – AI-generowane sugestie następnych dokumentów (np. po sprzeciwie od nakazu → wniosek o zwolnienie z kosztów → odpowiedź na pozew).
+Powiązane sprawy – jeśli użytkownik ma inne sprawy z tym samym wierzycielem / sygnaturą.
+Historia – timeline zdarzeń: utworzenie, edycja, płatność, generowanie PDF, wysyłka, zmiana statusu.
+5.A.7 Kalkulator przedawnienia – logika i UI
+Formularz przyjmuje: datę wymagalności roszczenia, typ zobowiązania (select: umowa cywilna, działalność gospodarcza, mandat, podatek, ZUS, alimenty, karta kredytowa, pożyczka), czy były przerwania biegu (pozew, ugoda, uznanie długu) z datami, czy zobowiązanie powstało przed czy po 9.07.2018.
+Algorytm (lib/calculators/przedawnienie.ts) stosuje odpowiedni termin przedawnienia (2, 3, 6 lub 10 lat), uwzględnia art. 118 k.c. po nowelizacji (koniec roku kalendarzowego), sprawdza przerwania i zawieszenia biegu. Wynik zawiera: status (przedawnione / nieprzedawnione / graniczne), datę przedawnienia, liczbę dni do/po przedawnieniu, podstawę prawną, rekomendację (zarzut przedawnienia, wniosek o umorzenie, negocjacja).
+UI wyświetla wynik jako kartę z dużym badge (zielony = przedawnione, czerwony = nieprzedawnione, żółty = graniczne), osią czasu wizualizującą bieg, przyciskami akcji (Generuj sprzeciw z zarzutem przedawnienia / Generuj wniosek o umorzenie / Skonsultuj z AI).
+5.A.8 Kalkulator odsetek – logika i UI
+Formularz: kwota główna, data wymagalności, data obliczenia (domyślnie dzisiaj), typ odsetek (ustawowe za opóźnienie, ustawowe kapitałowe, maksymalne, umowne – z polem na stopę), ewentualna kapitalizacja.
+Algorytm (lib/calculators/odsetki.ts) pobiera historyczne stopy procentowe NBP (tabela w Supabase lub stała w kodzie), oblicza odsetki dzień po dniu z uwzględnieniem zmian stóp, zwraca: kwotę odsetek, łączną kwotę (kapitał + odsetki), tabelę okresów ze stopami.
+UI: karta wyniku z kwotą odsetek (duża czcionka), wykres liniowy narastania długu w czasie (Recharts), tabela amortyzacyjna, eksport do PDF, przycisk „Dodaj do sprawy".
+5.A.9 Spójność z Mandatomatem
+Moduł Długomat współdzieli z Mandatomatem następujące elementy:
+Komponenty UI – DynamicForm, DocumentPreview, ScoringGauge, DeadlineWidget, TimelineActivity, RecommendationCard, StyleSelector, PaymentFlow (Stripe Checkout), OCRUploader – wszystkie importowane z components/shared/.
+Backend – wspólne API routes (/api/ai/generate-document, /api/ai/scoring, /api/ai/chat, /api/billing/*, /api/deadlines/*), wspólna tabela cases (rozróżnienie po category enum), wspólne documents, payments, events.
+Baza danych – ta sama instancja Supabase; Długomat dodaje wartości do istniejących enumów (case_category: 'windykacja', 'egzekucja', 'dlug_bankowy', 'dlug_publiczny', 'restrukturyzacja') i nowe typy do case_type enum.
+Design system – ta sama paleta kolorowa, typografia, zaokrąglenia, cienie. Długomat otrzymuje własne kolory kategorii: windykacja #E11D48 (rose-600), egzekucja #DC2626 (red-600), restrukturyzacja #059669 (emerald-600), długi bankowe #7C3AED (violet-600), długi publicznoprawne #D97706 (amber-600).
+Nawigacja – użytkownik przełącza się między produktami (Mandatomat / Długomat / Rozwodomat) za pomocą przełącznika w topbarze lub sidebarze (komponent ProductSwitcher). Każdy produkt ma własny zestaw pozycji w sidebarze, ale layout, topbar i footer są współdzielone.
+5.A.10 Komponenty specyficzne dla Długomat
+Oprócz komponentów współdzielonych, Długomat wymaga następujących dedykowanych elementów:
+DebtSummaryCard (components/dlugomat/debt-summary-card.tsx) – karta podsumowująca łączne zadłużenie użytkownika: suma kapitału, suma odsetek, liczba wierzycieli, procent przedawnionych. Gradient tła zależny od ogólnej sytuacji (zielony = większość przedawniona, czerwony = wszystko aktywne).
+PrzedawnienieGauge (components/dlugomat/przedawnienie-gauge.tsx) – okrągły wskaźnik z animacją, wyświetlający status przedawnienia konkretnego roszczenia. Trzy stany kolorystyczne. Kliknięcie rozwija szczegóły (oś czasu, podstawa prawna).
+CreditorTimeline (components/dlugomat/creditor-timeline.tsx) – wizualizacja historii działań wierzyciela: wezwania, cesje, pozwy, nakazy, egzekucje – renderowana na osi czasu z ikonami i datami.
+DebtComparisonTable (components/dlugomat/debt-comparison-table.tsx) – tabela porównująca scenariusze: spłata jednorazowa vs raty vs zarzut przedawnienia vs negocjacja, z kosztami i prawdopodobieństwem sukcesu.
+InterestChart (components/dlugomat/interest-chart.tsx) – wykres liniowy (Recharts) narastania odsetek w czasie z zaznaczonymi zmianami stóp NBP.
+AmortizationTable (components/dlugomat/amortization-table.tsx) – tabela rat z kolumnami: nr raty, data, rata, kapitał, odsetki, saldo, z opcją eksportu CSV/PDF.
+CreditorCard (components/dlugomat/creditor-card.tsx) – karta wierzyciela z nazwą, typem (bank, fundusz, firma windykacyjna, organ publiczny), liczbą spraw, łączną kwotą, badge statusu.
+DocumentChecklist (components/dlugomat/document-checklist.tsx) – interaktywna lista dokumentów do przygotowania (generowana przez AI), z checkboxami, tooltipami wyjaśniającymi, linkami do uploadu.
+Niniejszy podrozdział 5.A stanowi kompletny opis warstwy użytkownika modułu Długomat i powinien być wstawiony do specyfikacji Mandatomatu między istniejącym podrozdziałem 5 (Frontend – komponenty, strony, UX/UI) a podrozdziałem 6 (Panel użytkownika – Dashboard Mandatomat), zachowując ciągłość numeracji i spójność architektoniczną z resztą dokumentu.
+5.B Panel Administracyjny – Długomat
+(Wstawiamy bezpośrednio po podrozdziale 5.A Panel użytkownika – Długomat i przed istniejącym podrozdziałem 7. Panel administracyjny Mandatomat)
+5.B.1 Architektura panelu admina Długomat
+Panel administracyjny Długomat działa w ramach tego samego layoutu /admin/* co Mandatomat i Rozwodomat, z dodatkową sekcją nawigacji dedykowaną modułowi Długomat. Dostęp chroniony middleware sprawdzającym role = 'admin' | 'super_admin' w tabeli profiles. Cała komunikacja przechodzi przez API Routes z walidacją tokenu Supabase i dodatkowym sprawdzeniem roli w RLS.
+Panel admina jest zbudowany jako SPA wewnątrz Next.js App Router pod ścieżką (admin)/ z własnym layoutem (app/(admin)/layout.tsx) zawierającym sidebar administracyjny, topbar z przełącznikiem produktów i breadcrumb, oraz footer z wersją systemu i logami ostatniej aktywności.
+5.B.2 Nawigacja administracyjna – sekcja Długomat
+Sidebar admina otrzymuje grupę „Długomat" z następującymi pozycjami:
+---------------------------------------------
+| |Ikona | |Etykieta | |Ścieżka | |Opis |
+---------------------------------------------
+| |LayoutDashboard | |Dashboard Długomat | |/admin/dlugomat/dashboard | |KPI, wykresy, live feed |
+---------------------------------------------
+| |Users | |Użytkownicy Długomat | |/admin/dlugomat/users | |Lista, szczegóły, aktywność |
+---------------------------------------------
+| |FolderOpen | |Sprawy | |/admin/dlugomat/cases | |Wszystkie sprawy, filtry, podgląd |
+---------------------------------------------
+| |FileCode2 | |Szablony pism | |/admin/dlugomat/templates | |32 typy, JSON Schema, branching |
+---------------------------------------------
+| |Brain | |Prompty AI | |/admin/dlugomat/prompts | |Edycja promptów, wersjonowanie |
+---------------------------------------------
+| |BookOpen | |Baza wiedzy RAG | |/admin/dlugomat/knowledge | |Artykuły, embeddingi, źródła |
+---------------------------------------------
+| |Calculator | |Kalkulatory | |/admin/dlugomat/calculators | |Konfiguracja, stopy NBP, logi |
+---------------------------------------------
+| |CreditCard | |Płatności | |/admin/dlugomat/payments | |Transakcje, zwroty, kody promo |
+---------------------------------------------
+| |BarChart3 | |Analityka | |/admin/dlugomat/analytics | |Funnele, kohorty, koszty AI |
+---------------------------------------------
+| |Bell | |Powiadomienia | |/admin/dlugomat/notifications | |Logi e-mail/SMS, kolejka, błędy |
+---------------------------------------------
+| |Settings | |Ustawienia | |/admin/dlugomat/settings | |Feature flags, CRON, limity |
+5.B.3 Dashboard KPI – widok główny
+Strona /admin/dlugomat/dashboard wyświetla metryki w czasie rzeczywistym (odświeżanie co 30 s via Supabase Realtime lub polling):
+Rząd 1 – karty KPI (4 kolumny)
+Karta MRR Długomat – miesięczny przychód z modułu Długomat w PLN, trend procentowy (porównanie z poprzednim miesiącem), sparkline 30-dniowy, kolor zielony przy wzroście / czerwony przy spadku. Wartość pobierana z payments filtrowane po product_type = 'dlugomat' i status = 'completed'.
+Karta Aktywni użytkownicy – liczba unikalnych użytkowników z co najmniej jedną sprawą Długomat w statusie innym niż draft w ostatnich 30 dniach. Badge z trendem. Drill-down po kliknięciu otwiera listę użytkowników.
+Karta Sprawy dziś – liczba spraw Długomat utworzonych dzisiaj, porównanie z wczoraj i średnią 7-dniową. Ikonka trendu.
+Karta Konwersja – procent użytkowników, którzy po wejściu na formularz Długomat dokonali płatności i pobrali PDF. Funnel: wizyta landing → start formularza → ukończenie formularza → płatność → pobranie. Wartości z tabeli events filtrowane po event_type i product.
+Rząd 2 – wykresy (2 kolumny)
+Wykres lewy: Przychody i sprawy – dual-axis chart (Recharts): słupki = przychód dzienny (PLN), linia = liczba spraw. Zakres: 7d / 30d / 90d / 12m. Tooltip z dokładnymi wartościami.
+Wykres prawy: Rozkład kategorii – donut chart pokazujący udział procentowy spraw w poszczególnych kategoriach Długomat (windykacja pozasądowa, postępowanie sądowe, egzekucyjne, restrukturyzacja, długi bankowe, długi publicznoprawne). Kolory zgodne z design system Długomat.
+Rząd 3 – wykresy dodatkowe (2 kolumny)
+Wykres lewy: Scoring przedawnienia – rozkład – histogram / stacked bar pokazujący ile spraw ma status przedawnione / nieprzedawnione / graniczne. Pozwala ocenić profil typowego klienta.
+Wykres prawy: Koszty AI – area chart przedstawiający dzienne wydatki na Claude API (tokens input + output przeliczone na USD/PLN), z podziałem na modele (Opus, Sonnet, Haiku). Linia budżetu dziennego (alert jeśli przekroczony).
+Rząd 4 – Live Feed
+Tabela strumieniowa ostatnich 50 zdarzeń w module Długomat (z tabeli events). Kolumny: timestamp, użytkownik (avatar + email), typ zdarzenia (badge kolorowy), szczegóły (JSON preview), sprawa (link). Auto-scroll z animacją wejścia nowego wiersza. Filtry po typie zdarzenia.
+5.B.4 Zarządzanie użytkownikami Długomat
+Strona /admin/dlugomat/users wyświetla listę użytkowników, którzy mają co najmniej jedną sprawę w module Długomat:
+Tabela główna – kolumny: ID (skrócone UUID), e-mail, imię i nazwisko, data rejestracji, pakiet (badge: basic / standard / premium), liczba spraw Długomat, łączna wartość płatności Długomat (PLN), ostatnia aktywność (relative time), status konta (aktywny / zablokowany / usunięty). Sortowanie po każdej kolumnie, wyszukiwarka pełnotekstowa, filtry po pakiecie, statusie, dacie rejestracji, wartości płatności.
+Widok szczegółowy użytkownika (/admin/dlugomat/users/[id]) – nagłówek z danymi użytkownika, badgem pakietu i przyciskami akcji (zablokuj, usuń, wyślij e-mail, zmień pakiet, nadaj promo kod). Zakładki:
+Zakładka Sprawy – lista spraw Długomat z podglądem statusu, kategorii, kwoty, scoringu przedawnienia. Kliknięcie otwiera podgląd sprawy admina.
+Zakładka Płatności – historia transakcji Stripe z kwotami, statusami, linkami do Stripe Dashboard. Przycisk „Zwrot" uruchamia partial/full refund via /api/admin/payments/refund.
+Zakładka Dokumenty – lista wygenerowanych pism z wersjami, podglądem PDF, informacją o modelu AI i kosztach tokenów.
+Zakładka Aktywność – timeline zdarzeń z event sourcing: logowania, formularze, płatności, pobrania, chaty AI.
+Zakładka AI Chat – podgląd historii konwersacji z AI asystentem (read-only), z informacją o modelu, tokenach, źródłach RAG użytych w odpowiedziach.
+Zakładka Kalkulatory – historia użycia kalkulatorów z danymi wejściowymi i wynikami.
+5.B.5 Zarządzanie sprawami Długomat
+Strona /admin/dlugomat/cases wyświetla wszystkie sprawy modułu:
+Tabela spraw – kolumny: ID sprawy (link), użytkownik (email, link do profilu), kategoria (badge kolorowy), typ pisma, status (badge: draft, form_in_progress, ai_generating, ai_validating, pending_payment, paid, document_ready, sent_epuap, completed, expired, cancelled), kwota roszczenia (PLN), scoring przedawnienia (badge: przedawnione / nieprzedawnione / graniczne), data utworzenia, data ostatniej modyfikacji. Filtry wielokrotne po: statusie, kategorii, typie pisma, scoringu, zakresie kwot, zakresie dat. Sortowanie po każdej kolumnie. Eksport CSV/XLSX.
+Widok szczegółowy sprawy (/admin/dlugomat/cases/[id]) – pełne dane sprawy widoczne w trybie read-only z możliwością ręcznej zmiany statusu (dropdown z potwierdzeniem). Sekcje:
+Sekcja Formularz – renderowany JSON formularza z danymi wejściowymi użytkownika, z podświetleniem pól branching.
+Sekcja Dokument AI – wygenerowany markdown, informacje o modelu, wersji promptu, tokenach, koszcie, źródłach RAG. Przycisk „Regeneruj" (uruchamia ponowne generowanie z logowaniem w admin_logs).
+Sekcja Walidacja – wynik walidacji Haiku: completeness_score, legal_accuracy_score, recommendation_score, uwagi, czerwone flagi. Przycisk „Wymuś ponowną walidację".
+Sekcja Scoring przedawnienia – pełny wynik algorytmu z datami, podstawą prawną, przerwaniami biegu, statusem.
+Sekcja OCR – jeśli użytkownik uploadował dokumenty: podgląd oryginalnych skanów, wyekstrahowany tekst, confidence score, status.
+Sekcja Płatność – dane transakcji Stripe, status, kwota, promo kod, link do Stripe Dashboard.
+Sekcja Terminy – lista terminów procesowych z datami, statusami powiadomień, logami wysyłki.
+Sekcja Rekomendacje AI – wygenerowane sugestie następnych kroków z priorytetami.
+Sekcja Historia zdarzeń – pełna timeline event sourcing dla tej sprawy.
+5.B.6 Zarządzanie szablonami pism (32 typy)
+Strona /admin/dlugomat/templates umożliwia zarządzanie konfiguracją każdego z 32 typów pism Długomat:
+Lista szablonów – tabela: typ pisma (case_type), nazwa wyświetlana, kategoria (badge), cena (PLN, edytowalna inline), opłata sądowa, termin (dni), status (aktywny / draft / wyłączony), liczba użyć (łączna i 30d), średnia ocena walidacji AI, data ostatniej modyfikacji. Sortowanie, filtry, wyszukiwarka.
+Edytor szablonu (/admin/dlugomat/templates/[case_type]) – formularz z zakładkami:
+Zakładka Ogólne – nazwa, opis, kategoria, cena, opłata sądowa, termin, pakiet minimalny (basic/standard/premium), status, tagi SEO, ikona.
+Zakładka Formularz (JSON Schema) – edytor kodu (Monaco Editor lub CodeMirror) z podświetlaniem składni JSON. Pole form_schema definiuje pola formularza użytkownika: typ (text, textarea, select, radio, checkbox, date, number, file), label, placeholder, tooltip, walidacja (required, min, max, regex, custom), opcje (dla select/radio), warunkowe wyświetlanie (depends_on). Przycisk „Podgląd formularza" renderuje formularz w modal obok edytora. Walidacja JSON Schema w czasie rzeczywistym z komunikatami błędów.
+Zakładka Branching Rules – edytor JSON definiujący reguły rozgałęzień formularza. Struktura: { step_id, condition (field + operator + value), show_steps[], hide_steps[], modify_fields[] }. Wizualizacja grafowa (react-flow lub mermaid) pokazująca ścieżki formularza. Przycisk „Testuj branching" otwiera symulator z interaktywnym formularzu.
+Zakładka Prompt AI – pole system_prompt (textarea z markdown), user_prompt_template (z placeholderami {{pole_formularza}}), validation_prompt, model (select: opus-4.6, sonnet-4.6, haiku-4.5), max_tokens, temperature, wersja promptu (auto-incrementowana przy zapisie). Historia wersji promptów z możliwością porównania diff i rollbacku.
+Zakładka RAG – lista kolekcji RAG przypisanych do tego typu pisma (np. kodeks_cywilny, kodeks_postepowania_cywilnego, orzecznictwo_przedawnienie). Przycisk „Dodaj kolekcję" z selectem. Pole rag_query_template definiujące jak dane formularza mapują się na zapytanie RAG.
+Zakładka Rekomendacje – lista sugerowanych następnych dokumentów po wygenerowaniu tego typu. Każda rekomendacja: case_type docelowy, priorytet (1–5), warunek (opcjonalny: np. „jeśli kwota > 10 000 PLN"), opis dla użytkownika.
+Zakładka Checklist załączników – lista wymaganych i opcjonalnych załączników z opisami, tooltipami, flagą „wymagany".
+Zakładka Statystyki – wykresy użycia: liczba generowań dziennie, średni czas generowania, średni koszt AI (tokeny/PLN), średnia ocena walidacji, najczęstsze wartości pól formularza, funnel konwersji tego typu.
+5.B.7 Zarządzanie promptami AI
+Strona /admin/dlugomat/prompts oferuje centralny widok wszystkich promptów AI używanych w module Długomat:
+Lista promptów – tabela: identyfikator (case_type + prompt_type), typ (generation / validation / recommendation / chat_system), model, wersja aktualna, data modyfikacji, autor, średni koszt tokenu, średnia ocena walidacji. Filtry po typie, modelu, wersji.
+Edytor promptu – Monaco Editor z podświetlaniem markdown i Mustache placeholderów. Panel boczny z dostępnymi zmiennymi (pola formularza, dane użytkownika, kontekst RAG). Przycisk „Testuj" otwiera modal z przykładowymi danymi formularza i generuje podgląd odpowiedzi AI w czasie rzeczywistym (streaming). Porównanie wersji: diff viewer (side-by-side) między dowolnymi dwiema wersjami. Rollback jednym kliknięciem. System tagów do organizacji promptów.
+A/B testing promptów – możliwość oznaczenia dwóch wersji promptu jako warianty A i B z procentowym podziałem ruchu (np. 80/20). Automatyczne zbieranie metryk: jakość walidacji, czas generowania, koszt, satysfakcja użytkownika (jeśli zbierana). Dashboard porównawczy A/B z testem istotności statystycznej.
+5.B.8 Baza wiedzy i RAG
+Strona /admin/dlugomat/knowledge zarządza źródłami wiedzy prawnej dla RAG:
+Artykuły i dokumenty źródłowe – lista z kolumnami: tytuł, kolekcja (kodeks_cywilny, kpc, orzecznictwo, komentarze, ustawy_specjalne), status (aktywny / draft / archiwum), data dodania, liczba chunków, rozmiar embeddingów. Akcje: edycja, podgląd, re-embedding, dezaktywacja.
+Dodawanie źródła – formularz: upload pliku (PDF, DOCX, TXT) lub wklejenie tekstu. Opcje chunkingu: rozmiar chunka (domyślnie 1000 tokenów), overlap (200 tokenów), metadane (kolekcja, tagi, data obowiązywania). Po zapisie system automatycznie: dzieli tekst na chunki → generuje embeddingi via OpenAI text-embedding-3-small → zapisuje w tabeli legal_knowledge z wektorem embedding.
+Monitor embeddingów – statystyki: łączna liczba chunków, rozmiar bazy wektorowej, rozkład po kolekcjach (bar chart), średni similarity score przy wyszukiwaniu, koszt embeddingów (OpenAI).
+Testowanie RAG – pole tekstowe „Zapytanie testowe" → system wykonuje search_legal_knowledge → wyświetla top-10 wyników z similarity score, fragmentem tekstu, metadanymi. Pozwala adminowi weryfikować jakość wyszukiwania.
+E-booki i checklisty – osobna podsekcja do zarządzania treściami edukacyjnymi (lead magnets). Pola: tytuł, opis, kategoria, plik PDF, miniatura, status (opublikowany / draft), czy bezpłatny, czy wymaga e-maila (lead capture). CRUD z podglądem.
+5.B.9 Konfiguracja kalkulatorów
+Strona /admin/dlugomat/calculators zarządza ustawieniami kalkulatorów Długomat:
+Kalkulator przedawnienia – tabela terminów przedawnienia: typ zobowiązania, termin (lata), podstawa prawna (artykuł k.c./ustawy), data obowiązywania (od–do), uwagi. Admin może dodawać / edytować wpisy gdy zmienia się legislacja. Historia zmian z datami i autorami.
+Kalkulator odsetek – tabela historycznych stóp procentowych NBP: typ stopy (referencyjna, lombardowa, depozytowa), wartość (%), data obowiązywania (od–do). Import z CSV lub ręczne dodawanie. System automatycznie przelicza stopy na odsetki ustawowe za opóźnienie (stopa referencyjna + 5,5 pp), maksymalne (2× ustawowe), kapitałowe (stopa referencyjna + 3,5 pp). Podgląd aktualnych wartości. Alert gdy NBP opublikuje nową decyzję (admin ręcznie aktualizuje lub CRON sprawdza RSS NBP).
+Logi użycia – tabela: użytkownik, kalkulator, dane wejściowe (JSON), wynik (JSON), timestamp, czy darmowy. Statystyki: liczba użyć dziennie, najpopularniejszy kalkulator, średnia kwota, rozkład typów zobowiązań.
+5.B.10 Zarządzanie płatnościami
+Strona /admin/dlugomat/payments to centralny hub finansowy modułu:
+Lista transakcji – tabela: ID, Stripe Payment Intent ID (link do Stripe Dashboard), użytkownik, sprawa, typ produktu (pismo / kalkulator / chat / pakiet / upsell), kwota brutto (PLN), kwota netto, VAT, status (succeeded / pending / failed / refunded / partially_refunded), promo kod (jeśli użyty), data. Filtry po statusie, typie, zakresie kwot, zakresie dat. Eksport CSV.
+Szczegóły transakcji – pełne dane Stripe: metoda płatności, IP, country, risk score, timeline zdarzeń Stripe (payment_intent.created → charge.succeeded → …), powiązane logi webhook. Przyciski: pełny zwrot, częściowy zwrot (modal z kwotą), wyślij fakturę ponownie.
+Kody promocyjne – CRUD: kod (tekst, auto-generowany lub ręczny), typ rabatu (procent / kwota stała), wartość, minimum zamówienia, data ważności (od–do), limit użyć (łączny i per-user), produkty objęte (select multi: typy pism lub „wszystkie"), status (aktywny / wygasły / wyłączony). Statystyki użycia: ile razy użyty, łączna wartość rabatów, konwersja z kodem vs bez.
+Podsumowanie finansowe – karty: przychód brutto dziś / 7d / 30d / YTD, średnia transakcja, liczba transakcji, zwroty (% i PLN), MRR, ARR. Wykresy: przychód dzienny (bar), przychód per kategoria (donut), przychód per typ produktu (stacked bar), zwroty (linia).
+Faktury – integracja z Fakturownia API. Lista wystawionych faktur z podglądem PDF. Przycisk „Wystaw ręcznie" (modal z danymi). Status synchronizacji z Fakturownia.
+5.B.11 Analityka zaawansowana
+Strona /admin/dlugomat/analytics dostarcza głęboką analitykę modułu:
+Funnel konwersji – wizualizacja lejka: wizyta landing Długomat → rejestracja / logowanie → wybór kategorii → start formularza → ukończenie formularza → scoring/podgląd → przejście do płatności → płatność sukces → pobranie PDF. Każdy etap: liczba użytkowników, % drop-off, porównanie z poprzednim okresem. Filtry po źródle ruchu (UTM), urządzeniu, kategorii pisma.
+Kohorty – tabela kohortowa: rejestracja tygodniowa → retencja w tygodniu 1, 2, 4, 8, 12 (% użytkowników, którzy wygenerowali kolejny dokument). Heatmapa kolorystyczna (ciemniejszy = lepsza retencja).
+Scoring analytics – rozkład wyników scoringu przedawnienia: histogram, średnia per kategoria, korelacja scoring → konwersja (czy osoby z wynikiem „przedawnione" częściej kupują?).
+Koszty AI – tabela dzienna: data, liczba generowań, tokeny input (łączne), tokeny output (łączne), koszt USD, koszt PLN, średni koszt per dokument, model breakdown (Opus vs Sonnet vs Haiku). Wykresy: koszt dzienny (area), koszt per dokument (linia), udział modeli (stacked). Alert budżetowy: admin ustawia dzienny / miesięczny limit kosztów AI; system wyświetla warning gdy osiągnięto 80% i blokuje przy 100% (z override).
+SEO analytics – (opcjonalnie integracja Google Search Console API): impressions, clicks, CTR, pozycja per strona Długomat. Ranking stron landing per typ pisma.
+Analiza typów pism – tabela: typ pisma, liczba generowań (łącznie / 30d), przychód (łącznie / 30d), średni koszt AI, średnia ocena walidacji, NPS (jeśli zbierany), funnel konwersji per typ. Sortowanie, eksport.
+5.B.12 Zarządzanie powiadomieniami
+Strona /admin/dlugomat/notifications monitoruje wszystkie powiadomienia wysyłane do użytkowników Długomat:
+Logi e-mail – tabela: ID, odbiorca, temat, szablon (welcome, deadline_reminder, document_ready, payment_success, payment_failed, deadline_urgent, weekly_summary), status (sent / delivered / opened / clicked / bounced / failed), data wysyłki, data otwarcia, provider (Resend). Filtry po statusie, szablonie, dacie.
+Logi SMS – tabela: ID, numer telefonu (zamaskowany), treść (skrócona), status (sent / delivered / failed), koszt (PLN), provider (SMSAPI), data. Filtry.
+Kolejka CRON – podgląd zadań zaplanowanych: sprawdzenie terminów (/api/deadlines/check), wysyłka przypomnień, weekly summary. Status ostatniego uruchomienia (success / error + komunikat), czas wykonania, liczba przetworzonych rekordów. Przycisk „Uruchom ręcznie".
+Szablony e-mail – edytor szablonów e-mail (HTML + React Email lub Resend Templates). Podgląd w modalnym oknie. Zmienne: {{imie}}, {{typ_pisma}}, {{termin_data}}, {{link_do_sprawy}}. Wersjonowanie szablonów.
+Statystyki – karty: wysłane dziś / 7d / 30d, delivery rate, open rate, click rate, bounce rate, koszt SMS. Wykresy trendów.
+5.B.13 Ustawienia systemowe Długomat
+Strona /admin/dlugomat/settings zawiera konfigurację specyficzną dla modułu:
+Cennik – edycja cen per typ pisma (inline w tabeli lub bulk upload CSV). Historia zmian cen z datami i autorami. Możliwość ustawienia „promocja czasowa" (cena przecreślona + nowa, data ważności).
+Feature flags – przełączniki (toggle) kontrolujące dostępność funkcji: dlugomat_chat_enabled, dlugomat_ocr_enabled, dlugomat_epuap_enabled, dlugomat_calculators_free, dlugomat_scoring_free, dlugomat_new_case_types_enabled, dlugomat_b2b_enabled. Zmiany zapisywane w admin_logs.
+Limity – konfiguracja limitów per pakiet: max spraw / miesiąc (basic: 3, standard: 10, premium: unlimited), max dokumentów per sprawa, max wiadomości chat / dzień, max upload rozmiar (MB), max OCR pages / miesiąc.
+CRON schedule – konfiguracja harmonogramu zadań automatycznych: sprawdzanie terminów (domyślnie co godzinę), wysyłka digest tygodniowego (piątek 10:00), czyszczenie draftów starszych niż 30 dni (raz dziennie), re-embedding bazy wiedzy (raz w tygodniu).
+Logi systemowe – przeglądarka logów z tabeli admin_logs filtrowana po module Długomat: timestamp, admin (email), akcja (created / updated / deleted / config_changed / refund / block_user), zasób (typ + ID), dane przed i po (JSON diff). Paginacja, wyszukiwarka.
+Integracje – statusy połączeń z zewnętrznymi serwisami: Stripe (zielony / czerwony + ostatni webhook), Resend (status API), SMSAPI (saldo + status), Fakturownia (status API), OpenAI (klucz + saldo), Anthropic Claude (klucz + rate limits). Przycisk „Test połączenia" dla każdego.
+5.B.14 API Routes administracyjne – Długomat
+Wszystkie endpointy admina pod prefixem /api/admin/dlugomat/:
+---------------------------------------------
+| |Metoda | |Ścieżka | |Opis |
+---------------------------------------------
+| |GET | |/api/admin/dlugomat/dashboard/kpis | |Zwraca MRR, users, cases, conversion, costs |
+---------------------------------------------
+| |GET | |/api/admin/dlugomat/dashboard/charts | |Dane do wykresów (revenue, categories, scoring, AI costs) |
+---------------------------------------------
+| |GET | |/api/admin/dlugomat/dashboard/live-feed | |Ostatnie 50 eventów (SSE lub polling) |
+---------------------------------------------
+| |GET | |/api/admin/dlugomat/users | |Lista użytkowników z paginacją, filtrami, sortowaniem |
+---------------------------------------------
+| |GET | |/api/admin/dlugomat/users/[id] | |Szczegóły użytkownika + sprawy + płatności + aktywność |
+---------------------------------------------
+| |PATCH | |/api/admin/dlugomat/users/[id] | |Zmiana roli, pakietu, statusu blokady |
+---------------------------------------------
+| |GET | |/api/admin/dlugomat/cases | |Lista spraw z filtrami, sortowaniem, paginacją |
+---------------------------------------------
+| |GET | |/api/admin/dlugomat/cases/[id] | |Pełne szczegóły sprawy |
+---------------------------------------------
+| |PATCH | |/api/admin/dlugomat/cases/[id]/status | |Ręczna zmiana statusu sprawy |
+---------------------------------------------
+| |POST | |/api/admin/dlugomat/cases/[id]/regenerate | |Ponowne generowanie dokumentu AI |
+---------------------------------------------
+| |GET | |/api/admin/dlugomat/templates | |Lista szablonów pism |
+---------------------------------------------
+| |GET | |/api/admin/dlugomat/templates/[case_type] | |Pełna konfiguracja szablonu |
+---------------------------------------------
+| |PUT | |/api/admin/dlugomat/templates/[case_type] | |Aktualizacja szablonu (schema, branching, prompt, RAG, recs) |
+---------------------------------------------
+| |POST | |/api/admin/dlugomat/templates | |Utworzenie nowego szablonu |
+---------------------------------------------
+| |GET | |/api/admin/dlugomat/prompts | |Lista promptów z wersjami |
+---------------------------------------------
+| |PUT | |/api/admin/dlugomat/prompts/[id] | |Aktualizacja promptu (auto-versioning) |
+---------------------------------------------
+| |POST | |/api/admin/dlugomat/prompts/[id]/rollback | |Rollback do wskazanej wersji |
+---------------------------------------------
+| |POST | |/api/admin/dlugomat/prompts/[id]/test | |Testowe generowanie z przykładowymi danymi |
+---------------------------------------------
+| |GET | |/api/admin/dlugomat/knowledge | |Lista źródeł RAG |
+---------------------------------------------
+| |POST | |/api/admin/dlugomat/knowledge | |Dodanie źródła (upload + chunking + embedding) |
+---------------------------------------------
+| |PUT | |/api/admin/dlugomat/knowledge/[id] | |Edycja źródła |
+---------------------------------------------
+| |POST | |/api/admin/dlugomat/knowledge/[id]/re-embed | |Ponowne generowanie embeddingów |
+---------------------------------------------
+| |POST | |/api/admin/dlugomat/knowledge/test-search | |Testowe wyszukiwanie RAG |
+---------------------------------------------
+| |GET | |/api/admin/dlugomat/calculators/config | |Konfiguracja kalkulatorów |
+---------------------------------------------
+| |PUT | |/api/admin/dlugomat/calculators/config | |Aktualizacja (terminy przedawnienia, stopy NBP) |
+---------------------------------------------
+| |GET | |/api/admin/dlugomat/calculators/logs | |Logi użycia kalkulatorów |
+---------------------------------------------
+| |GET | |/api/admin/dlugomat/payments | |Lista transakcji z filtrami |
+---------------------------------------------
+| |GET | |/api/admin/dlugomat/payments/[id] | |Szczegóły transakcji + Stripe data |
+---------------------------------------------
+| |POST | |/api/admin/dlugomat/payments/[id]/refund | |Zwrot (pełny lub częściowy) |
+---------------------------------------------
+| |GET | |/api/admin/dlugomat/promo-codes | |Lista kodów promo |
+---------------------------------------------
+| |POST | |/api/admin/dlugomat/promo-codes | |Utworzenie kodu |
+---------------------------------------------
+| |PUT | |/api/admin/dlugomat/promo-codes/[id] | |Edycja kodu |
+---------------------------------------------
+| |DELETE | |/api/admin/dlugomat/promo-codes/[id] | |Dezaktywacja kodu |
+---------------------------------------------
+| |GET | |/api/admin/dlugomat/analytics/funnel | |Dane funnela konwersji |
+---------------------------------------------
+| |GET | |/api/admin/dlugomat/analytics/cohorts | |Dane kohortowe |
+---------------------------------------------
+| |GET | |/api/admin/dlugomat/analytics/ai-costs | |Koszty AI dziennie / per model |
+---------------------------------------------
+| |GET | |/api/admin/dlugomat/analytics/document-types | |Analityka per typ pisma |
+---------------------------------------------
+| |GET | |/api/admin/dlugomat/notifications/logs | |Logi powiadomień (e-mail + SMS) |
+---------------------------------------------
+| |POST | |/api/admin/dlugomat/notifications/cron/trigger | |Ręczne uruchomienie CRON |
+---------------------------------------------
+| |GET | |/api/admin/dlugomat/settings | |Aktualna konfiguracja |
+---------------------------------------------
+| |PUT | |/api/admin/dlugomat/settings | |Aktualizacja ustawień |
+---------------------------------------------
+| |GET | |/api/admin/dlugomat/settings/integrations | |Statusy integracji |
+---------------------------------------------
+| |POST | |/api/admin/dlugomat/settings/integrations/[service]/test | |Test połączenia |
+Każdy endpoint chroniony middleware adminAuthMiddleware sprawdzającym: token Supabase → profil → role IN ('admin', 'super_admin'). Wszystkie operacje zapisu logowane w admin_logs z danymi before/after. Rate limiting: 100 req/min per admin.
+5.B.15 RLS i bezpieczeństwo panelu admina
+Polityki RLS dla tabel administracyjnych Długomat:
+Tabela admin_logs – SELECT: role IN ('admin','super_admin'); INSERT: trigger-only (nie bezpośrednio przez admina); UPDATE/DELETE: role = 'super_admin' only.
+Tabela case_type_config – SELECT: publiczny (potrzebny na frontendzie do renderowania formularzy); INSERT/UPDATE/DELETE: role IN ('admin','super_admin').
+Tabela category_config – jak wyżej.
+Tabela legal_knowledge – SELECT: publiczny (potrzebny do RAG); INSERT/UPDATE/DELETE: role IN ('admin','super_admin').
+Wszystkie tabele z danymi użytkowników (cases, documents, payments, events, chat) – admin widzi wszystkie rekordy (policy: role IN ('admin','super_admin')), zwykły user widzi tylko swoje (policy: auth.uid() = user_id).
+Dodatkowe zabezpieczenia: audit trail (admin_logs) dla każdej operacji, IP logging w middleware, session timeout 4h, wymuszony MFA dla kont admin (Supabase Auth MFA), CSP headers w Next.js middleware.
+5.B.16 Komponenty React panelu admina – Długomat
+Dedykowane komponenty w components/admin/dlugomat/:
+DlugomatKPICards.tsx – cztery karty KPI z animowanymi wartościami (count-up), sparkline (Recharts), badge trendu. Props: data: { mrr, users, casesToday, conversion }.
+DlugomatRevenueChart.tsx – dual-axis chart (bar + line) z selektorem zakresu czasowego. Dane z /api/admin/dlugomat/dashboard/charts.
+DlugomatCategoryDonut.tsx – donut chart z legendą i tooltipami. Kolory z design system Długomat.
+DlugomatScoringHistogram.tsx – histogram rozkładu scoringu przedawnienia z trzema strefami kolorystycznymi.
+DlugomatAICostChart.tsx – area chart kosztów AI z linią budżetu i alertem.
+DlugomatLiveFeed.tsx – tabela strumieniowa z auto-scroll, animacją wejścia, filtrami. Supabase Realtime subscription na tabeli events.
+DlugomatCaseTable.tsx – zaawansowana tabela (TanStack Table) z virtual scrolling, multi-sort, multi-filter, column resize, row selection, bulk actions (zmiana statusu, eksport).
+DlugomatUserDetail.tsx – page component z zakładkami, ładowaniem danych z wielu endpointów równolegle (Promise.all).
+DlugomatTemplateEditor.tsx – złożony formularz z zakładkami, Monaco Editor, podglądem formularza, wizualizacją branching (react-flow), diff viewer, rollback.
+DlugomatPromptEditor.tsx – Monaco Editor z markdown + Mustache, panel zmiennych, testowy streaming AI, diff, A/B config.
+DlugomatRAGManager.tsx – upload, chunking progress, lista źródeł, test search, statystyki embeddingów.
+DlugomatCalculatorConfig.tsx – tabele edytowalne (terminy przedawnienia, stopy NBP) z walidacją, importem CSV, historią zmian.
+DlugomatFunnelChart.tsx – wizualizacja lejka (custom SVG lub Recharts funnel) z drop-off percentages i porównaniem okresów.
+DlugomatCohortHeatmap.tsx – tabela kohortowa z heatmapą kolorystyczną (zielony = wysoka retencja, czerwony = niska).
+DlugomatPaymentsTable.tsx – tabela transakcji z inline refund modal, linkami Stripe, filtrami.
+DlugomatPromoCodeForm.tsx – formularz CRUD kodu promo z walidacją dat, limitów, preview rabatu.
+DlugomatNotificationLogs.tsx – tabela logów z filtrami po typie (email/SMS), statusie, szablonie.
+DlugomatSettingsForm.tsx – formularz ustawień z feature flag toggles, edycją limitów, konfiguracją CRON, statusami integracji z przyciskami testowymi.
+Niniejszy podrozdział 5.B stanowi kompletny opis panelu administracyjnego modułu Długomat. Powinien być wstawiony do specyfikacji bezpośrednio po podrozdziale 5.A (Panel użytkownika – Długomat) i przed istniejącym podrozdziałem opisującym Panel administracyjny Mandatomat, zachowując ciągłość numeracji i spójność architektoniczną całego dokumentu.
+5.1 Routing (App Router)
+Grupy tras (Route Groups):
+(marketing) — strony publiczne, SEO-optymalizowane, ISR/SSG. Obejmują stronę główną z hero, social proof i CTA; stronę „Jak to działa" z animowaną wizualizacją 4 kroków; cennik z toggle miesięczny/jednorazowy; blog SEO (artykuły o przedawnieniu, EPU, komornikach); FAQ z dynamicznym schema.org(http://schema.org/) markup; oraz strony prawne (regulamin, polityka prywatności).
+(auth) — logowanie, rejestracja, reset hasła. Minimal UI, dark/light mode, magic link jako domyślna opcja (reduce friction).
+(dashboard) — panel zalogowanego użytkownika. Protected route (middleware sprawdza sesję Supabase). Zawiera dashboard (overview spraw, nadchodzące terminy, ostatnie dokumenty), listę spraw z filtrami i sortowaniem, szczegóły sprawy (timeline, dokumenty, terminy), kreator nowej sprawy, zarządzanie dokumentami, kalendarz terminów, profil i ustawienia, oraz historię płatności.
+(wizards) — kreatory pism, wyodrębnione w osobną grupę tras ze względu na odmienną nawigację (stepper zamiast sidebar). Każdy wizard ma identyczną strukturę: upload → dane → argumenty → podgląd → płatność → pobranie.
+5.2 Design System — „Tarcza"
+Filozofia: Długomat obsługuje osoby w stresie — zadłużone, przerażone komornikiem, z poczuciem bezsilności. Design musi komunikować: bezpieczeństwo (jesteś chroniony), kompetencję (wiemy co robimy), prostotę (to łatwiejsze niż myślisz), oraz nadzieję (jest rozwiązanie).
+Paleta kolorów:
+Primary:
+  --shield-900: #0B1D3A    (navy — nagłówki, tekst główny)
+  --shield-800: #132D5E
+  --shield-700: #1B3F82
+  --shield-600: #2354A6    (primary button, linki)
+  --shield-500: #2B69CA
+  --shield-400: #5A8FDB
+  --shield-300: #89B5EC
+  --shield-200: #B8DBFD
+  --shield-100: #E0EFFF
+  --shield-50:  #F0F7FF    (tło sekcji)
+
+Accent (zielony — sukces, nadzieja):
+  --hope-600:   #0D8A4A
+  --hope-500:   #10B461    (CTA buttons, success states)
+  --hope-400:   #34D07E
+  --hope-100:   #DCFCE7
+  --hope-50:    #F0FFF4
+
+Warning (amber — terminy):
+  --alert-600:  #D97706
+  --alert-500:  #F59E0B
+  --alert-100:  #FEF3C7
+
+Danger (red — pilne terminy, błędy):
+  --danger-600: #DC2626
+  --danger-500: #EF4444
+  --danger-100: #FEE2E2
+
+Neutrals:
+  --gray-900:   #111827
+  --gray-700:   #374151
+  --gray-500:   #6B7280
+  --gray-300:   #D1D5DB
+  --gray-100:   #F3F4F6
+  --gray-50:    #F9FAFB
+  --white:      #FFFFFF
+
+Typografia:
+Nagłówki: Space Grotesk (zmienny font, 600–700 weight). Geometric sans-serif komunikuje nowoczesność i technologię. H1: 48px/1.1 (desktop), 36px/1.15 (mobile). H2: 36px/1.2 (desktop), 28px/1.25 (mobile). H3: 24px/1.3. H4: 20px/1.4.
+Body text: Inter (zmienny font, 400–500 weight). Doskonała czytelność na ekranach, szerokie wsparcie polskich znaków. Body: 16px/1.6. Small: 14px/1.5. Caption: 12px/1.4.
+Tekst prawny w pismach: system serif font (Georgia, “Times New Roman”) — 12pt, interlinia 1.5, marginesy zgodne z wymogami procesowymi.
+Spacing system: bazowy 4px grid. Skala: 4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96, 128px. Sekcje na landing page: 96–128px padding vertical. Karty: 24px padding. Formularze: 16–20px gap między polami.
+Border radius: Karty i kontenery: 16px. Buttony i inputy: 12px. Badges i chipy: 8px. Avatary: pełne koło.
+Shadows: sm (karty formularzy): 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06). md (karty dashboard): 0 4px 6px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.06). lg (modele, dropdowny): 0 10px 15px rgba(0,0,0,0.08), 0 4px 6px rgba(0,0,0,0.05). xl (hero card): 0 20px 25px rgba(0,0,0,0.08), 0 8px 10px rgba(0,0,0,0.04).
+5.3 Kluczowe komponenty UI
+WizardShell — wspólny shell dla wszystkich kreatorów pism. Zawiera step indicator (numerowany stepper z ikonami i opisami kroków), wizard content area (renderuje bieżący krok), wizard navigation (przyciski Wstecz/Dalej z walidacją), progress bar (procent ukończenia), oraz kontekstowy panel informacyjny (wyświetla wskazówki prawne zależne od kroku).
+┌─────────────────────────────────────────────────────────────┐
+│  ← Wstecz          SPRZECIW OD NAKAZU EPU        Krok 2/6  │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  ████████████████████░░░░░░░░░░░░  33% ukończono            │
+│                                                              │
+│  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌───┐  ┌───┐  ┌───┐│
+│  │ ✓ Upload│──│ 2 Dane  │──│ 3 Zarzu-│──│ 4 │──│ 5 │──│ 6 ││
+│  │         │  │ sprawy  │  │   ty    │  │   │  │   │  │   ││
+│  └─────────┘  └─────────┘  └─────────┘  └───┘  └───┘  └───┘│
+│                                                              │
+│  ┌──────────────────────────────┬──────────────────────────┐ │
+│  │                              │  ℹ️ Wskazówka            │ │
+│  │   DANE SPRAWY                │                          │ │
+│  │                              │  Sygnatura sprawy        │ │
+│  │   Sygnatura: [VI Nc-e ___]   │  znajduje się w lewym    │ │
+│  │   Sąd: [e-Sąd w Lublinie▼]  │  górnym rogu nakazu      │ │
+│  │   Data nakazu: [__/__/____]  │  zapłaty. Format:        │ │
+│  │   Data doręczenia: [__/__]   │  "VI Nc-e XXXXXX/XX"    │ │
+│  │   Powód: [________________]  │                          │ │
+     Kwota: [________] PLN       � PrzykBad:             
+│  │   Odsetki: [________] PLN   │  VI Nc-e 1234567/25      │ │
+│  │   Koszty: [________] PLN    │                          │ │
+│  │                              │                          │ │
+│  └──────────────────────────────┴──────────────────────────┘ │
+│                                                              │
+│  ┌──────────────────────┐  ┌──────────────────────────────┐  │
+│  │   ← Wstecz           │  │        Dalej →               │  │
+│  └──────────────────────┘  └──────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
+
+OCRUploadStep — drag-and-drop zone z ikoną dokumentu, obsługa PDF/JPG/PNG do 10MB, progress bar uploadu, preview zeskanowanego dokumentu z podświetlonymi wykrytymi polami (sygnatura, kwota, data — zielone podkreślenie), confidence score z informacją „Wykryto X/Y pól" i opcja ręcznej korekty.
+DeadlineCountdown — widget wyświetlający odliczanie do terminu procesowego. Kolory: >7 dni = zielony, 3–7 dni = amber, <3 dni = czerwony pulsujący. Format: „Zostało X dni Y godzin". Poniżej: data terminu, opis konsekwencji przekroczenia.
+PDFPreview — podgląd wygenerowanego pisma w PDF.js z zoom, nawigacją stron, przyciskiem „Edytuj" (otwiera edytor tekstu pisma), oraz watermark „PODGLĄD — WERSJA ROBOCZA" przed płatnością.
+PricingTable — tabela z trzema kolumnami (podstawowy / rekomendowany / premium), animowane badge „NAJPOPULARNIEJSZY", lista cech z checkmarkami, przycisk CTA z ceną i mikrokopiją („bez zobowiązań", „14-dniowa gwarancja"), porównanie z kosztem prawnika (przekreślona cena 1500–3000 zł).
+5.4 Stany UI
+Każdy komponent interaktywny obsługuje 7 stanów: default, hover, focus (visible ring dla accessibility), active/pressed, loading (skeleton lub spinner), error (komunikat + sugestia rozwiązania), success (zielony checkmark + mikro-animacja). Formularze: real-time walidacja po blur, nie po każdym keystroku. Formularze: error messages pod polem (nie nad, nie w tooltip).
+5.5 Animacje (Framer Motion)
+Przejścia między krokami wizarda: slide-in z prawej (Dalej) lub lewej (Wstecz), duration 300ms, ease [0.4, 0, 0.2, 1]. OCR scanning: animowana linia skanująca dokument (od góry do dołu, 2s). Generowanie pisma: typewriter effect na preview tekstu, symulujący „pisanie przez AI". Celebracja po płatności: confetti (react-confetti) + komunikat „Twoje pismo jest gotowe!". Page transitions: fade-in 200ms na zmianie route. Karty na dashboard: staggered fade-in (każda karta z 50ms opóźnieniem).
+5.6 Responsywność
+Breakpoints: sm 640px, md 768px, lg 1024px, xl 1280px, 2xl 1536px. Mobile (375–768px): single column, bottom navigation bar, full-width buttons, drawer zamiast dropdown, larger touch targets (min 48×48px). Tablet (768–1024px): 2-column layout gdzie możliwe, sidebar collapsible. Desktop (1024+): 3-column layout (sidebar + content + context panel), hover states, keyboard shortcuts.
+kontynuuję dokładnie od miejsca przerwania:
+5.7 Accessibility (WCAG 2.1 AA) — kontynuacja
+Kontrast minimum 4.5:1 dla tekstu, 3:1 dla elementów graficznych. Focus visible ring (ring-2 ring-shield-500 ring-offset-2) na każdym interaktywnym elemencie — nigdy nie usuwać outline: none bez replacement. Pełna nawigacja klawiaturą: Tab/Shift+Tab między polami, Enter na przyciskach, Escape zamyka modale/drawery, Arrow keys w dropdownach i tabelach. Aria-labels na ikonach bez tekstu, aria-live="polite" na dynamicznych komunikatach (status OCR, postęp generowania, błędy walidacji). role="alert" na komunikatach o terminach procesowych. Skip-to-content link na każdej stronie. Semantic HTML: <nav>, <main>, <article>, <aside>, <section> z odpowiednimi aria-labelledby. Formularze: <label> powiązane z <input> przez htmlFor, aria-describedby dla podpowiedzi i błędów, aria-invalid="true" na polach z błędem. Reduced motion: prefers-reduced-motion: reduce — wyłączenie wszystkich animacji Framer Motion, zastąpienie ich instant transitions. Screen reader testing: weryfikacja z NVDA (Windows) i VoiceOver (macOS/iOS) przed każdym release.
+5.8 SEO (strony marketingowe)
+Każda strona marketingowa ma unikalne <title> i <meta name="description"> z frazą kluczową. Struktura nagłówków: jeden <h1> na stronę, hierarchia h2 > h3 > h4 bez przeskoków. Schema.org(http://schema.org/) JSON-LD: FAQPage na stronie FAQ, Product na cennikach, Article na blogu, Organization na stronie głównej, BreadcrumbList na każdej podstronie. Open Graph i Twitter Card meta tags z dedykowanymi grafikami OG (1200×630px) per strona. Canonical URLs. sitemap.xml generowany dynamicznie przez Next.js. robots.txt blokujący /panel/, /api/, indeksujący wszystkie strony marketingowe. Core Web Vitals targets: LCP < 2.5s (SSG/ISR), FID < 100ms (minimalne JS na marketing pages), CLS < 0.1 (explicit width/height na obrazach, font-display: swap). Blog: ISR z rewalidacją co 3600s, internal linking między artykułami.
+6. BACKEND — API ROUTES, MIDDLEWARE, LOGIKA BIZNESOWA
+6.1 Middleware (Next.js Middleware)
+Middleware uruchamia się na edge (przed SSR) i obsługuje następujące zadania:
+Autoryzacja sesji: odczyt tokena sesji Supabase z cookie, weryfikacja ważności, refresh jeśli wygasa w ciągu 10 minut. Trasy /panel/* i /api/* (z wyjątkiem /api/auth/* i /api/payments/webhook) wymagają aktywnej sesji — brak sesji → redirect na /login?redirect={original_path}.
+Rate limiting: token bucket per IP na edge. Limity: /api/ai/generate — 10 req/min (zapobiega abuse generowania), /api/ocr/upload — 20 req/min, /api/auth/* — 5 req/min (brute force protection), pozostałe API — 60 req/min. Przekroczenie → HTTP 429 z nagłówkiem Retry-After.
+Geolokalizacja: header x-vercel-ip-country. Jeśli ≠ PL, wyświetl banner „Długomat jest przeznaczony dla polskiego systemu prawnego". Nie blokuj dostępu (Polacy za granicą).
+Security headers: X-Frame-Options: DENY, X-Content-Type-Options: nosniff, Referrer-Policy: strict-origin-when-cross-origin, Permissions-Policy: camera=(), microphone=(), geolocation=(), CSP z whitelistą domen (Supabase, Stripe, APIPod, PostHog, fonts.googleapis.com(http://fonts.googleapis.com/)).
+Bot detection: user-agent filtering — blokuj znane scrapery na trasach /api/ai/*. Honeypot: ukryte pole formularza — wypełnienie = bot → silent reject.
+6.2 Standaryzacja odpowiedzi API
+Wszystkie API Routes zwracają zunifikowaną strukturę:
+// types/api.ts
+interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: {
+    code: string;          // np. "VALIDATION_ERROR", "OCR_FAILED", "AI_TIMEOUT"
+    message: string;       // przyjazna wiadomość po polsku
+    details?: unknown;     // dodatkowe info dla debugowania (tylko dev)
+  };
+  meta?: {
+    page?: number;
+    perPage?: number;
+    total?: number;
+    requestId: string;     // UUID do śledzenia w logach
+  };
+}
+
+HTTP status codes: 200 (sukces z danymi), 201 (utworzono), 204 (sukces bez danych), 400 (błąd walidacji), 401 (brak autoryzacji), 403 (brak uprawnień), 404 (nie znaleziono), 409 (konflikt — np. duplikat sprawy), 429 (rate limit), 500 (błąd serwera), 503 (AI service unavailable → fallback).
+6.3 Endpointy API — pełna specyfikacja
+6.3.1 Auth (/api/auth/)
+POST /api/auth/register — rejestracja: email + password (min 8 znaków, 1 cyfra, 1 wielka litera) lub magic link. Tworzy konto w Supabase Auth, wiersz w profiles, wysyła e-mail powitalny (AWS SES). Zwraca { user_id, session_token }.
+POST /api/auth/login — logowanie: email + password lub magic link. Zwraca { session_token, expires_at }. Błędne hasło → throttling (1s, 2s, 4s, 8s delay do max 30s).
+POST /api/auth/logout — unieważnienie sesji, czyszczenie cookie.
+POST /api/auth/reset-password — wysyłka linku reset (ważny 1h) na e-mail.
+POST /api/auth/callback — obsługa callbacku magic link i OAuth (Google).
+6.3.2 Cases — sprawy (/api/cases/)
+GET /api/cases — lista spraw użytkownika. Query params: status (draft, active, completed, archived), type (sprzeciw_epu, komornik_shield, bik_fix, cesja_check, ugodo_mat, upadlosc_lite, potracenia_stop), sort (created_at, deadline, updated_at), order (asc, desc), page, perPage. Zwraca paginowaną listę z deadline countdown.
+POST /api/cases — tworzenie nowej sprawy. Body: { type, title?, metadata? }. Automatycznie ustawia status: 'draft', created_at, oblicza wstępny deadline (jeśli typ ma termin procesowy).
+GET /api/cases/[id] — szczegóły sprawy z powiązanymi dokumentami, terminami i historią płatności. RLS: tylko właściciel.
+PATCH /api/cases/[id] — aktualizacja sprawy (metadata, status, dane formularza). Walidacja Zod per typ sprawy.
+DELETE /api/cases/[id] — soft delete (ustawia deleted_at). Dane przechowywane 30 dni, potem hard delete przez CRON.
+GET /api/cases/[id]/timeline — historia zdarzeń sprawy (utworzenie, OCR, generowanie, płatność, pobranie, powiadomienia) — w formacie timeline do wyświetlenia w UI.
+6.3.3 OCR (/api/ocr/)
+POST /api/ocr/upload — upload pliku (multipart/form-data). Akceptowane formaty: PDF, JPG, JPEG, PNG. Max rozmiar: 10 MB. Pipeline: walidacja MIME type → upload do Supabase Storage (bucket ocr-uploads, ścieżka {user_id}/{case_id}/{filename}) → Tesseract.js OCR (server-side Web Worker) → jeśli confidence < 80%, fallback do AWS Textract → parsowanie tekstu (nakaz-parser.ts) → ekstrakcja pól (sygnatura, sąd, data, powód/pozwany, kwoty, podstawa prawna) → zapis do tabeli ocr_results → zwrot { ocr_id, extracted_data, confidence, raw_text }.
+GET /api/ocr/status/[id] — status przetwarzania OCR (pending, processing, completed, failed). Polling co 2s z frontendu (lub Supabase Realtime subscription).
+6.3.4 AI Engine (/api/ai/)
+POST /api/ai/generate — główny endpoint generowania pisma. Body:
+{
+  case_id: string;
+  document_type: DocumentType;  // enum: 'sprzeciw_epu' | 'wniosek_zwolnienie_konta' | ...
+  form_data: Record<string, unknown>;  // dane z formularza wizarda
+  ocr_data?: OcrExtractedData;         // dane z OCR (opcjonalne)
+  options?: {
+    model?: 'sonnet' | 'haiku' | 'opus';  // domyślnie 'sonnet'
+    include_rag?: boolean;                  // domyślnie true
+    language_style?: 'formal' | 'standard'; // domyślnie 'formal'
+  };
+}
+
+Pipeline (szczegółowo opisany w sekcji 10):
+1. Walidacja Zod inputu
+2. Pobranie kontekstu RAG (orzecznictwo, przepisy) z tabeli legal_knowledge
+3. Kompozycja promptu (system + context + user data)
+4. Wywołanie Claude Sonnet 4.6 via APIPod
+5. Parsowanie odpowiedzi (Markdown)
+6. Walidacja przez Claude Haiku 4.5 (checklist kompletności)
+7. Jeśli walidacja failed → retry z korektami (max 2 retry)
+8. Zapis do tabeli documents (treść Markdown + metadata)
+9. Zwrot { document_id, content_markdown, validation_score, warnings[] }
+Timeout: 60s. Fallback: jeśli APIPod nie odpowiada w 30s, przełączenie na direct Anthropic API. Jeśli oba failują → zwrot predefiniowanego szablonu z flagą is_template: true i komunikatem dla użytkownika.
+POST /api/ai/validate — walidacja istniejącego dokumentu. Używa Haiku do sprawdzenia kompletności formalnej (sygnatura, dane stron, podpis, data, żądanie, uzasadnienie, podstawa prawna). Zwraca { score: 0-100, issues: ValidationIssue[], suggestions: string[] }.
+POST /api/ai/chat — asystent „Co dalej?". Kontekstowy chatbot, który na podstawie stanu sprawy sugeruje kolejne kroki. Używa Haiku (tani, szybki). Kontekst: typ sprawy, status, deadline, dokumenty. Max 3 tury konwersacji per sesja (zapobieganie abuse).
+POST /api/ai/analyze-ocr — po OCR, AI analizuje wykryty tekst: identyfikuje typ dokumentu (nakaz, pismo komornika, wezwanie), wykrywa potencjalne zarzuty (przedawnienie, brak legitymacji czynnej, błędy formalne), scoring szansy powodzenia (0–100%). Używa Sonnet.
+6.3.5 Documents (/api/documents/)
+GET /api/documents — lista dokumentów użytkownika. Filtr: case_id, status (draft, generated, paid, downloaded), type.
+GET /api/documents/[id] — szczegóły dokumentu z treścią Markdown.
+PATCH /api/documents/[id] — edycja treści dokumentu (użytkownik modyfikuje wygenerowany tekst). Zapisuje wersję (tabela document_versions).
+GET /api/documents/[id]/pdf — renderowanie PDF. Pipeline: pobranie Markdown z bazy → konwersja do HTML z szablonem (templates/base-layout.html + templates/[type].html) → wstrzyknięcie danych (strony, sąd, sygnatura, data) → Puppeteer render → zwrot PDF jako stream (Content-Type: application/pdf). Cache: PDF cachowany w Supabase Storage, regeneracja tylko po edycji.
+POST /api/documents/[id]/send — (V2) wysyłka pisma na adres sądu/komornika/wierzyciela. Integracja z usługą e-PUAP lub InPost Paczkomat (list polecony).
+6.3.6 Payments (/api/payments/)
+POST /api/payments/create-session — tworzenie sesji Stripe Checkout. Body: { document_id, product_type, pricing_tier }. Stripe session z success_url (redirect na stronę pobrania) i cancel_url (redirect na podgląd). Metadata: { user_id, case_id, document_id, product_type }.
+POST /api/payments/webhook — Stripe webhook. Obsługiwane eventy: checkout.session.completed (oznacz dokument jako paid, odblokuj PDF, wyślij e-mail z potwierdzeniem i fakturą), checkout.session.expired (oznacz jako payment_expired, wyślij reminder), charge.refunded (oznacz dokument jako refunded, zablokuj PDF). Webhook secret weryfikowany przez stripe.webhooks.constructEvent().
+GET /api/payments/status/[id] — status płatności. Polling z frontendu po redirect z Checkout.
+6.3.7 Notifications (/api/notifications/)
+GET /api/notifications/deadlines — lista nadchodzących terminów użytkownika z odliczaniem.
+POST /api/notifications/send — (wewnętrzne, wywoływane przez CRON Edge Function) — wysyłka powiadomień o terminach. Logika: D-7, D-5, D-3, D-1, D-0 (rano), D-0 (wieczór — OSTATNIA SZANSA).
+6.3.8 Admin (/api/admin/)
+GET /api/admin/stats — dashboard administracyjny. Metryki: liczba użytkowników (total, nowi w okresie), liczba spraw (per typ, per status), liczba dokumentów (generated, paid, downloaded), MRR, ARPU, conversion rate, churn, NPS. Chronione: wymaga role: 'admin' w profiles.
+GET /api/admin/users — lista użytkowników z filtrami, paginacją. Akcje: dezaktywacja, zmiana roli.
+6.4 Logika biznesowa — kluczowe procesy
+6.4.1 Cykl życia sprawy (Case Lifecycle)
+                 ┌──────────┐
+                 │  DRAFT   │ ← użytkownik tworzy sprawę
+                 └────┬─────┘
+                      │ (wypełnienie formularza + OCR)
+                      ▼
+                 ┌──────────┐
+                 │ ANALYSIS │ ← AI analizuje dokumenty
+                 └────┬─────┘
+                      │ (generowanie pisma)
+                      ▼
+                 ┌──────────┐
+                 │ GENERATED│ ← pismo wygenerowane, podgląd
+                 └────┬─────┘
+                      │ (płatność Stripe)
+                      ▼
+                 ┌──────────┐
+                 │   PAID   │ ← PDF odblokowany
+                 └────┬─────┘
+                      │ (pobranie PDF)
+                      ▼
+                 ┌──────────┐
+                 │DOWNLOADED│ ← użytkownik pobrał pismo
+                 └────┬─────┘
+                      │ (po terminie lub ręcznie)
+                      ▼
+                 ┌──────────┐
+                 │ COMPLETED│ ← sprawa zamknięta
+                 └────┬─────┘
+                      │ (po 30 dniach)
+                      ▼
+                 ┌──────────┐
+                 │ ARCHIVED │ ← dane zanonimizowane
+                 └──────────┘
+
+Każda zmiana statusu logowana w tabeli case_events z timestampem i aktorem (user, system, ai, payment).
+6.4.2 Logika terminów procesowych (Deadline Engine)
+Terminy są krytyczne — przekroczenie terminu może oznaczać utratę prawa do sprzeciwu lub odwołania. System zarządza terminami następująco:
+Obliczanie terminu: deadline_date = doręczenie_date + termin_dni (np. 14 dni dla sprzeciwu EPU, 7 dni dla skargi na czynności komornika). Uwzględnianie dni wolnych od pracy (kalendarz polskich świąt i weekendów — jeśli termin wypada w dzień wolny, przesuwa się na następny dzień roboczy). Baza świąt: statyczna tablica w constants/deadlines.ts + dynamiczne obliczanie dat ruchomych (Wielkanoc = algorytm Gaussa → Poniedziałek Wielkanocny, Boże Ciało).
+Powiadomienia: system CRON (Supabase Edge Function uruchamiana co godzinę) sprawdza tabelę deadlines i wysyła powiadomienia na e-mail (AWS SES) i SMS (SMSAPI.pl(http://smsapi.pl/)) według harmonogramu D-7, D-5, D-3, D-1, D-0.
+Template powiadomień: każdy email jest spersonalizowany (imię, typ sprawy, sygnatura, data terminu, odliczanie, przycisk CTA „Wróć do sprawy"), responsywny HTML (MJML compiled), z fallbackiem na plain text.
+6.4.3 System wersjonowania dokumentów
+Każda edycja dokumentu tworzy nowy wiersz w document_versions. Pole version_number auto-inkrementowane. Diff między wersjami obliczany na froncie (library diff). Użytkownik może przywrócić starszą wersję. Limit wersji: 20 per dokument (starsze usuwane).
+7. BAZA DANYCH — SCHEMAT, TABELE, INDEKSY, RLS
+7.1 Diagram ERD (Entity-Relationship)
+┌────────────┐     ┌────────────────┐     ┌──────────────────┐
+│  profiles   │──1──│     cases      │──1──│   documents      │
+│            │  :N  │                │  :N │                  │
+│ id (FK→auth│      │ id             │     │ id               │
+│ email       │      │ user_id (FK)   │     │ case_id (FK)     │
+│ full_name   │      │ type           │     │ type             │
+│ phone       │      │ status         │     │ content_md       │
+│ created_at  │      │ title          │     │ content_html     │
+│ updated_at  │      │ metadata (JSON)│     │ pdf_url          │
+│ role        │      │ created_at     │     │ status           │
+│ avatar_url  │      │ updated_at     │     │ version          │
+│ settings    │      │ deleted_at     │     │ ai_model_used    │
+└────────────┘      └───────┬────────┘     │ tokens_used      │
+                            │              │ validation_score  │
+                    ┌───────┴────────┐     │ created_at       │
+                    │                │     │ updated_at       │
+              ┌─────┴──────┐  ┌──────┴───┐ └──────────────────┘
+              │  deadlines  │  │ocr_results│
+              │            │  │           │       ┌───────────────┐
+              │ id         │  │ id        │       │document_      │
+              │ case_id(FK)│  │ case_id   │       │  versions     │
+              │ type       │  │ file_url  │       │               │
+              │ deadline_dt│  │ raw_text  │       │ id            │
+              │ notif_sent │  │ extracted │       │ document_id   │
+              │ created_at │  │ confidence│       │ version_num   │
+              └────────────┘  │ provider  │       │ content_md    │
+                              │ created_at│       │ changed_by    │
+                              └───────────┘       │ created_at    │
+                                                  └───────────────┘
+              ┌──────────────┐     ┌──────────────────┐
+              │   payments   │     │   case_events     │
+              │              │     │                   │
+              │ id           │     │ id                │
+              │ user_id (FK) │     │ case_id (FK)      │
+              │ case_id (FK) │     │ event_type        │
+              │ document_id  │     │ actor             │
+              │ stripe_sid   │     │ metadata (JSON)   │
+              │ amount       │     │ created_at        │
+              │ currency     │     └───────────────────┘
+              │ status       │
+              │ product_type │     ┌──────────────────┐
+              │ created_at   │     │ legal_knowledge   │
+              │ paid_at      │     │                   │
+              └──────────────┘     │ id                │
+                                   │ category          │
+              ┌──────────────┐     │ subcategory       │
+              │ notifications│     │ title             │
+              │              │     │ content           │
+              │ id           │     │ embedding (vector)│
+              │ user_id (FK) │     │ source            │
+              │ case_id (FK) │     │ effective_date    │
+              │ channel      │     │ created_at        │
+              │ template     │     └──────────────────┘
+              │ status       │
+              │ sent_at      │
+              │ created_at   │
+              └──────────────┘
+
+7.2 Definicje tabel (SQL Migrations)
+Migration 001: Core tables
+-- 20260401000000_init.sql
+
+-- Enable necessary extensions
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+CREATE EXTENSION IF NOT EXISTS "vector";  -- pgvector for RAG embeddings
+
+-- Custom types
+CREATE TYPE case_type AS ENUM (
+  'sprzeciw_epu',
+  'komornik_zwolnienie_konta',
+  'komornik_zwolnienie_swiadczen',
+  'komornik_skarga',
+  'komornik_ograniczenie',
+  'komornik_umorzenie',
+  'komornik_raty',
+  'bik_reklamacja_bank',
+  'bik_reklamacja_bik',
+  'bik_skarga_uodo',
+  'cesja_odpowiedz',
+  'ugoda_raty',
+  'ugoda_umorzenie',
+  'ugoda_propozycja',
+  'upadlosc_wniosek',
+  'potracenia_wniosek_pracodawca',
+  'potracenia_wniosek_komornik'
+);
+
+CREATE TYPE case_status AS ENUM (
+  'draft',
+  'analysis',
+  'generated',
+  'paid',
+  'downloaded',
+  'completed',
+  'archived'
+);
+
+CREATE TYPE document_status AS ENUM (
+  'generating',
+  'generated',
+  'validated',
+  'paid',
+  'downloaded',
+  'expired'
+);
+
+CREATE TYPE payment_status AS ENUM (
+  'pending',
+  'completed',
+  'failed',
+  'refunded',
+  'expired'
+);
+
+CREATE TYPE notification_channel AS ENUM (
+  'email',
+  'sms',
+  'push'
+);
+
+CREATE TYPE notification_status AS ENUM (
+  'scheduled',
+  'sent',
+  'failed',
+  'cancelled'
+);
+
+CREATE TYPE event_actor AS ENUM (
+  'user',
+  'system',
+  'ai',
+  'payment',
+  'admin'
+);
+
+CREATE TYPE user_role AS ENUM (
+  'user',
+  'admin',
+  'moderator'
+);
+
+Migration 002: Profiles
+-- 20260401000001_profiles.sql
+
+CREATE TABLE profiles (
+  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  email TEXT NOT NULL UNIQUE,
+  full_name TEXT,
+  phone TEXT,
+  role user_role NOT NULL DEFAULT 'user',
+  avatar_url TEXT,
+  settings JSONB NOT NULL DEFAULT '{
+    "notifications": {
+      "email": true,
+      "sms": false,
+      "deadline_reminders": true,
+      "marketing": false
+    },
+    "display": {
+      "theme": "light",
+      "language": "pl"
+    }
+  }'::jsonb,
+  onboarding_completed BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Auto-create profile on auth.users insert
+CREATE OR REPLACE FUNCTION handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.profiles (id, email, full_name)
+  VALUES (
+    NEW.id,
+    NEW.email,
+    COALESCE(NEW.raw_user_meta_data->>'full_name', '')
+  );
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW
+  EXECUTE FUNCTION handle_new_user();
+
+-- Auto-update updated_at
+CREATE OR REPLACE FUNCTION update_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER profiles_updated_at
+  BEFORE UPDATE ON profiles
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at();
+
+Migration 003: Cases
+-- 20260401000002_cases.sql
+
+CREATE TABLE cases (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  type case_type NOT NULL,
+  status case_status NOT NULL DEFAULT 'draft',
+  title TEXT NOT NULL DEFAULT '',
+  
+  -- Dane wspólne sprawy
+  sygnatura TEXT,                          -- np. "VI Nc-e 1234567/25"
+  sad TEXT,                                -- nazwa sądu
+  data_nakazu DATE,                        -- data wydania nakazu/pisma
+  data_doreczenia DATE,                    -- data doręczenia
+  
+  -- Strony
+  powod_nazwa TEXT,                        -- powód / wierzyciel
+  powod_adres TEXT,
+  pozwany_nazwa TEXT,                      -- pozwany / dłużnik
+  pozwany_adres TEXT,
+  pozwany_pesel TEXT,                      -- szyfrowane (pgcrypto)
+  
+  -- Kwoty
+  kwota_glowna DECIMAL(12,2),
+  kwota_odsetki DECIMAL(12,2),
+  kwota_koszty DECIMAL(12,2),
+  kwota_razem DECIMAL(12,2) GENERATED ALWAYS AS (
+    COALESCE(kwota_glowna, 0) + COALESCE(kwota_odsetki, 0) + COALESCE(kwota_koszty, 0)
+  ) STORED,
+  
+  -- Metadata (typ-specyficzne dane w JSON)
+  metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+  
+  -- Timestamps
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  deleted_at TIMESTAMPTZ,
+  
+  -- Constraints
+  CONSTRAINT cases_kwota_glowna_positive CHECK (kwota_glowna IS NULL OR kwota_glowna >= 0),
+  CONSTRAINT cases_kwota_odsetki_positive CHECK (kwota_odsetki IS NULL OR kwota_odsetki >= 0)
+);
+
+-- Metadata schema per case_type (documented, not enforced in DB):
+-- sprzeciw_epu: { zarzuty: string[], data_wymagalnosci: date, podstawa_roszczenia: string, 
+--                 cesja: boolean, cesja_data: date, fundusz_nazwa: string }
+-- komornik_*:   { komornik_nazwa: string, komornik_adres: string, komornik_sygnatura: string,
+--                 kwota_wolna: decimal, typ_dochodu: string, swiadczenia: string[] }
+-- bik_*:        { bank_nazwa: string, numer_umowy: string, data_umowy: date, 
+--                 kwota_kredytu: decimal, status_bik: string }
+-- cesja_*:      { fundusz_nazwa: string, cedent_nazwa: string, data_cesji: date,
+--                 umowa_pierwotna: string }
+-- ugoda_*:      { wierzyciele: jsonb[], laczna_kwota: decimal, miesieczny_dochod: decimal,
+--                 miesieczne_wydatki: decimal, propozycja_rat: integer }
+-- upadlosc_*:   { wierzyciele: jsonb[], majatek: jsonb[], przyczyna_niewypłacalnosci: string,
+--                 miesieczny_dochod: decimal, osoby_na_utrzymaniu: integer }
+
+CREATE TRIGGER cases_updated_at
+  BEFORE UPDATE ON cases
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at();
+
+-- Indexes
+CREATE INDEX idx_cases_user_id ON cases(user_id);
+CREATE INDEX idx_cases_status ON cases(status);
+CREATE INDEX idx_cases_type ON cases(type);
+CREATE INDEX idx_cases_user_status ON cases(user_id, status) WHERE deleted_at IS NULL;
+CREATE INDEX idx_cases_created_at ON cases(created_at DESC);
+CREATE INDEX idx_cases_metadata ON cases USING GIN(metadata);
+
+Migration 004: Documents
+-- 20260401000003_documents.sql
+
+CREATE TABLE documents (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  case_id UUID NOT NULL REFERENCES cases(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  type case_type NOT NULL,
+  status document_status NOT NULL DEFAULT 'generating',
+  
+  -- Content
+  content_markdown TEXT,                   -- treść pisma w Markdown
+  content_html TEXT,                       -- renderowany HTML
+  pdf_url TEXT,                            -- URL do PDF w Supabase Storage
+  
+  -- Version control
+  version INTEGER NOT NULL DEFAULT 1,
+  is_template BOOLEAN NOT NULL DEFAULT false,  -- true = fallback template
+  
+  -- AI metadata
+  ai_model_used TEXT,                      -- np. 'claude-sonnet-4.6'
+  tokens_input INTEGER,
+  tokens_output INTEGER,
+  ai_cost_usd DECIMAL(8,6),               -- koszt wywołania AI w USD
+  generation_time_ms INTEGER,              -- czas generowania w ms
+  validation_score INTEGER CHECK (validation_score BETWEEN 0 AND 100),
+  validation_issues JSONB DEFAULT '[]'::jsonb,
+  
+  -- Prompt (do debugowania i polepszania promptów)
+  prompt_hash TEXT,                        -- hash promptu (bez danych user)
+  
+  -- Timestamps
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  paid_at TIMESTAMPTZ,
+  downloaded_at TIMESTAMPTZ,
+  expires_at TIMESTAMPTZ                   -- dokument wygasa po 30 dniach od paid_at
+);
+
+CREATE TABLE document_versions (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  document_id UUID NOT NULL REFERENCES documents(id) ON DELETE CASCADE,
+  version_number INTEGER NOT NULL,
+  content_markdown TEXT NOT NULL,
+  changed_by event_actor NOT NULL DEFAULT 'user',
+  change_summary TEXT,                     -- opis zmian (auto lub user)
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  
+  CONSTRAINT unique_doc_version UNIQUE(document_id, version_number)
+);
+
+CREATE TRIGGER documents_updated_at
+  BEFORE UPDATE ON documents
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at();
+
+CREATE INDEX idx_documents_case_id ON documents(case_id);
+CREATE INDEX idx_documents_user_id ON documents(user_id);
+CREATE INDEX idx_documents_status ON documents(status);
+CREATE INDEX idx_documents_type ON documents(type);
+CREATE INDEX idx_doc_versions_doc_id ON document_versions(document_id);
+
+Migration 005: Deadlines
+-- 20260401000005_deadlines.sql
+
+CREATE TABLE deadlines (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  case_id UUID NOT NULL REFERENCES cases(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  
+  type TEXT NOT NULL,                      -- np. 'sprzeciw_14dni', 'skarga_7dni'
+  description TEXT NOT NULL,               -- np. 'Termin na złożenie sprzeciwu'
+  
+  start_date DATE NOT NULL,                -- data doręczenia
+  deadline_date DATE NOT NULL,             -- obliczona data terminu
+  
+  -- Notification tracking
+  notif_d7_sent BOOLEAN NOT NULL DEFAULT false,
+  notif_d5_sent BOOLEAN NOT NULL DEFAULT false,
+  notif_d3_sent BOOLEAN NOT NULL DEFAULT false,
+  notif_d1_sent BOOLEAN NOT NULL DEFAULT false,
+  notif_d0_morning_sent BOOLEAN NOT NULL DEFAULT false,
+  notif_d0_evening_sent BOOLEAN NOT NULL DEFAULT false,
+  
+  is_completed BOOLEAN NOT NULL DEFAULT false,  -- user potwierdził złożenie pisma
+  completed_at TIMESTAMPTZ,
+  
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  
+  CONSTRAINT deadline_after_start CHECK (deadline_date >= start_date)
+);
+
+CREATE INDEX idx_deadlines_user_id ON deadlines(user_id);
+CREATE INDEX idx_deadlines_deadline_date ON deadlines(deadline_date) 
+  WHERE is_completed = false;
+CREATE INDEX idx_deadlines_upcoming ON deadlines(deadline_date, user_id) 
+  WHERE is_completed = false AND deadline_date >= CURRENT_DATE;
+
+Migration 006: OCR Results
+-- 20260401000006_ocr.sql
+
+CREATE TABLE ocr_results (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  case_id UUID NOT NULL REFERENCES cases(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  
+  -- File info
+  original_filename TEXT NOT NULL,
+  file_url TEXT NOT NULL,                  -- Supabase Storage URL
+  file_size_bytes INTEGER NOT NULL,
+  mime_type TEXT NOT NULL,
+  
+  -- OCR output
+  raw_text TEXT,                           -- pełny rozpoznany tekst
+  extracted_data JSONB DEFAULT '{}'::jsonb, -- sparsowane pola
+  confidence DECIMAL(5,2),                 -- 0.00 - 100.00
+  
+  -- Provider info
+  provider TEXT NOT NULL DEFAULT 'tesseract',  -- 'tesseract' | 'textract'
+  processing_time_ms INTEGER,
+  
+  status TEXT NOT NULL DEFAULT 'pending',  -- pending, processing, completed, failed
+  error_message TEXT,
+  
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- extracted_data schema:
+-- {
+--   "sygnatura": "VI Nc-e 1234567/25",
+--   "sad": "Sąd Rejonowy Lublin-Zachód w Lublinie",
+--   "data_wydania": "2025-12-15",
+--   "powod": { "nazwa": "Fundusz XYZ", "adres": "..." },
+--   "pozwany": { "nazwa": "Jan Kowalski", "adres": "..." },
+--   "kwota_glowna": 5432.10,
+--   "kwota_odsetki": 1234.56,
+--   "kwota_koszty": 30.00,
+--   "podstawa_prawna": "umowa pożyczki z dnia...",
+--   "detected_issues": ["possible_przedawnienie", "cesja_detected"]
+-- }
+
+CREATE INDEX idx_ocr_case_id ON ocr_results(case_id);
+CREATE INDEX idx_ocr_status ON ocr_results(status);
+
+Migration 007: Payments
+-- 20260401000004_payments.sql
+
+CREATE TABLE payments (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  case_id UUID REFERENCES cases(id) ON DELETE SET NULL,
+  document_id UUID REFERENCES documents(id) ON DELETE SET NULL,
+  
+  -- Stripe
+  stripe_session_id TEXT UNIQUE,
+  stripe_payment_intent_id TEXT,
+  
+  -- Amounts
+  amount INTEGER NOT NULL,                 -- kwota w groszach (np. 15900 = 159.00 PLN)
+  currency TEXT NOT NULL DEFAULT 'pln',
+  
+  -- Product info
+  product_type TEXT NOT NULL,              -- np. 'sprzeciw_epu', 'pakiet_komornik'
+  product_name TEXT NOT NULL,              -- np. 'Sprzeciw od nakazu zapłaty EPU'
+  pricing_tier TEXT,                       -- 'basic', 'standard', 'premium'
+  
+  -- Status
+  status payment_status NOT NULL DEFAULT 'pending',
+  
+  -- Incubator fee tracking
+  incubator_fee INTEGER,                   -- opłata inkubatora w groszach
+  incubator_model TEXT,                    -- '5_percent' | 'flat_490'
+  
+  -- Invoice
+  invoice_url TEXT,                        -- URL faktury z Fakturownia
+  invoice_number TEXT,
+  
+  -- Timestamps
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  paid_at TIMESTAMPTZ,
+  refunded_at TIMESTAMPTZ,
+  
+  -- Metadata
+  metadata JSONB DEFAULT '{}'::jsonb       -- dodatkowe dane (kupon, utm, etc.)
+);
+
+CREATE INDEX idx_payments_user_id ON payments(user_id);
+CREATE INDEX idx_payments_stripe_session ON payments(stripe_session_id);
+CREATE INDEX idx_payments_status ON payments(status);
+CREATE INDEX idx_payments_created_at ON payments(created_at DESC);
+CREATE INDEX idx_payments_product_type ON payments(product_type);
+
+Migration 008: Notifications
+-- 20260401000007_notifications.sql
+
+CREATE TABLE notifications (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  case_id UUID REFERENCES cases(id) ON DELETE SET NULL,
+  deadline_id UUID REFERENCES deadlines(id) ON DELETE SET NULL,
+  
+  channel notification_channel NOT NULL,
+  template TEXT NOT NULL,                  -- nazwa szablonu
+  subject TEXT,                            -- tytuł (email) lub treść (SMS)
+  body TEXT,                               -- treść HTML (email)
+  
+  recipient TEXT NOT NULL,                 -- email lub numer telefonu
+  
+  status notification_status NOT NULL DEFAULT 'scheduled',
+  scheduled_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  sent_at TIMESTAMPTZ,
+  error_message TEXT,
+  
+  -- Tracking
+  opened_at TIMESTAMPTZ,                   -- email open tracking
+  clicked_at TIMESTAMPTZ,                  -- link click tracking
+  
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_notifications_user_id ON notifications(user_id);
+CREATE INDEX idx_notifications_scheduled ON notifications(scheduled_at) 
+  WHERE status = 'scheduled';
+CREATE INDEX idx_notifications_status ON notifications(status);
+
+Migration 009: Case Events (Audit Log)
+-- 20260401000008_case_events.sql
+
+CREATE TABLE case_events (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  case_id UUID NOT NULL REFERENCES cases(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
+  
+  event_type TEXT NOT NULL,                -- np. 'created', 'ocr_completed', 'document_generated',
+                                           --     'payment_completed', 'downloaded', 'deadline_set'
+  actor event_actor NOT NULL DEFAULT 'system',
+  description TEXT,                        -- opis zdarzenia po polsku
+  metadata JSONB DEFAULT '{}'::jsonb,      -- dodatkowe dane per event
+  
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_case_events_case_id ON case_events(case_id);
+CREATE INDEX idx_case_events_created_at ON case_events(created_at DESC);
+CREATE INDEX idx_case_events_type ON case_events(event_type);
+
+Migration 010: Legal Knowledge (RAG)
+-- 20260401000009_legal_knowledge.sql
+
+CREATE TABLE legal_knowledge (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  
+  category TEXT NOT NULL,                  -- 'przepis', 'orzecznictwo', 'procedura', 'wzor'
+  subcategory TEXT NOT NULL,               -- np. 'przedawnienie', 'epu', 'cesja', 'komornik'
+  
+  title TEXT NOT NULL,                     -- np. 'Art. 118 KC - terminy przedawnienia'
+  content TEXT NOT NULL,                   -- pełna treść (przepis, teza orzeczenia)
+  
+  -- RAG embedding
+  embedding vector(1536),                  -- OpenAI text-embedding-3-small lub Cohere
+  
+  -- Metadata
+  source TEXT,                             -- np. 'Dz.U. 2023 poz. 1610', 'II CSK 123/22'
+  source_url TEXT,
+  effective_date DATE,                     -- data wejścia w życie / data orzeczenia
+  is_active BOOLEAN NOT NULL DEFAULT true, -- false = uchylony przepis
+  
+  -- Tags for filtering
+  tags TEXT[] DEFAULT ARRAY[]::TEXT[],     -- np. ['epu', 'przedawnienie', 'cesja']
+  applicable_case_types case_type[] DEFAULT ARRAY[]::case_type[],
+  
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Vector similarity search index
+CREATE INDEX idx_legal_knowledge_embedding ON legal_knowledge 
+  USING ivfflat (embedding vector_cosine_ops) WITH (lists = 50);
+
+CREATE INDEX idx_legal_knowledge_category ON legal_knowledge(category, subcategory);
+CREATE INDEX idx_legal_knowledge_tags ON legal_knowledge USING GIN(tags);
+CREATE INDEX idx_legal_knowledge_case_types ON legal_knowledge USING GIN(applicable_case_types);
+CREATE INDEX idx_legal_knowledge_active ON legal_knowledge(is_active) WHERE is_active = true;
+
+Migration 011: RLS Policies
+-- 20260401000010_rls_policies.sql
+
+-- Enable RLS on all tables
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE cases ENABLE ROW LEVEL SECURITY;
+ALTER TABLE documents ENABLE ROW LEVEL SECURITY;
+ALTER TABLE deadlines ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ocr_results ENABLE ROW LEVEL SECURITY;
+ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE case_events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE document_versions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE legal_knowledge ENABLE ROW LEVEL SECURITY;
+
+-- Profiles: user can read/update own profile, admin can read all
+CREATE POLICY "Users can view own profile" ON profiles
+  FOR SELECT USING (auth.uid() = id);
+CREATE POLICY "Users can update own profile" ON profiles
+  FOR UPDATE USING (auth.uid() = id);
+CREATE POLICY "Admins can view all profiles" ON profiles
+  FOR SELECT USING (
+    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
+  );
+
+-- Cases: user can CRUD own cases (not deleted)
+CREATE POLICY "Users can view own cases" ON cases
+  FOR SELECT USING (auth.uid() = user_id AND deleted_at IS NULL);
+CREATE POLICY "Users can create own cases" ON cases
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can update own cases" ON cases
+  FOR UPDATE USING (auth.uid() = user_id AND deleted_at IS NULL);
+CREATE POLICY "Users can soft-delete own cases" ON cases
+  FOR UPDATE USING (auth.uid() = user_id)
+  WITH CHECK (deleted_at IS NOT NULL);  -- only allow setting deleted_at
+
+-- Documents: user can view/edit own documents
+CREATE POLICY "Users can view own documents" ON documents
+  FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can create documents for own cases" ON documents
+  FOR INSERT WITH CHECK (
+    auth.uid() = user_id AND
+    EXISTS (SELECT 1 FROM cases WHERE id = case_id AND user_id = auth.uid())
+  );
+CREATE POLICY "Users can update own documents" ON documents
+  FOR UPDATE USING (auth.uid() = user_id);
+
+-- Deadlines: read own
+CREATE POLICY "Users can view own deadlines" ON deadlines
+  FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "System can manage deadlines" ON deadlines
+  FOR ALL USING (true)  -- service role only (API routes use service role for deadline ops)
+  WITH CHECK (true);
+
+-- OCR: read own
+CREATE POLICY "Users can view own OCR results" ON ocr_results
+  FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can create OCR for own cases" ON ocr_results
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- Payments: read own
+CREATE POLICY "Users can view own payments" ON payments
+  FOR SELECT USING (auth.uid() = user_id);
+
+-- Notifications: read own
+CREATE POLICY "Users can view own notifications" ON notifications
+  FOR SELECT USING (auth.uid() = user_id);
+
+-- Case events: read own (through case ownership)
+CREATE POLICY "Users can view events for own cases" ON case_events
+  FOR SELECT USING (
+    EXISTS (SELECT 1 FROM cases WHERE id = case_id AND user_id = auth.uid())
+  );
+
+-- Document versions: read own
+CREATE POLICY "Users can view versions of own documents" ON document_versions
+  FOR SELECT USING (
+    EXISTS (SELECT 1 FROM documents WHERE id = document_id AND user_id = auth.uid())
+  );
+
+-- Legal knowledge: public read
+CREATE POLICY "Anyone can read legal knowledge" ON legal_knowledge
+  FOR SELECT USING (is_active = true);
+CREATE POLICY "Admins can manage legal knowledge" ON legal_knowledge
+  FOR ALL USING (
+    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
+  );
+
+7.3 Supabase Storage Buckets
+-- Storage configuration (via Supabase dashboard or API)
+
+-- Bucket: ocr-uploads (prywatny)
+-- Max file size: 10MB
+-- Allowed MIME types: application/pdf, image/jpeg, image/png
+-- Path pattern: {user_id}/{case_id}/{filename}
+-- Retention: 30 days after case archived
+
+-- Bucket: generated-pdfs (prywatny)
+-- Max file size: 5MB
+-- Allowed MIME types: application/pdf
+-- Path pattern: {user_id}/{document_id}/v{version}.pdf
+-- Retention: 90 days after document expired
+
+-- Bucket: avatars (publiczny)
+-- Max file size: 2MB
+-- Allowed MIME types: image/jpeg, image/png, image/webp
+-- Path pattern: {user_id}/avatar.{ext}
+
+-- Storage RLS
+-- ocr-uploads: SELECT/INSERT where auth.uid() = path_tokens[1]::uuid
+-- generated-pdfs: SELECT where auth.uid() = path_tokens[1]::uuid AND document is paid
+-- avatars: SELECT for all, INSERT/UPDATE where auth.uid() = path_tokens[1]::uuid
+
+8. SUPABASE SELF-HOSTING — KONFIGURACJA
+8.1 Kiedy self-hosting, kiedy cloud
+Cloud (Supabase.com(http://supabase.com/)) — rekomendowany na start (Faza 1–2). Plan Free: 500MB DB, 1GB Storage, 50k auth users, 500k Edge Function invocations/month. Plan Pro ($25/mo): 8GB DB, 100GB Storage, unlimited auth. Wystarczający do MRR ~30k zł.
+Self-hosting — rekomendowany od Fazy 3 (>500 aktywnych spraw, dane wrażliwe w dużej skali, wymaganie pełnej kontroli RODO). Hosting: Hetzner Cloud (CPX31: 4 vCPU, 8GB RAM, 160GB SSD — ~€15/mo) lub OVH (podobne ceny). Alternatywnie: DigitalOcean, Linode.
+8.2 Docker Compose (self-hosted Supabase)
+# docker-compose.yml (supabase self-hosted)
+version: '3.8'
+
+services:
+  # PostgreSQL 15 + pgvector
+  db:
+    image: supabase/postgres:15.1.1.61
+    container_name: dlugomat-db
+    restart: unless-stopped
+    ports:
+      - '${POSTGRES_PORT:-5432}:5432'
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-dlugomat}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXP: ${JWT_EXP:-3600}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./supabase/migrations:/docker-entrypoint-initdb.d/migrations
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Supabase Auth (GoTrue)
+  auth:
+    image: supabase/gotrue:v2.151.0
+    container_name: dlugomat-auth
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      GOTRUE_API_HOST: 0.0.0.0
+      GOTRUE_API_PORT: 9999
+      API_EXTERNAL_URL: ${API_EXTERNAL_URL}
+      GOTRUE_DB_DRIVER: postgres
+      GOTRUE_DB_DATABASE_URL: postgres://supabase_auth_admin:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      GOTRUE_SITE_URL: ${SITE_URL}
+      GOTRUE_URI_ALLOW_LIST: ${ADDITIONAL_REDIRECT_URLS}
+      GOTRUE_JWT_SECRET: ${JWT_SECRET}
+      GOTRUE_JWT_EXP: ${JWT_EXP}
+      GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
+      GOTRUE_EXTERNAL_EMAIL_ENABLED: 'true'
+      GOTRUE_MAILER_AUTOCONFIRM: 'false'
+      GOTRUE_SMTP_HOST: ${SMTP_HOST}
+      GOTRUE_SMTP_PORT: ${SMTP_PORT:-587}
+      GOTRUE_SMTP_USER: ${SMTP_USER}
+      GOTRUE_SMTP_PASS: ${SMTP_PASS}
+      GOTRUE_SMTP_ADMIN_EMAIL: ${SMTP_ADMIN_EMAIL}
+      GOTRUE_MAILER_URLPATHS_INVITE: /auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_CONFIRMATION: /auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_RECOVERY: /auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_EMAIL_CHANGE: /auth/v1/verify
+    ports:
+      - '${AUTH_PORT:-9999}:9999'
+
+  # Supabase REST (PostgREST)
+  rest:
+    image: postgrest/postgrest:v12.2.3
+    container_name: dlugomat-rest
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGRST_DB_URI: postgres://authenticator:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      PGRST_DB_SCHEMAS: public,storage
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_JWT_SECRET: ${JWT_SECRET}
+      PGRST_DB_USE_LEGACY_GUCS: 'false'
+      PGRST_APP_SETTINGS_JWT_SECRET: ${JWT_SECRET}
+      PGRST_APP_SETTINGS_JWT_EXP: ${JWT_EXP}
+    ports:
+      - '${REST_PORT:-3000}:3000'
+
+  # Supabase Storage
+  storage:
+    image: supabase/storage-api:v1.0.6
+    container_name: dlugomat-storage
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ANON_KEY: ${ANON_KEY}
+      SERVICE_KEY: ${SERVICE_ROLE_KEY}
+      POSTGREST_URL: http://rest:3000
+      PGRST_JWT_SECRET: ${JWT_SECRET}
+      DATABASE_URL: postgres://supabase_storage_admin:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      FILE_SIZE_LIMIT: 10485760  # 10MB
+      STORAGE_BACKEND: file
+      FILE_STORAGE_BACKEND_PATH: /var/lib/storage
+      TENANT_ID: stub
+      REGION: eu-central-1
+      GLOBAL_S3_BUCKET: stub
+    volumes:
+      - storage-data:/var/lib/storage
+    ports:
+      - '${STORAGE_PORT:-5000}:5000'
+
+  # Supabase Realtime
+  realtime:
+    image: supabase/realtime:v2.29.15
+    container_name: dlugomat-realtime
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PORT: 4000
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: supabase_admin
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: ${POSTGRES_DB}
+      DB_AFTER_CONNECT_QUERY: 'SET search_path TO _realtime'
+      DB_ENC_KEY: ${REALTIME_ENC_KEY}
+      API_JWT_SECRET: ${JWT_SECRET}
+      FLY_ALLOC_ID: fly123
+      FLY_APP_NAME: realtime
+      SECRET_KEY_BASE: ${REALTIME_SECRET_KEY_BASE}
+      ERL_AFLAGS: '-proto_dist inet_tcp'
+      ENABLE_TAILSCALE: 'false'
+      DNS_NODES: "''"
+    ports:
+      - '${REALTIME_PORT:-4000}:4000'
+
+  # Kong API Gateway
+  kong:
+    image: kong:2.8.1
+    container_name: dlugomat-kong
+    restart: unless-stopped
+    depends_on:
+      - auth
+      - rest
+      - storage
+      - realtime
+    environment:
+      KONG_DATABASE: 'off'
+      KONG_DECLARATIVE_CONFIG: /var/lib/kong/kong.yml
+      KONG_DNS_ORDER: LAST,A,CNAME
+      KONG_PLUGINS: request-transformer,cors,key-auth,acl,basic-auth,rate-limiting
+      KONG_NGINX_PROXY_PROXY_BUFFER_SIZE: 160k
+      KONG_NGINX_PROXY_PROXY_BUFFERS: 64 160k
+    volumes:
+      - ./supabase/kong.yml:/var/lib/kong/kong.yml:ro
+    ports:
+      - '${KONG_HTTP_PORT:-8000}:8000'
+      - '${KONG_HTTPS_PORT:-8443}:8443'
+
+  # Nginx reverse proxy (SSL termination)
+  nginx:
+    image: nginx:alpine
+    container_name: dlugomat-nginx
+    restart: unless-stopped
+    depends_on:
+      - kong
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - certbot-data:/var/www/certbot:ro
+    ports:
+      - '80:80'
+      - '443:443'
+
+  # Certbot for SSL
+  certbot:
+    image: certbot/certbot
+    container_name: dlugomat-certbot
+    volumes:
+      - ./nginx/ssl:/etc/letsencrypt
+      - certbot-data:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+volumes:
+  db-data:
+    driver: local
+  storage-data:
+    driver: local
+  certbot-data:
+    driver: local
+
+8.3 Backup strategy
+PostgreSQL: pg_dump co 6h → szyfrowanie GPG → upload do Backblaze B2 (darmowe do 10GB). Retencja: daily 30 dni, weekly 12 tygodni, monthly 12 miesięcy. Storage files: rsync co 24h do secondary volume. Monitoring: cron job sprawdza rozmiar i integralność backupu, alert przez e-mail jeśli backup starszy niż 8h.
+8.4 Alternatywy do Supabase self-hosting
+Jeśli self-hosting Supabase okaże się zbyt złożony dla solo-foundera, rozważyć: Supabase Cloud Pro ($25/mo) — najprostsza opcja, full managed, EU region available. Neon + Clerk + Uploadthing — PostgreSQL (Neon, serverless, auto-scale) + Auth (Clerk, lepszy UX auth niż Supabase) + File upload (Uploadthing) — łączny koszt ~$30-40/mo, ale więcej integracji do utrzymania. PocketBase — single binary, SQLite, auth, storage, realtime — idealny do MVP, ale brak pgvector i skalowania.
+Rekomendacja: start na Supabase Cloud Free → migracja na Pro przy MRR > 2k zł → self-hosting przy MRR > 15k zł lub gdy wymaga tego audyt RODO.
+9. SYSTEM OCR — PIPELINE ROZPOZNAWANIA DOKUMENTÓW
+9.1 Architektura OCR
+Użytkownik uploaduje plik (PDF/JPG/PNG)
+         │
+         ▼
+┌─────────────────────┐
+│  Frontend validation │  ← sprawdzenie: rozmiar ≤10MB, typ MIME, wymiary
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│  Upload do Supabase  │  ← bucket 'ocr-uploads', path: {user_id}/{case_id}/
+│  Storage             │
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐    confidence ≥ 80%    ┌─────────────────────┐
+│  Tesseract.js        │ ─────────────────────→ │  NakazParser         │
+│  (server-side Worker)│                        │  (ekstrakcja pól)    │
+└──────────┬──────────┘                        └──────────┬──────────┘
+           │ confidence < 80%                              │
+           ▼                                               │
+┌─────────────────────┐                                    │
+│  AWS Textract        │ ─────────────────────────────────→│
+│  (fallback)          │                                    │
+└─────────────────────┘                                    │
+                                                           ▼
+                                                ┌─────────────────────┐
+                                                │  AI Analyzer          │
+                                                │  (Claude Sonnet 4.6) │
+                                                │  — typ dokumentu     │
+                                                │  — wykryte zarzuty   │
+                                                │  — scoring szansy    │
+                                                └──────────┬──────────┘
+                                                           │
+                                                           ▼
+                                                ┌─────────────────────┐
+                                                │  Zapis do ocr_results│
+                                                │  + auto-fill form    │
+                                                └─────────────────────┘
+
+9.2 NakazParser — specjalizowany parser
+NakazParser (lib/ocr/nakaz-parser.ts) to specjalizowany moduł do ekstrakcji danych z nakazów zapłaty EPU. Nakazy EPU mają standaryzowany format (generowane przez system e-Sądu), co pozwala na regex-based extraction z wysoką dokładnością.
+Pola do ekstrakcji: sygnatura (regex: /VI\s*Nc-e\s*\d{5,7}\/\d{2}/i), sąd (zawsze „Sąd Rejonowy Lublin-Zachód w Lublinie, VI Wydział Cywilny"), data wydania (regex: /dnia\s+(\d{1,2})\s+(stycznia|lutego|...|grudnia)\s+(\d{4})/i), powód (nazwa i adres — sekcja po „Powód:“), pozwany (sekcja po „Pozwany:”), kwota główna (regex: /kwot[ęa]\s+([\d\s]+[,\.]\d{2})\s*z[łl]/i), odsetki (regex po „odsetkami"), koszty procesu (regex po „kosztami procesu"), oraz podstawa roszczenia (sekcja „z tytułu" lub „na podstawie").
+Confidence scoring: pola krytyczne (sygnatura, sąd, data, kwota) mają wyższą wagę. Jeśli sygnatura i data wykryte → base confidence +40%. Kwoty wykryte → +30%. Strony wykryte → +20%. Pełna identyfikacja → 90%+.
+9.3 Obsługa pism komorniczych
+Pisma komornicze nie mają standaryzowanego formatu — każdy komornik ma własny wzór. Parser używa heurystyk: identyfikacja komornika (regex na „Komornik Sądowy" + imię i nazwisko + „przy Sądzie Rejonowym w…"), sygnatura komornicza (regex: /Km\s*\d+\/\d{2}/i lub /GKm\s*\d+\/\d{2}/i), wierzyciel i dłużnik, kwota egzekwowana, numer konta bankowego objętego zajęciem. Przy confidence < 70% → prompt użytkownika do ręcznego uzupełnienia.
+10. AI ENGINE — PROMPTY, RAG, WALIDACJA
+10.1 Pipeline generowania pisma (szczegółowy)
+[1] INPUT VALIDATION
+     │
+     │  Zod schema per document_type
+     │  ↳ brak wymaganych pól → HTTP 400
+     │
+[2] RAG CONTEXT RETRIEVAL
+     │
+     │  a) Określ applicable tags na podstawie case_type i form_data
+     │     np. sprzeciw_epu + cesja = ['epu', 'przedawnienie', 'cesja', 'legitymacja']
+     │  b) Query embedding (text-embedding-3-small via OpenAI lub Cohere)
+     │     → pgvector similarity search (top 5-10 fragmentów)
+     │  c) Filter: is_active = true, effective_date <= NOW()
+     │  d) Concat context (max 4000 tokens)
+     │
+[3] PROMPT COMPOSITION
+     │
+     │  system_prompt + legal_context + user_data + output_format
+     │  ↳ total prompt: 6-12k tokens (zależnie od typu pisma)
+     │
+[4] CLAUDE SONNET 4.6 GENERATION
+     │
+     │  via APIPod.ai ($1/M input, $7/M output)
+     │  temperature: 0.2 (niski — precyzja prawna)
+     │  max_tokens: 4000 (sprzeciw) do 8000 (upadłość)
+     │  stop_sequences: ["---KONIEC---"]
+     │
+[5] RESPONSE PARSING
+     │
+     │  a) Wyodrębnij sekcje pisma (nagłówek, żądanie, uzasadnienie, podstawa, podpis)
+     │  b) Sprawdź kompletność struktury
+     │  c) Sanitize (usunięcie artefaktów AI, komentarzy)
+     │
+[6] HAIKU VALIDATION
+     │
+     │  Claude Haiku 4.5 ($0.20/M input, $1.00/M output)
+     │  Prompt: checklist 15-20 punktów per typ pisma
+     │  Output: { score: 0-100, issues: [...], auto_fixable: [...] }
+     │
+[7] AUTO-FIX (jeśli score < 80)
+     │
+     │  a) Haiku identifies fixable issues (np. brak daty, niepełny adres)
+     │  b) Sonnet re-generates only problematic sections
+     │  c) Max 2 retry (po 2 → accept with warnings)
+     │
+[8] SAVE & RETURN
+     │
+     │  a) Zapis content_markdown do documents
+     │  b) Zapis tokeny, koszt, czas, model, score
+     │  c) Zapis case_event ('document_generated')
+     │  d) Zwrot { document_id, content_markdown, validation_score, warnings }
+
+10.2 System Promptów — architektura
+Każdy prompt składa się z czterech warstw:
+Warstwa 1 — System Prompt (wspólny): definiuje rolę AI, styl, ograniczenia. Używany we wszystkich typach pism.
+Jesteś ekspertem prawa cywilnego i procesowego specjalizującym się w polskim 
+systemie prawnym. Generujesz profesjonalne pisma procesowe na podstawie danych 
+dostarczonych przez użytkownika.
+
+ZASADY:
+1. Pismo MUSI być zgodne z wymogami formalnymi Kodeksu postępowania cywilnego.
+2. Używaj wyłącznie aktualnych przepisów (stan prawny na kwiecień 2026).
+3. NIGDY nie wymyślaj sygnatur, dat, nazwisk — używaj WYŁĄCZNIE danych podanych.
+4. Każde twierdzenie prawne MUSI mieć podstawę prawną (artykuł, paragraf).
+5. Styl: formalny, rzeczowy, bez emocji, bez potoczności.
+6. Format: Markdown z nagłówkami ## dla sekcji pisma.
+7. Zakończ pismo znacznikiem ---KONIEC---
+
+Warstwa 2 — Legal Context (RAG): wklejony kontekst z bazy legal_knowledge. Przykład dla sprzeciwu EPU:
+KONTEKST PRAWNY (wykorzystaj jako podstawę argumentacji):
+
+Art. 505^1 KPC: Sprzeciw od nakazu zapłaty wnosi się do sądu, który wydał 
+nakaz zapłaty. [...]
+
+Art. 118 KC: Termin przedawnienia wynosi sześć lat, a dla roszczeń o świadczenia 
+okresowe oraz roszczeń związanych z prowadzeniem działalności gospodarczej – trzy lata. 
+[...]
+
+Art. 117 § 2^1 KC: Po upływie terminu przedawnienia nie można domagać się 
+zaspokojenia roszczenia przysługującego przeciwko konsumentowi. [...]
+
+Wyrok SN II CSK 456/21: "Fundusz sekurytyzacyjny nabywający wierzytelność 
+nie może powoływać się na przerwanie biegu przedawnienia dokonane przez 
+pierwotnego wierzyciela..."
+
+[...kolejne fragmenty z RAG...]
+
+Warstwa 3 — User Data (structured): dane z formularza w formacie JSON.
+DANE SPRAWY:
+{
+  "sygnatura": "VI Nc-e 2345678/25",
+  "sad": "Sąd Rejonowy Lublin-Zachód w Lublinie, VI Wydział Cywilny",
+  "data_nakazu": "2025-11-20",
+  "data_doreczenia": "2026-04-01",
+  "powod": {
+    "nazwa": "Fundusz Sekurytyzacyjny Gamma Sp. z o.o.",
+    "adres": "ul. Przykładowa 10, 00-001 Warszawa"
+  },
+  "pozwany": {
+    "nazwa": "Anna Nowak",
+    "adres": "ul. Testowa 5/12, 30-001 Kraków"
+  },
+  "kwota_glowna": 8450.00,
+  "kwota_odsetki": 3210.50,
+  "kwota_koszty": 30.00,
+  "zarzuty": ["przedawnienie", "brak_legitymacji_czynnej", "niewlasciwa_cesja"],
+  "dodatkowe_okolicznosci": "Umowa pożyczki z 2018 roku z bankiem XYZ. 
+    Pożyczka spłacona w 80%. Fundusz kupił wierzytelność w 2024."
+}
+
+Warstwa 4 — Output Format (instrukcje formatowania):
+WYMAGANY FORMAT PISMA:
+
+## [Miejscowość], dnia [data_dzisiejsza]
+
+## Sąd Rejonowy Lublin-Zachód w Lublinie
+## VI Wydział Cywilny
+
+Sygn. akt: [sygnatura]
+
+Pozwany: [pozwany_nazwa], [pozwany_adres]
+Powód: [powod_nazwa], [powod_adres]
+
+## SPRZECIW OD NAKAZU ZAPŁATY W POSTĘPOWANIU UPOMINAWCZYM
+
+Działając w imieniu własnym, wnoszę sprzeciw od nakazu zapłaty z dnia 
+[data_nakazu], doręczonego w dniu [data_doreczenia], wydanego w sprawie 
+[sygnatura], i wnoszę o:
+
+[ŻĄDANIE — oddalenie powództwa w całości + zasądzenie kosztów]
+
+## UZASADNIENIE
+
+[Dla każdego zarzutu: osobny akapit z argumentacją + powołanie na przepis]
+
+## PODSTAWA PRAWNA
+
+[Lista artykułów]
+
+## ZAŁĄCZNIKI
+
+[Lista załączników]
+
+[podpis pozwanego]
+
+---KONIEC---
+
+10.3 Prompty per moduł — klucze
+D2 Sprzeciwomat EPU: system + RAG (art. 505¹ KPC, art. 117-118 KC, orzecznictwo SN ws. przedawnienia, cesji) + user data + format sprzeciwu. Warianty zarzutów (wybierane w formularzu, włączane do promptu): przedawnienie roszczenia (art. 118 KC), brak legitymacji czynnej powoda (brak dowodu cesji), nieudowodnienie roszczenia co do wysokości, nieudowodnienie roszczenia co do zasady, niezgodność danych (zły PESEL, zła kwota), brak wymagalności roszczenia, sprzeczność z zasadami współżycia społecznego, zarzut spełnienia świadczenia (częściowego lub całkowitego), zarzut potrącenia. Każdy zarzut ma dedykowany sub-prompt z odpowiednim kontekstem RAG.
+D3 KomornikShield: 6 typów pism, każdy z osobnym promptem. Wniosek o zwolnienie rachunku bankowego z zajęcia — RAG: art. 54 Prawo bankowe, art. 833 KPC. Prompt generuje wniosek wskazujący, które wpływy na konto są wolne od egzekucji (wynagrodzenie do kwoty wolnej, świadczenia 800+, zasiłki). Wniosek o zwolnienie świadczeń z egzekucji — RAG: art. 833 § 6 KPC (świadczenia rodzinne, 800+, alimenty). Skarga na czynności komornika — RAG: art. 767 KPC. Termin 7 dni. Prompt generuje skargę z opisem naruszonych przepisów. Wniosek o ograniczenie egzekucji — RAG: art. 829 KPC (przedmioty wyłączone z egzekucji). Wniosek o umorzenie egzekucji — RAG: art. 825 KPC (umorzenie na wniosek wierzyciela lub z urzędu). Wniosek o rozłożenie na raty — mniej formalny, ale wymaga uzasadnienia sytuacji materialnej.
+D5 BIK-Fix: 3-etapowy pipeline, 3 osobne prompty. Reklamacja do banku (etap 1): prompt z danymi kredytu, żądanie usunięcia/korekty wpisu, powołanie na art. 105a Prawo bankowe. Wniosek do BIK (etap 2): jeśli bank odmówi — prompt generujący wniosek bezpośrednio do BIK S.A. z powołaniem na RODO (art. 16-17). Skarga do UODO (etap 3): jeśli BIK odmówi — prompt generujący skargę do Urzędu Ochrony Danych Osobowych.
+D6 CesjaCheck: RAG: orzecznictwo SN ws. cesji wierzytelności, wymagania dowodowe funduszów sekurytyzacyjnych, art. 509-518 KC. Prompt analizuje pozew funduszu i generuje odpowiedź z zarzutami: brak udowodnienia cesji (brak umowy cesji, brak zawiadomienia dłużnika), przedawnienie, nieudowodnienie wysokości.
+D7 UgodoMat: prompt z „językiem korzyści" — pisma negocjacyjne do wierzycieli. RAG: zasady negocjacji, przykłady skutecznych ugód, progi umorzenia (banki typowo umarzają 20–50% odsetek). Generuje propozycję z kalkulacją: ile dłużnik może płacić, ile rat, ile wierzyciel zyskuje vs. kosztowna egzekucja.
+D8 Upadłość-Lite: najobszerniejszy prompt. Generuje pakiet 5 dokumentów. RAG: Prawo restrukturyzacyjne, art. 4911–49122 Prawo upadłościowe. Kwalifikacyjna ankieta (front-end) sprawdza, czy użytkownik spełnia warunki upadłości konsumenckiej — Sonnet ocenia i generuje recommendation letter + dokumenty jeśli eligible.
+10.4 Walidacja (Haiku Checklist)
+Prompt walidacyjny dla Claude Haiku 4.5 — przykład dla sprzeciwu EPU:
+Sprawdź poniższe pismo procesowe (sprzeciw od nakazu zapłaty EPU) 
+pod kątem następującej checklisty. Dla każdego punktu odpowiedz TAK/NIE.
+
+CHECKLIST:
+1. Czy pismo zawiera miejscowość i datę?
+2. Czy wskazano prawidłowy sąd (Sąd Rejonowy Lublin-Zachód)?
+3. Czy podano sygnaturę akt?
+4. Czy wskazano dane pozwanego (imię, nazwisko, adres)?
+5. Czy wskazano dane powoda (nazwa, adres)?
+6. Czy pismo jest zatytułowane "SPRZECIW"?
+7. Czy zawiera żądanie oddalenia powództwa?
+8. Czy żąda zasądzenia kosztów procesu?
+9. Czy uzasadnienie zawiera co najmniej jeden zarzut merytoryczny?
+10. Czy każdy zarzut jest poparty podstawą prawną (artykuł)?
+11. Czy powołano się na prawidłowe przepisy (nie zmyślone)?
+12. Czy daty w piśmie są spójne (data nakazu < data doręczenia < data pisma)?
+13. Czy kwoty w piśmie odpowiadają kwotom z danych wejściowych?
+14. Czy pismo zawiera sekcję "Załączniki"?
+15. Czy język jest formalny (brak kolokwializmów, emocji)?
+16. Czy pismo zawiera podpis pozwanego?
+
+Odpowiedz w formacie JSON:
+{
+  "score": [0-100],
+  "passed": ["1", "2", ...],
+  "failed": ["X"],
+  "warnings": ["opis problemu i sugestia naprawy"],
+  "auto_fixable": [true/false per warning]
+}
+
+10.5 Fallback strategy
+Jeśli APIPod nie odpowiada w 30s: retry 1× z 5s delay. Jeśli nadal nie odpowiada: przełączenie na bezpośrednie API Anthropic (droższe, ale niezależne). Jeśli Anthropic API down: użyj predefiniowanego szablonu pisma (statyczny HTML z placeholderami) + flaga is_template: true. Użytkownikowi wyświetl komunikat: „Wygenerowaliśmy pismo na podstawie szablonu. Ze względu na tymczasową niedostępność AI, zalecamy dodatkową weryfikację. Możesz bezpłatnie wygenerować pismo ponownie w ciągu 24h."
+10.6 Token tracking & cost control
+Każde wywołanie AI logowane: model, tokens_input, tokens_output, cost_usd, latency_ms. Dashboard admin: dzienny/tygodniowy/miesięczny koszt AI, średni koszt per dokument, rozkład użycia modeli. Alert: jeśli dzienny koszt > $10 (wskazuje na abuse lub pętlę retry). Per-user limit: max 10 generowań dziennie (zapobiega abuse na darmowym scannerze D1).
+11. MODUŁY BIZNESOWE (D1–D10) — SPECYFIKACJA SZCZEGÓŁOWA
+11.1 D1 — Skaner Nakazu (DARMOWY)
+Cel: lead magnet. Użytkownik uploaduje nakaz zapłaty, dostaje darmową analizę z procentowym scoring szansy obrony. CTA: „Wygeneruj sprzeciw za 159 zł".
+Workflow:
+10. Landing page z drag-and-drop upload zone
+11. OCR (Tesseract → Textract fallback)
+12. NakazParser ekstrahuje dane
+13. AI Analyzer (Sonnet) ocenia: typ dokumentu, identyfikuje potencjalne zarzuty, scoring 0–100%
+14. Wyświetl wynik: „Szansa na skuteczny sprzeciw: 78%" + lista wykrytych zarzutów (przedawnienie: tak, cesja: tak, kwota sporna: nie)
+15. CTA button: „Wygeneruj sprzeciw — 159 zł"
+16. Capture email (wymagane do zobaczenia pełnego raportu)
+Formularz: brak (tylko upload + email)
+Generowane pisma: brak (moduł analityczny)
+Monetyzacja: indirect — konwersja do D2
+Koszt AI: ~0.05–0.10 zł per analiza (Sonnet, krótki prompt ~2k input + 1k output)
+11.2 D2 — Sprzeciwomat EPU (159 zł)
+Cel: flagowy produkt Długomatu. Generowanie profesjonalnego sprzeciwu od nakazu zapłaty wydanego w elektronicznym postępowaniu upominawczym (EPU).
+Workflow (wizard 6 kroków):
+Krok 1 — Upload dokumentu: użytkownik uploaduje skan/zdjęcie nakazu zapłaty lub wezwania do zapłaty. OCR parsuje dane. Jeśli brak dokumentu → ręczne wypełnienie.
+Krok 2 — Dane sprawy: auto-fill z OCR. Pola: sygnatura, sąd, data wydania nakazu, data doręczenia (krytyczna — liczy termin 14 dni), powód (nazwa, adres), pozwany (imię, nazwisko, adres, PESEL opcjonalnie), kwota główna, odsetki, koszty. Walidacja: sygnatura w formacie EPU, data doręczenia nie może być w przyszłości, kwota > 0.
+Krok 3 — Wybór zarzutów: dynamiczna lista checkboxów z opisami. Każdy zarzut ma ikonę i tooltip wyjaśniający w prostym języku. Domyślnie pre-selected zarzuty wykryte przez AI Analyzer (D1). Użytkownik może dodać dodatkowe okoliczności w polu tekstowym.
+Krok 4 — Dane dodatkowe: pola kontekstowe zależne od wybranych zarzutów. Przedawnienie → „Kiedy powstało zobowiązanie? (data umowy/faktury)“. Cesja → „Czy otrzymałeś zawiadomienie o cesji? Nazwa pierwotnego wierzyciela.” Spełnienie świadczenia → „Ile zapłaciłeś? Kiedy? Sposób płatności?"
+Krok 5 — Podgląd i edycja: AI generuje sprzeciw (loading ~3-8s z typewriter animation). Wyświetlony w edytowalnym polu (rich text editor lub Markdown editor z preview). Użytkownik może modyfikować treść. Validation score badge w rogu.
+Krok 6 — Płatność i pobranie: podsumowanie (typ pisma, sygnatura, cena). Przycisk „Zapłać 159 zł" → Stripe Checkout. Po płatności: PDF odblokowany, przycisk „Pobierz PDF", e-mail z PDF i instrukcją wysłania do sądu. Ustawienie deadline’u D-14 (od daty doręczenia) z powiadomieniami.
+Generowane pisma: Sprzeciw od nakazu zapłaty w postępowaniu upominawczym (1 pismo, 2–5 stron).
+Termin procesowy: 14 dni od doręczenia nakazu (art. 505¹ § 1 KPC). Konsekwencja przekroczenia: nakaz staje się prawomocny → egzekucja.
+Cena: 159 zł (podstawowy) / 199 zł (z dodatkową analizą prawną Opus).
+11.3 D3 — KomornikShield (199 zł pakiet / 79–99 zł per pismo)
+Cel: pakiet pism dla osoby w trakcie egzekucji komorniczej. Każde pismo adresuje inny problem.
+Workflow (wspólny shell, rozgałęzienie po wyborze typu pisma):
+Krok 1 — Upload pisma komorniczego: upload zajęcia konta, zajęcia wynagrodzenia, lub innego pisma komorniczego. OCR. Alternatywnie: ręczne dane.
+Krok 2 — Dane egzekucji: komornik (imię, nazwisko, kancelaria, adres), sygnatura komornicza (Km …/…), wierzyciel, kwota egzekwowana, typ dochodu (umowa o pracę, emerytura, renta, zlecenie, działalność), kwota netto dochodu, osoby na utrzymaniu, świadczenia otrzymywane (800+, alimenty, zasiłki).
+Krok 3 — Wybór pisma: kafelki z ikonami i opisami. Użytkownik wybiera jedno lub pakiet. Dynamiczny kalkulator kwoty wolnej: na podstawie wprowadzonych danych natychmiast pokazuje ile powinno być zwolnione.
+Krok 4 — Dane dodatkowe: zależne od wybranego pisma. Zwolnienie konta → numer konta, bank, typ wpływów. Skarga → opis naruszenia. Raty → propozycja miesięcznej raty.
+Krok 5 — Podgląd i edycja (jak w D2).
+Krok 6 — Płatność i pobranie.
+Generowane pisma (6 typów):
+17. Wniosek o zwolnienie rachunku bankowego z zajęcia (art. 54 Prawo bankowe)
+18. Wniosek o zwolnienie świadczeń z egzekucji (art. 833 § 6 KPC)
+19. Skarga na czynności komornika (art. 767 KPC) — termin 7 dni
+20. Wniosek o ograniczenie egzekucji (art. 829 KPC)
+21. Wniosek o umorzenie postępowania egzekucyjnego (art. 825 KPC)
+22. Wniosek o rozłożenie na raty
+Kalkulator kwoty wolnej — wbudowany komponent (calculators/kwota-wolna.ts): minimalne wynagrodzenie 2026 (aktualizowane co styczeń), algorytm obliczania kwoty wolnej od potrąceń (75% wynagrodzenia minimum dla alimentów, 100% dla innych długów), lista świadczeń niepodlegających egzekucji.
+Cena: pakiet 199 zł (wszystkie 6 pism) / 79 zł (jedno pismo) / 99 zł (2 pisma).
+11.4 D4 — PotrąceniaStop (199 zł pakiet / 79 zł solo)
+Cel: ochrona wynagrodzenia i świadczeń przed nadmiernymi potrąceniami.
+Workflow: kalkulator potrąceń → identyfikacja nadmiernych potrąceń → generowanie pism do pracodawcy i/lub komornika.
+Kalkulator potrąceń (calculators/potracenia.ts): input: wynagrodzenie brutto, typ umowy, osoby na utrzymaniu, rodzaj długu (alimenty/inne), kwota potrącenia z ostatniego paska. Output: maksymalne dopuszczalne potrącenie, kwota nadmiernie potrącona, podstawa prawna (art. 87-91 Kodeks pracy).
+Generowane pisma (2 typy):
+23. Wniosek do pracodawcy o korektę potrąceń (powołanie na art. 87¹ KP)
+24. Wniosek do komornika o zmniejszenie potrąceń (powołanie na art. 833 KPC)
+Cena: 199 zł (pakiet oba pisma) / 79 zł (jedno pismo).
+11.5 D5 — BIK-Fix (129 zł)
+Cel: usunięcie lub korekta negatywnych wpisów w BIK (Biuro Informacji Kredytowej).
+Workflow (3-etapowy):
+Etap 1 — Reklamacja do banku: formularz z danymi kredytu/pożyczki (bank, numer umowy, data, kwota, status w BIK). Generowanie reklamacji do banku z żądaniem usunięcia/korekty wpisu. Termin odpowiedzi banku: 30 dni.
+Etap 2 — Wniosek do BIK: jeśli bank odmówi lub nie odpowie. Generowanie wniosku do BIK S.A. z powołaniem na RODO art. 16 (prawo do sprostowania). Termin: 30 dni.
+Etap 3 — Skarga do UODO: jeśli BIK odmówi. Generowanie skargi do Prezesa Urzędu Ochrony Danych Osobowych.
+Generowane pisma (3 typy, sekwencyjnie):
+25. Reklamacja do banku (art. 105a Prawo bankowe)
+26. Wniosek o sprostowanie/usunięcie danych do BIK S.A. (art. 16-17 RODO)
+27. Skarga do Prezesa UODO (art. 77 RODO)
+Użytkownik płaci raz (129 zł) i otrzymuje dostęp do wszystkich 3 etapów. Etapy 2 i 3 odblokowane po ręcznym potwierdzeniu, że poprzedni etap zakończył się odmową.
+Cena: 129 zł.
+11.6 D6 — CesjaCheck (149 zł)
+Cel: obrona przed pozwami funduszy sekurytyzacyjnych, które kupiły wierzytelność od banku za ułamek wartości.
+Workflow:
+Krok 1 — Upload pozwu funduszu: OCR lub ręczne dane. Parser identyfikuje: fundusz (nazwa, KRS), cedent (bank), data cesji, umowa pierwotna, kwota.
+Krok 2 — Analiza AI: Sonnet analizuje pozew pod kątem typowych słabości funduszy: brak dowodu cesji (umowy cesji lub wyciągu z umowy), brak zawiadomienia dłużnika o cesji (art. 512 KC), przedawnienie (cesja nie przerywa biegu przedawnienia — uchwała SN III CZP 29/16), nieudowodnienie wysokości (brak historii kredytu, wyciągu z ksiąg funduszu).
+Krok 3 — Formularz odpowiedzi: dane pozwanego, wybór zarzutów (pre-selected przez AI), okoliczności dodatkowe.
+Krok 4 — Generowanie odpowiedzi na pozew.
+Krok 5 — Podgląd, edycja, płatność, pobranie.
+Generowane pisma (1 typ + warianty):
+28. Odpowiedź na pozew funduszu sekurytyzacyjnego z zarzutami (2–6 stron)
+Termin: zależny od zarządzenia sądu (zwykle 14 lub 30 dni).
+Cena: 149 zł.
+11.7 D7 — UgodoMat (119 zł)
+Cel: negocjowanie spłaty długu na korzystniejszych warunkach (raty, umorzenie odsetek, redukcja kapitału).
+Workflow:
+Krok 1 — Budżet domowy: kalkulator (calculators/budzet-domowy.ts). Dochody (wynagrodzenie, świadczenia, inne). Wydatki stałe (czynsz, media, jedzenie, transport, leki, ubezpieczenia). Wynik: nadwyżka/deficyt.
+Krok 2 — Lista wierzycieli: dynamiczna lista (dodawanie wierzyciela: nazwa, kwota, typ długu, priorytet). System automatycznie priorytetyzuje (alimenty → ZUS → US → banki → fundusze).
+Krok 3 — Propozycja ugody: AI generuje propozycje na podstawie nadwyżki budżetowej. Np.: 5 wierzycieli, nadwyżka 800 zł/mc → proporcjonalny podział + propozycja umorzenia odsetek.
+Krok 4 — Generowanie pism negocjacyjnych (jedno per wierzyciel).
+Generowane pisma (3 warianty per wierzyciel):
+29. Wniosek o rozłożenie na raty z uzasadnieniem sytuacji materialnej
+30. Wniosek o umorzenie odsetek i kosztów
+31. Propozycja ugody (kompleksowa — raty + częściowe umorzenie)
+Język pism: „język korzyści" — zamiast „nie stać mnie", pisma podkreślają korzyść wierzyciela: „propozycja ugody zapewnia wierzycielowi pewne i regularne wpływy, minimalizując koszty dalszej windykacji i ryzyko upadłości konsumenckiej dłużnika".
+Cena: 119 zł (do 3 wierzycieli) / 179 zł (do 8 wierzycieli).
+11.8 D8 — Upadłość-Lite (249 zł)
+Cel: przygotowanie dokumentacji do upadłości konsumenckiej dla osób w stanie niewypłacalności.
+WAŻNE ZASTRZEŻENIE: Upadłość-Lite NIE zastępuje prawnika w postępowaniu sądowym. Generuje dokumenty wstępne i kwalifikację — użytkownik powinien skonsultować je z prawnikiem przed złożeniem. Disclaimer wyświetlany prominentnie w UI.
+Workflow:
+Krok 1 — Kwalifikacja (ankieta): seria pytań (tak/nie + szczegóły). Czy jesteś niewypłacalny (nie jesteś w stanie spłacać swoich zobowiązań)? Czy prowadzisz działalność gospodarczą? (jeśli tak → upadłość przedsiębiorcy, nie konsumencka). Ile masz wierzycieli? Jakie jest łączne zadłużenie? Czy masz majątek (nieruchomości, samochód, oszczędności)? Przyczyna niewypłacalności (utrata pracy, choroba, rozwód, nieodpowiedzialne zaciąganie kredytów)? Czy byłeś już upadłym? Osoby na utrzymaniu?
+Krok 2 — AI Scoring: Sonnet analizuje odpowiedzi i ocenia szansę na ogłoszenie upadłości (0–100%). Uwzględnia: czy niewypłacalność powstała z winy umyślnej (negatywna przesłanka), czy dłużnik nie ukrywał majątku, czy wcześniej ogłoszono upadłość (<10 lat temu → negatywna przesłanka).
+Krok 3 — Jeśli score ≥ 50%: przejście do generowania dokumentów. Jeśli < 50%: szczegółowe wyjaśnienie dlaczego (z zachęceniem do konsultacji prawnika) + alternatywna ścieżka (UgodoMat).
+Krok 4 — Dane do wniosku: szczegółowy formularz. Lista wierzycieli (nazwa, adres, kwota, tytuł). Lista majątku (nieruchomości, ruchomości, konta, inwestycje). Dochody i wydatki (miesięczne). Oświadczenie o prawdziwości danych.
+Krok 5 — Generowanie pakietu dokumentów.
+Generowane pisma (5 dokumentów):
+32. Wniosek o ogłoszenie upadłości konsumenckiej (art. 491² Prawo upadłościowe)
+33. Wykaz majątku
+34. Spis wierzycieli
+35. Oświadczenie o stanie rodzinnym, majątku, dochodach i źródłach utrzymania
+36. Lista dokumentów do załączenia (checklist)
+Cena: 249 zł.
+11.9 D9 — OCR + AI Parser (wspólny moduł)
+Moduł techniczny (nie user-facing jako osobny produkt). Obsługuje wszystkie moduły D1–D8. Specjalizowane parsery: NakazParser (EPU), KomornikParser (pisma komornicze), PozewParser (pozwy funduszów), BIKParser (raporty BIK). Każdy parser to klasa z metodą parse(rawText: string): ExtractedData. Wspólny interfejs, różne implementacje.
+11.10 D10 — Centrum Dowodzenia (V2, subskrypcja 79 zł/mc)
+Planowane na V2 (po osiągnięciu MRR > 15k zł).
+Dashboard z: przeglądem wszystkich spraw (timeline), kalendarzem terminów procesowych (integracja z Google Calendar), AI chatbot „Co dalej?" (kontekstowy, sugeruje następne kroki), monitoringiem BIK (cykliczne sprawdzanie statusu wpisów), automatycznymi powiadomieniami o zmianach w statusie spraw (np. zmiana komornika, nowe zajęcie), cross-sell do innych modułów LexMate24.
+12. SYSTEM PŁATNOŚCI — STRIPE, FAKTURY, MODELE CENOWE
+12.1 Stripe Integration
+Stripe Checkout (hosted page) — wybrany zamiast Stripe Elements (embedded) ze względu na: szybszą implementację, compliance PCI DSS bez dodatkowej pracy, obsługę BLIK, Przelewy24, karty, Apple Pay, Google Pay out-of-the-box (po aktywacji w dashboard Stripe), oraz responsywny UI bez budowania własnego.
+Stripe Products & Prices: każdy moduł/tier to osobny Stripe Product z Price. Np.: prod_sprzeciw_epu → price_sprzeciw_basic (15900 groszy), price_sprzeciw_premium (19900 groszy). Waluta: PLN. Mode: payment (jednorazowy, nie subscription — z wyjątkiem D10).
+Stripe Webhook handling: endpoint /api/payments/webhook, weryfikacja podpisu (stripe-signature header), obsługa eventów checkout.session.completed (oznacz document jako paid, wyślij email, generuj fakturę), checkout.session.expired (oznacz jako expired, wyślij reminder), charge.refunded (oznacz jako refunded, zablokuj PDF).
+Metadata w sesji Stripe: user_id, case_id, document_id, product_type, pricing_tier, utm_source, utm_medium, utm_campaign. Umożliwia pełne śledzenie konwersji.
+12.2 Fakturowanie
+Integracja z Fakturownia (fakturownia.pl(http://fakturownia.pl/)) — polską platformą do faktur. API: po płatności Stripe → automatyczne wystawienie faktury VAT → PDF → wysyłka na e-mail użytkownika. Dane do faktury: z profilu użytkownika (NIP opcjonalnie, jeśli firma). Faktura pro-forma przed płatnością nie jest wystawiana (upraszcza flow).
+12.3 Cennik (podsumowanie)
+Moduł D1 Skaner Nakazu: darmowy. D2 Sprzeciwomat EPU: 159 zł (basic), 199 zł (premium z Opus). D3 KomornikShield: 199 zł (pakiet 6 pism), 79 zł (1 pismo), 99 zł (2 pisma). D4 PotrąceniaStop: 199 zł (pakiet), 79 zł (solo). D5 BIK-Fix: 129 zł (3 etapy). D6 CesjaCheck: 149 zł. D7 UgodoMat: 119 zł (do 3 wierzycieli), 179 zł (do 8). D8 Upadłość-Lite: 249 zł. D10 Centrum Dowodzenia (V2): 79 zł/mc.
+Pakiety cross-module: „Tarcza Antywindykacyjna" (D2+D3) = 299 zł (zamiast 358 zł), „Pełna Obrona" (D2+D3+D6) = 399 zł (zamiast 507 zł), „Upadłość Komplet" (D7+D8) = 329 zł (zamiast 368 zł).
+12.4 Incubator fee model
+Model 1 — 5% od transakcji: incubator pobiera 5% każdej płatności. Implementacja: Stripe Connect z automatic splitting lub ręczne obliczenie i przelew. Model 2 — 490 zł/mc flat: stała opłata niezależna od przychodów. Break-even: 490 / 0.05 = 9800 zł MRR. Poniżej 9800 zł → korzystniejszy model 5%. Powyżej → flat 490 zł. Rekomendacja: start z 5%, przejście na flat przy MRR > 10k zł.
+13. SYSTEM POWIADOMIEŃ
+13.1 Kanały
+E-mail (AWS SES): koszt ~$0.10/1000 e-maili. Konfiguracja: domain verification (SPF, DKIM, DMARC dla dlugomat.pl(http://dlugomat.pl/)), dedicated IP (opcjonalnie, od $24.95/mo — potrzebne przy >10k emails/day). Szablony: MJML → HTML (responsywne). Typy: powitalny, potwierdzenie płatności, dokument gotowy, deadline reminder (D-7, D-5, D-3, D-1, D-0), newsletter/marketing (opt-in only).
+SMS (SMSAPI.pl(http://smsapi.pl/)): koszt ~0.07–0.09 zł per SMS. Tylko dla deadline reminders D-1 i D-0 (opt-in). Format: „[Długomat] Termin na złożenie sprzeciwu mija JUTRO (17.04.2026). Zaloguj się: dlugomat.pl/panel(http://dlugomat.pl/panel)"
+Push (Web Push API): darmowy. Service Worker + Push API. Notification permission request po pierwszej płatności (nie na wejściu — unikaj push fatigue). Typy: deadline reminders, dokument wygenerowany.
+13.2 Deadline CRON (Edge Function)
+Supabase Edge Function deadline-checker uruchamiana co godzinę (CRON: 0 * * * *). Algorytm: query deadlines WHERE is_completed = false AND deadline_date >= CURRENT_DATE. Dla każdego deadline’u: sprawdź które powiadomienia jeszcze nie wysłane (notif_d7_sent, etc.). Jeśli dzisiaj = deadline_date - 7 AND notif_d7_sent = false → wyślij email + update notif_d7_sent = true. Analogicznie D-5, D-3, D-1, D-0 (rano, godzina 8:00), D-0 (wieczór, godzina 19:00 — „OSTATNIA SZANSA").
+14. SZATA GRAFICZNA — ZAAWANSOWANE ELEMENTY
+14.1 Landing Page — struktura sekcji
+Hero Section: nagłówek „Bronisz się przed komornikiem? Pomożemy." + podtytuł „Automatycznie generuj profesjonalne pisma procesowe. Taniej niż prawnik. Szybciej niż myślisz." + 2 CTA buttons: „Skanuj nakaz za darmo" (primary, zielony) + „Zobacz cennik" (secondary, outline). + ilustracja: shield icon z animacją (SVG animated), tło gradient shield-50 → white. + Trust badge: „Ponad [X] wygenerowanych pism | [Y] skuteczność | 14-dniowa gwarancja". Background: subtle grid pattern (opacity 3%), diagonal gradient shield-50 do white.
+Jak to działa (4 kroki): karty z ikonami + numerami + opisami. Krok 1: Wgraj dokument (ikona: upload cloud). Krok 2: AI analizuje sprawę (ikona: magnifying glass + brain). Krok 3: Wygeneruj pismo (ikona: document with sparkle). Krok 4: Pobierz i wyślij do sądu (ikona: download + stamp). Animacja: karty pojawiają się sekwencyjnie (staggered fade-in) przy scroll.
+Social proof / Testimonials: karousel 3–5 testimoniali. Format: zdjęcie (avatar generyczny), imię + lokalizacja, gwiazdki, cytat. „Dzięki Długomatowi złożyłam sprzeciw w 20 minut. Sąd oddalił nakaz." — Anna, Kraków. Trust badges poniżej: „Dane chronione szyfrowaniem AES-256", „Płatności przez Stripe", „Zgodne z RODO".
+Cennik (pricing table): 3 kolumny (Sprzeciw EPU / Pakiet Komornik / Pełna Tarcza), badge „NAJPOPULARNIEJSZY" na środkowej, lista cech z checkmarkami, przekreślona cena prawnika, przycisk CTA.
+FAQ: accordion (10–15 pytań). Schema.org(http://schema.org/) FAQPage markup. Pytania: „Czy to legalne?“, „Czy AI może pisać pisma procesowe?”, „Co jeśli mam mało czasu?“, „Czy potrzebuję prawnika?”, „Jak działa gwarancja?“, „Jakie metody płatności akceptujecie?”, etc.
+Footer: logo, nawigacja (Produkty, Cennik, Blog, Kontakt, Regulamin, Polityka prywatności), social links, NIP, adres firmy.
+14.2 Dashboard — layout
+Sidebar (desktop): logo na górze, nawigacja z ikonami (Panel, Sprawy, Dokumenty, Terminy, Płatności, Profil), badge z liczbą aktywnych spraw, nadchodzący deadline (jeśli <3 dni — czerwony pulsujący badge), przycisk „Nowa sprawa" (zielony, wyraźny). Width: 260px. Collapsible do 72px (ikony only).
+Header (top bar): breadcrumbs (Panel > Sprawy > VI Nc-e 1234567/25), search bar (Ctrl+K shortcut), notification bell z badge, avatar + dropdown (Profil, Ustawienia, Wyloguj).
+Main content area: karty z danymi, tabele, formularze. Max width: 1200px, centered.
+Mobile: bottom navigation bar (4 ikony: Panel, Sprawy, Terminy, Menu), full-width content, sheet (bottom drawer) zamiast sidebar.
+14.3 Ikony i ilustracje
+Ikony: Lucide Icons (MIT license, consistent style, tree-shakeable). Dodatkowe custom ikony (SVG): tarcza (shield — logo metaphor), dokument z pieczęcią, komornik (figurka z teczką), zegar z wykrzyknikiem (deadline).
+Ilustracje: custom SVG illustrations na stronach marketingowych. Styl: flat, clean, 2-color (shield-600 + hope-500), minimalistyczny. Generowane przez AI (Midjourney/DALL-E) i wyedytowane w Figma. Empty states: ilustracja + tekst zachęcający do akcji (np. „Nie masz jeszcze żadnych spraw. Zacznij od skanowania nakazu — za darmo!").
+14.4 Dark Mode
+Obsługa dark mode (prefers-color-scheme + manual toggle w ustawieniach). Paleta dark: background #0F1729, surface #1A2332, text #E5E7EB, primary shield-400 (lighter for dark bg), borders #2D3748. Implementacja: Tailwind dark: prefix + CSS custom properties. Cookie persistence (nie system-only — user choice remembered).
+15. BEZPIECZEŃSTWO
+15.1 RODO (GDPR) Compliance
+Minimalizacja danych: zbieramy tylko dane niezbędne do wygenerowania pisma. Dane PESEL opcjonalne (nie wymagane do generowania — tylko jeśli użytkownik chce wpisać w pismo). Retencja: dane sprawy 30 dni po statusie completed, potem anonimizacja (usunięcie danych osobowych, zachowanie metadata do analityki). Prawo do usunięcia: endpoint /api/profile/delete — hard delete profilu + kaskadowe usunięcie spraw + dokumentów + OCR + plików Storage. Prawo do eksportu: endpoint /api/profile/export — JSON z wszystkimi danymi użytkownika. Cookie banner: analityka (PostHog) i marketing require opt-in. Polityka prywatności: szczegółowy dokument opisujący zbieranie, przetwarzanie, udostępnianie danych.
+15.2 Szyfrowanie
+At-rest: Supabase Cloud automatyczne szyfrowanie (AES-256). Self-hosted: LUKS encryption na volume. Dane wrażliwe (PESEL): dodatkowe szyfrowanie na poziomie kolumny (pgcrypto encrypt()/decrypt() z server-side key). In-transit: TLS 1.3 (Vercel automatic, self-hosted via Nginx + Let’s Encrypt). API keys: nigdy w kodzie — env variables, Vercel encrypted env, self-hosted: Docker secrets.
+15.3 Authentication Security
+Supabase Auth: bcrypt password hashing, JWT tokens (1h expiry, refresh tokens), rate limiting na auth endpoints (5 req/min). Magic link: link ważny 1h, single-use. CSRF: Supabase auth cookies z SameSite=Lax. XSS: React automatic escaping + CSP headers + sanitize user-generated content (DOMPurify na document content editor).
+15.4 Input Validation
+Every API endpoint: Zod schema validation. File uploads: MIME type validation (buffer magic bytes, not just extension), virus scanning (ClamAV — opcjonalne, V2), rozmiar limit (10MB). SQL injection: Supabase client uses parameterized queries (never raw SQL in API routes). Prompt injection: user input sanitized before inclusion in AI prompt (strip control characters, limit length, escape markdown).
+16. DEPLOYMENT — CI/CD, GITHUB ACTIONS
+16.1 GitHub Repository Setup
+# Inicjalizacja repozytorium
+gh repo create dlugomat --private --clone
+cd dlugomat
+
+# Branch strategy
+git checkout -b develop
+# main — production (protected, requires PR + review)
+# develop — staging (auto-deploy to preview)
+# feature/* — feature branches
+
+# Branch protection rules (main):
+# - Require pull request (1 approval)
+# - Require status checks (CI pipeline)
+# - No force push
+# - No deletion
+
+16.2 GitHub Actions — CI Pipeline
+# .github/workflows/ci.yml
+name: CI Pipeline
+
+on:
+  push:
+    branches: [develop, main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-type-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm type-check
+
+  unit-tests:
+    runs-on: ubuntu-latest
+    needs: lint-and-type-check
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test:unit
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/
+
+  e2e-tests:
+    runs-on: ubuntu-latest
+    needs: unit-tests
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps
+      - run: pnpm test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [unit-tests]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_STRIPE_PUBLIC_KEY: ${{ secrets.STRIPE_PUBLIC_KEY }}
+
+16.3 Deployment Pipeline
+# .github/workflows/deploy-production.yml
+name: Deploy to Production
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
+          
+  run-migrations:
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+      - run: supabase db push --db-url ${{ secrets.SUPABASE_DB_URL }}
+
+16.4 Environment Variables
+# .env.local.example
+
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
+SUPABASE_SERVICE_ROLE_KEY=eyJ...
+SUPABASE_DB_URL=postgresql://...
+
+# AI (APIPod)
+APIPOD_API_KEY=sk-...
+APIPOD_BASE_URL=https://api.apipod.ai/v1
+ANTHROPIC_API_KEY=sk-ant-...  # direct fallback
+
+# Stripe
+NEXT_PUBLIC_STRIPE_PUBLIC_KEY=pk_live_...
+STRIPE_SECRET_KEY=sk_live_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+
+# AWS SES
+AWS_SES_ACCESS_KEY_ID=AKIA...
+AWS_SES_SECRET_ACCESS_KEY=...
+AWS_SES_REGION=eu-west-1
+AWS_SES_FROM_EMAIL=powiadomienia@dlugomat.pl
+
+# SMS
+SMSAPI_TOKEN=...
+SMSAPI_FROM=Dlugomat
+
+# OCR
+AWS_TEXTRACT_ACCESS_KEY_ID=AKIA...
+AWS_TEXTRACT_SECRET_ACCESS_KEY=...
+AWS_TEXTRACT_REGION=eu-central-1
+
+# Fakturownia
+FAKTUROWNIA_API_TOKEN=...
+FAKTUROWNIA_PREFIX=dlugomat
+
+# Analytics
+NEXT_PUBLIC_POSTHOG_KEY=phc_...
+NEXT_PUBLIC_POSTHOG_HOST=https://eu.i.posthog.com
+
+# App
+NEXT_PUBLIC_APP_URL=https://dlugomat.pl
+NEXT_PUBLIC_APP_NAME=Długomat
+NODE_ENV=production
+
+17. MONITORING I ANALITYKA
+17.1 Analytics (PostHog)
+Self-hosted PostHog (docker) lub cloud (EU region). Tracking: page views, button clicks (every CTA), funnel analysis (landing → register → scan → generate → pay → download), feature usage (which modules, which arguments selected), retention (7-day, 30-day), session recording (opt-in, for UX debugging), A/B testing (pricing, copy, layout).
+Key funnels to track: Visit → Free Scan (D1 conversion), Scan → Register (lead capture), Register → Generate (activation), Generate → Pay (monetization), Pay → Download (completion), Download → Second Purchase (retention/cross-sell).
+17.2 Error Monitoring
+Sentry (sentry.io(http://sentry.io/), free tier 5k events/mo). Frontend: automatic error catching (React Error Boundary + Sentry React integration). Backend: Sentry middleware on API routes. Custom context: user_id, case_type, AI model used, OCR provider. Alert rules: >10 errors/hour → Slack/email notification.
+17.3 Uptime Monitoring
+Better Uptime (betteruptime.com(http://betteruptime.com/), free tier). Monitored endpoints: dlugomat.pl(http://dlugomat.pl/) (homepage), /api/health (custom health check endpoint), Supabase API, APIPod API. Check interval: 3 minutes. Alert: email + SMS.
+17.4 AI Quality Monitoring
+Dashboard (admin panel): średni validation_score per typ pisma per tydzień, rozkład scores (histogram), pisma z score < 70 (flagged for manual review), koszt AI per dokument (trend), latency per model (trend). Weekly review: admin przegląda 5–10 losowych pism (quality assurance).
+18. ROADMAP WDROŻENIOWA — FAZY I ESTYMACJE TOKENÓW
+18.1 Faza 0 — Setup (2–3 dni)
+Zadania: GitHub repo + branch strategy, Next.js boilerplate (create-next-app), Tailwind + shadcn/ui setup, Supabase project (cloud free tier), ESLint + Prettier + TypeScript strict config, folder structure (jak w sekcji 4), .env.local, Vercel project + deploy preview.
+Estymacja tokenów (Kilo Code): ~15–20 interakcji × 8k tokens = ~120–160k tokens. Koszt APIPod (Sonnet): ~$0.15–0.20 → ~0.60–0.80 zł.
+18.2 Faza 1 — Core (5–7 dni)
+Zadania: Supabase Auth integration (login, register, magic link, middleware), database migrations (wszystkie tabele z sekcji 7), Supabase client utilities (browser, server, admin), layout components (marketing, dashboard, wizard shell), basic routing (all route groups), standaryzacja API response format, Zod validators (core schemas).
+Estymacja tokenów: ~40–60 interakcji × 10k tokens = ~400–600k tokens. Koszt: ~$0.50–0.80 → ~2.00–3.20 zł.
+18.3 Faza 2 — OCR Pipeline (3–5 dni)
+Zadania: Tesseract.js server-side Worker, upload flow (drag-drop → Supabase Storage → OCR → parse), NakazParser, KomornikParser, AWS Textract fallback integration, OCR review UI component (podświetlone pola).
+Estymacja tokenów: ~30–45 interakcji × 10k tokens = ~300–450k tokens. Koszt: ~$0.40–0.60 → ~1.60–2.40 zł.
+18.4 Faza 3 — AI Engine (5–7 dni)
+Zadania: Claude client (APIPod wrapper z fallback), RAG pipeline (embeddings, retriever, pgvector queries), prompt templates (wszystkie typy pism), generation pipeline (composition → call → parse → validate → retry), Haiku validation, token tracking, fallback templates.
+Estymacja tokenów: ~50–70 interakcji × 12k tokens = ~600–840k tokens (prompty w kontekście są dłuższe). Koszt: ~$0.80–1.20 → ~3.20–4.80 zł. Plus testowanie promptów (AI calls): ~$2–5 → ~8–20 zł.
+18.5 Faza 4 — Moduł D1 + D2 (5–7 dni)
+Zadania: Landing page D1 (scan CTA), D1 workflow (upload → OCR → AI analysis → scoring → CTA), D2 wizard (6 kroków), wszystkie formularze D2, zarzuty selection UI, PDF template sprzeciwu, payment flow (Stripe Checkout), download page, deadline creation, email notifications (welcome, payment confirmation, deadline reminders).
+Estymacja tokenów: ~60–80 interakcji × 10k tokens = ~600–800k tokens. Koszt: ~$0.80–1.10 → ~3.20–4.40 zł.
+18.6 Faza 5 — Moduły D3 + D4 (4–6 dni)
+Zadania: D3 KomornikShield (6 pism, kalkulator kwoty wolnej, wizard), D4 PotrąceniaStop (kalkulator potrąceń, 2 pisma). Reuse wizard shell i payment flow.
+Estymacja tokenów: ~40–60 interakcji × 10k tokens = ~400–600k tokens. Koszt: ~$0.50–0.80 → ~2.00–3.20 zł.
+18.7 Faza 6 — Moduły D5 + D6 + D7 (5–7 dni)
+Zadania: D5 BIK-Fix (3-etapowy flow), D6 CesjaCheck (pozew parser, odpowiedź), D7 UgodoMat (budżet calculator, multi-wierzyciel). Więcej formularzy, ale reuse komponentów core.
+Estymacja tokenów: ~50–70 interakcji × 10k tokens = ~500–700k tokens. Koszt: ~$0.65–0.95 → ~2.60–3.80 zł.
+18.8 Faza 7 — Moduł D8 (3–5 dni)
+Zadania: D8 Upadłość-Lite (ankieta kwalifikacyjna, AI scoring, 5 dokumentów, extensive prompts).
+Estymacja tokenów: ~35–50 interakcji × 12k tokens = ~420–600k tokens. Koszt: ~$0.55–0.85 → ~2.20–3.40 zł.
+18.9 Faza 8 — Marketing site + SEO (3–4 dni)
+Zadania: Landing page finalna (hero, how-it-works, pricing, testimonials, FAQ), blog setup (MDX lub CMS), SEO meta tags, Open Graph, Schema.org(http://schema.org/), sitemap, robots.txt, Core Web Vitals optimization.
+Estymacja tokenów: ~25–35 interakcji × 8k tokens = ~200–280k tokens. Koszt: ~$0.25–0.40 → ~1.00–1.60 zł.
+18.10 Faza 9 — Polish & Launch (3–5 dni)
+Zadania: dark mode, accessibility audit, responsive testing, edge case handling, error pages (404, 500), legal pages (regulamin, polityka prywatności), admin dashboard, Sentry + PostHog setup, load testing, security audit (OWASP top 10), final deployment.
+Estymacja tokenów: ~30–40 interakcji × 8k tokens = ~240–320k tokens. Koszt: ~$0.30–0.45 → ~1.20–1.80 zł.
+18.11 Podsumowanie kosztów tokenów — Długomat
+---------------------------------------------
+| |Faza | |Interakcje | |Tokeny (M) | |Koszt APIPod (zł) |
+---------------------------------------------
+| |0 Setup | |15–20 | |0.12–0.16 | |0.60–0.80 |
+---------------------------------------------
+| |1 Core | |40–60 | |0.40–0.60 | |2.00–3.20 |
+---------------------------------------------
+| |2 OCR | |30–45 | |0.30–0.45 | |1.60–2.40 |
+---------------------------------------------
+| |3 AI Engine | |50–70 | |0.60–0.84 | |3.20–4.80 |
+---------------------------------------------
+| |4 D1+D2 | |60–80 | |0.60–0.80 | |3.20–4.40 |
+---------------------------------------------
+| |5 D3+D4 | |40–60 | |0.40–0.60 | |2.00–3.20 |
+---------------------------------------------
+| |6 D5+D6+D7 | |50–70 | |0.50–0.70 | |2.60–3.80 |
+---------------------------------------------
+| |7 D8 | |35–50 | |0.42–0.60 | |2.20–3.40 |
+---------------------------------------------
+| |8 Marketing | |25–35 | |0.20–0.28 | |1.00–1.60 |
+---------------------------------------------
+| |9 Polish | |30–40 | |0.24–0.32 | |1.20–1.80 |
+---------------------------------------------
+| |TOTAL | |375–530 | |3.78–5.35 | |19.60–29.40 |
+Bufor bezpieczeństwa (2×): 39–59 zł. Testowanie promptów AI (dodatkowe wywołania Claude): 8–20 zł. Koszt Opus 4.6 (5% interakcji — edge cases): 5–10 zł.
+Łączny koszt tokenów development Długomat: ~55–90 zł.
+Budżet 500 zł per SaaS jest więcej niż wystarczający — pozostaje ~410–445 zł rezerwy na iteracje, bug fixing, nowe prompty.
+18.12 Łączna estymacja dla 4 SaaS
+Długomat: ~55–90 zł. Alimentomat (prostszy, mniej modułów): ~35–60 zł. Mandatomat (prosty, 1–2 moduły): ~25–45 zł. Rozwodomat (złożony, wiele wariantów): ~65–110 zł. Total 4 SaaS: ~180–305 zł (daleko poniżej budżetu 2 000 zł).
+19. INSTRUKCJA DLA KILO CODE / GENSPARK — PODZIAŁ NA PROMPTY
+19.1 Strategia promptowania
+Nie przekazuj całej specyfikacji naraz. Podziel na atomowe zadania. Każdy prompt powinien referencjonować co najwyżej 1–2 pliki z spec/. Schemat promptu:
+KONTEKST: [krótki opis projektu — 200 słów]
+CEL: [konkretne zadanie — np. "Stwórz komponent WizardShell"]
+REFERENCJA: [plik spec — np. "spec/05-dlugomat.md, sekcja 5.3"]
+WYMAGANIA: [lista 5-10 konkretnych wymagań]
+STACK: [Next.js 14, Tailwind, shadcn/ui, TypeScript strict]
+FORMAT: [oczekiwany output — np. "plik .tsx z exportowanym komponentem"]
+
+19.2 Sekwencja promptów — rekomendowana kolejność
+Batch 1 — Fundamenty (prompty 1–10):
+37. Next.js 14 boilerplate z App Router, Tailwind, shadcn/ui
+38. Folder structure (src/app, components, lib, hooks, stores, types)
+39. Tailwind config z custom theme (paleta „Tarcza", fonty, shadows)
+40. Supabase client utilities (browser, server, admin)
+41. Auth middleware (session check, rate limiting)
+42. Database migration: core tables (profiles, cases)
+43. Database migration: documents, deadlines, ocr_results
+44. Database migration: payments, notifications, case_events
+45. Database migration: legal_knowledge + pgvector
+46. RLS policies
+Batch 2 — Layout & UI (prompty 11–20):
+ 11. Marketing layout (navbar, footer)
+ 12. Dashboard layout (sidebar, header, mobile nav)
+ 13. WizardShell component (stepper, navigation, progress)
+ 14. shadcn/ui primitives customization (button, card, form, input, toast)
+ 15. Hero section component
+ 16. How-it-works section
+ 17. Pricing table component
+ 18. FAQ accordion + Schema.org(http://schema.org/)
+ 19. Dashboard overview page (cards, stats, deadlines widget)
+ 20. Cases list page (table, filters, pagination)
+Batch 3 — OCR (prompty 21–25):
+ 21. OCR upload component (drag-drop, preview, progress)
+ 22. Tesseract.js server-side Worker
+ 23. NakazParser (regex extraction)
+ 24. AWS Textract fallback
+ 25. OCR review UI (highlighted fields, confidence, edit)
+Batch 4 — AI Engine (prompty 26–35):
+ 26. Claude client (APIPod wrapper + Anthropic fallback)
+ 27. RAG: embeddings generation script
+ 28. RAG: pgvector retriever
+ 29. Prompt template: sprzeciw EPU (system + context + format)
+ 30. Prompt template: komornik pisma (6 wariantów)
+ 31. Prompt template: BIK-Fix (3 etapy)
+ 32. Prompt template: cesja, ugoda, upadłość
+ 33. Generation pipeline (orchestrator)
+ 34. Haiku validation prompt + checker
+ 35. Token tracking + cost logging
+Batch 5 — D1 + D2 (prompty 36–45):
+ 36. D1 landing page (free scan CTA)
+ 37. D1 scan flow (upload → OCR → AI analysis → result page)
+ 38. D2 wizard step 1: upload
+ 39. D2 wizard step 2: dane sprawy (form + auto-fill)
+ 40. D2 wizard step 3: wybór zarzutów
+ 41. D2 wizard step 4: dane dodatkowe (dynamic fields)
+ 42. D2 wizard step 5: preview + edit
+ 43. D2 wizard step 6: payment + download
+ 44. Stripe integration (create session, webhook, status)
+ 45. PDF generator (Puppeteer, template sprzeciwu)
+Batch 6 — D3-D8 (prompty 46–60):
+ 46–48: D3 KomornikShield (kalkulator + 6 pism)
+ 49–50: D4 PotrąceniaStop
+ 51–53: D5 BIK-Fix (3-etapowy flow)
+ 54–55: D6 CesjaCheck
+ 56–58: D7 UgodoMat (budżet + multi-wierzyciel)
+ 59–60: D8 Upadłość-Lite (ankieta + scoring + 5 docs)
+Batch 7 — Notifications & Polish (prompty 61–70):
+ 61. Email templates (MJML → HTML)
+ 62. AWS SES integration
+ 63. SMSAPI.pl(http://smsapi.pl/) integration
+ 64. Deadline CRON Edge Function
+ 65. Admin dashboard (stats, users)
+ 66. Dark mode
+ 67. Accessibility pass
+ 68. SEO optimization (meta, OG, schema)
+ 69. Error pages + loading states
+ 70. Final deployment config (Vercel + Supabase)
+19.3 Przykład jednego prompta (prompt #39)
+KONTEKST: Buduję "Długomat" — legal-tech SaaS generujący pisma procesowe
+dla osób zadłużonych. Next.js 14 App Router, Tailwind, shadcn/ui, 
+Supabase, TypeScript strict.
+
+CEL: Stwórz komponent kroku 2 wizarda Sprzeciwu EPU — "Dane Sprawy".
+Plik: src/components/wizards/sprzeciw-epu/step-dane-sprawy.tsx
+
+WYMAGANIA:
+1. React Hook Form + Zod walidacja
+2. Pola: sygnatura (text, regex VI Nc-e), sąd (select — domyślnie e-Sąd 
+   Lublin), data nakazu (date picker), data doręczenia (date picker), 
+   powód nazwa (text), powód adres (textarea), pozwany imię (text), 
+   pozwany nazwisko (text), pozwany adres (textarea), kwota główna 
+   (number), odsetki (number), koszty (number)
+3. Auto-fill z OCR data (props: ocrData?: OcrExtractedData)
+4. Real-time walidacja: sygnatura musi pasować do regex, data doręczenia 
+   nie w przyszłości, kwota > 0
+5. Obliczanie deadline'u na żywo: data doręczenia + 14 dni 
+   (z uwzględnieniem weekendów i świąt PL) — wyświetl nad formularzem 
+   z kolorowym badge (zielony/amber/czerwony)
+6. Panel boczny z wskazówką (gdzie znaleźć sygnaturę, format daty)
+7. Tailwind + shadcn/ui components
+8. Mobile responsive
+9. Typ: export function StepDaneSprawy({ ocrData, onSubmit }: Props)
+10. Zod schema eksportowana osobno (do reuse w API route)
+
+STACK: Next.js 14 App Router, React Hook Form, Zod, Tailwind, shadcn/ui,
+date-fns (polskie formaty dat)
+
+FORMAT: Kompletny plik .tsx + osobny plik schema (validators/sprzeciw-epu.ts)
+
+PODSUMOWANIE WYKONAWCZE
+Długomat to kompletny legal-tech SaaS z 8 modułami biznesowymi (D1–D8) generującymi łącznie 15+ typów pism procesowych. Architektura oparta na Next.js 14, Supabase, Claude Sonnet 4.6 (via APIPod) i Stripe jest optymalna dla solo-foundera z budżetem bootstrapowym.
+Kluczowe metryki projektu: koszt development (AI tokens) to szacunkowo 55–90 zł, a z buforem bezpieczeństwa ~100–150 zł. Czas development wynosi 35–50 dni roboczych (8–12 tygodni). Koszt API per wygenerowane pismo to 0.15–0.50 zł, przy cenach sprzedaży 79–249 zł (marża >99%). Break-even to 9 płacących dokumentów miesięcznie.
+Specyfikacja zawiera: 19 sekcji, pełny schemat bazy danych (11 tabel + RLS + indeksy), 8 modułów biznesowych z workflow, 70 atomowych promptów do Kilo Code, pipeline OCR + AI + PDF + płatności + powiadomień, design system „Tarcza" z pełną paletą i typografią, CI/CD z GitHub Actions + Vercel, oraz strategię bezpieczeństwa (RODO, szyfrowanie, walidacja).
+Dokument jest gotowy do użycia jako mapa drogowa w Genspark AI Developer lub Kilo Code. Kolejność promptów z sekcji 19.2 jest zoptymalizowana pod minimalne zależności i maksymalny reuse komponentów.

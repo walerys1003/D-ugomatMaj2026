@@ -1,0 +1,254 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =========================================================================
+ * DŁUGOMAT — Design tokens
+ * Brand spec §3.2 / §3.3 / §3.4. Hex values converted to HSL so Tailwind's
+ * <alpha-value> can compose with opacity utilities (e.g., `bg-dlugomat-500/40`).
+ * ========================================================================= */
+
+@layer base {
+  :root {
+    /* ---- Shield Navy (Primary) -------------------------------------- */
+    --dlugomat-950: 220 67% 8%; /* #060E1F  — modal overlay, deepest surface */
+    --dlugomat-900: 218 69% 14%; /* #0B1D3A  — sidebar, hero gradient START   */
+    --dlugomat-850: 219 67% 18%; /* #0F2750  — sidebar hover                  */
+    --dlugomat-800: 220 65% 22%; /* #132D5E  — hero gradient END, headings    */
+    --dlugomat-700: 220 65% 31%; /* #1B3F82  — active nav, urgent border-left */
+    --dlugomat-600: 217 65% 39%; /* #2354A6  — links, active icons            */
+    --dlugomat-500: 215 64% 48%; /* #2B69CA  — primary button, focus ring     */
+    --dlugomat-400: 214 63% 60%; /* #5A8FDB  — secondary text, inactive icons */
+    --dlugomat-300: 212 73% 73%; /* #89B5EC  — info badges, disabled fields   */
+    --dlugomat-200: 211 95% 86%; /* #B8DBFD  — info card backgrounds          */
+    --dlugomat-100: 211 100% 94%; /* #E0EFFF — section backgrounds, hover     */
+    --dlugomat-50: 213 100% 97%; /* #F0F7FF  — subtle page backgrounds        */
+
+    /* ---- Controlled Hope Green (Accent — success only) -------------- */
+    --accent-700: 145 87% 25%; /* #087A3E */
+    --accent-600: 145 83% 30%; /* #0D8A4A */
+    --accent-500: 150 84% 38%; /* #10B461 */
+    --accent-400: 144 60% 51%; /* #34D07E */
+    --accent-300: 144 71% 67%; /* #6EE7A0 */
+    --accent-200: 144 73% 81%; /* #A7F3C8 */
+    --accent-100: 142 76% 93%; /* #DCFCE7 */
+    --accent-50: 138 100% 97%; /* #F0FFF4 */
+    --accent: var(--accent-500);
+    --accent-foreground: 0 0% 100%;
+
+    /* ---- Temporal Signals (only with numeric context) --------------- */
+    --warn-600: 28 92% 43%; /* #D97706 — caption text on light bg */
+    --warn-500: 38 92% 50%; /* #F59E0B — icon, badge fill         */
+    --warn-100: 48 96% 89%; /* #FEF3C7 — pill background          */
+    --warn-50: 48 100% 96%; /* #FFFBEB — section/banner bg        */
+
+    --danger-700: 0 73% 41%; /* #B91C1C */
+    --danger-600: 0 72% 51%; /* #DC2626 */
+    --danger-500: 0 84% 60%; /* #EF4444 */
+    --danger-100: 0 93% 94%; /* #FEE2E2 */
+    --danger-50: 0 86% 97%; /* #FEF2F2 */
+
+    /* ---- Iron neutrals (text, borders, surfaces) -------------------- */
+    --iron-950: 222 47% 6%;
+    --iron-900: 222 39% 11%;
+    --iron-800: 217 33% 17%;
+    --iron-700: 215 25% 27%;
+    --iron-600: 215 16% 36%;
+    --iron-500: 215 14% 47%;
+    --iron-400: 214 13% 60%;
+    --iron-300: 213 16% 76%;
+    --iron-200: 214 22% 88%;
+    --iron-100: 214 26% 94%;
+    --iron-50: 210 33% 98%;
+
+    /* ---- Semantic tokens (shadcn) — light theme --------------------- */
+    --background: 0 0% 100%;
+    --foreground: var(--iron-900);
+
+    --card: 0 0% 100%;
+    --card-foreground: var(--iron-900);
+
+    --popover: 0 0% 100%;
+    --popover-foreground: var(--iron-900);
+
+    --primary: var(--dlugomat-700);
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: var(--iron-100);
+    --secondary-foreground: var(--iron-900);
+
+    --muted: var(--iron-100);
+    --muted-foreground: var(--iron-600);
+
+    --destructive: var(--danger-600);
+    --destructive-foreground: 0 0% 100%;
+
+    --border: var(--iron-200);
+    --input: var(--iron-200);
+    --ring: var(--dlugomat-500);
+
+    /* ---- Typography (font-family vars) ------------------------------ */
+    /* Loaded by next/font in app/layout.tsx; this is the fallback chain. */
+    --font-sans:
+      "Inter", "Inter Fallback", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+      sans-serif;
+    --font-serif:
+      "IBM Plex Serif", "IBM Plex Serif Fallback", Georgia, "Times New Roman", serif;
+    --font-mono:
+      "JetBrains Mono", "JetBrains Mono Fallback", ui-monospace, "SF Mono", Menlo, monospace;
+  }
+
+  /* ----- Dark mode (.dark scope) -------------------------------------- */
+  .dark {
+    --background: var(--dlugomat-950);
+    --foreground: 0 0% 98%;
+
+    --card: var(--dlugomat-900);
+    --card-foreground: 0 0% 98%;
+
+    --popover: var(--dlugomat-900);
+    --popover-foreground: 0 0% 98%;
+
+    --primary: var(--dlugomat-500);
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: var(--dlugomat-850);
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: var(--dlugomat-850);
+    --muted-foreground: var(--iron-400);
+
+    --destructive: var(--danger-500);
+    --destructive-foreground: 0 0% 98%;
+
+    --border: var(--dlugomat-800);
+    --input: var(--dlugomat-800);
+    --ring: var(--dlugomat-400);
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply scroll-smooth antialiased;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+    font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
+  }
+
+  /* Heading defaults — fluid type scale + IBM Plex Serif for long-form
+     legal copy is opt-in (`.font-serif` on prose blocks). */
+  h1 {
+    @apply text-fluid-5xl font-bold tracking-tight text-dlugomat-900 dark:text-white;
+  }
+  h2 {
+    @apply text-fluid-4xl font-bold tracking-tight text-dlugomat-900 dark:text-white;
+  }
+  h3 {
+    @apply text-fluid-3xl font-semibold tracking-tight text-dlugomat-800 dark:text-iron-100;
+  }
+  h4 {
+    @apply text-fluid-2xl font-semibold text-dlugomat-800 dark:text-iron-100;
+  }
+  h5 {
+    @apply text-fluid-xl font-semibold text-dlugomat-800 dark:text-iron-200;
+  }
+  h6 {
+    @apply text-fluid-lg font-semibold text-dlugomat-800 dark:text-iron-200;
+  }
+
+  p {
+    @apply text-fluid-base text-iron-700 dark:text-iron-200;
+  }
+
+  /* Selection — institutional accent, not the default browser blue. */
+  ::selection {
+    background-color: hsl(var(--dlugomat-200));
+    color: hsl(var(--dlugomat-900));
+  }
+  .dark ::selection {
+    background-color: hsl(var(--dlugomat-700));
+    color: hsl(0 0% 100%);
+  }
+
+  /* Focus visibility — Tarcza shield ring, never the default outline. */
+  :focus-visible {
+    outline: none;
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), 0 0 0 2px hsl(var(--background)),
+      0 0 0 5px hsl(var(--ring) / 0.55);
+    border-radius: 0.375rem;
+  }
+}
+
+@layer components {
+  /* "Tarcza" hero gradient — used by landing hero and module banners. */
+  .tarcza-hero-gradient {
+    background:
+      radial-gradient(
+        circle at 20% 0%,
+        hsl(var(--dlugomat-700) / 0.6),
+        transparent 55%
+      ),
+      linear-gradient(
+        180deg,
+        hsl(var(--dlugomat-900)) 0%,
+        hsl(var(--dlugomat-800)) 100%
+      );
+  }
+
+  /* Status border-left — used on case cards to signal urgency without
+     resorting to decorative colour fills. */
+  .status-strip-overdue {
+    @apply border-l-4 border-danger-600;
+  }
+  .status-strip-critical {
+    @apply border-l-4 border-danger-500;
+  }
+  .status-strip-warning {
+    @apply border-l-4 border-warn-500;
+  }
+  .status-strip-normal {
+    @apply border-l-4 border-dlugomat-500;
+  }
+  .status-strip-success {
+    @apply border-l-4 border-accent-500;
+  }
+}
+
+@layer utilities {
+  /* Skip-to-content link target style (a11y). */
+  .sr-focusable:focus {
+    @apply not-sr-only fixed left-4 top-4 z-50 rounded-md bg-primary px-4 py-2 text-primary-foreground shadow-pop;
+  }
+
+  /* Visually-hidden but focusable for the skip link. */
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Reduced motion — respect user preference globally. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

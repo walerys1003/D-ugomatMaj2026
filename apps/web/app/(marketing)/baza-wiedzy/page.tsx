@@ -1,0 +1,284 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { ArrowRight, BookOpen, Scale, Gavel, FileText, Shield } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://dlugomat.pl";
+
+export const metadata: Metadata = {
+  title: "Baza wiedzy — pisma procesowe, długi, komornik, BIK | Długomat",
+  description:
+    "Praktyczne artykuły o sprzeciwach od nakazów zapłaty, skargach na komornika, korekcie BIK, cesji wierzytelności. Aktualne stan prawny + orzecznictwo SN.",
+  alternates: { canonical: "/baza-wiedzy" },
+};
+
+interface ArticleEntry {
+  slug: string;
+  title: string;
+  category: "Sąd" | "Egzekucja" | "Rejestry" | "Negocjacja" | "Upadłość" | "Podstawy";
+  readingMinutes: number;
+  excerpt: string;
+  available: boolean;
+}
+
+const ARTICLES: readonly ArticleEntry[] = [
+  {
+    slug: "sprzeciw-od-nakazu-zaplaty-epu",
+    title: "Sprzeciw od nakazu zapłaty z EPU — kompletny przewodnik 2025",
+    category: "Sąd",
+    readingMinutes: 12,
+    excerpt:
+      "Co to jest e-Sąd, jak rozpoznać nakaz zapłaty, jakie zarzuty można podnieść w sprzeciwie i co się stanie po jego wniesieniu.",
+    available: true,
+  },
+  {
+    slug: "skarga-na-czynnosci-komornika",
+    title: "Skarga na czynności komornika — 7 dni na reakcję",
+    category: "Egzekucja",
+    readingMinutes: 10,
+    excerpt:
+      "Kiedy można złożyć skargę, do jakiego sądu, w jakim terminie i jakie naruszenia komornika są najczęstszą podstawą uchylenia czynności.",
+    available: true,
+  },
+  {
+    slug: "wniosek-o-korekte-bik",
+    title: "Wniosek o korektę BIK — jak usunąć negatywny wpis",
+    category: "Rejestry",
+    readingMinutes: 9,
+    excerpt:
+      "Art. 105a Prawa bankowego, RODO art. 16, droga przez Rzecznika Finansowego. Kiedy bank musi zaktualizować wpis, a kiedy go usunąć.",
+    available: true,
+  },
+] as const;
+
+const CATEGORIES = [
+  {
+    key: "Sąd",
+    icon: Scale,
+    desc: "Sprzeciwy, zarzuty, odpowiedzi na pozew, zażalenia.",
+  },
+  {
+    key: "Egzekucja",
+    icon: Gavel,
+    desc: "Skargi na komornika, ograniczenie egzekucji, kwota wolna.",
+  },
+  {
+    key: "Rejestry",
+    icon: FileText,
+    desc: "BIK, BIG InfoMonitor, KRD, ERIF — wpisy i ich korekta.",
+  },
+  {
+    key: "Negocjacja",
+    icon: Shield,
+    desc: "Ugody, restrukturyzacja, propozycje spłaty.",
+  },
+  {
+    key: "Upadłość",
+    icon: BookOpen,
+    desc: "Upadłość konsumencka, plan spłaty, oddłużenie.",
+  },
+  {
+    key: "Podstawy",
+    icon: BookOpen,
+    desc: "Słownik pojęć, terminy procesowe, podstawowe prawa dłużnika.",
+  },
+] as const;
+
+export default function BazaWiedzyPage() {
+  // Tier 5 zad. 228 — Schema.org JSON-LD: BreadcrumbList + ItemList artykułów.
+  // Google używa ItemList do prezentacji jako "carousel" w wynikach.
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Strona główna",
+        item: BASE_URL,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Baza wiedzy",
+        item: `${BASE_URL}/baza-wiedzy`,
+      },
+    ],
+  };
+  const available = ARTICLES.filter((a) => a.available);
+  const itemListLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Baza wiedzy Długomat",
+    description:
+      "Artykuły o sprzeciwach od nakazów zapłaty, skargach komorniczych, korekcie BIK i innych instrumentach obrony dłużnika.",
+    numberOfItems: available.length,
+    itemListElement: available.map((article, idx) => ({
+      "@type": "ListItem",
+      position: idx + 1,
+      url: `${BASE_URL}/baza-wiedzy/${article.slug}`,
+      name: article.title,
+    })),
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(breadcrumbLd).replace(/</g, "\\u003c"),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(itemListLd).replace(/</g, "\\u003c"),
+        }}
+      />
+      {/* HERO */}
+      <section className="tarcza-hero-gradient relative overflow-hidden text-white">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -top-32 right-[-10%] h-[40rem] w-[40rem] rounded-full bg-dlugomat-500/20 blur-3xl"
+        />
+        <div className="container relative py-16 sm:py-20 lg:py-24">
+          <div className="mx-auto max-w-3xl text-center">
+            <Badge tone="info" withDot className="bg-white/10 text-white border-white/20">
+              Baza wiedzy
+            </Badge>
+            <h1 className="mt-4 text-balance text-fluid-5xl font-bold tracking-tight text-white">
+              Wiedza, która Cię chroni.
+            </h1>
+            <p className="mt-4 text-fluid-lg text-iron-200">
+              Bez prawniczego żargonu. Konkretne pytania, konkretne odpowiedzi —
+              z aktualnymi przepisami, terminami i orzecznictwem Sądu Najwyższego.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* CATEGORIES */}
+      <section className="container py-16 sm:py-20">
+        <div className="mx-auto max-w-2xl text-center">
+          <p className="text-fluid-sm font-semibold uppercase tracking-wider text-dlugomat-600">
+            Kategorie
+          </p>
+          <h2 className="mt-2 text-balance text-fluid-4xl font-bold tracking-tight text-dlugomat-900 dark:text-white">
+            Po prostu wybierz, co Cię dotyczy.
+          </h2>
+        </div>
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {CATEGORIES.map((cat) => {
+            const Icon = cat.icon;
+            const count = ARTICLES.filter((a) => a.category === cat.key && a.available).length;
+            return (
+              <Card key={cat.key} elevation="subtle">
+                <CardHeader>
+                  <div className="flex items-center gap-3">
+                    <span className="inline-flex size-10 items-center justify-center rounded-md bg-dlugomat-100 text-dlugomat-700 dark:bg-dlugomat-850 dark:text-dlugomat-200">
+                      <Icon className="size-5" aria-hidden />
+                    </span>
+                    <CardTitle className="text-fluid-lg">{cat.key}</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="flex items-center justify-between">
+                  <CardDescription className="text-fluid-sm">
+                    {cat.desc}
+                  </CardDescription>
+                  <Badge tone="neutral">
+                    {count} {count === 1 ? "artykuł" : "artykułów"}
+                  </Badge>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ARTICLES */}
+      <section className="bg-iron-50/60 py-20 sm:py-24 dark:bg-dlugomat-950/40">
+        <div className="container">
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="text-fluid-sm font-semibold uppercase tracking-wider text-dlugomat-600">
+              Flagowe artykuły
+            </p>
+            <h2 className="mt-2 text-balance text-fluid-4xl font-bold tracking-tight text-dlugomat-900 dark:text-white">
+              Zacznij od najczęstszych spraw.
+            </h2>
+          </div>
+          <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {ARTICLES.filter((a) => a.available).map((article) => (
+              <Link
+                key={article.slug}
+                href={`/baza-wiedzy/${article.slug}`}
+                className="group block rounded-md focus-visible:shadow-shield-focus focus-visible:outline-none"
+              >
+                <Card
+                  elevation="subtle"
+                  className="h-full transition-shadow duration-base group-hover:shadow-pop"
+                >
+                  <CardHeader className="gap-3">
+                    <div className="flex items-center gap-2">
+                      <Badge tone="info">{article.category}</Badge>
+                      <span className="text-fluid-xs text-iron-500">
+                        {article.readingMinutes} min czytania
+                      </span>
+                    </div>
+                    <CardTitle className="text-fluid-lg leading-snug">
+                      {article.title}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex items-end justify-between gap-3">
+                    <CardDescription>{article.excerpt}</CardDescription>
+                    <ArrowRight
+                      className="size-5 shrink-0 text-dlugomat-600 transition-transform duration-base group-hover:translate-x-0.5 dark:text-dlugomat-300"
+                      aria-hidden
+                    />
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+
+          <p className="mt-12 text-center text-fluid-sm text-iron-600 dark:text-iron-300">
+            Kolejne artykuły publikujemy co tydzień. Aktualizujemy istniejące przy
+            każdej zmianie przepisów. Wszystkie powołania do KPC, KC i orzeczeń
+            SN są aktualne na dzień publikacji.
+          </p>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="container py-20 sm:py-24">
+        <div className="tarcza-hero-gradient relative overflow-hidden rounded-2xl px-6 py-12 sm:px-12 sm:py-16">
+          <div className="relative mx-auto max-w-2xl text-center text-white">
+            <h2 className="text-balance text-fluid-3xl font-bold tracking-tight text-white sm:text-fluid-4xl">
+              Wiedza to dopiero pierwszy krok.
+            </h2>
+            <p className="mt-3 text-fluid-base text-iron-200">
+              Po przeczytaniu artykułu często wiesz, czego potrzebujesz. Skaner
+              Nakazu pokaże Ci, czy nie ma dodatkowych szans (np. przedawnienie),
+              o których nie pomyślałeś.
+            </p>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+              <Link
+                href="/skaner-nakazu"
+                className="inline-flex items-center gap-2 rounded-md bg-accent-600 px-5 py-3 text-fluid-sm font-semibold text-white shadow-sm transition-colors hover:bg-accent-500"
+              >
+                Zeskanuj pismo — DARMOWE
+                <ArrowRight className="size-4" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
