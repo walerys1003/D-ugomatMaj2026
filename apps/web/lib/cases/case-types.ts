@@ -11,7 +11,23 @@
  */
 import type { CaseType, DeadlineKind } from "@/lib/db/types";
 
-export type ModuleId = "D1" | "D2" | "D3" | "D4" | "D5" | "D6" | "D7" | "D8";
+export type ModuleId =
+  | "D1"
+  | "D2"
+  | "D3"
+  | "D4"
+  | "D5"
+  | "D6"
+  | "D7"
+  | "D8"
+  | "D9"
+  | "D10"
+  | "D11"
+  | "D12"
+  | "D13"
+  | "D14"
+  | "D15"
+  | "D16";
 
 export type ModuleStatus = "live" | "beta" | "planned";
 
@@ -193,18 +209,127 @@ export const caseTypeMeta: Record<CaseType, CaseTypeMeta> = {
     deadline: { kind: "wniosek_upadlosc", days: 30 },
     status: "live",
   },
+
+  // ---------------------------------------------------------------------
+  // Tier 7 — D9..D16 expansion (zad. 301-308)
+  // ---------------------------------------------------------------------
+
+  // D9 — Pełny wniosek o upadłość konsumencką (KRS-FORM-UPK1)
+  upadlosc_pelny_wniosek: {
+    module: "D9",
+    title: "Pełny wniosek o upadłość konsumencką (formularz urzędowy)",
+    shortTitle: "Upadłość — pełny pakiet",
+    description:
+      "Kompletny wniosek na formularzu KRS-FORM-UPK1: spis majątku, wierzycieli, dochodów, uzasadnienie + plan spłaty.",
+    priceGrosze: 39_900,
+    deadline: { kind: "wniosek_upadlosc", days: 30 },
+    status: "beta",
+  },
+
+  // D10 — Pozew o zwrot opłat windykacyjnych
+  pozew_zwrot_oplat_windykacyjnych: {
+    module: "D10",
+    title: "Pozew o zwrot opłat windykacyjnych",
+    shortTitle: "Zwrot opłat 30/40/100 zł",
+    description:
+      "Zwrot bezprawnie pobranych opłat za monity i wezwania (klauzula abuzywna, art. 385(1) k.c., art. 359 § 2(2) k.c.).",
+    priceGrosze: 14_900,
+    deadline: null,
+    status: "beta",
+  },
+
+  // D11 — Reklamacja do banku + Rzecznik Finansowy
+  reklamacja_bank_rf: {
+    module: "D11",
+    title: "Reklamacja do banku z eskalacją do Rzecznika Finansowego",
+    shortTitle: "Reklamacja bank/RF",
+    description:
+      "Wzór reklamacji z 30-dniową klauzulą odpowiedzi + automatyczna eskalacja do Rzecznika Finansowego.",
+    priceGrosze: 9_900,
+    deadline: { kind: "reklamacja_bank_30dni", days: 30 },
+    status: "beta",
+  },
+
+  // D12 — Skarga do PUODO
+  skarga_puodo: {
+    module: "D12",
+    title: "Skarga do Prezesa UODO",
+    shortTitle: "Skarga PUODO",
+    description:
+      "Wzór skargi ze wskazaniem naruszenia RODO + żądanie ograniczenia przetwarzania danych przez windykatora.",
+    priceGrosze: 9_900,
+    deadline: { kind: "puodo_30dni", days: 30 },
+    status: "beta",
+  },
+
+  // D13 — Wniosek o rozłożenie należności sądowych na raty
+  wniosek_raty_sadowe: {
+    module: "D13",
+    title: "Wniosek o rozłożenie należności sądowych na raty",
+    shortTitle: "Raty sądowe (art. 320 k.p.c.)",
+    description:
+      "Wzór wniosku z uzasadnieniem stanu majątkowego — art. 320 k.p.c., dla osób w trudnej sytuacji życiowej.",
+    priceGrosze: 7_900,
+    deadline: { kind: "wniosek_raty", days: 14 },
+    status: "beta",
+  },
+
+  // D14 — Wniosek o zwolnienie od kosztów sądowych
+  wniosek_zwolnienie_kosztow_sadowych: {
+    module: "D14",
+    title: "Wniosek o zwolnienie od kosztów sądowych",
+    shortTitle: "Zwolnienie z kosztów",
+    description:
+      "Formularz urzędowy + oświadczenie majątkowe — pełna ochrona przed opłatami sądowymi.",
+    priceGrosze: 7_900,
+    deadline: null,
+    status: "beta",
+  },
+
+  // D15 — Zażalenie na klauzulę wykonalności
+  zazalenie_klauzula_wykonalnosci: {
+    module: "D15",
+    title: "Zażalenie na nadanie klauzuli wykonalności",
+    shortTitle: "Zażalenie na klauzulę",
+    description:
+      "Art. 795 k.p.c. — zaskarżenie błędnie nadanej klauzuli wykonalności (np. brak doręczenia nakazu EPU).",
+    priceGrosze: 12_900,
+    deadline: { kind: "zazalenie_7dni", days: 7 },
+    status: "beta",
+  },
+
+  // D16 — Powództwo o pozbawienie tytułu wykonawczego wykonalności
+  pozbawienie_tytulu_wykonalnosci: {
+    module: "D16",
+    title: "Powództwo o pozbawienie tytułu wykonawczego wykonalności",
+    shortTitle: "Pozbawienie tytułu (art. 840 k.p.c.)",
+    description:
+      "Trzy podstawy z art. 840 k.p.c. — przedawnienie, spełnienie świadczenia, brak wymagalności.",
+    priceGrosze: 19_900,
+    deadline: { kind: "powodztwo_przeciwegzekucyjne", days: 30 },
+    status: "beta",
+  },
 };
 
 /** Static module index used by /panel and landing. */
 export const moduleIndex: Record<ModuleId, { title: string; tagline: string; status: ModuleStatus }> = {
-  D1: { title: "Skaner Nakazu", tagline: "Bezpłatna analiza pisma sądowego", status: "planned" },
-  D2: { title: "Sprzeciw EPU",   tagline: "Sprzeciw od nakazu zapłaty",   status: "live"    },
-  D3: { title: "KomornikShield", tagline: "Pakiet pism do komornika",      status: "live"    },
-  D4: { title: "PotrąceniaStop", tagline: "Ochrona kwot wolnych",          status: "live"    },
-  D5: { title: "BIK-Fix",        tagline: "Czyszczenie historii kredytowej", status: "live"    },
-  D6: { title: "CesjaCheck",     tagline: "Obrona przed funduszami",       status: "live"    },
-  D7: { title: "UgodoMat",       tagline: "Propozycje ugody",              status: "live"    },
-  D8: { title: "Upadłość-Lite",  tagline: "Wniosek o upadłość konsumencką", status: "live"    },
+  D1:  { title: "Skaner Nakazu",     tagline: "Bezpłatna analiza pisma sądowego",       status: "planned" },
+  D2:  { title: "Sprzeciw EPU",      tagline: "Sprzeciw od nakazu zapłaty",             status: "live"    },
+  D3:  { title: "KomornikShield",    tagline: "Pakiet pism do komornika",               status: "live"    },
+  D4:  { title: "PotrąceniaStop",    tagline: "Ochrona kwot wolnych",                   status: "live"    },
+  D5:  { title: "BIK-Fix",           tagline: "Czyszczenie historii kredytowej",        status: "live"    },
+  D6:  { title: "CesjaCheck",        tagline: "Obrona przed funduszami",                status: "live"    },
+  D7:  { title: "UgodoMat",          tagline: "Propozycje ugody",                       status: "live"    },
+  D8:  { title: "Upadłość-Lite",     tagline: "Wniosek o upadłość konsumencką",         status: "live"    },
+  // Tier 7 expansion
+  D9:  { title: "Upadłość-Pro",      tagline: "Pełny pakiet upadłościowy (KRS-FORM)",   status: "beta"    },
+  D10: { title: "Zwrot opłat",       tagline: "Pozew o zwrot opłat windykacyjnych",     status: "beta"    },
+  D11: { title: "Bank/Rzecznik",     tagline: "Reklamacja + RF",                        status: "beta"    },
+  D12: { title: "Skarga PUODO",      tagline: "Ochrona danych przed windykatorem",      status: "beta"    },
+  D13: { title: "Raty sądowe",       tagline: "Rozłożenie należności na raty",          status: "beta"    },
+  D14: { title: "Bez kosztów",       tagline: "Zwolnienie od kosztów sądowych",         status: "beta"    },
+  D15: { title: "Zażalenie",         tagline: "Zaskarżenie klauzuli wykonalności",      status: "beta"    },
+  D16: { title: "Anty-egzekucja",    tagline: "Pozbawienie tytułu wykonalności",        status: "beta"    },
 };
 
 /** Helper — czytelne tytuły dla statusów sprawy w UI. */

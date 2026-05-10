@@ -40,7 +40,16 @@ export type CaseType =
   | "ugoda_raty"
   | "ugoda_umorzenie"
   | "ugoda_propozycja"
-  | "upadlosc_wniosek";
+  | "upadlosc_wniosek"
+  // Tier 7 zad. 301-308 — D9..D16 expansion
+  | "upadlosc_pelny_wniosek"
+  | "pozew_zwrot_oplat_windykacyjnych"
+  | "reklamacja_bank_rf"
+  | "skarga_puodo"
+  | "wniosek_raty_sadowe"
+  | "wniosek_zwolnienie_kosztow_sadowych"
+  | "zazalenie_klauzula_wykonalnosci"
+  | "pozbawienie_tytulu_wykonalnosci";
 
 export type CaseStatus =
   | "draft"
@@ -78,6 +87,11 @@ export type DeadlineKind =
   | "odpowiedz_cesja_14dni"
   | "wniosek_raty"
   | "wniosek_upadlosc"
+  // Tier 7 expansion
+  | "reklamacja_bank_30dni"
+  | "puodo_30dni"
+  | "zazalenie_7dni"
+  | "powodztwo_przeciwegzekucyjne"
   | "custom";
 
 // -----------------------------------------------------------------------------
