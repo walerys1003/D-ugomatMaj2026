@@ -46,6 +46,15 @@ const ROUTES: RouteEntry[] = [
     changeFrequency: "monthly",
     priority: 0.7,
   },
+  { path: "/baza-wiedzy/przedawnienie-dlugu", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/baza-wiedzy/kwota-wolna-od-egzekucji", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/baza-wiedzy/cesja-wierzytelnosci-fundusze", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/baza-wiedzy/upadlosc-konsumencka", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/baza-wiedzy/klauzule-abuzywne-w-umowach-kredytowych", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/baza-wiedzy/ugoda-z-wierzycielem", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/baza-wiedzy/zajecie-wynagrodzenia-przez-komornika", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/baza-wiedzy/big-infomonitor-krd-erif", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/baza-wiedzy/odpowiedz-na-pozew", changeFrequency: "monthly", priority: 0.7 },
 
   // Strony firmowe.
   { path: "/o-nas", changeFrequency: "monthly", priority: 0.5 },

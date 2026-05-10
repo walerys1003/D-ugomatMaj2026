@@ -329,17 +329,98 @@ async function handleChargeRefunded(event: {
   const charge = event.data.object as {
     payment_intent: string;
     amount_refunded: number;
+    refunds?: {
+      data?: Array<{
+        id: string;
+        amount: number;
+        currency: string;
+        status: string;
+        reason: string | null;
+        created: number;
+        metadata?: Record<string, string>;
+      }>;
+    };
   };
   if (!charge.payment_intent) return;
 
   const supabase = createSupabaseAdminClient();
+
+  // Pobierz powiązaną płatność (potrzebujemy payment_id + user_id do `refunds`)
+  const { data: payment } = await supabase
+    .from("payments")
+    .select("id, user_id, case_id, amount")
+    .eq("stripe_payment_intent_id", charge.payment_intent)
+    .maybeSingle();
+
+  // 1) Zapisz każdy refund z eventu do `refunds` (idempotent via stripe_refund_id).
+  // Stripe wysyła kompletną listę refundów dla charge'a, więc każdy może być
+  // już w bazie (jeżeli admin wywołał refund przez naszą akcję) — unique
+  // constraint na stripe_refund_id załatwia idempotency.
+  if (payment && charge.refunds?.data) {
+    for (const r of charge.refunds.data) {
+      // Sprawdź czy już istnieje (idempotency dla async webhook retries)
+      const { data: existing } = await supabase
+        .from("refunds")
+        .select("id, status")
+        .eq("stripe_refund_id", r.id)
+        .maybeSingle();
+
+      if (existing) {
+        // Update statusu (np. pending → succeeded)
+        if (existing.status !== r.status) {
+          await supabase
+            .from("refunds")
+            .update({
+              status: r.status === "succeeded" ? "succeeded" : r.status,
+              succeeded_at:
+                r.status === "succeeded" ? new Date().toISOString() : null,
+            })
+            .eq("id", existing.id);
+        }
+      } else {
+        // Insert nowego — wywołane spoza naszego admin tool (np. Dashboard Stripe)
+        await supabase.from("refunds").insert({
+          payment_id: payment.id,
+          user_id: payment.user_id,
+          stripe_refund_id: r.id,
+          stripe_payment_intent_id: charge.payment_intent,
+          amount: r.amount,
+          currency: r.currency.toLowerCase(),
+          reason: r.reason,
+          status: r.status === "succeeded" ? "succeeded" : "pending",
+          succeeded_at:
+            r.status === "succeeded" ? new Date().toISOString() : null,
+        });
+      }
+    }
+  }
+
+  // 2) Update payments.status + refunded_at jeżeli pełna kwota zrefundowana
+  const isFullRefund =
+    payment && charge.amount_refunded >= payment.amount;
   await supabase
     .from("payments")
     .update({
-      status: "refunded",
-      refunded_at: new Date().toISOString(),
+      status: isFullRefund ? "refunded" : "completed",
+      refunded_at: isFullRefund ? new Date().toISOString() : null,
     })
     .eq("stripe_payment_intent_id", charge.payment_intent);
+
+  // 3) Audit case_event
+  if (payment?.case_id) {
+    await supabase.from("case_events").insert({
+      case_id: payment.case_id,
+      user_id: payment.user_id,
+      actor: "payment",
+      event_type: isFullRefund ? "payment_refunded_full" : "payment_refunded_partial",
+      metadata: {
+        payment_id: payment.id,
+        stripe_payment_intent_id: charge.payment_intent,
+        amount_refunded: charge.amount_refunded,
+        amount_original: payment.amount,
+      },
+    });
+  }
 }
 
 /**

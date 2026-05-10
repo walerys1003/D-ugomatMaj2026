@@ -11,6 +11,8 @@ import {
   Bell,
   BookOpen,
   Tag,
+  CreditCard,
+  Activity,
 } from "lucide-react";
 
 import { requireAdminOrRedirect } from "@/lib/admin/rbac";
@@ -31,6 +33,8 @@ interface AdminNavItem {
 const ADMIN_NAV: AdminNavItem[] = [
   { href: "/admin", label: "Pulpit", icon: ShieldCheck },
   { href: "/admin/sprawy", label: "Kolejka spraw", icon: ListChecks },
+  { href: "/admin/platnosci", label: "Płatności", icon: CreditCard, fullAdminOnly: true },
+  { href: "/admin/wydajnosc", label: "Wydajność", icon: Activity },
   { href: "/admin/notyfikacje", label: "Notyfikacje", icon: Bell },
   { href: "/admin/wiedza", label: "Baza wiedzy", icon: BookOpen },
   { href: "/admin/promocje", label: "Kody promo", icon: Tag, fullAdminOnly: true },

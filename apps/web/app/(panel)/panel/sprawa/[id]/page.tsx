@@ -12,6 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { CaseUsageMeter } from "@/components/cases/case-usage-meter";
 import { CaseWizardClient } from "@/components/wizard/case-wizard-client";
 import { CheckoutButton } from "@/components/payments/checkout-button";
 import { getCaseById } from "@/lib/cases/case-repository";
@@ -307,6 +308,9 @@ async function PostGenerationView({
           </CardContent>
         </Card>
       )}
+
+      {/* Tier 3 zad. 109 — widget zużycia AI per case */}
+      <CaseUsageMeter caseId={caseId} />
 
       {isPaid && latestPayment?.fakturownia_invoice_url && (
         <Card>

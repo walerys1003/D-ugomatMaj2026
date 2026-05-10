@@ -299,3 +299,55 @@ export function constructWebhookEvent(
 export function isStripeAvailable(): boolean {
   return Boolean(process.env.STRIPE_SECRET_KEY);
 }
+
+// -----------------------------------------------------------------------------
+// Public — Refunds (Tier 4 zad. 156)
+// -----------------------------------------------------------------------------
+
+export interface RefundCreateParams {
+  /** Stripe PaymentIntent ID (z payments.stripe_payment_intent_id). */
+  paymentIntentId: string;
+  /** Kwota refundu w groszach. Jeżeli `undefined` → pełny refund. */
+  amountGrosze?: number;
+  /** Powód refundu — wpada do Stripe Dashboard. */
+  reason?: "duplicate" | "fraudulent" | "requested_by_customer";
+  /** Wewnętrzny audit — payment_id, admin_user_id. */
+  metadata?: Record<string, string>;
+}
+
+export interface RefundResult {
+  id: string;
+  amount: number;
+  currency: string;
+  status: "succeeded" | "pending" | "failed" | "canceled" | "requires_action";
+  payment_intent: string;
+  reason: string | null;
+  metadata: Record<string, string>;
+  created: number;
+}
+
+/**
+ * Tworzy refund w Stripe.
+ *
+ * Webhook `charge.refunded` powinien dorzucić rekord do `refunds` table.
+ * Tutaj zwracamy result synchronicznie, by admin UI mógł od razu pokazać status.
+ */
+export async function createRefund(
+  params: RefundCreateParams,
+): Promise<RefundResult> {
+  const body: Record<string, unknown> = {
+    payment_intent: params.paymentIntentId,
+  };
+  if (params.amountGrosze !== undefined) body.amount = params.amountGrosze;
+  if (params.reason) body.reason = params.reason;
+  if (params.metadata) body.metadata = params.metadata;
+
+  return stripeRequest<RefundResult>("/refunds", {
+    method: "POST",
+    body,
+  });
+}
+
+export async function retrieveRefund(refundId: string): Promise<RefundResult> {
+  return stripeRequest<RefundResult>(`/refunds/${refundId}`, { method: "GET" });
+}

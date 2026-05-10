@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { rateLimit, clientIdFromHeaders, RATE_LIMIT_PROFILES } from "@/lib/security/rate-limit";
+import { createSupabaseAdminClient } from "@/lib/db/supabase-server";
 
 /**
  * Tier 5.5 — Web Vitals beacon endpoint.
@@ -83,6 +84,42 @@ export async function POST(request: Request) {
       ...sanitized,
     }),
   );
+
+  // Tier 5 zad. 229 — persist to web_vitals table for P75 dashboard aggregation.
+  // We swallow errors silently because the beacon must never delay or fail UX.
+  try {
+    const admin = createSupabaseAdminClient();
+    if (admin && sanitized.value !== null) {
+      // Extract url_path (pathname) from the full URL, fallback to raw value.
+      let urlPath: string | null = sanitized.url;
+      if (sanitized.url) {
+        try {
+          urlPath = new URL(sanitized.url).pathname.slice(0, 500);
+        } catch {
+          urlPath = sanitized.url.slice(0, 500);
+        }
+      }
+
+      await admin.from("web_vitals").insert({
+        metric_name: sanitized.name,
+        value: sanitized.value,
+        rating: sanitized.rating,
+        delta: sanitized.delta,
+        navigation_type: sanitized.navigation_type,
+        url_path: urlPath,
+      });
+    }
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      JSON.stringify({
+        level: "warn",
+        source: "web_vitals",
+        message: "failed_to_persist",
+        error: error instanceof Error ? error.message : String(error),
+      }),
+    );
+  }
 
   return NextResponse.json({ ok: true });
 }

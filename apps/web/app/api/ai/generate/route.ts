@@ -165,13 +165,20 @@ export async function POST(req: NextRequest): Promise<Response> {
       try {
         writeEvent("status", { phase: "starting", caseId });
 
-        // Uwaga: aktualnie `runGenerationPipeline` jest blokujące (nie streamuje
-        // tokenów per-token). Zwracamy zatem jeden "delta" event z całością + 'done'.
-        // Gdy backend AI dostarczy SSE per token (Anthropic streaming), zamienimy
-        // to na pętlę po `completeStreaming()`.
+        // Tier 3 zad. 108/109/110 — pipeline z budget guardrail (userId+caseId).
+        // Pipeline jest blokujący (Sonnet → Haiku → optional Opus), ale w środku
+        // przepuszczamy markdown przez "soft-stream" — dzielimy go na linijki
+        // i emitujemy event 'delta' co każdy zakończony akapit, by UX miał
+        // realistyczną animację bez konieczności prawdziwego SSE z backendu.
+        // Prawdziwy per-token SSE jest dostępny w `completeStreaming()` w
+        // apipod-client.ts — Tier 4 podepnie go tu po dopracowaniu UX
+        // (obecnie 6-fragmentowy soft-stream jest deterministyczny i tańszy
+        // — nie wymaga drugiego wywołania backendu).
         const result = await runGenerationPipeline({
           caseType: caseRow.type,
           variables,
+          userId,
+          caseId,
         });
 
         writeEvent("meta", {
@@ -181,14 +188,15 @@ export async function POST(req: NextRequest): Promise<Response> {
           finalRole: result.finalRole,
         });
 
-        // Symulacja streamu — wysyłamy w 6 chunkach, by UX miał animację.
-        // Real streaming wprowadzimy po podpięciu Anthropic streaming endpoint.
+        // Soft-stream — emituje delty co akapit (po podwójnym \n) z mikrostopem
+        // 35 ms, by UI mogło je animować w terminal-style typewriter.
         const md = result.markdown;
-        const chunkCount = 6;
-        const chunkSize = Math.ceil(md.length / chunkCount);
-        for (let i = 0; i < chunkCount; i += 1) {
-          const slice = md.slice(i * chunkSize, (i + 1) * chunkSize);
-          if (slice) writeEvent("delta", { text: slice });
+        const paragraphs = md.split(/\n\n+/);
+        for (const para of paragraphs) {
+          if (para.trim().length === 0) continue;
+          writeEvent("delta", { text: para + "\n\n" });
+          // mikrostop nie blokuje pipeline'u (await tu jest tylko dla UX)
+          await new Promise((r) => setTimeout(r, 35));
         }
 
         if (result.validation) {

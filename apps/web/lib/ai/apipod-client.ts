@@ -233,18 +233,144 @@ export interface StreamingChunk {
 }
 
 /**
- * Streamuje tokeny z modelu jako AsyncIterable.
+ * Tier 3 zad. 108 — Streamuje tokeny z modelu jako AsyncIterable (prawdziwy SSE).
  *
- * Tier 3 implementuje tylko shape — `complete()` jest wystarczający
- * dla MVP (generacja pisma trwa ~10–20 s i pokazujemy spinner).
- * Streaming wprowadzimy w Tier 4 razem z UX "pismo na żywo".
+ * Implementuje Anthropic Messages API streaming format:
+ *   - `message_start` → metadata + tokensInput
+ *   - `content_block_delta` → kolejne fragmenty tekstu
+ *   - `message_delta` → tokensOutput
+ *   - `message_stop` → done
+ *
+ * Jeżeli backend zwraca 5xx/429 — fallback do non-streaming `complete()`
+ * (deterministycznie, by UI nie zostało bez treści).
  */
 export async function* completeStreaming(
   req: CompletionRequest,
 ): AsyncGenerator<StreamingChunk> {
-  // MVP: jedno wywołanie, pojedynczy delta + done. Pełne SSE wprowadzimy
-  // w Tier 4. Ten kontrakt zachowujemy, by call-site nie musiał być
-  // zmieniany przy upgrade.
+  const backends = readBackends();
+  if (backends.length === 0) {
+    yield {
+      type: "error",
+      delta: "Brak skonfigurowanych backendów AI.",
+    };
+    return;
+  }
+
+  const m = models[req.role];
+  const body = {
+    model: m.id,
+    system: req.systemPrompt,
+    messages: req.messages,
+    temperature: req.temperature ?? 0.2,
+    max_tokens: req.maxTokens ?? m.defaultMaxTokens,
+    stream: true,
+  };
+
+  // Próbujemy SSE na pierwszym dostępnym backendzie.
+  const backend = backends[0];
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
+  let response: Response;
+  try {
+    response = await fetch(`${backend.baseUrl}/messages`, {
+      method: "POST",
+      signal: controller.signal,
+      headers: {
+        "content-type": "application/json",
+        "anthropic-version": "2023-06-01",
+        "x-api-key": backend.apiKey,
+        accept: "text/event-stream",
+      },
+      body: JSON.stringify(body),
+    });
+  } catch (err) {
+    clearTimeout(timer);
+    // Fallback do non-streaming
+    yield* fallbackToComplete(req);
+    return;
+  }
+
+  if (!response.ok || !response.body) {
+    clearTimeout(timer);
+    yield* fallbackToComplete(req);
+    return;
+  }
+
+  let tokensInput = 0;
+  let tokensOutput = 0;
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+
+  try {
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+
+      // SSE event boundaries: \n\n
+      let boundary = buffer.indexOf("\n\n");
+      while (boundary !== -1) {
+        const event = buffer.slice(0, boundary);
+        buffer = buffer.slice(boundary + 2);
+        boundary = buffer.indexOf("\n\n");
+
+        // Parse `data: {...}`
+        const dataLine = event
+          .split("\n")
+          .find((l) => l.startsWith("data:"));
+        if (!dataLine) continue;
+        const payload = dataLine.slice(5).trim();
+        if (!payload || payload === "[DONE]") continue;
+
+        try {
+          const parsed = JSON.parse(payload) as {
+            type?: string;
+            delta?: { type?: string; text?: string };
+            message?: {
+              usage?: { input_tokens?: number; output_tokens?: number };
+            };
+            usage?: { input_tokens?: number; output_tokens?: number };
+          };
+
+          if (parsed.type === "message_start" && parsed.message?.usage) {
+            tokensInput = parsed.message.usage.input_tokens ?? 0;
+          } else if (
+            parsed.type === "content_block_delta" &&
+            parsed.delta?.type === "text_delta" &&
+            typeof parsed.delta.text === "string"
+          ) {
+            yield { type: "delta", delta: parsed.delta.text };
+          } else if (parsed.type === "message_delta" && parsed.usage) {
+            tokensOutput = parsed.usage.output_tokens ?? tokensOutput;
+          }
+        } catch {
+          // Ignore malformed event — Anthropic sometimes sends pings.
+        }
+      }
+    }
+
+    yield {
+      type: "done",
+      costUsd: computeCostUsd(req.role, tokensInput, tokensOutput),
+      tokensInput,
+      tokensOutput,
+    };
+  } catch (err) {
+    yield {
+      type: "error",
+      delta: err instanceof Error ? err.message : String(err),
+    };
+  } finally {
+    clearTimeout(timer);
+    reader.releaseLock();
+  }
+}
+
+async function* fallbackToComplete(
+  req: CompletionRequest,
+): AsyncGenerator<StreamingChunk> {
   try {
     const result = await complete(req);
     yield { type: "delta", delta: result.text };

@@ -28,6 +28,10 @@ import {
   validateRequiredVariables,
   PromptNotFoundError,
 } from "./prompt-loader";
+import {
+  assertWithinBudget,
+  BudgetExceededError,
+} from "./token-tracker";
 import type { CaseType, PromptTemplateRow } from "@/lib/db/types";
 
 // -----------------------------------------------------------------------------
@@ -43,6 +47,9 @@ export interface GenerationInput {
   ragTags?: string[];
   /** Pomiń walidację Haiku (np. szybki preview). */
   skipValidation?: boolean;
+  /** Tier 3 zad. 109/110 — sprawdź budżet user/case przed wywołaniem. */
+  userId?: string;
+  caseId?: string;
 }
 
 export interface GenerationResult {
@@ -112,6 +119,20 @@ const VALIDATOR_SYSTEM_PROMPT = `Jesteś prawnikiem-walidatorem. Otrzymujesz pis
 export async function runGenerationPipeline(
   input: GenerationInput,
 ): Promise<GenerationResult> {
+  // 0) Budget guardrail (Tier 3 zad. 109/110) — sprawdzamy budżet PRZED pipeline
+  if (input.userId) {
+    try {
+      await assertWithinBudget({ userId: input.userId, caseId: input.caseId });
+    } catch (err) {
+      if (err instanceof BudgetExceededError) {
+        // Konwertujemy na AiUnavailableError, by warstwa wyżej fallbackowała
+        // na Tier 2 static template (zamiast pokazywać błąd 500).
+        throw new AiUnavailableError(err.message, err);
+      }
+      throw err;
+    }
+  }
+
   // 1) Load active prompt template
   const template = await loadActivePromptTemplate(input.caseType);
 

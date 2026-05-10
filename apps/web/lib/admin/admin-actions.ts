@@ -348,5 +348,168 @@ export async function adminUpdateUserRoleAction(input: {
   };
 }
 
+// ─── Tier 4 zad. 156 — Refund flow (admin tool) ──────────────────────────
+
+const refundSchema = z.object({
+  paymentId: z.string().uuid(),
+  amountGrosze: z.number().int().positive().optional(),
+  reason: z
+    .enum(["duplicate", "fraudulent", "requested_by_customer"])
+    .optional(),
+  internalNote: z.string().max(1000).optional(),
+});
+
+export interface AdminRefundInput extends z.infer<typeof refundSchema> {
+  csrf: string;
+}
+
+/**
+ * Admin server action — tworzy refund w Stripe + rekord w `refunds`.
+ *
+ * Flow:
+ *   1. CSRF + RBAC (requireFullAdmin — refundy wymagają pełnego admina).
+ *   2. Load payment row (must be status='completed' + stripe_payment_intent_id).
+ *   3. Stripe `createRefund()` (sync).
+ *   4. Insert into `refunds` table (status z Stripe).
+ *   5. Audit case_event + revalidate paths.
+ *
+ * Webhook `charge.refunded` zaktualizuje payments.refunded_at + status,
+ * gdy Stripe potwierdzi finalizację (czasem async dla niektórych PM).
+ */
+export async function adminCreateRefundAction(
+  input: AdminRefundInput,
+): Promise<AdminActionResult & { refundId: string; stripeRefundId: string }> {
+  await assertCsrfFromFormData({ csrf: input.csrf });
+
+  const admin = await requireFullAdmin();
+  await guardAction({ profile: "api", key: "admin.payment.refund" });
+
+  const parsed = refundSchema.safeParse(input);
+  if (!parsed.success) {
+    throw new Error("Niepoprawne dane refundu.");
+  }
+
+  const supabase = createSupabaseAdminClient();
+
+  // 1) Load payment
+  const { data: payment, error: payErr } = await supabase
+    .from("payments")
+    .select(
+      "id, user_id, case_id, amount, status, stripe_payment_intent_id, refunded_at",
+    )
+    .eq("id", parsed.data.paymentId)
+    .maybeSingle();
+  if (payErr || !payment) {
+    throw new Error("Płatność nie została znaleziona.");
+  }
+  if (payment.status !== "completed") {
+    throw new Error(
+      `Nie można zrefundować płatności o statusie "${payment.status}".`,
+    );
+  }
+  if (!payment.stripe_payment_intent_id) {
+    throw new Error(
+      "Brak Stripe payment_intent_id — refund nie jest możliwy via API.",
+    );
+  }
+
+  const refundAmount = parsed.data.amountGrosze ?? payment.amount;
+  if (refundAmount > payment.amount) {
+    throw new Error("Kwota refundu przekracza kwotę pierwotnej płatności.");
+  }
+
+  // 2) Stripe call (lazy import — by nie wciągać klienta do bundle'a server-only)
+  const { createRefund } = await import("@/lib/payments/stripe-client");
+  let stripeRes;
+  try {
+    stripeRes = await createRefund({
+      paymentIntentId: payment.stripe_payment_intent_id,
+      amountGrosze: refundAmount,
+      reason: parsed.data.reason,
+      metadata: {
+        payment_id: payment.id,
+        admin_user_id: admin.userId,
+      },
+    });
+  } catch (err) {
+    throw new Error(
+      `Stripe odrzucił refund: ${err instanceof Error ? err.message : String(err)}`,
+    );
+  }
+
+  // 3) Insert refund row
+  const { data: refundRow, error: insErr } = await supabase
+    .from("refunds")
+    .insert({
+      payment_id: payment.id,
+      user_id: payment.user_id,
+      stripe_refund_id: stripeRes.id,
+      stripe_payment_intent_id: payment.stripe_payment_intent_id,
+      amount: refundAmount,
+      currency: "pln",
+      reason: parsed.data.reason ?? null,
+      internal_note: parsed.data.internalNote ?? null,
+      status: stripeRes.status === "succeeded" ? "succeeded" : "pending",
+      initiated_by_admin_id: admin.userId,
+      succeeded_at: stripeRes.status === "succeeded" ? new Date().toISOString() : null,
+    })
+    .select("id")
+    .single();
+
+  if (insErr || !refundRow) {
+    throw new Error(
+      `Refund w Stripe się powiódł, ale zapis do bazy nie: ${insErr?.message}. Sprawdź Stripe Dashboard.`,
+    );
+  }
+
+  // 4) Mark payment as refunded jeżeli full refund
+  if (refundAmount === payment.amount && stripeRes.status === "succeeded") {
+    await supabase
+      .from("payments")
+      .update({
+        status: "refunded",
+        refunded_at: new Date().toISOString(),
+        failure_reason: parsed.data.reason ?? "admin_refund",
+      })
+      .eq("id", payment.id);
+  }
+
+  // 5) Audit
+  if (payment.case_id) {
+    await supabase.from("case_events").insert({
+      case_id: payment.case_id,
+      user_id: payment.user_id,
+      actor: "admin",
+      event_type: "admin_payment_refunded",
+      metadata: {
+        payment_id: payment.id,
+        refund_id: refundRow.id,
+        stripe_refund_id: stripeRes.id,
+        amount: refundAmount,
+        reason: parsed.data.reason ?? null,
+        admin_user_id: admin.userId,
+        admin_email: admin.email,
+      },
+    });
+  }
+
+  revalidatePath("/admin/platnosci");
+  revalidatePath("/admin/sprawy");
+  if (payment.case_id) {
+    revalidatePath(`/admin/sprawy/${payment.case_id}`);
+    revalidatePath(`/panel/sprawa/${payment.case_id}`);
+  }
+
+  return {
+    ok: true,
+    message:
+      stripeRes.status === "succeeded"
+        ? `Refund ${(refundAmount / 100).toFixed(2)} PLN wykonany.`
+        : `Refund zlecony (status: ${stripeRes.status}). Webhook potwierdzi finalizację.`,
+    refundId: refundRow.id,
+    stripeRefundId: stripeRes.id,
+  };
+}
+
 // Re-export błędów dla UI (klient może rozróżniać).
 export { ActionRateLimitError, ActionUnauthenticatedError };

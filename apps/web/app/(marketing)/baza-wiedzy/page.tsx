@@ -56,6 +56,87 @@ const ARTICLES: readonly ArticleEntry[] = [
       "Art. 105a Prawa bankowego, RODO art. 16, droga przez Rzecznika Finansowego. Kiedy bank musi zaktualizować wpis, a kiedy go usunąć.",
     available: true,
   },
+  {
+    slug: "przedawnienie-dlugu",
+    title: "Przedawnienie długu — kiedy bank traci prawo do egzekucji",
+    category: "Podstawy",
+    readingMinutes: 11,
+    excerpt:
+      "Terminy 3/6/10 lat, jak podnieść zarzut przedawnienia, co przerywa bieg terminu, art. 117 § 2(1) k.c. — badanie z urzędu w sprawach konsumenckich.",
+    available: true,
+  },
+  {
+    slug: "kwota-wolna-od-egzekucji",
+    title: "Kwota wolna od egzekucji — ile komornik musi Ci zostawić",
+    category: "Egzekucja",
+    readingMinutes: 9,
+    excerpt:
+      "Minimalna krajowa netto wolna przy długach niealimentacyjnych, 75% minimalnej brutto na rachunku bankowym, ochrona umów zlecenia.",
+    available: true,
+  },
+  {
+    slug: "cesja-wierzytelnosci-fundusze",
+    title: "Cesja wierzytelności — gdy Twój dług kupuje fundusz",
+    category: "Sąd",
+    readingMinutes: 10,
+    excerpt:
+      "Co to jest cesja, jak rozpoznać legitymację czynną funduszu (Kruk, Best, Ultimo), jakie dokumenty musi przedstawić powód.",
+    available: true,
+  },
+  {
+    slug: "upadlosc-konsumencka",
+    title: "Upadłość konsumencka — kompletny przewodnik 2025",
+    category: "Upadłość",
+    readingMinutes: 14,
+    excerpt:
+      "Kto może ogłosić upadłość po nowelizacji 2020, procedura, plan spłaty 36/84 miesięcy, umorzenie bez planu, co z mieszkaniem i samochodem.",
+    available: true,
+  },
+  {
+    slug: "klauzule-abuzywne-w-umowach-kredytowych",
+    title: "Klauzule abuzywne w umowach kredytowych — jak je rozpoznać",
+    category: "Sąd",
+    readingMinutes: 11,
+    excerpt:
+      "Art. 385(1) k.c., rejestr klauzul UOKiK, orzecznictwo TSUE (Dziubak, Aziz), jak skutecznie podnieść zarzut abuzywności.",
+    available: true,
+  },
+  {
+    slug: "ugoda-z-wierzycielem",
+    title: "Ugoda z wierzycielem — kiedy negocjować, czego nie podpisywać",
+    category: "Negocjacja",
+    readingMinutes: 9,
+    excerpt:
+      "Pułapki uznania długu, klauzule poddania się egzekucji, wzory klauzul ochronnych, kiedy ugoda przerywa przedawnienie.",
+    available: true,
+  },
+  {
+    slug: "zajecie-wynagrodzenia-przez-komornika",
+    title: "Zajęcie wynagrodzenia przez komornika — co możesz zrobić",
+    category: "Egzekucja",
+    readingMinutes: 10,
+    excerpt:
+      "Procedura zajęcia, obowiązki pracodawcy, limity 50%/60%, ochrona umów zlecenia od 2019 r., zbieg egzekucji wielu komorników.",
+    available: true,
+  },
+  {
+    slug: "big-infomonitor-krd-erif",
+    title: "BIG InfoMonitor, KRD, ERIF — jak działają rejestry dłużników",
+    category: "Rejestry",
+    readingMinutes: 8,
+    excerpt:
+      "Różnice między biurami informacji gospodarczej, kiedy wierzyciel ma prawo wpisać dłużnika, jak skutecznie żądać usunięcia wpisu.",
+    available: true,
+  },
+  {
+    slug: "odpowiedz-na-pozew",
+    title: "Odpowiedź na pozew — co napisać, gdy sąd wyznaczył rozprawę",
+    category: "Sąd",
+    readingMinutes: 11,
+    excerpt:
+      "Termin 14/21 dni, struktura pisma, zarzuty merytoryczne, prekluzja dowodowa po nowelizacji 2019, najczęstsze błędy procesowe.",
+    available: true,
+  },
 ] as const;
 
 const CATEGORIES = [
