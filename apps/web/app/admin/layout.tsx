@@ -13,6 +13,8 @@ import {
   Tag,
   CreditCard,
   Activity,
+  Gauge,
+  AlertOctagon,
 } from "lucide-react";
 
 import { requireAdminOrRedirect } from "@/lib/admin/rbac";
@@ -35,6 +37,8 @@ const ADMIN_NAV: AdminNavItem[] = [
   { href: "/admin/sprawy", label: "Kolejka spraw", icon: ListChecks },
   { href: "/admin/platnosci", label: "Płatności", icon: CreditCard, fullAdminOnly: true },
   { href: "/admin/wydajnosc", label: "Wydajność", icon: Activity },
+  { href: "/admin/sli", label: "SLI / SLO", icon: Gauge, fullAdminOnly: true },
+  { href: "/admin/dlq", label: "Dead-letter queue", icon: AlertOctagon, fullAdminOnly: true },
   { href: "/admin/notyfikacje", label: "Notyfikacje", icon: Bell },
   { href: "/admin/wiedza", label: "Baza wiedzy", icon: BookOpen },
   { href: "/admin/promocje", label: "Kody promo", icon: Tag, fullAdminOnly: true },

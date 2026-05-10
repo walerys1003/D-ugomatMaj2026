@@ -171,19 +171,44 @@ async function sendRequest(
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   let response: Response;
   try {
-    response = await fetch(`${backend.baseUrl}/messages`, {
-      method: "POST",
-      signal: controller.signal,
-      headers: {
-        "content-type": "application/json",
-        // Anthropic + APIPod zgodne nagłówki:
-        "anthropic-version": "2023-06-01",
-        "x-api-key": backend.apiKey,
-      },
-      body: JSON.stringify(body),
-    });
+    // Lazy import — avoid circular when bundling
+    const { anthropicCircuit, CircuitOpenError } = await import(
+      "@/lib/observability/circuit-breaker"
+    );
+    const { withRetry, classifyAnthropic } = await import("@/lib/observability/retry");
+    try {
+      response = await anthropicCircuit.run(() =>
+        withRetry(
+          () =>
+            fetch(`${backend.baseUrl}/messages`, {
+              method: "POST",
+              signal: controller.signal,
+              headers: {
+                "content-type": "application/json",
+                "anthropic-version": "2023-06-01",
+                "x-api-key": backend.apiKey,
+              },
+              body: JSON.stringify(body),
+            }),
+          {
+            classify: classifyAnthropic,
+            opName: `anthropic.${backend.provider}.messages`,
+            maxAttempts: 3,
+          },
+        ),
+      );
+    } catch (innerErr) {
+      if (innerErr instanceof CircuitOpenError) {
+        throw new AiTransientError(
+          `${backend.provider}: circuit breaker open`,
+          innerErr,
+        );
+      }
+      throw innerErr;
+    }
   } catch (err) {
     clearTimeout(timer);
+    if (err instanceof AiTransientError) throw err;
     throw new AiTransientError(
       `Nie udało się połączyć z ${backend.provider}: ${
         err instanceof Error ? err.message : String(err)

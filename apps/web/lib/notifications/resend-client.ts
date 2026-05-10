@@ -62,25 +62,56 @@ export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult>
 
   let response: Response;
   try {
-    response = await fetch(RESEND_API, {
-      method: "POST",
-      signal: controller.signal,
-      headers: {
-        "content-type": "application/json",
-        authorization: `Bearer ${apiKey}`,
-        ...(input.idempotencyKey ? { "idempotency-key": input.idempotencyKey } : {}),
-      },
-      body: JSON.stringify({
-        from,
-        to: [input.to],
-        subject: input.subject,
-        text: input.text,
-        html: input.html,
-        reply_to: replyTo,
-      }),
-    });
+    const { resendCircuit, CircuitOpenError } = await import(
+      "@/lib/observability/circuit-breaker"
+    );
+    const { withRetry } = await import("@/lib/observability/retry");
+    try {
+      response = await resendCircuit.run(() =>
+        withRetry(
+          () =>
+            fetch(RESEND_API, {
+              method: "POST",
+              signal: controller.signal,
+              headers: {
+                "content-type": "application/json",
+                authorization: `Bearer ${apiKey}`,
+                ...(input.idempotencyKey
+                  ? { "idempotency-key": input.idempotencyKey }
+                  : {}),
+              },
+              body: JSON.stringify({
+                from,
+                to: [input.to],
+                subject: input.subject,
+                text: input.text,
+                html: input.html,
+                reply_to: replyTo,
+              }),
+            }),
+          {
+            opName: "resend.send",
+            maxAttempts: 3,
+            classify: (err) => {
+              if (err && typeof err === "object" && "status" in err) {
+                const s = Number((err as { status?: number }).status);
+                if (s === 429 || s >= 500) return "retry";
+                if (s >= 400) return "fail";
+              }
+              return "retry";
+            },
+          },
+        ),
+      );
+    } catch (inner) {
+      if (inner instanceof CircuitOpenError) {
+        throw new EmailProviderUnavailableError("Resend: circuit open", inner);
+      }
+      throw inner;
+    }
   } catch (e) {
     clearTimeout(timer);
+    if (e instanceof EmailProviderUnavailableError) throw e;
     throw new EmailProviderUnavailableError(
       `Brak łączności z Resend: ${e instanceof Error ? e.message : String(e)}`,
       e,

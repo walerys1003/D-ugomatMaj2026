@@ -8,6 +8,22 @@ import {
   rateLimit,
 } from "@/lib/security/rate-limit";
 
+// Tier 6 zad. 251 — correlation_id helper (edge-safe).
+// We can't import the Node-only AsyncLocalStorage logger here, so we
+// generate the id inline and propagate it via `x-request-id`.
+function edgeCorrelationId(headers: Headers): string {
+  const incoming = headers.get("x-request-id") || headers.get("x-correlation-id");
+  if (incoming && /^[A-Za-z0-9_-]{8,64}$/.test(incoming)) return incoming;
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const c = (globalThis as any).crypto;
+    if (c?.randomUUID) return (c.randomUUID() as string).replace(/-/g, "").slice(0, 16);
+  } catch {
+    // fallthrough
+  }
+  return Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-8);
+}
+
 /**
  * Edge middleware — odpowiada za:
  *
@@ -49,11 +65,13 @@ export async function middleware(request: NextRequest) {
   }
 
   // -------------------------------------------------------------------
-  // 2) Nonce — przekażemy do app/layout przez request header
+  // 2) Nonce + correlation_id — przekażemy do app/layout przez request header
   // -------------------------------------------------------------------
   const nonce = generateNonce();
+  const requestId = edgeCorrelationId(request.headers);
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-nonce", nonce);
+  requestHeaders.set("x-request-id", requestId);
 
   let response = NextResponse.next({
     request: { headers: requestHeaders },
@@ -106,6 +124,10 @@ export async function middleware(request: NextRequest) {
     "X-RateLimit-Remaining",
     String(rl.remaining),
   );
+
+  // Tier 6 zad. 251 — expose correlation_id w response, by klient mógł
+  // dołączyć go do raportów błędów. NIE jest sekretem.
+  guardResponse.headers.set("x-request-id", requestId);
 
   // -------------------------------------------------------------------
   // 5) Security headers — applikujemy NA KOŃCU, żeby nie zostały

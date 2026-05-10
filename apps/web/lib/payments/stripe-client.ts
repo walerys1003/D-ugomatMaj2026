@@ -18,6 +18,9 @@ import "server-only";
  * Caller pokazuje user'owi UI „płatność niedostępna w trybie demo".
  */
 import { createHmac, timingSafeEqual } from "node:crypto";
+import { stripeCircuit, CircuitOpenError } from "@/lib/observability/circuit-breaker";
+import { withRetry, classifyStripe } from "@/lib/observability/retry";
+import { logger } from "@/lib/observability/logger";
 
 // -----------------------------------------------------------------------------
 // Errors
@@ -156,12 +159,31 @@ async function stripeRequest<T>(
     body = encodeForm(init.body).toString();
   }
 
-  const resp = await fetch(`${STRIPE_BASE}${path}`, {
-    method: init.method ?? "POST",
-    headers,
-    body,
-    cache: "no-store",
-  });
+  let resp: Response;
+  try {
+    resp = await stripeCircuit.run(() =>
+      withRetry(
+        () =>
+          fetch(`${STRIPE_BASE}${path}`, {
+            method: init.method ?? "POST",
+            headers,
+            body,
+            cache: "no-store",
+          }),
+        {
+          classify: classifyStripe,
+          opName: `stripe.${init.method ?? "POST"} ${path}`,
+          maxAttempts: 3,
+        },
+      ),
+    );
+  } catch (err) {
+    if (err instanceof CircuitOpenError) {
+      logger.warn("stripe.circuit_open", { path });
+      throw new StripeUnavailableError("circuit_open");
+    }
+    throw err;
+  }
 
   const json = (await resp.json().catch(() => ({}))) as Record<string, unknown>;
 

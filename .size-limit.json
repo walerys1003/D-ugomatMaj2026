@@ -1,0 +1,38 @@
+[
+  {
+    "name": "Marketing homepage (first load JS)",
+    "path": "apps/web/.next/static/chunks/pages/_app-*.js",
+    "limit": "150 KB",
+    "gzip": true
+  },
+  {
+    "name": "Marketing homepage CSS",
+    "path": "apps/web/.next/static/css/*.css",
+    "limit": "30 KB",
+    "gzip": true
+  },
+  {
+    "name": "App shell (authenticated)",
+    "path": "apps/web/.next/static/chunks/app/app/**/*.js",
+    "limit": "250 KB",
+    "gzip": true
+  },
+  {
+    "name": "Baza wiedzy article bundle",
+    "path": "apps/web/.next/static/chunks/app/(marketing)/baza-wiedzy/**/*.js",
+    "limit": "120 KB",
+    "gzip": true
+  },
+  {
+    "name": "Wizard (case form) bundle",
+    "path": "apps/web/.next/static/chunks/app/app/sprawy/**/*.js",
+    "limit": "200 KB",
+    "gzip": true
+  },
+  {
+    "name": "Admin dashboard bundle",
+    "path": "apps/web/.next/static/chunks/app/admin/**/*.js",
+    "limit": "300 KB",
+    "gzip": true
+  }
+]

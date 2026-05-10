@@ -36,6 +36,13 @@ import {
   AiUnavailableError,
 } from "@/lib/ai/generation-pipeline";
 import type { CaseRow } from "@/lib/db/types";
+import {
+  parseIdempotencyHeader,
+  reserveIdempotency,
+  completeIdempotency,
+  abortIdempotency,
+} from "@/lib/observability/idempotency";
+import { logger, withLogContext, generateCorrelationId } from "@/lib/observability/logger";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -97,6 +104,20 @@ export async function POST(req: NextRequest): Promise<Response> {
   const userId = u.user.id;
 
   // ---------------------------------------------------------------------
+  // 2.5) Tier 6 zad. 260 — Chaos engineering flag.
+  // Gdy DLUGOMAT_AI_DEGRADE=true (lub probabilistycznie z _RATE),
+  // losowo zwraca 503, by przetestować UX degradacji na produkcji.
+  // ---------------------------------------------------------------------
+  const chaosOn = process.env.DLUGOMAT_AI_DEGRADE === "true";
+  const chaosRate = Number(process.env.DLUGOMAT_AI_DEGRADE_RATE ?? "0");
+  if (chaosOn && Math.random() < (Number.isFinite(chaosRate) ? chaosRate : 1)) {
+    return NextResponse.json(
+      { error: "ai_unavailable_chaos", message: "Chaos engineering: forced degradation" },
+      { status: 503, headers: { "Retry-After": "10" } },
+    );
+  }
+
+  // ---------------------------------------------------------------------
   // 3) Rate-limit per user (drogie wywołania AI)
   // ---------------------------------------------------------------------
   const rl = rateLimit(`ai:generate:user:${userId}`, RATE_LIMIT_PROFILES.documentGenerate);
@@ -119,6 +140,44 @@ export async function POST(req: NextRequest): Promise<Response> {
       { error: "rate_limit_ip" },
       { status: 429, headers: { "Retry-After": String(Math.ceil(ipLimit.resetMs / 1000)) } },
     );
+  }
+
+  // ---------------------------------------------------------------------
+  // 3.5) Tier 6 zad. 255 — Idempotency-Key support
+  // Klient może wysłać nagłówek `Idempotency-Key` (UUID/ULID).
+  // Pierwsze wywołanie rezerwuje klucz; kolejne z tym samym kluczem
+  // zwracają cached result (24h TTL).
+  // ---------------------------------------------------------------------
+  const idemKey = parseIdempotencyHeader(req.headers.get("idempotency-key"));
+  const correlationId = req.headers.get("x-request-id") ?? generateCorrelationId();
+  const idemScope = `ai.generate:${userId}`;
+  if (idemKey) {
+    try {
+      const lookup = await reserveIdempotency<{ document_id?: string; cached: true }>({
+        scope: idemScope,
+        key: idemKey,
+        user_id: userId,
+      });
+      if (lookup.hit && lookup.status === "completed" && lookup.result) {
+        logger.info("ai.generate.idempotency_hit", { caseId, idemKey });
+        return NextResponse.json(lookup.result, {
+          status: lookup.http_status ?? 200,
+          headers: { "X-Idempotent-Replay": "true", "X-Correlation-Id": correlationId },
+        });
+      }
+      if (lookup.hit && lookup.status === "in_progress") {
+        return NextResponse.json(
+          { error: "idempotency_in_progress", message: "Duplicate request in progress." },
+          { status: 409, headers: { "Retry-After": "5" } },
+        );
+      }
+    } catch (e) {
+      logger.warn("ai.generate.idempotency_reserve_failed", {
+        caseId,
+        error: e instanceof Error ? e.message : String(e),
+      });
+      // Nie blokuj generacji jeśli idempotency cache nie działa.
+    }
   }
 
   // ---------------------------------------------------------------------

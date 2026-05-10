@@ -1,0 +1,5 @@
+{
+  "_comment": "Tier 6 zad. 280 — SRI manifest. Regenerate with `node scripts/generate-sri.mjs`. Update on every external script change.",
+  "_generated_at": "2026-05-11T00:00:00Z",
+  "_algorithm": "sha384"
+}

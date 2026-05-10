@@ -97,17 +97,46 @@ export async function sendSms(input: SendSmsInput): Promise<SendSmsResult> {
 
   let response: Response;
   try {
-    response = await fetch(SMSAPI_URL, {
-      method: "POST",
-      signal: controller.signal,
-      headers: {
-        "content-type": "application/x-www-form-urlencoded",
-        authorization: `Bearer ${token}`,
-      },
-      body: params.toString(),
-    });
+    const { smsapiCircuit, CircuitOpenError } = await import(
+      "@/lib/observability/circuit-breaker"
+    );
+    const { withRetry } = await import("@/lib/observability/retry");
+    try {
+      response = await smsapiCircuit.run(() =>
+        withRetry(
+          () =>
+            fetch(SMSAPI_URL, {
+              method: "POST",
+              signal: controller.signal,
+              headers: {
+                "content-type": "application/x-www-form-urlencoded",
+                authorization: `Bearer ${token}`,
+              },
+              body: params.toString(),
+            }),
+          {
+            opName: "smsapi.send",
+            maxAttempts: 3,
+            classify: (err) => {
+              if (err && typeof err === "object" && "status" in err) {
+                const s = Number((err as { status?: number }).status);
+                if (s === 429 || s >= 500) return "retry";
+                if (s >= 400) return "fail";
+              }
+              return "retry";
+            },
+          },
+        ),
+      );
+    } catch (inner) {
+      if (inner instanceof CircuitOpenError) {
+        throw new SmsProviderUnavailableError("SMSAPI: circuit open", inner);
+      }
+      throw inner;
+    }
   } catch (e) {
     clearTimeout(timer);
+    if (e instanceof SmsProviderUnavailableError) throw e;
     throw new SmsProviderUnavailableError(
       `Brak łączności z SMSAPI: ${e instanceof Error ? e.message : String(e)}`,
       e,
