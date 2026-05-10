@@ -85,6 +85,40 @@ export interface ButtonProps
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, block, asChild = false, loading, disabled, children, ...props }, ref) => {
     const Comp = asChild ? Slot : "button";
+
+    // When using asChild, Radix Slot requires EXACTLY ONE React element child.
+    // We must therefore inject the loading spinner *inside* the user-provided
+    // element rather than alongside it. For non-asChild we keep the previous
+    // structure (spinner + children) since a native <button> accepts many kids.
+    const spinner =
+      loading ? (
+        <span
+          aria-hidden
+          className="size-4 animate-spin rounded-full border-2 border-current border-r-transparent"
+        />
+      ) : null;
+
+    let content: React.ReactNode;
+    if (asChild) {
+      // Ensure children is a single React element; if not, wrap in a <span>.
+      const onlyChild = React.isValidElement(children) ? children : <span>{children}</span>;
+      content = React.cloneElement(
+        onlyChild as React.ReactElement,
+        undefined,
+        <>
+          {spinner}
+          {(onlyChild as React.ReactElement).props.children}
+        </>
+      );
+    } else {
+      content = (
+        <>
+          {spinner}
+          {children}
+        </>
+      );
+    }
+
     return (
       <Comp
         ref={ref}
@@ -93,13 +127,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={disabled || loading}
         {...props}
       >
-        {loading ? (
-          <span
-            aria-hidden
-            className="size-4 animate-spin rounded-full border-2 border-current border-r-transparent"
-          />
-        ) : null}
-        {children}
+        {content}
       </Comp>
     );
   }

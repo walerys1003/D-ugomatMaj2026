@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import {
   KnowledgeArticle,
   buildArticleJsonLd,
+  buildBreadcrumbJsonLd,
 } from "@/components/marketing/knowledge-article";
 
 const SLUG = "skarga-na-czynnosci-komornika";
