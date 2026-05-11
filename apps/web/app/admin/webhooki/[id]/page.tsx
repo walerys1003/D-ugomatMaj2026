@@ -1,231 +1,235 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import {
-  ArrowLeft,
-  CheckCircle2,
-  Clock,
-  Copy,
-  RotateCw,
-  Trash2,
-  XCircle,
-} from "lucide-react";
-
+import { notFound } from "next/navigation";
+import { ArrowLeft, Webhook, RefreshCw, Play, Pause, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const metadata: Metadata = {
-  title: "Webhook · Admin · Długomat",
+  title: "Webhook — szczegoly",
+  robots: { index: false, follow: false },
 };
 
-type Delivery = {
+interface WebhookDetail {
   id: string;
-  event: string;
-  status: "success" | "failed" | "retrying";
-  http_status: number;
-  duration_ms: number;
-  at: string;
-  attempts: number;
-};
+  name: string;
+  url: string;
+  events: ReadonlyArray<string>;
+  status: "active" | "paused" | "failing";
+  created_at: string;
+  signing_secret_prefix: string;
+  deliveries_24h: number;
+  success_rate: number;
+}
 
-const DELIVERIES: Delivery[] = [
-  {
-    id: "dlv_001",
-    event: "letter.generated",
-    status: "success",
-    http_status: 200,
-    duration_ms: 142,
-    at: "2026-05-11T08:51:00Z",
-    attempts: 1,
-  },
-  {
-    id: "dlv_002",
-    event: "case.created",
-    status: "success",
-    http_status: 200,
-    duration_ms: 98,
-    at: "2026-05-11T08:48:00Z",
-    attempts: 1,
-  },
-  {
-    id: "dlv_003",
-    event: "payment.paid",
-    status: "failed",
-    http_status: 502,
-    duration_ms: 28000,
-    at: "2026-05-11T08:42:00Z",
-    attempts: 3,
-  },
-  {
-    id: "dlv_004",
-    event: "letter.sent",
-    status: "retrying",
-    http_status: 503,
-    duration_ms: 12000,
-    at: "2026-05-11T08:40:00Z",
-    attempts: 2,
-  },
+interface Delivery {
+  id: string;
+  at: string;
+  event: string;
+  status_code: number;
+  duration_ms: number;
+  ok: boolean;
+}
+
+async function loadWebhook(id: string): Promise<WebhookDetail | null> {
+  const KNOWN: Record<string, WebhookDetail> = {
+    "wh_001": {
+      id: "wh_001",
+      name: "Salesforce — case sync",
+      url: "https://api.salesforce.com/services/data/v59.0/sobjects/Case",
+      events: ["case.created", "case.updated", "case.closed", "document.uploaded"],
+      status: "active",
+      created_at: "2026-02-14 10:23",
+      signing_secret_prefix: "whsec_sf_8xK4...",
+      deliveries_24h: 1240,
+      success_rate: 99.84,
+    },
+    "wh_002": {
+      id: "wh_002",
+      name: "Slack — alerty SLA",
+      url: "https://hooks.slack.com/services/T0/B0/XXX",
+      events: ["sla.breach", "case.overdue"],
+      status: "failing",
+      created_at: "2026-03-22 14:01",
+      signing_secret_prefix: "whsec_sl_2aP9...",
+      deliveries_24h: 18,
+      success_rate: 22.2,
+    },
+  };
+  return KNOWN[id] ?? null;
+}
+
+const DELIVERIES: ReadonlyArray<Delivery> = [
+  { id: "d1", at: "2026-05-11 09:14:22", event: "case.updated", status_code: 200, duration_ms: 142, ok: true },
+  { id: "d2", at: "2026-05-11 09:13:58", event: "case.created", status_code: 200, duration_ms: 156, ok: true },
+  { id: "d3", at: "2026-05-11 09:13:11", event: "document.uploaded", status_code: 502, duration_ms: 30000, ok: false },
+  { id: "d4", at: "2026-05-11 09:12:44", event: "case.updated", status_code: 200, duration_ms: 138, ok: true },
+  { id: "d5", at: "2026-05-11 09:12:01", event: "case.closed", status_code: 200, duration_ms: 124, ok: true },
+  { id: "d6", at: "2026-05-11 09:11:38", event: "case.created", status_code: 200, duration_ms: 169, ok: true },
 ];
 
-const TONE: Record<Delivery["status"], "success" | "danger" | "warning"> = {
-  success: "success",
-  failed: "danger",
-  retrying: "warning",
+const STATUS_TONE: Record<WebhookDetail["status"], "success" | "neutral" | "danger"> = {
+  active: "success",
+  paused: "neutral",
+  failing: "danger",
 };
 
-const LABEL: Record<Delivery["status"], string> = {
-  success: "Dostarczono",
-  failed: "Błąd",
-  retrying: "Retry",
+const STATUS_LABEL: Record<WebhookDetail["status"], string> = {
+  active: "Aktywny",
+  paused: "Wstrzymany",
+  failing: "Awarie",
 };
 
-export default async function WebhookDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function WebhookDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const wh = await loadWebhook(id);
+  if (!wh) notFound();
 
   return (
-    <div className="flex flex-col gap-8">
-      <header className="flex flex-col gap-2">
-        <Link
-          href="/admin/webhooki"
-          className="flex items-center gap-1 text-fluid-sm font-semibold text-dlugomat-600 hover:underline dark:text-dlugomat-300"
-        >
-          <ArrowLeft className="size-4" />
-          Wszystkie webhooki
-        </Link>
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <p className="text-fluid-sm font-semibold uppercase tracking-wider text-dlugomat-600">
-              Endpoint · {id}
-            </p>
-            <h1 className="text-fluid-3xl font-bold tracking-tight text-dlugomat-900 dark:text-white">
-              https://crm.kowalska.pl/integracje/dlugomat
-            </h1>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="secondary">
-              <RotateCw className="size-4" />
-              Wymuś retry
+    <div className="space-y-6">
+      <Link href="/admin/webhooki" className="inline-flex items-center gap-2 text-sm text-iron-600 hover:text-dlugomat-900">
+        <ArrowLeft className="h-4 w-4" aria-hidden />
+        Powrot do listy webhookow
+      </Link>
+
+      <header className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p className="text-xs uppercase tracking-[0.18em] text-iron-500">Admin · Webhook {wh.id}</p>
+          <h1 className="font-display text-fluid-h1 text-dlugomat-950 flex items-center gap-3">
+            <Webhook className="h-7 w-7 text-dlugomat-700" aria-hidden />
+            {wh.name}
+          </h1>
+          <p className="mt-1 font-mono text-sm text-iron-600">{wh.url}</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Badge tone={STATUS_TONE[wh.status]} withDot>{STATUS_LABEL[wh.status]}</Badge>
+          {wh.status === "active" ? (
+            <Button variant="secondary" size="sm">
+              <Pause className="mr-2 h-4 w-4" aria-hidden />
+              Wstrzymaj
             </Button>
-            <Button variant="danger">
-              <Trash2 className="size-4" />
-              Usuń
+          ) : (
+            <Button variant="primary" size="sm">
+              <Play className="mr-2 h-4 w-4" aria-hidden />
+              Wznow
             </Button>
-          </div>
+          )}
+          <Button variant="secondary" size="sm">
+            <RefreshCw className="mr-2 h-4 w-4" aria-hidden />
+            Testuj
+          </Button>
         </div>
       </header>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-        <Card elevation="subtle">
+      <section className="grid gap-4 lg:grid-cols-4" aria-label="KPI webhooka">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-fluid-lg">Ostatnie doręczenia</CardTitle>
-            <CardDescription>50 ostatnich wpisów (cache 5 min)</CardDescription>
+            <CardDescription>Dostarczenia / 24h</CardDescription>
+            <CardTitle className="font-display text-fluid-h3 text-dlugomat-950">
+              {wh.deliveries_24h.toLocaleString("pl-PL")}
+            </CardTitle>
           </CardHeader>
-          <CardContent className="overflow-x-auto p-0">
-            <table className="w-full text-fluid-sm">
-              <thead className="border-b border-iron-200 bg-iron-50/60 dark:border-dlugomat-800 dark:bg-dlugomat-900/40">
-                <tr className="text-left text-iron-600 dark:text-iron-300">
-                  <th className="px-5 py-3 font-semibold">Event</th>
-                  <th className="px-5 py-3 font-semibold">Status</th>
-                  <th className="px-5 py-3 text-right font-semibold">HTTP</th>
-                  <th className="px-5 py-3 text-right font-semibold">Czas</th>
-                  <th className="px-5 py-3 text-right font-semibold">Próby</th>
-                  <th className="px-5 py-3 font-semibold">Kiedy</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-iron-100 dark:divide-dlugomat-800">
-                {DELIVERIES.map((d) => (
-                  <tr key={d.id}>
-                    <td className="px-5 py-3 font-mono text-fluid-xs">{d.event}</td>
-                    <td className="px-5 py-3">
-                      <Badge tone={TONE[d.status]} withDot>
-                        {d.status === "success" ? (
-                          <CheckCircle2 className="size-3" />
-                        ) : d.status === "failed" ? (
-                          <XCircle className="size-3" />
-                        ) : (
-                          <Clock className="size-3" />
-                        )}
-                        {LABEL[d.status]}
-                      </Badge>
-                    </td>
-                    <td className="px-5 py-3 text-right tabular-nums">
-                      {d.http_status}
-                    </td>
-                    <td className="px-5 py-3 text-right tabular-nums">
-                      {d.duration_ms < 1000
-                        ? `${d.duration_ms} ms`
-                        : `${(d.duration_ms / 1000).toFixed(1)} s`}
-                    </td>
-                    <td className="px-5 py-3 text-right tabular-nums">
-                      {d.attempts}
-                    </td>
-                    <td className="px-5 py-3 text-fluid-xs text-iron-500">
-                      {new Date(d.at).toLocaleString("pl-PL")}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </CardContent>
         </Card>
+        <Card urgency={wh.success_rate < 95 ? "warning" : "success"}>
+          <CardHeader>
+            <CardDescription>Sukces</CardDescription>
+            <CardTitle
+              className={`font-display text-fluid-h3 ${
+                wh.success_rate < 95 ? "text-warn" : "text-accent-700"
+              }`}
+            >
+              {wh.success_rate.toFixed(2)}%
+            </CardTitle>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardDescription>Zdarzenia</CardDescription>
+            <CardTitle className="font-display text-fluid-h3 text-dlugomat-950">{wh.events.length}</CardTitle>
+          </CardHeader>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardDescription>Utworzony</CardDescription>
+            <CardTitle className="font-display text-fluid-h4 text-dlugomat-950">{wh.created_at}</CardTitle>
+          </CardHeader>
+        </Card>
+      </section>
 
-        <aside className="flex flex-col gap-4">
-          <Card elevation="subtle">
-            <CardHeader>
-              <CardTitle className="text-fluid-base">Sekret HMAC</CardTitle>
-              <CardDescription>
-                Używany do nagłówka{" "}
-                <code className="font-mono text-fluid-xs">X-Dlugomat-Signature</code>
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-2 rounded-lg border border-iron-200 bg-iron-50 p-2 dark:border-iron-800 dark:bg-iron-950">
-                <code className="flex-1 truncate font-mono text-fluid-xs">
-                  whsec_••••••••••••••••••••••••••••••
-                </code>
-                <Button size="sm" variant="ghost" aria-label="Skopiuj sekret">
-                  <Copy className="size-4" />
-                </Button>
-              </div>
-              <Button size="sm" variant="link" className="mt-2 px-0">
-                Wygeneruj nowy →
-              </Button>
-            </CardContent>
-          </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Subskrybowane zdarzenia</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-2">
+            {wh.events.map((e) => (
+              <Badge key={e} tone="info">
+                <span className="font-mono text-xs">{e}</span>
+              </Badge>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
-          <Card elevation="subtle">
-            <CardHeader>
-              <CardTitle className="text-fluid-base">Subskrybowane zdarzenia</CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-wrap gap-1">
-              <Badge tone="info">case.created</Badge>
-              <Badge tone="info">case.updated</Badge>
-              <Badge tone="info">letter.generated</Badge>
-              <Badge tone="info">letter.sent</Badge>
-              <Badge tone="info">payment.paid</Badge>
-            </CardContent>
-          </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Konfiguracja</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2 text-sm">
+          <div className="flex items-start justify-between gap-3">
+            <span className="text-iron-600">URL endpointu</span>
+            <span className="font-mono text-xs text-dlugomat-900">{wh.url}</span>
+          </div>
+          <div className="flex items-start justify-between gap-3">
+            <span className="text-iron-600">Signing secret (prefix)</span>
+            <span className="font-mono text-xs text-dlugomat-900">{wh.signing_secret_prefix}</span>
+          </div>
+          <div className="flex items-start justify-between gap-3">
+            <span className="text-iron-600">Retry policy</span>
+            <span className="text-dlugomat-900">Exponential backoff 5 prob, max 24 h</span>
+          </div>
+        </CardContent>
+      </Card>
 
-          <Card elevation="subtle">
-            <CardHeader>
-              <CardTitle className="text-fluid-base">Polityka retry</CardTitle>
-              <CardDescription>
-                30s → 2m → 10m → 1h → 6h → 24h (max 6 prób). Po wyczerpaniu DLQ.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-        </aside>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Ostatnie dostarczenia</CardTitle>
+          <CardDescription>6 ostatnich prob</CardDescription>
+        </CardHeader>
+        <CardContent className="p-0">
+          <table className="w-full text-sm">
+            <thead className="border-b border-iron-100 bg-iron-50/50 text-xs uppercase tracking-wide text-iron-600">
+              <tr>
+                <th className="px-5 py-2 text-left font-medium">Czas</th>
+                <th className="px-5 py-2 text-left font-medium">Zdarzenie</th>
+                <th className="px-5 py-2 text-right font-medium">HTTP</th>
+                <th className="px-5 py-2 text-right font-medium">Czas (ms)</th>
+                <th className="px-5 py-2 text-right font-medium">Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-iron-100">
+              {DELIVERIES.map((d) => (
+                <tr key={d.id}>
+                  <td className="px-5 py-3 font-mono text-xs text-iron-600">{d.at}</td>
+                  <td className="px-5 py-3 font-mono text-xs text-dlugomat-900">{d.event}</td>
+                  <td className={`px-5 py-3 text-right font-mono ${d.ok ? "text-accent-700" : "text-danger"}`}>
+                    {d.status_code}
+                  </td>
+                  <td className="px-5 py-3 text-right font-mono text-iron-700">{d.duration_ms}</td>
+                  <td className="px-5 py-3 text-right">
+                    {d.ok ? (
+                      <CheckCircle2 className="inline h-4 w-4 text-accent-700" aria-label="OK" />
+                    ) : (
+                      <AlertTriangle className="inline h-4 w-4 text-danger" aria-label="Blad" />
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </CardContent>
+      </Card>
     </div>
   );
 }
