@@ -1,81 +1,93 @@
-import { Upload, ScanLine, Sparkles, FileDown } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Card } from "@/components/ui/card";
 
-const STEPS = [
+interface Step {
+  num: number;
+  title: string;
+  desc: string;
+  detail: string;
+}
+
+const STEPS: readonly Step[] = [
   {
-    icon: Upload,
+    num: 1,
     title: "Wczytaj dokument",
-    desc: "Zrób zdjęcie nakazu, listu komorniczego lub raportu BIK. Plik nigdy nie opuszcza serwera w UE.",
+    desc: "Zrob zdjecie nakazu, listu komorniczego lub raportu BIK.",
+    detail: "Plik nie opuszcza serwera w UE. Szyfrowanie AES-256.",
   },
   {
-    icon: ScanLine,
-    title: "OCR rozpozna treść",
-    desc: "Wyciągniemy sygnaturę, kwotę, datę wymagalności i wierzyciela. Sprawdzisz i zatwierdzisz dane w jednym kroku.",
+    num: 2,
+    title: "OCR rozpozna tresc",
+    desc: "Wyciagamy sygnature, kwote, date wymagalnosci i wierzyciela.",
+    detail: "Sprawdzasz i zatwierdzasz dane w jednym kroku.",
   },
   {
-    icon: Sparkles,
+    num: 3,
     title: "AI zbuduje pismo",
-    desc: "Claude Sonnet 4.6 z bazą orzeczeń przygotuje pismo dopasowane do Twoich zarzutów. Walidacja jakości w tle.",
+    desc: "Claude Sonnet 4.6 z baza orzeczen przygotuje pismo dopasowane do Twoich zarzutow.",
+    detail: "Walidacja jakosci w tle przez Haiku 4.5.",
   },
   {
-    icon: FileDown,
-    title: "Pobierz PDF i wyślij",
-    desc: "Gotowe pismo procesowe w formacie sądowym. Z miejscem na podpis i pełną listą załączników.",
+    num: 4,
+    title: "Pobierz PDF i wyslij",
+    desc: "Gotowe pismo procesowe w formacie sadowym - z miejscem na podpis i pelna lista zalacznikow.",
+    detail: "E-mail i SMS przypomnienie o terminie.",
   },
-] as const;
+];
 
+/**
+ * HowItWorks v2 - premium minimalist 4-step timeline (Design System Tarcza)
+ * Z aria-progressbar, bez bouncy ikon, neutralna paleta.
+ */
 export function HowItWorks() {
   return (
-    <section
-      aria-labelledby="how-it-works-title"
-      className="container py-20 sm:py-24"
-    >
-      <div className="mx-auto max-w-2xl text-center">
-        <p className="text-fluid-sm font-semibold uppercase tracking-wider text-dlugomat-600">
-          Jak to działa
-        </p>
-        <h2
-          id="how-it-works-title"
-          className="mt-2 text-balance text-fluid-4xl font-bold tracking-tight text-dlugomat-900 dark:text-white"
-        >
-          Cztery kroki — bez prawnika, bez stresu, bez kosztów.
-        </h2>
-        <p className="mt-3 text-fluid-base text-iron-600 dark:text-iron-300">
-          Średni czas pełnej obsługi sprawy: <strong>12 minut</strong>. 70% naszych
-          użytkowników kończy proces na telefonie.
-        </p>
-      </div>
+    <section aria-labelledby="how-title" className="bg-white py-20">
+      <div className="container px-6">
+        <header className="mx-auto max-w-2xl text-center">
+          <p className="text-xs uppercase tracking-wide text-dlugomat-500">Jak to dziala</p>
+          <h2 id="how-title" className="mt-2 font-display text-3xl text-dlugomat-900 sm:text-4xl">
+            Cztery kroki - bez prawnika, bez stresu
+          </h2>
+          <p className="mt-3 text-sm text-dlugomat-600">
+            Sredni czas pelnej obslugi sprawy: 12 minut. 70% naszych uzytkownikow konczy proces na telefonie.
+          </p>
+        </header>
 
-      <ol className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {STEPS.map((step, i) => {
-          const Icon = step.icon;
-          return (
-            <li
-              key={step.title}
-              className={cn(
-                "relative rounded-xl border border-iron-200 bg-card p-6 shadow-card",
-                "dark:border-dlugomat-800 dark:bg-dlugomat-900",
-                "transition-shadow duration-base hover:shadow-pop"
-              )}
-            >
-              <div className="flex items-center gap-3">
-                <span className="grid size-10 place-items-center rounded-lg bg-dlugomat-100 text-dlugomat-700 dark:bg-dlugomat-850 dark:text-dlugomat-300">
-                  <Icon className="size-5" aria-hidden />
-                </span>
-                <span className="font-mono text-fluid-xs font-bold uppercase tracking-wider text-iron-400">
-                  Krok {i + 1}
-                </span>
-              </div>
-              <h3 className="mt-4 text-fluid-lg font-semibold text-dlugomat-900 dark:text-iron-50">
-                {step.title}
-              </h3>
-              <p className="mt-2 text-fluid-sm text-iron-600 dark:text-iron-300">
-                {step.desc}
-              </p>
+        <ol className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {STEPS.map((step, i) => (
+            <li key={step.num}>
+              <Card elevation="subtle" className="flex h-full flex-col p-6">
+                <header className="flex items-center gap-3">
+                  <span
+                    aria-hidden
+                    className="flex h-9 w-9 items-center justify-center rounded-full bg-dlugomat-900 font-display text-base text-white"
+                  >
+                    {step.num}
+                  </span>
+                  <span className="text-xs uppercase tracking-wide text-dlugomat-500">
+                    Krok {step.num} z {STEPS.length}
+                  </span>
+                </header>
+                <h3 className="mt-4 font-display text-lg text-dlugomat-900">{step.title}</h3>
+                <p className="mt-2 text-sm text-dlugomat-600">{step.desc}</p>
+                <p className="mt-auto pt-4 font-mono text-xs text-dlugomat-500">{step.detail}</p>
+                <div
+                  role="progressbar"
+                  aria-valuenow={(i + 1) * 25}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label={`Postep krokow: ${i + 1} z ${STEPS.length}`}
+                  className="mt-4 h-1 w-full overflow-hidden rounded-full bg-dlugomat-100"
+                >
+                  <div
+                    className="h-full rounded-full bg-accent-500"
+                    style={{ width: `${(i + 1) * 25}%` }}
+                  />
+                </div>
+              </Card>
             </li>
-          );
-        })}
-      </ol>
+          ))}
+        </ol>
+      </div>
     </section>
   );
 }

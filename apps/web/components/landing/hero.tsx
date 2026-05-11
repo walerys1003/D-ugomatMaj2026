@@ -1,110 +1,66 @@
-"use client";
-
-import * as React from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { ArrowRight, ShieldCheck, Clock, FileCheck } from "lucide-react";
-import { Button } from "@/components/ui/button";
+
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 /**
- * Hero — first 100 vh of the landing page. Brand spec §3.5.1:
- *  - "Tarcza" gradient background (Shield Navy 900 → 800 with corner glow)
- *  - Decisive headline (max 8 words), concrete subhead with numbers
- *  - Single primary CTA, supportive secondary CTA
- *  - Trust strip immediately under the buttons
- *  - No alarmist language ("nie strasz, ale prowadź")
+ * Hero v2 - premium minimalist (Design System Tarcza, Tier 62-landing)
+ *
+ * Bez Framer Motion bouncy, bez gradient hero-tarcza.
+ * Spokojna, techniczna kompozycja: tlo iron-50, KPI strip, dwa CTA, mockup karty sprawy.
  */
 export function Hero() {
   return (
     <section
       aria-labelledby="hero-headline"
-      className="tarcza-hero-gradient relative overflow-hidden text-white"
+      className="relative overflow-hidden border-b border-dlugomat-100 bg-white"
     >
-      {/* Soft halo for depth without bouncy decoration */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -top-32 right-[-10%] h-[40rem] w-[40rem] rounded-full bg-dlugomat-500/20 blur-3xl"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute bottom-[-20%] left-[-15%] h-[35rem] w-[35rem] rounded-full bg-accent-500/10 blur-3xl"
-      />
-
-      <div className="container relative grid gap-10 py-20 sm:py-24 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-16 lg:py-32">
+      <div className="container relative grid gap-12 px-6 py-16 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-16 lg:py-24">
         <div className="flex flex-col gap-6">
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.32, ease: [0.22, 0.61, 0.36, 1] }}
-          >
-            <Badge tone="info" withDot className="bg-white/10 text-white border-white/20">
-              Sztuczna inteligencja zgodna z polskim prawem
-            </Badge>
-          </motion.div>
+          <Badge tone="info" withDot>
+            Sztuczna inteligencja zgodna z polskim prawem
+          </Badge>
 
-          <motion.h1
+          <h1
             id="hero-headline"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.36, delay: 0.05, ease: [0.22, 0.61, 0.36, 1] }}
-            className="max-w-2xl text-balance text-fluid-5xl font-bold tracking-tight text-white"
+            className="max-w-2xl font-display text-4xl tracking-tight text-dlugomat-900 sm:text-5xl"
           >
-            Tarcza dla&nbsp;osób&nbsp;zadłużonych. Pismo procesowe gotowe w&nbsp;12&nbsp;minut.
-          </motion.h1>
+            Tarcza dla osob zadluzonych. Pismo procesowe gotowe w 12 minut.
+          </h1>
 
-          <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.1, ease: [0.22, 0.61, 0.36, 1] }}
-            className="max-w-xl text-fluid-lg text-iron-200"
-          >
-            Wczytaj nakaz, list od komornika lub raport BIK. Długomat rozpozna
-            dokument, oceni przedawnienie i wygeneruje pismo procesowe
-            spersonalizowane dla Twojej sprawy. Bez prawnika, bez kolejek, bez paniki.
-          </motion.p>
+          <p className="max-w-xl text-base text-dlugomat-600">
+            Wczytaj nakaz, list od komornika lub raport BIK. Dlugomat rozpozna dokument,
+            oceni przedawnienie i wygeneruje pismo procesowe dopasowane do Twojej sprawy.
+            Bez prawnika, bez kolejek, bez paniki.
+          </p>
 
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.42, delay: 0.15, ease: [0.22, 0.61, 0.36, 1] }}
-            className="flex flex-wrap items-center gap-3 pt-2"
-          >
-            <Button asChild size="lg" variant="success">
-              <Link href="/skaner-nakazu">
-                Zeskanuj nakaz — DARMOWE
-                <ArrowRight className="size-4" />
-              </Link>
+          <div className="flex flex-wrap items-center gap-3 pt-2">
+            <Button asChild size="lg" variant="primary">
+              <Link href="/skaner-nakazu">Zeskanuj nakaz - DARMOWE</Link>
             </Button>
-            <Button
-              asChild
-              size="lg"
-              variant="ghost"
-              className="text-white hover:bg-white/10"
-            >
-              <Link href="/jak-to-dziala">Zobacz jak to działa</Link>
+            <Button asChild size="lg" variant="secondary">
+              <Link href="/jak-to-dziala">Zobacz jak to dziala</Link>
             </Button>
-          </motion.div>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.4, delay: 0.25 }}
-            className="mt-2 flex flex-wrap items-center gap-x-6 gap-y-2 text-fluid-xs text-iron-300"
+          <dl
+            aria-label="Najwazniejsze wskazniki platformy"
+            className="mt-6 grid grid-cols-3 gap-4 border-t border-dlugomat-100 pt-6"
           >
-            <span className="flex items-center gap-2">
-              <ShieldCheck className="size-4 text-accent-400" aria-hidden />
-              Dane szyfrowane (AES-256)
-            </span>
-            <span className="flex items-center gap-2">
-              <Clock className="size-4 text-accent-400" aria-hidden />
-              Średni czas: 12 minut
-            </span>
-            <span className="flex items-center gap-2">
-              <FileCheck className="size-4 text-accent-400" aria-hidden />
-              Pismo gotowe do wysyłki w PDF
-            </span>
-          </motion.div>
+            <div>
+              <dt className="text-xs uppercase tracking-wide text-dlugomat-500">Sredni czas</dt>
+              <dd className="mt-1 font-display text-xl text-dlugomat-900">12 min</dd>
+            </div>
+            <div>
+              <dt className="text-xs uppercase tracking-wide text-dlugomat-500">Walidacja AI</dt>
+              <dd className="mt-1 font-display text-xl text-dlugomat-900">94%</dd>
+            </div>
+            <div>
+              <dt className="text-xs uppercase tracking-wide text-dlugomat-500">Szyfrowanie</dt>
+              <dd className="mt-1 font-display text-xl text-dlugomat-900">AES-256</dd>
+            </div>
+          </dl>
         </div>
 
         <HeroVisual />
@@ -113,77 +69,56 @@ export function Hero() {
   );
 }
 
-/**
- * HeroVisual — abstract case-card mock that hints at the dashboard
- * without showing real PII. Pure SVG / CSS so it's < 1 KB extra.
- */
 function HeroVisual() {
+  const steps = [
+    { label: "OCR rozpoznal sygnature i wierzyciela", value: 100 },
+    { label: "Wykryto zarzut przedawnienia (3 lata)", value: 92 },
+    { label: "Pismo wygenerowane i zwalidowane", value: 100 },
+  ];
+
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.96 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.5, delay: 0.18, ease: [0.22, 0.61, 0.36, 1] }}
-      className="relative mx-auto w-full max-w-md"
-    >
-      <div className="relative rounded-2xl border border-white/15 bg-white/5 p-5 shadow-pop backdrop-blur-md">
-        <div className="flex items-center justify-between">
-          <span className="text-fluid-xs font-semibold uppercase tracking-wider text-iron-300">
-            Sprawa #DLG-2026-00187
-          </span>
-          <span className="inline-flex items-center gap-1 rounded-full bg-warn-500/15 px-2 py-0.5 text-fluid-xs font-semibold text-warn-100 ring-1 ring-inset ring-warn-500/30">
-            <span className="size-1.5 rounded-full bg-warn-500" />5 dni do terminu
-          </span>
-        </div>
-        <h3 className="mt-3 text-fluid-xl font-semibold leading-tight text-white">
-          Sprzeciw od nakazu zapłaty (EPU)
-        </h3>
-        <p className="mt-1 text-fluid-sm text-iron-300">
-          Dochodzony dług: 4 218,00 zł · Prawdopodobne przedawnienie
-        </p>
+    <Card elevation="pop" className="relative mx-auto w-full max-w-md p-6">
+      <header className="flex items-center justify-between">
+        <span className="font-mono text-xs uppercase tracking-wider text-dlugomat-500">
+          Sprawa #DLG-2026-00187
+        </span>
+        <Badge tone="warning" withDot>
+          5 dni do terminu
+        </Badge>
+      </header>
 
-        <ul className="mt-4 space-y-2 text-fluid-sm text-iron-200">
-          {[
-            ["OCR rozpoznał sygnaturę i wierzyciela", "100%"],
-            ["Wykryto zarzut przedawnienia (3 lata)", "92%"],
-            ["Pismo wygenerowane i zwalidowane", "OK"],
-          ].map(([label, pct]) => (
-            <li key={label} className="flex items-center justify-between rounded-md bg-white/5 px-3 py-2">
-              <span>{label}</span>
-              <span className="font-mono text-fluid-xs text-accent-300">{pct}</span>
-            </li>
-          ))}
-        </ul>
+      <h2 className="mt-4 font-display text-xl text-dlugomat-900">
+        Sprzeciw od nakazu zaplaty (EPU)
+      </h2>
+      <p className="mt-1 text-sm text-dlugomat-600">
+        Dochodzony dlug: 4 218,00 PLN - prawdopodobne przedawnienie
+      </p>
 
-        <div className="mt-5 flex items-center justify-between rounded-lg bg-dlugomat-950/60 px-4 py-3 text-fluid-xs text-iron-300 ring-1 ring-inset ring-white/10">
-          <span>Pismo PDF</span>
-          <span className="font-mono text-accent-300">sprzeciw_epu_v3.pdf</span>
-        </div>
+      <ul className="mt-5 space-y-3">
+        {steps.map((s) => (
+          <li key={s.label} className="space-y-1">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-dlugomat-700">{s.label}</span>
+              <span className="font-mono text-xs text-dlugomat-900">{s.value}%</span>
+            </div>
+            <div
+              role="progressbar"
+              aria-valuenow={s.value}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label={s.label}
+              className="h-1.5 w-full overflow-hidden rounded-full bg-dlugomat-100"
+            >
+              <div className="h-full rounded-full bg-accent-500" style={{ width: `${s.value}%` }} />
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      <div className="mt-5 flex items-center justify-between rounded-md bg-dlugomat-50 px-4 py-3">
+        <span className="text-xs uppercase tracking-wide text-dlugomat-500">Pismo PDF</span>
+        <span className="font-mono text-xs text-dlugomat-900">sprzeciw_epu_v3.pdf</span>
       </div>
-
-      {/* Floating "deadline ring" — calm, never bouncy */}
-      <div
-        aria-hidden
-        className="absolute -bottom-6 -left-6 hidden h-24 w-24 rounded-full border border-white/15 bg-dlugomat-900/70 p-2 backdrop-blur-md sm:block"
-      >
-        <svg viewBox="0 0 36 36" className="h-full w-full">
-          <circle cx="18" cy="18" r="15.5" fill="none" stroke="hsl(var(--dlugomat-700))" strokeWidth="3" />
-          <circle
-            cx="18"
-            cy="18"
-            r="15.5"
-            fill="none"
-            stroke="hsl(var(--warn-500))"
-            strokeWidth="3"
-            strokeDasharray="100"
-            strokeDashoffset="35"
-            strokeLinecap="round"
-            transform="rotate(-90 18 18)"
-          />
-          <text x="18" y="20" textAnchor="middle" className="fill-white text-[8px] font-semibold">
-            5 dni
-          </text>
-        </svg>
-      </div>
-    </motion.div>
+    </Card>
   );
 }
