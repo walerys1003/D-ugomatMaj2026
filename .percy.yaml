@@ -1,0 +1,23 @@
+version: 2
+snapshot:
+  widths: [375, 768, 1440]
+  min-height: 1024
+  percy-css: |
+    [data-testid="live-timestamp"],
+    [data-testid="live-metric"],
+    [data-testid="status-uptime"],
+    time {
+      visibility: hidden !important;
+    }
+    *, *::before, *::after {
+      animation-duration: 0s !important;
+      transition-duration: 0s !important;
+    }
+discovery:
+  allowed-hostnames:
+    - dlugomat.pl
+    - localhost
+  network-idle-timeout: 750
+  disable-cache: false
+static:
+  base-url: /
