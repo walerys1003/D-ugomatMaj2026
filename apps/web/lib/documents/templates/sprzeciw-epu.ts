@@ -35,7 +35,7 @@ export function renderSprzeciwEpuMarkdown(
   const zarzutyById = new Map(ZARZUTY_OPTIONS.map((z) => [z.id, z]));
 
   for (const id of answers.zarzuty) {
-    const opt = zarzutyById.get(id);
+    const opt = zarzutyById.get(id as never);
     if (!opt) continue;
     zarzutyParas.push(buildZarzutParagraph(id, answers));
     void opt;

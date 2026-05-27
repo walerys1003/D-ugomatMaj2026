@@ -88,15 +88,19 @@ export async function POST(request: Request) {
   // Tier 5 zad. 229 — persist to web_vitals table for P75 dashboard aggregation.
   // We swallow errors silently because the beacon must never delay or fail UX.
   try {
-    const admin = createSupabaseAdminClient();
+    const adminBase = createSupabaseAdminClient();
+    // W10-3: loose cast — typed Database stale for recent schema columns
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const admin: any = adminBase;
     if (admin && sanitized.value !== null) {
       // Extract url_path (pathname) from the full URL, fallback to raw value.
       let urlPath: string | null = sanitized.url;
-      if (sanitized.url) {
+      const rawUrl = sanitized.url;
+      if (rawUrl) {
         try {
-          urlPath = new URL(sanitized.url).pathname.slice(0, 500);
+          urlPath = new URL(rawUrl).pathname.slice(0, 500);
         } catch {
-          urlPath = sanitized.url.slice(0, 500);
+          urlPath = rawUrl.slice(0, 500);
         }
       }
 

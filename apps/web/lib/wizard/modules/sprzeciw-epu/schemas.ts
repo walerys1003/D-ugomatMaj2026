@@ -100,7 +100,7 @@ export const ZARZUTY_OPTIONS = [
   },
 ] as const;
 
-export const ZARZUT_IDS = ZARZUTY_OPTIONS.map((z) => z.id) as readonly [
+export const ZARZUT_IDS = ZARZUTY_OPTIONS.map((z) => z.id) as unknown as readonly [
   string,
   ...string[],
 ];

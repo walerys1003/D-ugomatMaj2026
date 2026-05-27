@@ -24,6 +24,11 @@ export const DEADLINE_KIND_LABEL: Record<DeadlineKind, string> = {
   odpowiedz_cesja_14dni: "termin na odpowiedź na wezwanie funduszu (14 dni)",
   wniosek_raty: "termin na wniosek o raty",
   wniosek_upadlosc: "termin na wniosek o upadłość",
+  // Tier 7 expansion
+  reklamacja_bank_30dni: "termin reklamacji do banku (30 dni)",
+  puodo_30dni: "termin na skargę do PUODO (30 dni)",
+  zazalenie_7dni: "termin na zażalenie (7 dni)",
+  powodztwo_przeciwegzekucyjne: "termin na powództwo przeciwegzekucyjne",
   custom: "termin procesowy",
 };
 

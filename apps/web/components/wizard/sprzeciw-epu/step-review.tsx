@@ -88,7 +88,7 @@ export function StepReview({
       </div>
 
       <fieldset className="space-y-3">
-        <FormField error={form.formState.errors.zgoda_dane?.message}>
+        <FormField label="Zgoda RODO" error={form.formState.errors.zgoda_dane?.message}>
           <label className="flex items-start gap-3">
             <input
               type="checkbox"
@@ -102,7 +102,7 @@ export function StepReview({
           </label>
         </FormField>
 
-        <FormField error={form.formState.errors.zgoda_oswiadczenie?.message}>
+        <FormField label="Oświadczenie" error={form.formState.errors.zgoda_oswiadczenie?.message}>
           <label className="flex items-start gap-3">
             <input
               type="checkbox"

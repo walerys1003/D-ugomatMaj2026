@@ -25,6 +25,9 @@ interface DeadlineRule {
   reminders_days_before: number[];
 }
 
+// NOTE: typy `DeadlineRule.kind` używają etykiet legacy które wykraczają
+// poza `DeadlineKind` z `lib/db/types.ts`. Tutaj traktujemy je jako
+// human-readable identifiers reguły — nie są zapisywane jako enum w bazie.
 const RULES: Record<LetterKind, DeadlineRule | null> = {
   nakaz_zaplaty_epu: {
     days: 14,
@@ -33,47 +36,12 @@ const RULES: Record<LetterKind, DeadlineRule | null> = {
     description: "Termin 14 dni od doręczenia. Po tym terminie nakaz uprawomocni się.",
     reminders_days_before: [10, 5, 2, 1],
   },
-  nakaz_zaplaty_klasyczny: {
+  nakaz_zaplaty_zwykly: {
     days: 14,
     kind: "sprzeciw_14dni",
     title: "Sprzeciw od nakazu zapłaty",
     description: "Termin 14 dni od doręczenia.",
     reminders_days_before: [10, 5, 2, 1],
-  },
-  postanowienie_klauzula: {
-    days: 7,
-    kind: "zazalenie_7dni",
-    title: "Zażalenie na nadanie klauzuli wykonalności",
-    description: "Krótki termin — 7 dni od doręczenia.",
-    reminders_days_before: [5, 3, 1],
-  },
-  wezwanie_zaplaty_bank: {
-    days: 30,
-    kind: "reklamacja_bank_30dni",
-    title: "Reklamacja do banku",
-    description: "Bank ma 30 dni na odpowiedź — w przeciwnym razie reklamacja jest uznana.",
-    reminders_days_before: [14, 5, 1],
-  },
-  wezwanie_zaplaty_komornik: {
-    days: 7,
-    kind: "skarga_komornik_7dni",
-    title: "Skarga na czynności komornika",
-    description: "Termin 7 dni od doręczenia / dokonania czynności.",
-    reminders_days_before: [5, 3, 1],
-  },
-  decyzja_administracyjna: {
-    days: 14,
-    kind: "odwolanie_14dni",
-    title: "Odwołanie od decyzji administracyjnej",
-    description: "Termin 14 dni od doręczenia decyzji.",
-    reminders_days_before: [10, 5, 2, 1],
-  },
-  wyrok_sad: {
-    days: 14,
-    kind: "wniosek_uzasadnienie_7dni",
-    title: "Wniosek o sporządzenie uzasadnienia wyroku",
-    description: "7 dni od ogłoszenia/doręczenia. Po tym terminie nie można już złożyć apelacji bez uzasadnienia.",
-    reminders_days_before: [5, 3, 1],
   },
   pozew: {
     days: 14,
@@ -82,16 +50,39 @@ const RULES: Record<LetterKind, DeadlineRule | null> = {
     description: "Termin wyznaczony przez sąd (zwykle 14 dni).",
     reminders_days_before: [10, 5, 2, 1],
   },
-  wezwanie_zaplaty_inne: {
+  wezwanie_do_zaplaty: {
     days: 14,
     kind: "odpowiedz_na_wezwanie",
     title: "Odpowiedź na wezwanie do zapłaty",
-    description: "Zwyczajowo 14 dni — sprawdź konkretne wezwanie.",
+    description: "Zwyczajowo 14 dni — sprawdź konkretne wezwanie. Bank ma 30 dni.",
     reminders_days_before: [7, 2],
   },
-  upomnienie_sad: null,
-  pismo_urzedowe_inne: null,
-  inne: null,
+  pismo_komornika: {
+    days: 7,
+    kind: "skarga_komornik_7dni",
+    title: "Skarga na czynności komornika",
+    description: "Termin 7 dni od doręczenia / dokonania czynności.",
+    reminders_days_before: [5, 3, 1],
+  },
+  postanowienie: {
+    days: 7,
+    kind: "zazalenie_7dni",
+    title: "Zażalenie na postanowienie (np. nadanie klauzuli wykonalności)",
+    description: "Krótki termin — 7 dni od doręczenia.",
+    reminders_days_before: [5, 3, 1],
+  },
+  wyrok: {
+    days: 7,
+    kind: "wniosek_uzasadnienie_7dni",
+    title: "Wniosek o sporządzenie uzasadnienia wyroku",
+    description: "7 dni od ogłoszenia/doręczenia. Po tym terminie nie można już złożyć apelacji bez uzasadnienia.",
+    reminders_days_before: [5, 3, 1],
+  },
+  // Bez sztywnej reguły deadline — caller decyduje na podstawie kontekstu.
+  monit_windykatora: null,
+  zawiadomienie_o_cesji: null,
+  wpis_do_big: null,
+  unknown: null,
 };
 
 export interface AutoTagInput {

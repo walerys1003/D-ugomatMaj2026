@@ -135,8 +135,10 @@ export async function seedActiveExperiments(opts?: {
   sb?: unknown;
 }): Promise<{ inserted: number; updated: number; errors: number }> {
   const { createServerSupabase } = await import("@/lib/db/supabase-server");
-  const sb = (opts?.sb as Awaited<ReturnType<typeof createServerSupabase>>) ??
-    (await createServerSupabase());
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // (Tier 7 added experiments table; codegen types not regen'd yet).
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = opts?.sb ?? (await createServerSupabase());
 
   let inserted = 0;
   let updated = 0;

@@ -305,9 +305,15 @@ export const uzasadnienieSchema = z.object({
 });
 export type UzasadnienieValues = z.infer<typeof uzasadnienieSchema>;
 
-/** Pełny zestaw odpowiedzi D9 (8 D8 + 3 D9-only). */
+/**
+ * Pełny zestaw odpowiedzi D9 (8 D8 + 3 D9-only).
+ *
+ * Uwaga: D8 ma już pole `uzasadnienie: string` (z `niewyplacalnoscSchema`).
+ * D9 wymaga rozszerzonej struktury — udostępniamy ją pod nazwą
+ * `uzasadnienie_full`, aby uniknąć kolizji nazw przy `extends`.
+ */
 export interface UpadloscPelnyAnswers extends UpadloscAnswers {
   dochody_historyczne: DochodyHistoryczneValues;
   plan_splaty: PlanSplatyValues;
-  uzasadnienie: UzasadnienieValues;
+  uzasadnienie_full: UzasadnienieValues;
 }

@@ -109,7 +109,7 @@ export const BIK_NIEPRAWIDLOWOSCI = [
   },
 ] as const;
 
-export const BIK_NIEPRAWIDLOWOSCI_IDS = BIK_NIEPRAWIDLOWOSCI.map((x) => x.id) as readonly [
+export const BIK_NIEPRAWIDLOWOSCI_IDS = BIK_NIEPRAWIDLOWOSCI.map((x) => x.id) as unknown as readonly [
   string,
   ...string[],
 ];

@@ -28,7 +28,12 @@ export interface CopilotSession {
 }
 
 export interface BulkOperation {
-  op: "close_cases" | "generate_documents" | "send_reminders" | "export_pdf";
+  op:
+    | "close_cases"
+    | "generate_documents"
+    | "send_reminders"
+    | "export_pdf"
+    | "send_documents";
   case_ids: string[];
   params?: Record<string, unknown>;
 }

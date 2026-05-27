@@ -213,7 +213,7 @@ export function Eyebrow({
       {withDot ? (
         <span
           aria-hidden
-          className={cn("size-1.5 rounded-full", DOT_TONE[tone])}
+          className={cn("size-1.5 rounded-full", DOT_TONE[(tone ?? "brand") as NonNullable<EyebrowProps["tone"]>])}
         />
       ) : null}
       {children}

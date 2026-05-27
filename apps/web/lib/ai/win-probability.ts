@@ -278,7 +278,8 @@ const PER_TYPE_FEATURES: Partial<Record<CaseType, FeatureRule[]>> = {
       label: "Brak dyskwalifikacji (działalność)",
       weight: 0.5,
       evaluate: (a) => {
-        if (a.has_business === false || a.business_closed_years_ago >= 1) {
+        const closedYears = Number(a.business_closed_years_ago ?? 0);
+        if (a.has_business === false || closedYears >= 1) {
           return { value: 0.4, rationale: "Brak aktywnej działalności — brak negatywnych przesłanek." };
         }
         return null;

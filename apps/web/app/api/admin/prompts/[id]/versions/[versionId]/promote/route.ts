@@ -56,7 +56,7 @@ export async function POST(
     .update({
       status: "production",
       promoted_at: nowIso,
-      promoted_by: admin.user_id ?? admin.email ?? "admin",
+      promoted_by: admin.userId ?? admin.email ?? "admin",
     })
     .eq("id", versionId);
 
@@ -67,7 +67,7 @@ export async function POST(
   // Audit log
   await sb.from("audit_events").insert({
     event_type: "ai_prompt_version_promoted",
-    actor_id: admin.user_id ?? null,
+    actor_id: admin.userId ?? null,
     actor_email: admin.email ?? null,
     target_type: "ai_prompt_version",
     target_id: versionId,
