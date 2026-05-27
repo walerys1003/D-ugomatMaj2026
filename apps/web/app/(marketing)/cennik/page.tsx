@@ -20,6 +20,13 @@ import {
   MarketingPageHero,
   MarketingCtaBanner,
 } from "@/components/marketing/page-hero";
+import {
+  Display,
+  Eyebrow,
+  Heading,
+  Text,
+  Mono,
+} from "@/components/ui/typography";
 
 export const metadata: Metadata = {
   title: "Cennik Długomatu — od 0 zł, bez abonamentu, bez ukrytych kosztów",
@@ -241,7 +248,7 @@ export default function CennikPage() {
         subtitle="Skaner pism — DARMOWE. Pojedyncze pismo procesowe — od 79 zł. Pakiet komorniczy (4 pisma) — 199 zł. Bez subskrypcji, bez abonamentu, bez kart przy rejestracji."
       />
 
-      {/* PRICING GRID */}
+      {/* PRICING GRID — Tarcza v4 */}
       <section className="container py-16 sm:py-20">
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {ITEMS.map((item) => {
@@ -254,7 +261,7 @@ export default function CennikPage() {
               >
                 <CardHeader className="gap-3">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="rounded-md bg-dlugomat-100 px-2 py-0.5 font-mono text-fluid-xs font-bold uppercase tracking-wide text-dlugomat-700 dark:bg-dlugomat-850 dark:text-dlugomat-300">
+                    <span className="rounded-sm bg-ink-100 px-2 py-0.5 font-mono text-[11px] font-bold uppercase tracking-wide text-ink-700">
                       {item.code}
                     </span>
                     {item.highlight === "free" ? (
@@ -271,22 +278,28 @@ export default function CennikPage() {
                       </Badge>
                     ) : null}
                   </div>
-                  <CardTitle className="text-fluid-xl">{item.title}</CardTitle>
-                  <CardDescription>{item.desc}</CardDescription>
+                  <Heading level={3} as="h3">
+                    {item.title}
+                  </Heading>
+                  <Text size="sm" tone="default">
+                    {item.desc}
+                  </Text>
                   <div className="flex items-baseline gap-1 pt-2">
                     {isFree ? (
-                      <span className="text-fluid-3xl font-bold text-accent-600 dark:text-accent-400">
+                      <span className="font-display text-4xl font-semibold tabular-nums tracking-tight text-accent-600">
                         0 zł
                       </span>
                     ) : (
                       <>
-                        <span className="text-fluid-3xl font-bold text-dlugomat-900 dark:text-iron-50">
+                        <span className="font-display text-4xl font-semibold tabular-nums tracking-tight text-ink-900">
                           {item.price}
                         </span>
-                        <span className="text-fluid-lg font-semibold text-iron-600 dark:text-iron-300">
+                        <span className="text-[18px] font-semibold text-ink-500">
                           zł
                         </span>
-                        <span className="ml-1 text-fluid-xs text-iron-500">brutto</span>
+                        <span className="ml-1 text-[12px] text-ink-400">
+                          brutto
+                        </span>
                       </>
                     )}
                   </div>
@@ -296,10 +309,10 @@ export default function CennikPage() {
                     {item.includes.map((line, i) => (
                       <li key={i} className="flex items-start gap-2">
                         <Check
-                          className="mt-0.5 size-4 shrink-0 text-accent-600 dark:text-accent-400"
+                          className="mt-0.5 size-4 shrink-0 text-accent-600"
                           aria-hidden
                         />
-                        <span className="text-fluid-sm text-iron-700 dark:text-iron-200">
+                        <span className="text-[14px] leading-snug text-ink-700">
                           {line}
                         </span>
                       </li>
@@ -317,94 +330,98 @@ export default function CennikPage() {
           })}
         </div>
 
-        <p className="mt-6 text-center text-fluid-xs text-iron-500">
+        <Text size="xs" tone="muted" className="mt-8 text-center">
           Wszystkie ceny w PLN, brutto (zawierają 23% VAT). Faktura wystawiana
           automatycznie w ciągu 24h.
-        </p>
+        </Text>
       </section>
 
-      {/* COMPARISON */}
-      <section className="bg-iron-50/60 py-20 sm:py-24 dark:bg-dlugomat-950/40">
+      {/* COMPARISON — Tarcza v4 */}
+      <section className="bg-ink-50 py-20 sm:py-24 lg:py-28">
         <div className="container max-w-5xl">
           <div className="mx-auto max-w-2xl text-center">
-            <p className="text-fluid-sm font-semibold uppercase tracking-wider text-dlugomat-600">
-              Porównanie
-            </p>
-            <h2 className="mt-2 text-balance text-fluid-4xl font-bold tracking-tight text-dlugomat-900 dark:text-white">
-              Długomat • Adwokat • Sam
-            </h2>
-            <p className="mt-3 text-fluid-base text-iron-600 dark:text-iron-300">
+            <div className="flex justify-center">
+              <Eyebrow tone="neutral" tracking="wide">
+                Porównanie
+              </Eyebrow>
+            </div>
+            <Display level={2} className="mt-4">
+              Długomat · Adwokat · Sam
+            </Display>
+            <Text size="lg" tone="default" className="mt-4">
               Każda z tych opcji ma swoje miejsce. Pokazujemy uczciwie, czym
               różnimy się od pozostałych.
-            </p>
+            </Text>
           </div>
 
-          <div className="mt-10 overflow-x-auto rounded-xl border border-iron-200 bg-card dark:border-dlugomat-800">
-            <table className="w-full text-fluid-sm">
-              <thead className="bg-iron-100 dark:bg-dlugomat-900/60">
+          <div className="mt-12 overflow-x-auto rounded-lg border border-ink-200 bg-background shadow-sm">
+            <table className="w-full text-[14px]">
+              <thead className="bg-ink-50/70 border-b border-ink-200">
                 <tr>
-                  <th className="px-4 py-3 text-left font-semibold text-iron-700 dark:text-iron-200">
+                  <th className="px-5 py-4 text-left font-semibold text-ink-900">
                     Element
                   </th>
-                  <th className="px-4 py-3 text-left font-semibold text-dlugomat-700 dark:text-dlugomat-200">
-                    Długomat
+                  <th className="px-5 py-4 text-left font-semibold text-ink-900">
+                    <span className="inline-flex items-center gap-1.5">
+                      <span className="size-1.5 rounded-full bg-accent-500" aria-hidden />
+                      Długomat
+                    </span>
                   </th>
-                  <th className="px-4 py-3 text-left font-semibold text-iron-700 dark:text-iron-200">
+                  <th className="px-5 py-4 text-left font-semibold text-ink-500">
                     Adwokat
                   </th>
-                  <th className="px-4 py-3 text-left font-semibold text-iron-700 dark:text-iron-200">
+                  <th className="px-5 py-4 text-left font-semibold text-ink-500">
                     Sam (wzory z netu)
                   </th>
                 </tr>
               </thead>
               <tbody>
                 {COMPARISON.map((row, i) => (
-                  <tr
-                    key={i}
-                    className="border-t border-iron-200 dark:border-dlugomat-800"
-                  >
-                    <td className="px-4 py-3 font-medium text-iron-800 dark:text-iron-100">
+                  <tr key={i} className="border-t border-ink-150">
+                    <td className="px-5 py-4 font-semibold text-ink-900">
                       {row.feature}
                     </td>
-                    <td className="px-4 py-3 text-dlugomat-700 dark:text-dlugomat-200">
+                    <td className="px-5 py-4 text-ink-900 font-medium">
                       {row.dlugomat}
                     </td>
-                    <td className="px-4 py-3 text-iron-600 dark:text-iron-300">
-                      {row.lawyer}
-                    </td>
-                    <td className="px-4 py-3 text-iron-600 dark:text-iron-300">
-                      {row.diy}
-                    </td>
+                    <td className="px-5 py-4 text-ink-500">{row.lawyer}</td>
+                    <td className="px-5 py-4 text-ink-500">{row.diy}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
 
-          <p className="mt-6 text-center text-fluid-xs text-iron-500">
+          <Text size="xs" tone="muted" className="mt-8 text-center">
             Długomat nie zastępuje kancelarii w sprawach skomplikowanych — w
             takich przypadkach kierujemy do partnerów.
-          </p>
+          </Text>
         </div>
       </section>
 
-      {/* FAQ */}
+      {/* FAQ — Tarcza v4 */}
       <section className="container py-20 sm:py-24">
         <div className="max-w-3xl mx-auto">
           <div className="text-center">
-            <p className="text-fluid-sm font-semibold uppercase tracking-wider text-dlugomat-600">
-              Pytania o cenę
-            </p>
-            <h2 className="mt-2 text-balance text-fluid-4xl font-bold tracking-tight text-dlugomat-900 dark:text-white">
-              Bez gwiazdek, bez druku 'mała czcionka'.
-            </h2>
+            <div className="flex justify-center">
+              <Eyebrow tone="neutral" tracking="wide">
+                Pytania o cenę
+              </Eyebrow>
+            </div>
+            <Display level={2} className="mt-4">
+              Bez gwiazdek, bez druku „mała czcionka".
+            </Display>
           </div>
-          <Accordion type="single" collapsible className="mt-10">
+          <Accordion type="single" collapsible className="mt-12">
             {FAQ.map((item, i) => (
               <AccordionItem key={i} value={`item-${i}`}>
-                <AccordionTrigger>{item.q}</AccordionTrigger>
+                <AccordionTrigger className="text-[16px] font-semibold">
+                  {item.q}
+                </AccordionTrigger>
                 <AccordionContent>
-                  <p className="leading-relaxed">{item.a}</p>
+                  <Text size="base" tone="default" className="leading-relaxed">
+                    {item.a}
+                  </Text>
                 </AccordionContent>
               </AccordionItem>
             ))}
