@@ -1,24 +1,25 @@
-import { Sparkles, ShieldCheck, FileText, ArrowRight } from "lucide-react";
+import Link from "next/link";
+import { Sparkles, FileText, CheckCircle2, ArrowRight, Scan } from "lucide-react";
 
 import { Section } from "@/components/ui/section";
 import { Surface } from "@/components/ui/surface";
 import { Badge } from "@/components/ui/badge";
-import { Kbd } from "@/components/ui/kbd";
-import { Divider } from "@/components/ui/divider";
 import { Eyebrow, Heading, Text, Mono } from "@/components/ui/typography";
 
 /**
- * AIShowcase v3 — Tarcza Stoic "terminal-grade".
+ * AIShowcase v5 — "AI w pracy" zredukowane do jednej konwersacji.
  *
- * Vs v2:
- *  - Wszystkie typography przez primitivy (Eyebrow/Heading/Text/Mono).
- *  - Surface uses ink-200 border (true neutral, brak niebieskiego tintu).
- *  - Tighter padding (Surface padded=sm zamiast md — 16 zamiast 20).
- *  - Center column ma terminal-style header z dot indicator (Linear/Raycast).
- *  - Mono primitive zamiast inline font-mono text-[0.78rem] magic numbers.
- *  - Heading level=1 dla h2 (modular 4xl/5xl), tone=brand spawn dla "AI w pracy".
- *  - Layout grid 3-col bez przesadnych ratio (1:1:1 zamiast 1.05:1:1.05).
- *  - Wszystko 8pt grid w gap (gap-3, gap-4, mt-12).
+ * Vs v3 (audit V5 §3.6):
+ *  - Z 3 kolumn (dokument → analiza → pismo) zostają tylko 2 (dokument
+ *    + analiza). Trzecia kolumna (pismo) była redundantna względem
+ *    hero-artifact, który już pokazuje sprzeciw. Powtórzenie = redundancja
+ *    informacji = scroll fatigue.
+ *  - Pod 2-panelowym mockupem ląduje pasek 3 walidacji
+ *    (Haiku 4.5 / KPC / ISAP) — każdy z odznaką ✓. To bezpośredni dowód
+ *    "jak działa kontrola jakości", którego brakowało.
+ *  - Sekcja kończy się konkretnym CTA "Zeskanuj swój nakaz" — nie pozwala
+ *    użytkownikowi "przewinąć dalej i zapomnieć". Showcase teraz prowadzi
+ *    do akcji.
  */
 
 const FINDINGS: ReadonlyArray<{
@@ -53,25 +54,63 @@ const FINDINGS: ReadonlyArray<{
   },
 ];
 
+/**
+ * Validation checkmarks shown directly below the mockup.
+ * Each item is a concrete, technical guarantee — not marketing copy.
+ */
+const VALIDATIONS: ReadonlyArray<{ label: string; detail: string }> = [
+  {
+    label: "Walidator Haiku 4.5",
+    detail:
+      "Drugi model AI sprawdza kompletność i spójność pisma — zanim zobaczysz wynik.",
+  },
+  {
+    label: "Zgodność z KPC",
+    detail:
+      "Każdy zarzut sprawdzany pod kątem aktualnej wersji Kodeksu postępowania cywilnego.",
+  },
+  {
+    label: "Cytaty z ISAP",
+    detail:
+      "Powoływane orzeczenia pobierane z urzędowej bazy ISAP — bez halucynacji.",
+  },
+];
+
 export function AIShowcase() {
   return (
-    <Section tone="muted" density="regular" surface aria-labelledby="ai-showcase-title">
+    <Section
+      tone="muted"
+      density="regular"
+      surface
+      aria-labelledby="ai-showcase-title"
+    >
       <header className="mx-auto max-w-2xl text-center">
         <Eyebrow tone="brand" withDot>
           AI w pracy
         </Eyebrow>
-        <Heading level={1} id="ai-showcase-title" as="h2" className="mt-3">
-          Od skanu nakazu do gotowego sprzeciwu — w&nbsp;jednym oknie
+        <Heading
+          level={1}
+          id="ai-showcase-title"
+          as="h2"
+          className="mt-3"
+        >
+          Od skanu nakazu do diagnozy — w&nbsp;jednym oknie
         </Heading>
         <Text size="base" tone="muted" className="mt-4">
-          AI Długomata nie pisze ogólników. Czyta każdy paragraf, sprawdza terminy w&nbsp;kalendarzu
-          sądowym, wykrywa przedawnienie i&nbsp;komponuje pismo procesowe na podstawie 14&nbsp;sprawdzonych szablonów.
+          AI Długomata nie pisze ogólników. Czyta każdy paragraf,
+          sprawdza terminy w&nbsp;kalendarzu sądowym i&nbsp;wykrywa
+          przedawnienie zanim klikniesz „dalej".
         </Text>
       </header>
 
-      <div className="mt-14 grid gap-3 lg:grid-cols-3 lg:items-stretch">
-        {/* Kolumna 1 — DOKUMENT WEJŚCIOWY */}
-        <Surface elevation="raised" padded="none" className="flex flex-col overflow-hidden">
+      {/* 2-panel mockup — dokument po lewej, analiza po prawej. */}
+      <div className="mt-14 grid gap-3 lg:grid-cols-2 lg:items-stretch">
+        {/* DOKUMENT WEJŚCIOWY */}
+        <Surface
+          elevation="raised"
+          padded="none"
+          className="flex flex-col overflow-hidden"
+        >
           <ColumnHeader
             icon={<FileText className="size-3.5" aria-hidden />}
             tone="neutral"
@@ -80,7 +119,10 @@ export function AIShowcase() {
           />
           <div className="flex flex-1 flex-col gap-3 p-5">
             <Mono size="xs" tone="muted">
-              Sygn. akt: <span className="text-ink-800 dark:text-ink-800">Nc-e 4118723/24</span>
+              Sygn. akt:{" "}
+              <span className="text-ink-800 dark:text-ink-800">
+                Nc-e 4118723/24
+              </span>
             </Mono>
             <div className="rounded border-l-2 border-danger-500 bg-danger-50 px-3 py-2.5 dark:bg-danger-500/10">
               <Mono size="sm" tone="default" className="leading-relaxed">
@@ -96,31 +138,42 @@ export function AIShowcase() {
               </Mono>
             </div>
             <Mono size="xs" tone="muted">
-              Powód: <span className="text-ink-800 dark:text-ink-800">Ultimo Portfolio S.A.</span>
+              Powód:{" "}
+              <span className="text-ink-800 dark:text-ink-800">
+                Ultimo Portfolio S.A.
+              </span>
             </Mono>
             <Mono size="xs" tone="muted">
-              Wierzytelność pierwotna: <span className="text-ink-800 dark:text-ink-800">Plus GSM (T-Mobile)</span>
+              Wierzytelność pierwotna:{" "}
+              <span className="text-ink-800 dark:text-ink-800">
+                Plus GSM (T-Mobile)
+              </span>
             </Mono>
-            <div className="mt-auto flex items-center gap-1.5 pt-2">
-              <Kbd>⌘</Kbd>
-              <Kbd>O</Kbd>
-              <Text size="xs" tone="muted" as="span">
-                aby otworzyć inny dokument
-              </Text>
-            </div>
+            <Mono size="xs" tone="muted" className="mt-auto pt-2">
+              Doręczenie 27.05.2026 · zastępcze (art. 139 KPC)
+            </Mono>
           </div>
         </Surface>
 
-        {/* Kolumna 2 — ANALIZA AI */}
-        <Surface elevation="raised" padded="none" className="flex flex-col overflow-hidden">
+        {/* ANALIZA AI */}
+        <Surface
+          elevation="raised"
+          padded="none"
+          className="flex flex-col overflow-hidden"
+        >
           <ColumnHeader
             icon={<Sparkles className="size-3.5" aria-hidden />}
             tone="brand"
             label="Analiza AI · 4,2 s"
             badge={
               <span className="inline-flex items-center gap-1">
-                <span aria-hidden className="size-1.5 animate-pulse rounded-full bg-accent-500" />
-                <Mono size="xs" tone="muted">live</Mono>
+                <span
+                  aria-hidden
+                  className="size-1.5 animate-pulse rounded-full bg-accent-500"
+                />
+                <Mono size="xs" tone="muted">
+                  live
+                </Mono>
               </span>
             }
           />
@@ -128,7 +181,10 @@ export function AIShowcase() {
             <ul className="flex flex-col gap-3">
               {FINDINGS.map((f) => (
                 <li key={f.label} className="flex items-start gap-2.5">
-                  <Badge tone={f.tone} className="mt-0.5 shrink-0 capitalize">
+                  <Badge
+                    tone={f.tone}
+                    className="mt-0.5 shrink-0 capitalize"
+                  >
                     <span
                       aria-hidden
                       className={`size-1.5 rounded-full ${
@@ -144,10 +200,20 @@ export function AIShowcase() {
                     {f.level}
                   </Badge>
                   <div className="min-w-0">
-                    <Text size="sm" tone="strong" weight="medium" as="div">
+                    <Text
+                      size="sm"
+                      tone="strong"
+                      weight="medium"
+                      as="div"
+                    >
                       {f.label}
                     </Text>
-                    <Text size="xs" tone="muted" as="div" className="mt-0.5">
+                    <Text
+                      size="xs"
+                      tone="muted"
+                      as="div"
+                      className="mt-0.5"
+                    >
                       {f.detail}
                     </Text>
                   </div>
@@ -156,57 +222,61 @@ export function AIShowcase() {
             </ul>
           </div>
         </Surface>
-
-        {/* Kolumna 3 — PISMO WYJŚCIOWE */}
-        <Surface elevation="raised" padded="none" className="flex flex-col overflow-hidden">
-          <ColumnHeader
-            icon={<ShieldCheck className="size-3.5" aria-hidden />}
-            tone="success"
-            label="Sprzeciw od nakazu"
-            badge={<Badge tone="success">DOCX · gotowe</Badge>}
-          />
-          <div className="flex flex-1 flex-col gap-3 p-5">
-            <div className="space-y-2 font-serif text-[13px] leading-relaxed text-ink-800 dark:text-ink-800">
-              <p className="text-center font-semibold uppercase tracking-wide text-ink-700 dark:text-ink-700">
-                Sprzeciw
-              </p>
-              <p className="text-center text-ink-500">od nakazu zapłaty w EPU</p>
-              <Mono size="xs" tone="muted" className="block">
-                Sygn. akt: Nc-e 4118723/24
-              </Mono>
-              <p className="mt-3 text-ink-700 dark:text-ink-700">
-                Niniejszym, działając w imieniu własnym, wnoszę sprzeciw od nakazu zapłaty
-                wydanego dnia 02.05.2026 r., zaskarżając go w&nbsp;całości.
-              </p>
-              <p className="text-ink-700 dark:text-ink-700">
-                <span className="font-semibold text-ink-900 dark:text-ink-900">Zarzuty:</span> przedawnienie
-                roszczenia (art. 118 k.c. — termin 3-letni dla świadczeń okresowych)…
-              </p>
-            </div>
-            <div className="mt-auto flex items-center justify-between gap-2 pt-2">
-              <Mono size="xs" tone="muted">
-                Strona 1 z 4 · 14 cytatów
-              </Mono>
-              <span className="inline-flex items-center gap-1 text-xs font-semibold text-dlugomat-700 dark:text-dlugomat-300">
-                Wyślij
-                <ArrowRight className="size-3.5" aria-hidden />
-              </span>
-            </div>
-          </div>
-        </Surface>
       </div>
 
-      <Text size="xs" tone="muted" className="mx-auto mt-10 max-w-2xl text-center">
-        Każde pismo przechodzi walidację drugim modelem (Claude Haiku 4.5) i&nbsp;kontrolę zgodności
-        z&nbsp;KPC przed pokazaniem użytkownikowi. Nigdy nie pokazujemy „surowego" outputu.
-      </Text>
+      {/* 3 walidacje — checkmark grid pod mockupem */}
+      <ul className="mt-10 grid gap-4 sm:grid-cols-3">
+        {VALIDATIONS.map((v) => (
+          <li
+            key={v.label}
+            className="flex items-start gap-2.5 rounded-md border border-ink-200 bg-white p-4 dark:bg-card"
+          >
+            <CheckCircle2
+              className="mt-0.5 size-4 shrink-0 text-accent-700"
+              aria-hidden
+            />
+            <div className="min-w-0">
+              <Text
+                size="sm"
+                tone="strong"
+                weight="semibold"
+                as="div"
+              >
+                {v.label}
+              </Text>
+              <Text
+                size="xs"
+                tone="muted"
+                as="div"
+                className="mt-1"
+              >
+                {v.detail}
+              </Text>
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      {/* CTA do skanera — sekcja AI w pracy kończy się konkretną akcją. */}
+      <div className="mx-auto mt-10 flex max-w-xl flex-col items-center gap-3 text-center">
+        <Text size="sm" tone="muted">
+          Chcesz zobaczyć to samo na swoim dokumencie? Skaner jest darmowy.
+        </Text>
+        <Link
+          href="/skaner-nakazu"
+          className="group inline-flex h-11 items-center justify-center gap-2 rounded-sm bg-ink-900 px-5 text-[14px] font-semibold text-white shadow-[inset_0_1px_0_0_hsl(0_0%_100%/0.12)] transition-all duration-150 ease-out hover:bg-ink-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink-900 focus-visible:ring-offset-2"
+        >
+          <Scan className="size-4" aria-hidden />
+          Zeskanuj swój nakaz
+          <ArrowRight
+            className="size-3.5 -mr-0.5 transition-transform duration-150 ease-out group-hover:translate-x-0.5"
+            aria-hidden
+          />
+        </Link>
+      </div>
     </Section>
   );
 }
-
-// =========================================================================
-// ColumnHeader — wspólny pasek nagłówka kolumny (window-chrome look)
-// =========================================================================
 
 function ColumnHeader({
   icon,

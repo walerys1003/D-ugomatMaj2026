@@ -1,95 +1,137 @@
 import Link from "next/link";
-import { ArrowRight, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowRight, ShieldCheck, Sparkles, Scan, FileSearch } from "lucide-react";
 
 import { Section } from "@/components/ui/section";
 import { Surface } from "@/components/ui/surface";
 import { Badge } from "@/components/ui/badge";
 import { Eyebrow, Heading, Text, Mono } from "@/components/ui/typography";
 
+/**
+ * ModulesGrid v5 — Skupienie zamiast rozproszenia.
+ *
+ * Vs v3 (audit V5 §3.4):
+ *  - Z 8 modułów (1 hero row + 2 hero tiles + 6 standard) zostają tylko
+ *    4 flagship: D2 (najpopularniejszy, gwiazda), D1 (darmowy lead magnet),
+ *    D3 (kategoria komornicza), D5 (BIK).
+ *  - Każda karta dostaje konkretny CTA — nie "Sprawdź" tylko np.
+ *    "Sprawdź swój nakaz", "Sprawdź swój BIK". To zmienia tile z
+ *    "tu możesz coś zobaczyć" na "tu możesz coś ZROBIĆ".
+ *  - Pod 4 kafelkami pojawia się link "Zobacz wszystkie 8 modułów →"
+ *    który prowadzi do /moduly (full catalog).
+ *  - Ceny zsynchronizowane z PricingTeaser i podstronami modułów —
+ *    single source of truth.
+ *
+ * Dlaczego 4 a nie 8?
+ *  Audit §3.4: u typowego użytkownika landing 8 modułów = paraliż wyboru.
+ *  D2 robi ~60% przychodu, D1 to lead magnet (free), reszta to long tail.
+ *  Lepiej pokazać 4 z konkretnymi CTA niż 8 generic tiles.
+ */
 interface ModuleDef {
-  code: "D1" | "D2" | "D3" | "D4" | "D5" | "D6" | "D7" | "D8";
+  code: "D1" | "D2" | "D3" | "D5";
   title: string;
   href: string;
   price: string;
-  highlight?: "free" | "popular";
+  fromPrice?: boolean;
+  badge?: { tone: "info" | "success" | "warning"; label: string; icon?: typeof Sparkles };
   desc: string;
+  cta: string;
+  ctaIcon?: typeof Scan;
 }
 
-const MODULES: readonly ModuleDef[] = [
-  { code: "D1", title: "Skaner Nakazu", href: "/skaner-nakazu", price: "DARMOWE", highlight: "free",
-    desc: "Wczytaj nakaz, sprawdź czy roszczenie jest przedawnione i dowiedz się jakie masz opcje." },
-  { code: "D2", title: "Sprzeciwomat EPU", href: "/moduly/sprzeciw-epu", price: "159 PLN", highlight: "popular",
-    desc: "Sprzeciw od nakazu zapłaty z e-Sądu. 14 dni na reakcję — pismo w 12 minut." },
-  { code: "D3", title: "KomornikShield", href: "/moduly/komornik", price: "od 79 PLN",
-    desc: "Skarga na czynności komornika, wniosek o ograniczenie egzekucji, kwota wolna." },
-  { code: "D4", title: "PotrąceniaStop", href: "/moduly/potracenia", price: "od 79 PLN",
-    desc: "Wstrzymaj zajęcie wynagrodzenia, odblokuj kwotę wolną na koncie bankowym." },
-  { code: "D5", title: "BIK-Fix", href: "/moduly/bik", price: "129 PLN",
-    desc: "Wniosek o korektę negatywnego wpisu w BIK plus pismo do banku. Średnio 30 dni." },
-  { code: "D6", title: "CesjaCheck", href: "/moduly/cesja", price: "149 PLN",
-    desc: "Weryfikacja umowy cesji i zarzut braku legitymacji procesowej. Fundusz na bok." },
-  { code: "D7", title: "UgodoMat", href: "/moduly/ugoda", price: "119 PLN",
-    desc: "Propozycja ugody z wierzycielem — kapitał, odsetki, raty. Harmonogram w PDF." },
-  { code: "D8", title: "Upadłość-Lite", href: "/moduly/upadlosc", price: "249 PLN",
-    desc: "Wniosek o upadłość konsumencką — formularz, uzasadnienie i spis majątku." },
-] as const;
+const FLAGSHIP_MODULES: readonly ModuleDef[] = [
+  {
+    code: "D2",
+    title: "Sprzeciwomat EPU",
+    href: "/moduly/sprzeciw-epu",
+    price: "159 PLN",
+    badge: { tone: "info", label: "Najpopularniejszy", icon: Sparkles },
+    desc:
+      "Sprzeciw od nakazu zapłaty z e-Sądu. 14 dni na reakcję — pismo gotowe w 12 minut, z zarzutem przedawnienia i listą cytatów z KPC.",
+    cta: "Sprawdź swój nakaz",
+    ctaIcon: Scan,
+  },
+  {
+    code: "D1",
+    title: "Skaner Nakazu",
+    href: "/skaner-nakazu",
+    price: "0 PLN",
+    badge: { tone: "success", label: "Darmowe", icon: ShieldCheck },
+    desc:
+      "Wczytaj nakaz lub list komorniczy, dowiedz się czy roszczenie jest przedawnione i jakie masz dokładnie opcje. Bez konta, bez karty.",
+    cta: "Zeskanuj teraz",
+    ctaIcon: Scan,
+  },
+  {
+    code: "D3",
+    title: "KomornikShield",
+    href: "/moduly/komornik",
+    price: "79 PLN",
+    fromPrice: true,
+    desc:
+      "Skarga na czynności komornika, wniosek o ograniczenie egzekucji, odblokowanie kwoty wolnej. Sześć typów pism w jednym module.",
+    cta: "Sprawdź swoją sprawę",
+    ctaIcon: FileSearch,
+  },
+  {
+    code: "D5",
+    title: "BIK-Fix",
+    href: "/moduly/bik",
+    price: "129 PLN",
+    desc:
+      "Wniosek o korektę negatywnego wpisu w BIK plus pismo reklamacyjne do banku. Średni czas usunięcia błędnego wpisu — 30 dni.",
+    cta: "Sprawdź swój BIK",
+    ctaIcon: FileSearch,
+  },
+];
 
-/**
- * ModulesGrid v3 — Tarcza Stoic "bento".
- *
- * Vs v2:
- *  - Bento layout: D1 (free) i D2 (popular) jako "hero tiles" zajmujące
- *    podwójną szerokość, reszta jako standardowe tiles. Pattern Vercel/
- *    Anthropic — wyróżnia 2 najważniejsze moduły wizualnie, nie tylko
- *    badge'em.
- *  - Surface elevation="raised" + interactive zamiast Card subtle/pop +
- *    urgency strip (urgency był nadużywany dla "decorative", v3 reserved
- *    dla deadlines).
- *  - Mono primitive dla kodu modułu (D1..D8) zamiast custom font-mono span.
- *  - Heading level=3 dla card title (consistent z HowItWorks).
- *  - Section compact density (48/64/80) zamiast hardcoded py-20.
- */
 export function ModulesGrid() {
-  const heroes = MODULES.filter((m) => m.highlight);
-  const standard = MODULES.filter((m) => !m.highlight);
-
   return (
     <Section tone="muted" density="compact" aria-labelledby="modules-title">
       <header className="mx-auto max-w-2xl text-center">
         <Eyebrow tone="brand">Moduły</Eyebrow>
         <Heading level={1} id="modules-title" className="mt-3" as="h2">
-          Osiem narzędzi — jedna tarcza
+          Cztery flagowe narzędzia — jedna tarcza
         </Heading>
         <Text size="base" tone="muted" className="mt-4">
-          Każdy moduł rozwiązuje jeden problem. Płacisz tylko za to, czego potrzebujesz.
+          Pokazujemy najczęściej używane moduły. Pełny katalog
+          ośmiu&nbsp;modułów D1–D8 — krok niżej.
         </Text>
       </header>
 
-      {/* Hero row — D1 + D2 jako duże tiles */}
-      <div className="mt-14 grid gap-3 lg:grid-cols-2">
-        {heroes.map((m) => (
-          <HeroTile key={m.code} m={m} />
-        ))}
-      </div>
-
-      {/* Standard row — D3..D8 */}
-      <ul className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {standard.map((m) => (
+      <ul className="mt-14 grid gap-3 sm:grid-cols-2">
+        {FLAGSHIP_MODULES.map((m) => (
           <li key={m.code}>
-            <StandardTile m={m} />
+            <FlagshipTile m={m} />
           </li>
         ))}
       </ul>
+
+      {/* "Zobacz wszystkie" link — prowadzi do pełnego katalogu */}
+      <div className="mt-8 flex justify-center">
+        <Link
+          href="/moduly"
+          className="group inline-flex items-center gap-2 text-[14px] font-semibold text-ink-900 transition-colors hover:text-dlugomat-700 dark:text-ink-800 dark:hover:text-dlugomat-300"
+        >
+          Zobacz wszystkie 8 modułów (D4 · D6 · D7 · D8)
+          <ArrowRight
+            className="size-3.5 transition-transform group-hover:translate-x-0.5"
+            aria-hidden
+          />
+        </Link>
+      </div>
     </Section>
   );
 }
 
-function HeroTile({ m }: { m: ModuleDef }) {
+function FlagshipTile({ m }: { m: ModuleDef }) {
+  const BadgeIcon = m.badge?.icon;
+  const CtaIcon = m.ctaIcon;
+
   return (
     <Link
       href={m.href}
-      className="group block rounded-md focus-visible:shadow-shield-focus focus-visible:outline-none"
-      aria-label={`Sprawdź moduł ${m.title}`}
+      className="group block h-full rounded-md focus-visible:shadow-shield-focus focus-visible:outline-none"
+      aria-label={`${m.title} — ${m.cta}`}
     >
       <Surface
         elevation="raised"
@@ -97,6 +139,7 @@ function HeroTile({ m }: { m: ModuleDef }) {
         interactive
         className="relative flex h-full flex-col gap-3"
       >
+        {/* Header: code + badge */}
         <div className="flex items-center justify-between gap-2">
           <Mono
             size="sm"
@@ -105,17 +148,12 @@ function HeroTile({ m }: { m: ModuleDef }) {
           >
             {m.code}
           </Mono>
-          {m.highlight === "free" ? (
-            <Badge tone="success">
-              <ShieldCheck className="size-3" aria-hidden />
-              <span>Darmowe</span>
+          {m.badge ? (
+            <Badge tone={m.badge.tone}>
+              {BadgeIcon ? <BadgeIcon className="size-3" aria-hidden /> : null}
+              <span>{m.badge.label}</span>
             </Badge>
-          ) : (
-            <Badge tone="info">
-              <Sparkles className="size-3" aria-hidden />
-              <span>Najpopularniejsze</span>
-            </Badge>
-          )}
+          ) : null}
         </div>
 
         <Heading level={2} as="h3" className="mt-2">
@@ -125,51 +163,27 @@ function HeroTile({ m }: { m: ModuleDef }) {
           {m.desc}
         </Text>
 
-        <div className="mt-auto flex items-center justify-between border-t border-ink-200 pt-4 dark:border-ink-200">
-          <Mono size="base" tone="strong">{m.price}</Mono>
+        {/* Footer: price + CTA */}
+        <div className="mt-auto flex items-center justify-between gap-3 border-t border-ink-200 pt-4">
+          <div className="flex items-baseline gap-1">
+            {m.fromPrice ? (
+              <Mono size="xs" tone="muted">
+                od
+              </Mono>
+            ) : null}
+            <Mono size="base" tone="strong">
+              {m.price}
+            </Mono>
+          </div>
           <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-dlugomat-700 transition-colors group-hover:text-dlugomat-900 dark:text-dlugomat-300 dark:group-hover:text-white">
-            Sprawdź
-            <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden />
+            {CtaIcon ? <CtaIcon className="size-3.5" aria-hidden /> : null}
+            {m.cta}
+            <ArrowRight
+              className="size-3.5 transition-transform group-hover:translate-x-0.5"
+              aria-hidden
+            />
           </span>
         </div>
-      </Surface>
-    </Link>
-  );
-}
-
-function StandardTile({ m }: { m: ModuleDef }) {
-  return (
-    <Link
-      href={m.href}
-      className="group block h-full rounded-md focus-visible:shadow-shield-focus focus-visible:outline-none"
-      aria-label={`Sprawdź moduł ${m.title}`}
-    >
-      <Surface
-        elevation="flat"
-        padded="md"
-        interactive
-        className="flex h-full flex-col gap-2"
-      >
-        <div className="flex items-center justify-between">
-          <Mono
-            size="xs"
-            tone="muted"
-            className="rounded-sm border border-ink-200 bg-ink-50 px-1.5 py-0.5 dark:bg-ink-100"
-          >
-            {m.code}
-          </Mono>
-          <Mono size="xs" tone="muted">{m.price}</Mono>
-        </div>
-        <Heading level={3} as="h3" className="mt-1">
-          {m.title}
-        </Heading>
-        <Text size="sm" tone="default" className="line-clamp-3">
-          {m.desc}
-        </Text>
-        <span className="mt-auto inline-flex items-center gap-1.5 pt-2 text-xs font-semibold text-dlugomat-700 transition-colors group-hover:text-dlugomat-900 dark:text-dlugomat-300 dark:group-hover:text-white">
-          Sprawdź
-          <ArrowRight className="size-3 transition-transform group-hover:translate-x-0.5" aria-hidden />
-        </span>
       </Surface>
     </Link>
   );

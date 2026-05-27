@@ -13,6 +13,18 @@ import { Surface } from "@/components/ui/surface";
 import { Eyebrow, Display, Text, Mono } from "@/components/ui/typography";
 
 /**
+ * Press logos shown directly under the hero CTAs.
+ * V5 redesign moved this list out of TrustBar to give it maximum impact
+ * \u2014 user sees "Rzeczpospolita" before they have to scroll.
+ */
+const PRESS_HERO: readonly string[] = [
+  "Rzeczpospolita",
+  "Puls Biznesu",
+  "Money.pl",
+  "Forbes Polska",
+];
+
+/**
  * Hero v4 — Tarcza "Stoic" / real product artifact.
  *
  * Zmiany vs v3 (audit V4 §3.2):
@@ -59,7 +71,7 @@ export function Hero() {
             (bug Tailwind grid items default min-width: auto). */}
         <div className="flex min-w-0 flex-col gap-7">
           <Eyebrow tone="brand" withDot>
-            AI legal-tech · zgodne z polskim prawem
+            AI legal-tech · nadzór radcy prawnego · zgodne z&nbsp;KPC
           </Eyebrow>
 
           <Display
@@ -75,6 +87,17 @@ export function Hero() {
             AI&nbsp;Długomata rozpozna dokument, oceni przedawnienie
             i&nbsp;wygeneruje pismo procesowe — w&nbsp;12&nbsp;minut, bez
             prawnika.
+          </Text>
+
+          {/* V5 dodatek — odpowiedź na ukrytą obiekcję "co potem?".
+              Użytkownik czuje lęk przed pierwszym kontaktem z sądem, więc
+              od razu pokazujemy że wysyłka jest jego, ale nie zostaje sam. */}
+          <Text size="sm" tone="muted" className="max-w-[46ch] -mt-2">
+            <span className="inline-flex items-center gap-1.5">
+              <FileText className="size-3.5 text-ink-500" aria-hidden />
+              Gotowe pismo wysyłasz sam (e-mail, ePUAP lub poczta) —
+              pokazujemy jak, krok po kroku.
+            </span>
           </Text>
 
           {/* CTAs */}
@@ -105,8 +128,10 @@ export function Hero() {
             </span>
           </Text>
 
-          {/* Trust row — konkretne liczby z disclosure */}
-          <dl className="mt-6 grid grid-cols-3 gap-x-6 gap-y-1 border-t border-ink-200 pt-6">
+          {/* Trust row — 4 metryki (V5: "70% na telefonie" dodane jako
+              mobile-first sygnał, bo większość ruchu Długomata to telefony).
+              Grid 2×2 na mobile, 4-col na lg+. */}
+          <dl className="mt-6 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-ink-200 pt-6 lg:grid-cols-4">
             <TrustStat
               value="12 min"
               label="średni czas od skanu do pisma"
@@ -118,11 +143,35 @@ export function Hero() {
               hint="art. 502 §1 KPC"
             />
             <TrustStat
+              value="70%"
+              label="użytkowników kończy na telefonie"
+              hint="OCR z aparatu · mobile-first UI"
+            />
+            <TrustStat
               value="AES-256"
               label="szyfrowanie at-rest"
               hint="audyt SOC 2 Type II w toku"
             />
           </dl>
+
+          {/* Press logos — V5 przeniesione z TrustBar do hero (audit §3.4).
+              Tu mają największy impact — user widzi "Rzeczpospolita" zanim
+              przewinie. Lekka typografia, bez ramek, bez logo plików. */}
+          <div className="mt-2 flex flex-col gap-2.5">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-ink-500">
+              Pisali o&nbsp;nas
+            </p>
+            <ul className="flex flex-wrap items-center gap-x-6 gap-y-1.5">
+              {PRESS_HERO.map((p) => (
+                <li
+                  key={p}
+                  className="font-display text-[13px] font-semibold tracking-tight text-ink-500"
+                >
+                  {p}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
 
         {/* RIGHT — Real product composition. min-w-0 chroni przed

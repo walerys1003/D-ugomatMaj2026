@@ -63,8 +63,16 @@ export function CtaBand() {
               </Button>
             </div>
 
-            <Mono size="xs" tone="muted" className="block">
-              Długomat nie jest kancelarią prawną. Pisma weryfikujesz przed wysyłką.
+            {/* V5 disclaimer — ofensywne, nie defensywne (audit §3.10).
+                Zamiast "nie jesteśmy kancelarią" → "mamy radcę,
+                który osobiście sprawdza szablony co kwartał". Ta sama
+                informacja, ale ramka pewności siebie zamiast obrony. */}
+            <Mono size="xs" tone="muted" className="block max-w-[42ch]">
+              Długomat nie jest kancelarią prawną — pisma weryfikujesz przed
+              wysyłką. Ale nad każdym szablonem czuwa radca prawny&nbsp;
+              <span className="text-ink-700">[Imię Nazwisko, KIRP nr WA-XXXX]</span>
+              , który osobiście sprawdza je co&nbsp;kwartał pod kątem
+              zgodności z&nbsp;KPC.
             </Mono>
           </div>
 
