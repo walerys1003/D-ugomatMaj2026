@@ -1,0 +1,444 @@
+/* ============================================================================
+ * DŁUGOMAT V5-INFRA — Design tokens (Agent 01: Design System Architect)
+ * ----------------------------------------------------------------------------
+ * Ultra-enterprise AI-native legal OS token system. Layered on top of V4
+ * Tarcza tokens (which remain available for legacy components). V5 tokens
+ * are namespaced `--v5-*` to prevent collision and enable side-by-side
+ * deployment during migration.
+ *
+ * Inspirations: Modal · OpenAI · Anthropic · Linear · Vercel · Stripe · Harvey AI
+ *
+ * RULES:
+ *   1. No raw hex in components — only CSS vars or tailwind tokens.
+ *   2. Typography uses clamp() for fluid 120%-baseline scale.
+ *   3. Spacing uses clamp() for infrastructure rhythm.
+ *   4. Motion: calm, cinematic, operational. NO bounces, NO over-spring.
+ * ============================================================================ */
+
+:root {
+  /* ─────────────────────────────────────────────────────────────────────
+   * COLOR — Infrastructure-grade neutrals
+   * Warmer than pure white. Closer to paper / vellum / Modal cards.
+   * ─────────────────────────────────────────────────────────────────── */
+  --v5-infra-25: 50 12% 98%;     /* #FAFAF8 page bg (warmer white) */
+  --v5-infra-50: 48 12% 97%;     /* #F7F6F3 raised surface */
+  --v5-infra-100: 46 12% 95%;    /* #F3F2EF card bg */
+  --v5-infra-150: 42 10% 91%;    /* #EBE9E4 divider */
+  --v5-infra-200: 40 8% 86%;     /* #DBD8D1 border default */
+  --v5-infra-300: 38 6% 76%;     /* #C3BFB6 border emphasized */
+
+  /* Procedural Violet — primary accent for AI / reasoning / orchestration */
+  --v5-violet-100: 240 100% 96%; /* #ECECFF subtle wash */
+  --v5-violet-200: 240 100% 90%; /* #D6D6FF */
+  --v5-violet-300: 238 100% 82%; /* #A4A8FF */
+  --v5-violet-400: 240 91% 72%;  /* #837EFF */
+  --v5-violet-500: 240 91% 66%;  /* #5B5AF7 primary CTA */
+  --v5-violet-600: 240 100% 71%; /* #6B6BFF hover */
+  --v5-violet-700: 240 64% 56%;  /* #4D4BD8 pressed */
+  --v5-violet-900: 240 50% 24%;  /* #2A2A5C deep accent */
+
+  /* Audit Blue — verification & evidence chains */
+  --v5-audit-300: 238 100% 82%;  /* #A4A8FF */
+  --v5-audit-500: 244 75% 59%;   /* #4F46E5 */
+  --v5-audit-700: 244 64% 42%;   /* #3933B1 */
+
+  /* System Gray — infrastructure chrome */
+  --v5-system-100: 36 14% 93%;
+  --v5-system-200: 38 11% 84%;   /* #D8D4CC */
+  --v5-system-400: 35 7% 58%;    /* #9A958B */
+  --v5-system-600: 35 7% 36%;    /* #5E5A52 */
+  --v5-system-800: 35 8% 18%;    /* #2F2C28 */
+
+  /* Ink — text */
+  --v5-ink-900: 0 0% 7%;         /* #111111 */
+  --v5-ink-800: 0 0% 13%;        /* #202020 */
+  --v5-ink-700: 0 0% 22%;
+  --v5-ink-500: 35 7% 36%;       /* #5E5A52 secondary */
+  --v5-ink-400: 0 0% 58%;        /* placeholder */
+
+  /* Topology semantic */
+  --v5-ok: 156 100% 38%;         /* #00C27A success */
+  --v5-warn: 38 92% 50%;
+  --v5-err: 0 72% 51%;
+  --v5-info: 217 91% 60%;
+
+  /* ─────────────────────────────────────────────────────────────────────
+   * TYPOGRAPHY — Fluid 120% baseline scale
+   * Native equivalent of browser zoom 120% — no JS tricks.
+   * Min values calibrated for 375px viewport (no overflow).
+   * ─────────────────────────────────────────────────────────────────── */
+  --v5-font-display: clamp(3rem, 7vw + 0.5rem, 8.75rem);   /* 48→140px */
+  --v5-font-h1: clamp(2.5rem, 5vw + 0.5rem, 5.5rem);       /* 40→88px */
+  --v5-font-h2: clamp(2rem, 3vw + 0.5rem, 3.75rem);        /* 32→60px */
+  --v5-font-h3: clamp(1.5rem, 1.5vw + 0.75rem, 2.5rem);    /* 24→40px */
+  --v5-font-h4: clamp(1.25rem, 0.5vw + 1rem, 1.75rem);     /* 20→28px */
+  --v5-font-body-lg: 1.375rem;    /* 22px */
+  --v5-font-body: 1.1875rem;      /* 19px */
+  --v5-font-small: 1rem;          /* 16px minimum */
+  --v5-font-caption: 0.9375rem;   /* 15px minimum */
+
+  --v5-leading-display: 0.95;
+  --v5-leading-tight: 1.05;
+  --v5-leading-snug: 1.2;
+  --v5-leading-normal: 1.55;
+  --v5-leading-relaxed: 1.7;
+
+  --v5-tracking-display: -0.04em;
+  --v5-tracking-tight: -0.02em;
+  --v5-tracking-normal: 0;
+  --v5-tracking-wide: 0.04em;
+  --v5-tracking-uppercase: 0.12em;
+
+  /* ─────────────────────────────────────────────────────────────────────
+   * SPACING — Infrastructure rhythm
+   * ─────────────────────────────────────────────────────────────────── */
+  --v5-space-section: clamp(11.25rem, 14vw, 16.25rem); /* 180→260px */
+  --v5-space-section-sm: clamp(7.5rem, 9vw, 10rem);    /* 120→160px */
+  --v5-space-card-pad: clamp(2.25rem, 3vw, 3.5rem);    /* 36→56px */
+  --v5-space-card-pad-sm: clamp(1.5rem, 2vw, 2.25rem); /* 24→36px */
+  --v5-space-grid-gap: clamp(1.75rem, 2vw, 2.75rem);   /* 28→44px */
+  --v5-space-stack-lg: clamp(2rem, 3vw, 3rem);
+  --v5-space-stack-md: 1.5rem;
+  --v5-space-stack-sm: 1rem;
+
+  --v5-layout-max: min(1800px, 100% - 4rem);
+  --v5-layout-wide: min(1600px, 100% - 4rem);
+  --v5-layout-content: min(1280px, 100% - 4rem);
+  --v5-layout-narrow: min(960px, 100% - 2rem);
+
+  /* ─────────────────────────────────────────────────────────────────────
+   * RADIUS — Infrastructure cards are restrained, not pillow-soft
+   * ─────────────────────────────────────────────────────────────────── */
+  --v5-radius-sm: 6px;
+  --v5-radius-md: 10px;
+  --v5-radius-lg: 14px;
+  --v5-radius-xl: 20px;
+  --v5-radius-2xl: 28px;
+  --v5-radius-pill: 9999px;
+
+  /* ─────────────────────────────────────────────────────────────────────
+   * ELEVATION — Layered depth, infrastructure feel
+   * Always paired (sharp + diffuse). Tinted with system-gray, not pure black.
+   * ─────────────────────────────────────────────────────────────────── */
+  --v5-shadow-tint: 35 12% 14%;
+
+  --v5-shadow-0: none;
+  --v5-shadow-1:
+    0 1px 0 hsl(var(--v5-shadow-tint) / 0.04),
+    0 1px 2px hsl(var(--v5-shadow-tint) / 0.04);
+  --v5-shadow-2:
+    0 1px 2px hsl(var(--v5-shadow-tint) / 0.04),
+    0 6px 16px -4px hsl(var(--v5-shadow-tint) / 0.08);
+  --v5-shadow-3:
+    0 1px 2px hsl(var(--v5-shadow-tint) / 0.04),
+    0 12px 32px -8px hsl(var(--v5-shadow-tint) / 0.12);
+  --v5-shadow-4:
+    0 4px 8px hsl(var(--v5-shadow-tint) / 0.06),
+    0 24px 60px -16px hsl(var(--v5-shadow-tint) / 0.18);
+
+  /* AI Glow — used SPARINGLY on reasoning surfaces */
+  --v5-glow-ai:
+    0 0 0 1px hsl(var(--v5-violet-500) / 0.18),
+    0 0 32px -8px hsl(var(--v5-violet-500) / 0.32);
+  --v5-glow-ai-strong:
+    0 0 0 1px hsl(var(--v5-violet-500) / 0.32),
+    0 0 48px -8px hsl(var(--v5-violet-500) / 0.5);
+
+  /* Hairline borders — the infrastructure signature */
+  --v5-border-hairline: 1px solid hsl(var(--v5-infra-200));
+  --v5-border-hairline-strong: 1px solid hsl(var(--v5-infra-300));
+  --v5-border-ai: 1px solid hsl(var(--v5-violet-500) / 0.32);
+
+  /* ─────────────────────────────────────────────────────────────────────
+   * MOTION — Calm, cinematic, operational
+   * ─────────────────────────────────────────────────────────────────── */
+  --v5-ease-cinematic: cubic-bezier(0.22, 1, 0.36, 1);
+  --v5-ease-procedural: cubic-bezier(0.4, 0, 0.2, 1);
+  --v5-ease-topology: cubic-bezier(0.65, 0, 0.35, 1);
+
+  --v5-dur-instant: 80ms;
+  --v5-dur-fast: 160ms;
+  --v5-dur-base: 240ms;
+  --v5-dur-slow: 400ms;
+  --v5-dur-cinematic: 640ms;
+  --v5-dur-ambient: 2400ms;
+
+  /* ─────────────────────────────────────────────────────────────────────
+   * Z-INDEX — Strict topology
+   * ─────────────────────────────────────────────────────────────────── */
+  --v5-z-base: 0;
+  --v5-z-raised: 10;
+  --v5-z-sticky: 100;
+  --v5-z-dropdown: 200;
+  --v5-z-overlay: 800;
+  --v5-z-modal: 900;
+  --v5-z-toast: 1000;
+}
+
+/* ============================================================================
+ * V5 ROOT FONT SIZE — 120% native scale
+ * Inherits the V4-ι decision (font-size: 1.2rem on html) but documents it
+ * here as a V5-managed token so future scale adjustments are namespaced.
+ * ============================================================================ */
+html[data-v5="on"] {
+  font-size: 1.2rem;
+}
+
+/* ============================================================================
+ * UTILITY CLASSES — V5 typography & spacing primitives
+ * Use these in components instead of inline tailwind text-* sizes.
+ * ============================================================================ */
+.v5-text-display {
+  font-size: var(--v5-font-display);
+  line-height: var(--v5-leading-display);
+  letter-spacing: var(--v5-tracking-display);
+  font-weight: 600;
+}
+.v5-text-h1 {
+  font-size: var(--v5-font-h1);
+  line-height: var(--v5-leading-tight);
+  letter-spacing: var(--v5-tracking-display);
+  font-weight: 600;
+}
+.v5-text-h2 {
+  font-size: var(--v5-font-h2);
+  line-height: var(--v5-leading-tight);
+  letter-spacing: var(--v5-tracking-tight);
+  font-weight: 600;
+}
+.v5-text-h3 {
+  font-size: var(--v5-font-h3);
+  line-height: var(--v5-leading-snug);
+  letter-spacing: var(--v5-tracking-tight);
+  font-weight: 600;
+}
+.v5-text-h4 {
+  font-size: var(--v5-font-h4);
+  line-height: var(--v5-leading-snug);
+  font-weight: 600;
+}
+.v5-text-body-lg {
+  font-size: var(--v5-font-body-lg);
+  line-height: var(--v5-leading-relaxed);
+}
+.v5-text-body {
+  font-size: var(--v5-font-body);
+  line-height: var(--v5-leading-normal);
+}
+.v5-text-small {
+  font-size: var(--v5-font-small);
+  line-height: var(--v5-leading-normal);
+}
+.v5-text-caption {
+  font-size: var(--v5-font-caption);
+  line-height: var(--v5-leading-normal);
+  color: hsl(var(--v5-ink-500));
+}
+.v5-text-eyebrow {
+  font-size: var(--v5-font-caption);
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: var(--v5-tracking-uppercase);
+  font-weight: 600;
+  color: hsl(var(--v5-violet-500));
+}
+.v5-text-mono {
+  font-family: ui-monospace, "SF Mono", "Menlo", "Monaco", "Cascadia Mono", monospace;
+  font-size: 0.9em;
+  letter-spacing: 0;
+}
+
+/* Section rhythm */
+.v5-section {
+  padding-block: var(--v5-space-section);
+}
+.v5-section-sm {
+  padding-block: var(--v5-space-section-sm);
+}
+
+/* Layout containers */
+.v5-container,
+.v5-container-wide,
+.v5-container-content,
+.v5-container-narrow {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: 1rem;
+  min-width: 0;
+}
+.v5-container { max-width: min(1800px, 100%); }
+.v5-container-wide { max-width: min(1600px, 100%); }
+.v5-container-content { max-width: min(1280px, 100%); }
+.v5-container-narrow { max-width: min(960px, 100%); }
+
+@media (min-width: 640px) {
+  .v5-container,
+  .v5-container-wide,
+  .v5-container-content,
+  .v5-container-narrow {
+    padding-inline: 1.5rem;
+  }
+}
+@media (min-width: 1024px) {
+  .v5-container,
+  .v5-container-wide {
+    padding-inline: 2rem;
+  }
+}
+
+/* ============================================================================
+ * AMBIENT MOTION — System-level keyframes
+ * Used by reasoning surfaces, status indicators, AI activity hints.
+ * ============================================================================ */
+@keyframes v5-pulse-soft {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 1; }
+}
+
+@keyframes v5-pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 hsl(var(--v5-violet-500) / 0.45);
+  }
+  60% {
+    box-shadow: 0 0 0 8px hsl(var(--v5-violet-500) / 0);
+  }
+}
+
+@keyframes v5-scan-line {
+  0%   { transform: translateY(-100%); opacity: 0; }
+  50%  { opacity: 1; }
+  100% { transform: translateY(100%); opacity: 0; }
+}
+
+@keyframes v5-data-flow {
+  0%   { transform: translateX(-12%); opacity: 0; }
+  20%  { opacity: 1; }
+  80%  { opacity: 1; }
+  100% { transform: translateX(112%); opacity: 0; }
+}
+
+@keyframes v5-topology-drift {
+  0%, 100% { transform: translate(0, 0); }
+  50%      { transform: translate(2px, -1px); }
+}
+
+@keyframes v5-shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================================================
+ * TOPOLOGY OVERLAYS — Infrastructure visual signatures
+ * Optional textures that hint at the reasoning underlying surface.
+ * ============================================================================ */
+.v5-topology-grid {
+  background-image:
+    linear-gradient(hsl(var(--v5-infra-200) / 0.5) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--v5-infra-200) / 0.5) 1px, transparent 1px);
+  background-size: 32px 32px;
+  background-position: -1px -1px;
+}
+
+.v5-topology-dots {
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    hsl(var(--v5-infra-300)) 1px,
+    transparent 0
+  );
+  background-size: 24px 24px;
+}
+
+.v5-topology-fade {
+  mask-image: radial-gradient(
+    ellipse at center,
+    black 0%,
+    black 40%,
+    transparent 100%
+  );
+}
+
+.v5-topology-hairline {
+  position: relative;
+}
+.v5-topology-hairline::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(to right, hsl(var(--v5-infra-200) / 0.6), transparent 30%, transparent 70%, hsl(var(--v5-infra-200) / 0.6)),
+    linear-gradient(to bottom, hsl(var(--v5-infra-200) / 0.6), transparent 30%, transparent 70%, hsl(var(--v5-infra-200) / 0.6));
+}
+
+/* ============================================================================
+ * AI GLOW — Reasoning surface signature
+ * Apply to surfaces that represent live AI reasoning.
+ * ============================================================================ */
+.v5-ai-glow {
+  box-shadow: var(--v5-glow-ai);
+  border: var(--v5-border-ai);
+}
+.v5-ai-glow-strong {
+  box-shadow: var(--v5-glow-ai-strong);
+}
+.v5-ai-pulse {
+  animation: v5-pulse-glow 2.4s var(--v5-ease-cinematic) infinite;
+}
+
+/* ============================================================================
+ * SURFACE CLASSES — V5 card system
+ * Cards are infrastructure modules, not decoration.
+ * ============================================================================ */
+.v5-surface {
+  background: hsl(var(--v5-infra-25));
+  border: var(--v5-border-hairline);
+  border-radius: var(--v5-radius-lg);
+}
+.v5-surface-raised {
+  background: hsl(0 0% 100%);
+  border: var(--v5-border-hairline);
+  border-radius: var(--v5-radius-lg);
+  box-shadow: var(--v5-shadow-2);
+}
+.v5-surface-elevated {
+  background: hsl(0 0% 100%);
+  border: var(--v5-border-hairline);
+  border-radius: var(--v5-radius-xl);
+  box-shadow: var(--v5-shadow-3);
+}
+.v5-surface-ai {
+  background: linear-gradient(
+    180deg,
+    hsl(0 0% 100%) 0%,
+    hsl(var(--v5-violet-100) / 0.4) 100%
+  );
+  border: var(--v5-border-ai);
+  border-radius: var(--v5-radius-xl);
+  box-shadow: var(--v5-glow-ai);
+}
+.v5-surface-terminal {
+  background: hsl(var(--v5-system-800));
+  color: hsl(var(--v5-infra-25));
+  border-radius: var(--v5-radius-md);
+  font-family: ui-monospace, "SF Mono", "Menlo", monospace;
+  border: 1px solid hsl(0 0% 100% / 0.06);
+}
+
+/* ============================================================================
+ * FOCUS RING — accessibility + brand
+ * ============================================================================ */
+.v5-focus-ring:focus-visible {
+  outline: 2px solid hsl(var(--v5-violet-500));
+  outline-offset: 2px;
+  border-radius: var(--v5-radius-sm);
+}

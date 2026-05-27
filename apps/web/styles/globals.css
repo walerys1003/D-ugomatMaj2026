@@ -3,6 +3,13 @@
 @tailwind utilities;
 
 /* =========================================================================
+ * V5-INFRA tokens — Ultra Enterprise AI-Native Legal OS
+ * Imported BEFORE V4 tokens so V5 components consuming `--v5-*` vars work
+ * everywhere. V4 tokens remain authoritative for legacy components.
+ * ========================================================================= */
+@import "./v5/tokens.css";
+
+/* =========================================================================
  * DŁUGOMAT — Design tokens
  * Brand spec §3.2 / §3.3 / §3.4. Hex values converted to HSL so Tailwind's
  * <alpha-value> can compose with opacity utilities (e.g., `bg-dlugomat-500/40`).
