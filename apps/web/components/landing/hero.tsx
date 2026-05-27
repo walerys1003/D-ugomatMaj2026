@@ -52,7 +52,7 @@ export function Hero() {
         className="pointer-events-none absolute inset-0 -z-10 opacity-[0.35] [background-image:radial-gradient(hsl(0_0%_85%)_1px,transparent_1px)] [background-size:32px_32px] [mask-image:radial-gradient(ellipse_at_top,black_30%,transparent_70%)]"
       />
 
-      <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_1fr] lg:gap-14 xl:gap-20">
+      <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-12 xl:gap-16">
         {/* LEFT — Editorial copy */}
         <div className="flex flex-col gap-7">
           <Eyebrow tone="brand" withDot>
@@ -122,8 +122,10 @@ export function Hero() {
           </dl>
         </div>
 
-        {/* RIGHT — Real product composition */}
-        <div className="relative isolate">
+        {/* RIGHT — Real product composition. min-w-0 chroni przed
+            wypychaniem grid'a przez wewnętrzną zawartość kart (Tailwind
+            grid items mają domyślnie min-width: auto).  */}
+        <div className="relative isolate min-w-0">
           <HeroArtifact />
         </div>
       </div>
@@ -140,13 +142,18 @@ export function Hero() {
  * mockup terminala. Z premium depth: floating card + ground card behind.
  */
 function HeroArtifact() {
+  // V4-ι.1 — fix kompozycji po root font-size 1.2× (zoom-120-parity).
+  // Karty zwężone (w-[80%] / w-[86%] zamiast 88%/92%), rotacje stonowane
+  // (1.8°/-1° zamiast 2.5°/-1.5°). Wrapper z max-w na mobile + min-w-0 na
+  // gridzie chronią przed wypchnięciem prawej kolumny przez wewnętrzną
+  // szerokość kart (Tailwind grid items defaultują do min-width: auto).
   return (
-    <div className="relative h-[500px] sm:h-[540px] lg:h-[580px]">
-      {/* Background card — Sprzeciw draft (rotated, lower z, less padding) */}
+    <div className="relative mx-auto h-[480px] w-full max-w-[460px] sm:h-[520px] lg:h-[560px] lg:max-w-none">
+      {/* Background card — Sprzeciw draft (subtle tilt, behind) */}
       <Surface
         elevation="raised"
         padded="none"
-        className="absolute right-0 top-8 w-[88%] rotate-[2.5deg] overflow-hidden lg:right-4 lg:top-12"
+        className="absolute right-0 top-6 w-[80%] rotate-[1.8deg] overflow-hidden lg:right-2 lg:top-10"
       >
         <SprzeciwCard />
       </Surface>
@@ -155,7 +162,7 @@ function HeroArtifact() {
       <Surface
         elevation="floating"
         padded="none"
-        className="absolute -bottom-2 left-0 w-[92%] -rotate-[1.5deg] overflow-hidden lg:left-0"
+        className="absolute -bottom-2 left-0 w-[86%] -rotate-[1deg] overflow-hidden"
       >
         <ScannerCard />
       </Surface>
