@@ -115,7 +115,7 @@ export default async function SprawaTimelinePage({ params }: PageProps) {
       <div>
         <Link
           href={`/panel/sprawa/${id}`}
-          className="inline-flex items-center gap-2 text-sm text-iron-600 hover:text-dlugomat-900 focus-visible:outline-none focus-visible:shadow-shield-focus rounded"
+          className="inline-flex items-center gap-2 text-sm text-ink-600 hover:text-dlugomat-900 focus-visible:outline-none focus-visible:shadow-shield-focus rounded"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden />
           Wróć do sprawy
@@ -123,13 +123,13 @@ export default async function SprawaTimelinePage({ params }: PageProps) {
       </div>
 
       <header className="space-y-2">
-        <p className="text-xs uppercase tracking-[0.18em] text-iron-500">
+        <p className="text-xs uppercase tracking-[0.18em] text-ink-500">
           Sprawa · {id} · oś czasu
         </p>
         <h1 className="font-display text-fluid-h1 text-dlugomat-950">
           Kamienie milowe
         </h1>
-        <p className="max-w-2xl text-iron-600">
+        <p className="max-w-2xl text-ink-600">
           Wizualizacja postępu sprawy z prognozą terminów. Czas realizacji
           szacujemy na podstawie podobnych spraw z naszej bazy (ostatnie 24 miesiące).
         </p>
@@ -139,17 +139,17 @@ export default async function SprawaTimelinePage({ params }: PageProps) {
         <CardContent className="p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="text-xs uppercase tracking-wide text-iron-500">Postęp sprawy</p>
+              <p className="text-xs uppercase tracking-wide text-ink-500">Postęp sprawy</p>
               <p className="font-display text-fluid-h2 text-dlugomat-950">{pct}%</p>
             </div>
             {current ? (
               <div className="text-right">
-                <p className="text-xs uppercase tracking-wide text-iron-500">Aktualny etap</p>
+                <p className="text-xs uppercase tracking-wide text-ink-500">Aktualny etap</p>
                 <p className="font-medium text-dlugomat-900">{current.title}</p>
               </div>
             ) : null}
           </div>
-          <div className="mt-4 h-2 w-full rounded-full bg-iron-100">
+          <div className="mt-4 h-2 w-full rounded-full bg-ink-100">
             <div
               className="h-2 rounded-full bg-gradient-to-r from-dlugomat-700 to-dlugomat-500"
               style={{ width: `${pct}%` }}
@@ -165,7 +165,7 @@ export default async function SprawaTimelinePage({ params }: PageProps) {
           <CardDescription>Ukończone, w toku oraz prognozowane terminy</CardDescription>
         </CardHeader>
         <CardContent>
-          <ol className="relative space-y-6 border-l-2 border-iron-200 pl-8">
+          <ol className="relative space-y-6 border-l-2 border-ink-200 pl-8">
             {MILESTONES.map((m) => {
               const Icon = STATUS_ICON[m.status];
               const iconColor =
@@ -173,7 +173,7 @@ export default async function SprawaTimelinePage({ params }: PageProps) {
                   ? "text-accent-600 bg-accent-50 border-accent-200"
                   : m.status === "current"
                   ? "text-dlugomat-700 bg-dlugomat-50 border-dlugomat-300"
-                  : "text-iron-400 bg-white border-iron-200";
+                  : "text-ink-400 bg-white border-ink-200";
               return (
                 <li key={m.id} className="relative">
                   <span
@@ -202,8 +202,8 @@ export default async function SprawaTimelinePage({ params }: PageProps) {
                           : "Planowane"}
                       </Badge>
                     </div>
-                    <p className="text-sm text-iron-600">{m.description}</p>
-                    <div className="flex flex-wrap items-center gap-3 text-xs text-iron-500">
+                    <p className="text-sm text-ink-600">{m.description}</p>
+                    <div className="flex flex-wrap items-center gap-3 text-xs text-ink-500">
                       {m.date ? (
                         <span>
                           {m.status === "upcoming" ? "Prognoza: " : ""}
@@ -234,7 +234,7 @@ export default async function SprawaTimelinePage({ params }: PageProps) {
           <CheckCircle2 className="h-8 w-8 text-accent-700" aria-hidden />
           <div className="flex-1 min-w-[240px]">
             <p className="font-semibold text-dlugomat-950">Prognoza zamknięcia</p>
-            <p className="text-sm text-iron-600">
+            <p className="text-sm text-ink-600">
               Szacujemy zamknięcie sprawy na 2026-08-15 (103 dni od rozpoczęcia).
               Mediana podobnych spraw: 87 dni.
             </p>

@@ -13,7 +13,7 @@ export const AccordionItem = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <AccordionPrimitive.Item
     ref={ref}
-    className={cn("border-b border-iron-200 dark:border-dlugomat-800", className)}
+    className={cn("border-b border-ink-200 dark:border-dlugomat-800", className)}
     {...props}
   />
 ));
@@ -28,7 +28,7 @@ export const AccordionTrigger = React.forwardRef<
       ref={ref}
       className={cn(
         "flex flex-1 items-center justify-between gap-3 py-4 text-left",
-        "text-fluid-base font-medium text-dlugomat-900 dark:text-iron-100",
+        "text-fluid-base font-medium text-dlugomat-900 dark:text-ink-100",
         "transition-colors duration-base hover:text-dlugomat-700 dark:hover:text-white",
         "focus-visible:shadow-shield-focus focus-visible:outline-none rounded-md",
         "[&[data-state=open]>svg]:rotate-180",
@@ -39,7 +39,7 @@ export const AccordionTrigger = React.forwardRef<
       {children}
       <ChevronDown
         aria-hidden
-        className="size-5 shrink-0 text-iron-400 transition-transform duration-base ease-shield-out"
+        className="size-5 shrink-0 text-ink-400 transition-transform duration-base ease-shield-out"
       />
     </AccordionPrimitive.Trigger>
   </AccordionPrimitive.Header>
@@ -53,7 +53,7 @@ export const AccordionContent = React.forwardRef<
   <AccordionPrimitive.Content
     ref={ref}
     className={cn(
-      "overflow-hidden text-fluid-sm text-iron-700 dark:text-iron-300",
+      "overflow-hidden text-fluid-sm text-ink-700 dark:text-ink-300",
       "data-[state=closed]:animate-out data-[state=closed]:fade-out",
       "data-[state=open]:animate-fade-in"
     )}

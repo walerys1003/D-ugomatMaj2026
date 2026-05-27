@@ -81,16 +81,16 @@ export default async function TemplatesGalleryPage({
     : templates;
 
   return (
-    <div className="bg-gradient-to-b from-iron-50 to-white pb-20 dark:from-dlugomat-950 dark:to-dlugomat-900">
+    <div className="bg-gradient-to-b from-ink-50 to-white pb-20 dark:from-dlugomat-950 dark:to-dlugomat-900">
       <section className="container py-12 lg:py-20">
         <p className="mb-3 inline-flex items-center gap-2 text-fluid-xs font-semibold uppercase tracking-wider text-dlugomat-600 dark:text-dlugomat-300">
           <span className="h-px w-8 bg-dlugomat-600" />
           Szablony certyfikowane
         </p>
-        <h1 className="font-display text-fluid-5xl font-bold leading-tight text-dlugomat-900 dark:text-iron-50">
+        <h1 className="font-display text-fluid-5xl font-bold leading-tight text-dlugomat-900 dark:text-ink-50">
           Wzory pism, którym sędziowie nie odmawiają
         </h1>
-        <p className="mt-5 max-w-3xl text-fluid-lg leading-relaxed text-iron-700 dark:text-iron-200">
+        <p className="mt-5 max-w-3xl text-fluid-lg leading-relaxed text-ink-700 dark:text-ink-200">
           Każdy szablon przeszedł audyt przez minimum dwóch radców prawnych. Cytujemy
           aktualne podstawy prawne, automatycznie aktualizujemy przy zmianach
           przepisów — Ty po prostu pobierasz najnowszą wersję.
@@ -102,7 +102,7 @@ export default async function TemplatesGalleryPage({
             className={`rounded-full border px-4 py-2 text-fluid-sm font-medium ${
               !params.category
                 ? "border-dlugomat-700 bg-dlugomat-700 text-white"
-                : "border-iron-200 bg-white text-iron-700 hover:border-dlugomat-300 dark:border-dlugomat-800 dark:bg-dlugomat-900 dark:text-iron-200"
+                : "border-ink-200 bg-white text-ink-700 hover:border-dlugomat-300 dark:border-dlugomat-800 dark:bg-dlugomat-900 dark:text-ink-200"
             }`}
           >
             Wszystkie ({templates.length})
@@ -117,10 +117,10 @@ export default async function TemplatesGalleryPage({
                 className={`rounded-full border px-4 py-2 text-fluid-sm font-medium ${
                   params.category === key
                     ? "border-dlugomat-700 bg-dlugomat-700 text-white"
-                    : "border-iron-200 bg-white text-iron-700 hover:border-dlugomat-300 dark:border-dlugomat-800 dark:bg-dlugomat-900 dark:text-iron-200"
+                    : "border-ink-200 bg-white text-ink-700 hover:border-dlugomat-300 dark:border-dlugomat-800 dark:bg-dlugomat-900 dark:text-ink-200"
                 }`}
               >
-                {label} <span className="ml-1 text-iron-400">({count})</span>
+                {label} <span className="ml-1 text-ink-400">({count})</span>
               </Link>
             );
           })}
@@ -131,8 +131,8 @@ export default async function TemplatesGalleryPage({
         {filtered.length === 0 ? (
           <Card elevation="subtle" className="py-16 text-center">
             <CardContent>
-              <p className="font-display text-fluid-xl text-iron-700">Brak szablonów w tej kategorii</p>
-              <p className="mt-2 text-fluid-sm text-iron-500">
+              <p className="font-display text-fluid-xl text-ink-700">Brak szablonów w tej kategorii</p>
+              <p className="mt-2 text-fluid-sm text-ink-500">
                 Pracujemy nad nowymi wzorami. Wróć wkrótce.
               </p>
             </CardContent>
@@ -147,7 +147,7 @@ export default async function TemplatesGalleryPage({
               >
                 <Link
                   href={`/marketplace/szablony/${t.slug}`}
-                  className="flex aspect-[3/4] items-center justify-center border-b border-iron-200 bg-iron-50 dark:border-dlugomat-800 dark:bg-dlugomat-900"
+                  className="flex aspect-[3/4] items-center justify-center border-b border-ink-200 bg-ink-50 dark:border-dlugomat-800 dark:bg-dlugomat-900"
                 >
                   {t.preview_image_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -158,7 +158,7 @@ export default async function TemplatesGalleryPage({
                       loading="lazy"
                     />
                   ) : (
-                    <div className="text-center text-iron-300">
+                    <div className="text-center text-ink-300">
                       <p className="font-display text-fluid-4xl">PDF</p>
                       <p className="text-fluid-xs">{t.page_count} stron</p>
                     </div>
@@ -173,13 +173,13 @@ export default async function TemplatesGalleryPage({
                       {t.difficulty}
                     </span>
                   </div>
-                  <h3 className="font-display text-fluid-lg font-semibold leading-tight text-dlugomat-900 dark:text-iron-50">
+                  <h3 className="font-display text-fluid-lg font-semibold leading-tight text-dlugomat-900 dark:text-ink-50">
                     {t.title}
                   </h3>
-                  <p className="text-fluid-xs text-iron-500">
-                    Certyfikat: <span className="font-medium text-iron-700 dark:text-iron-200">{t.certified_by}</span>
+                  <p className="text-fluid-xs text-ink-500">
+                    Certyfikat: <span className="font-medium text-ink-700 dark:text-ink-200">{t.certified_by}</span>
                   </p>
-                  <ul className="space-y-1 text-fluid-xs text-iron-600 dark:text-iron-300">
+                  <ul className="space-y-1 text-fluid-xs text-ink-600 dark:text-ink-300">
                     {t.legal_basis.slice(0, 2).map((b) => (
                       <li key={b} className="flex items-start gap-1.5">
                         <span aria-hidden className="mt-1 inline-block size-1 shrink-0 rounded-full bg-dlugomat-500" />
@@ -187,13 +187,13 @@ export default async function TemplatesGalleryPage({
                       </li>
                     ))}
                   </ul>
-                  <div className="mt-auto flex items-center justify-between border-t border-iron-200 pt-3 dark:border-dlugomat-800">
+                  <div className="mt-auto flex items-center justify-between border-t border-ink-200 pt-3 dark:border-dlugomat-800">
                     <div>
-                      <p className="font-display text-fluid-xl font-bold text-dlugomat-900 dark:text-iron-50">
+                      <p className="font-display text-fluid-xl font-bold text-dlugomat-900 dark:text-ink-50">
                         {t.price_pln} zł
                       </p>
                       {t.bundle_price_pln != null && (
-                        <p className="text-fluid-xs text-iron-500">
+                        <p className="text-fluid-xs text-ink-500">
                           w pakiecie: {t.bundle_price_pln} zł
                         </p>
                       )}

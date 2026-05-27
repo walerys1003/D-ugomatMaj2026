@@ -62,7 +62,7 @@ const SLA_INFO = [
 export default function KontaktFirmyPage() {
   return (
     <div className="bg-background">
-      <section className="border-b border-iron-100 bg-white">
+      <section className="border-b border-ink-100 bg-white">
         <div className="mx-auto max-w-6xl px-6 py-16">
           <Badge tone="neutral" withDot className="mb-4">
             <Building2 className="mr-1 h-3 w-3" />
@@ -71,7 +71,7 @@ export default function KontaktFirmyPage() {
           <h1 className="font-display text-4xl tracking-tight text-dlugomat-950 sm:text-5xl">
             Porozmawiajmy o Twojej firmie.
           </h1>
-          <p className="mt-4 max-w-2xl text-lg text-iron-600">
+          <p className="mt-4 max-w-2xl text-lg text-ink-600">
             Dedykowany kanal dla kancelarii, biur rachunkowych i organizacji enterprise.
             Bez chatbota, bez kolejki — od razu czlowiek z dzialu B2B.
           </p>
@@ -105,7 +105,7 @@ export default function KontaktFirmyPage() {
         </div>
       </section>
 
-      <section className="border-y border-iron-100 bg-white">
+      <section className="border-y border-ink-100 bg-white">
         <div className="mx-auto max-w-6xl px-6 py-12">
           <div className="grid gap-8 lg:grid-cols-2">
             <Card>
@@ -117,35 +117,35 @@ export default function KontaktFirmyPage() {
                 <form className="space-y-4">
                   <div className="grid gap-3 sm:grid-cols-2">
                     <label className="flex flex-col gap-1 text-sm">
-                      <span className="text-iron-700">Imie i nazwisko</span>
+                      <span className="text-ink-700">Imie i nazwisko</span>
                       <input
                         type="text"
                         required
-                        className="h-10 rounded-md border border-iron-200 px-3 focus-visible:outline-none focus-visible:shadow-shield-focus"
+                        className="h-10 rounded-md border border-ink-200 px-3 focus-visible:outline-none focus-visible:shadow-shield-focus"
                       />
                     </label>
                     <label className="flex flex-col gap-1 text-sm">
-                      <span className="text-iron-700">Firma</span>
+                      <span className="text-ink-700">Firma</span>
                       <input
                         type="text"
                         required
-                        className="h-10 rounded-md border border-iron-200 px-3 focus-visible:outline-none focus-visible:shadow-shield-focus"
+                        className="h-10 rounded-md border border-ink-200 px-3 focus-visible:outline-none focus-visible:shadow-shield-focus"
                       />
                     </label>
                   </div>
                   <label className="flex flex-col gap-1 text-sm">
-                    <span className="text-iron-700">Email sluzbowy</span>
+                    <span className="text-ink-700">Email sluzbowy</span>
                     <input
                       type="email"
                       required
-                      className="h-10 rounded-md border border-iron-200 px-3 focus-visible:outline-none focus-visible:shadow-shield-focus"
+                      className="h-10 rounded-md border border-ink-200 px-3 focus-visible:outline-none focus-visible:shadow-shield-focus"
                     />
                   </label>
                   <label className="flex flex-col gap-1 text-sm">
-                    <span className="text-iron-700">Temat</span>
+                    <span className="text-ink-700">Temat</span>
                     <select
                       required
-                      className="h-10 rounded-md border border-iron-200 bg-white px-3 focus-visible:outline-none focus-visible:shadow-shield-focus"
+                      className="h-10 rounded-md border border-ink-200 bg-white px-3 focus-visible:outline-none focus-visible:shadow-shield-focus"
                     >
                       <option value="">Wybierz temat...</option>
                       {TOPICS.map((t) => (
@@ -156,15 +156,15 @@ export default function KontaktFirmyPage() {
                     </select>
                   </label>
                   <label className="flex flex-col gap-1 text-sm">
-                    <span className="text-iron-700">Wiadomosc</span>
+                    <span className="text-ink-700">Wiadomosc</span>
                     <textarea
                       rows={5}
                       required
                       placeholder="Np. ile spraw miesiecznie, jakie potrzeby, jakie integracje..."
-                      className="rounded-md border border-iron-200 p-3 focus-visible:outline-none focus-visible:shadow-shield-focus"
+                      className="rounded-md border border-ink-200 p-3 focus-visible:outline-none focus-visible:shadow-shield-focus"
                     />
                   </label>
-                  <label className="flex items-start gap-2 text-xs text-iron-600">
+                  <label className="flex items-start gap-2 text-xs text-ink-600">
                     <input type="checkbox" required className="mt-0.5" />
                     <span>
                       Wyrazam zgode na przetwarzanie danych zgodnie z{" "}
@@ -190,15 +190,15 @@ export default function KontaktFirmyPage() {
                     Biuro
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-2 text-sm text-iron-700">
+                <CardContent className="space-y-2 text-sm text-ink-700">
                   <p className="font-medium text-dlugomat-900">Dlugomat sp. z o.o.</p>
                   <p>{OFFICE.street}</p>
                   <p>{OFFICE.city}</p>
-                  <p className="flex items-center gap-2 pt-2 text-xs text-iron-500">
+                  <p className="flex items-center gap-2 pt-2 text-xs text-ink-500">
                     <Clock className="h-3 w-3" aria-hidden />
                     {OFFICE.hours}
                   </p>
-                  <div className="mt-3 grid grid-cols-2 gap-2 border-t border-iron-100 pt-3 text-xs text-iron-500">
+                  <div className="mt-3 grid grid-cols-2 gap-2 border-t border-ink-100 pt-3 text-xs text-ink-500">
                     <div>
                       <p className="uppercase tracking-wide">NIP</p>
                       <p className="font-mono text-dlugomat-900">{OFFICE.nip}</p>
@@ -217,14 +217,14 @@ export default function KontaktFirmyPage() {
                 </CardHeader>
                 <CardContent className="p-0">
                   <table className="w-full text-sm">
-                    <tbody className="divide-y divide-iron-100">
+                    <tbody className="divide-y divide-ink-100">
                       {SLA_INFO.map((s) => (
                         <tr key={s.plan}>
                           <td className="px-5 py-2 text-dlugomat-900">{s.plan}</td>
                           <td className="px-5 py-2 text-right font-mono text-accent-700">
                             {s.first_response}
                           </td>
-                          <td className="px-5 py-2 text-right text-xs text-iron-500">
+                          <td className="px-5 py-2 text-right text-xs text-ink-500">
                             {s.coverage}
                           </td>
                         </tr>
@@ -239,9 +239,9 @@ export default function KontaktFirmyPage() {
       </section>
 
       <section className="mx-auto max-w-6xl px-6 py-16">
-        <div className="rounded-lg border border-iron-200 bg-white p-8 text-center">
+        <div className="rounded-lg border border-ink-200 bg-white p-8 text-center">
           <h2 className="font-display text-2xl text-dlugomat-950">Klient indywidualny?</h2>
-          <p className="mt-2 text-iron-600">
+          <p className="mt-2 text-ink-600">
             Mamy dla Ciebie wlasny kanal — z krotszym czasem rejestracji.
           </p>
           <Button asChild variant="secondary" className="mt-6">

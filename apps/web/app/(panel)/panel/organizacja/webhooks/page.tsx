@@ -28,7 +28,7 @@ const EVENT_CATALOG: Array<{ key: string; label: string }> = [
 
 const STATUS_BADGE: Record<Webhook["status"], string> = {
   active: "bg-accent-50 text-accent-700 border-accent-200",
-  paused: "bg-iron-100 text-iron-700 border-iron-200",
+  paused: "bg-ink-100 text-ink-700 border-ink-200",
   failing: "bg-danger-50 text-danger-700 border-danger-200",
 };
 
@@ -55,13 +55,13 @@ export default async function WebhooksPage() {
   return (
     <main className="container mx-auto px-4 py-8 max-w-5xl space-y-6">
       <div>
-        <Link href="/panel/organizacja" className="text-xs text-iron-500 hover:text-iron-700">
+        <Link href="/panel/organizacja" className="text-xs text-ink-500 hover:text-ink-700">
           ← Organizacja
         </Link>
-        <h1 className="font-display text-3xl font-semibold text-iron-900 dark:text-iron-50 mt-2">
+        <h1 className="font-display text-3xl font-semibold text-ink-900 dark:text-ink-50 mt-2">
           Webhooki
         </h1>
-        <p className="text-sm text-iron-500 mt-1">
+        <p className="text-sm text-ink-500 mt-1">
           Wysyłamy zdarzenia HTTP POST do Twoich endpointów. Każde żądanie jest podpisane HMAC-SHA256.
         </p>
       </div>
@@ -73,7 +73,7 @@ export default async function WebhooksPage() {
         <CardContent>
           <form method="post" action="/api/orgs/webhooks" className="space-y-4">
             <label className="block">
-              <span className="text-sm font-medium text-iron-700 dark:text-iron-300 mb-1.5 block">
+              <span className="text-sm font-medium text-ink-700 dark:text-ink-300 mb-1.5 block">
                 URL endpointu
               </span>
               <input
@@ -81,22 +81,22 @@ export default async function WebhooksPage() {
                 name="url"
                 required
                 placeholder="https://api.firma.pl/dlugomat-events"
-                className="w-full rounded-lg border border-iron-300 dark:border-iron-700 bg-white dark:bg-iron-900 px-3 py-2 focus:outline-none focus-visible:shadow-shield-focus"
+                className="w-full rounded-lg border border-ink-300 dark:border-ink-700 bg-white dark:bg-ink-900 px-3 py-2 focus:outline-none focus-visible:shadow-shield-focus"
               />
             </label>
             <fieldset>
-              <legend className="text-sm font-medium text-iron-700 dark:text-iron-300 mb-2">
+              <legend className="text-sm font-medium text-ink-700 dark:text-ink-300 mb-2">
                 Subskrybowane zdarzenia
               </legend>
               <div className="grid sm:grid-cols-2 gap-2">
                 {EVENT_CATALOG.map((e) => (
                   <label
                     key={e.key}
-                    className="flex items-center gap-2 text-sm rounded-md border border-iron-200 dark:border-iron-800 px-3 py-2 cursor-pointer hover:border-iron-300"
+                    className="flex items-center gap-2 text-sm rounded-md border border-ink-200 dark:border-ink-800 px-3 py-2 cursor-pointer hover:border-ink-300"
                   >
                     <input type="checkbox" name="events" value={e.key} className="rounded" />
-                    <span className="text-iron-700 dark:text-iron-300">{e.label}</span>
-                    <code className="text-xs text-iron-500 ml-auto">{e.key}</code>
+                    <span className="text-ink-700 dark:text-ink-300">{e.label}</span>
+                    <code className="text-xs text-ink-500 ml-auto">{e.key}</code>
                   </label>
                 ))}
               </div>
@@ -114,13 +114,13 @@ export default async function WebhooksPage() {
         </CardHeader>
         <CardContent>
           {webhooks.length === 0 ? (
-            <p className="text-sm text-iron-500">Brak skonfigurowanych webhooków.</p>
+            <p className="text-sm text-ink-500">Brak skonfigurowanych webhooków.</p>
           ) : (
             <ul className="space-y-3">
               {webhooks.map((w) => (
-                <li key={w.id} className="rounded-lg border border-iron-200 dark:border-iron-800 p-4">
+                <li key={w.id} className="rounded-lg border border-ink-200 dark:border-ink-800 p-4">
                   <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                    <code className="font-mono text-sm text-iron-900 dark:text-iron-50 break-all">
+                    <code className="font-mono text-sm text-ink-900 dark:text-ink-50 break-all">
                       {w.url}
                     </code>
                     <span
@@ -133,13 +133,13 @@ export default async function WebhooksPage() {
                     {w.events.map((ev) => (
                       <span
                         key={ev}
-                        className="text-xs px-2 py-0.5 rounded-full bg-iron-100 dark:bg-iron-800 font-mono"
+                        className="text-xs px-2 py-0.5 rounded-full bg-ink-100 dark:bg-ink-800 font-mono"
                       >
                         {ev}
                       </span>
                     ))}
                   </div>
-                  <div className="text-xs text-iron-500">
+                  <div className="text-xs text-ink-500">
                     {w.last_delivery_at
                       ? `Ostatnia dostawa: ${new Date(w.last_delivery_at).toLocaleString("pl-PL")} (${w.last_status_code})`
                       : "Brak dostaw"}

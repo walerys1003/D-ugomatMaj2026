@@ -130,7 +130,7 @@ export function LegalHoldClient({
       )}
 
       {/* IMPOSE HOLD */}
-      <section className="rounded-lg border border-iron-200 dark:border-dlugomat-800 p-4 bg-white dark:bg-dlugomat-900">
+      <section className="rounded-lg border border-ink-200 dark:border-dlugomat-800 p-4 bg-white dark:bg-dlugomat-900">
         <h2 className="font-semibold mb-3">Nałóż nowy hold</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <label className="flex flex-col gap-1 text-sm">
@@ -138,7 +138,7 @@ export function LegalHoldClient({
             <select
               value={resType}
               onChange={(e) => setResType(e.target.value)}
-              className="rounded-md border border-iron-300 dark:border-dlugomat-700 px-3 h-10 bg-transparent"
+              className="rounded-md border border-ink-300 dark:border-dlugomat-700 px-3 h-10 bg-transparent"
             >
               <option value="case">case</option>
               <option value="user">user</option>
@@ -151,7 +151,7 @@ export function LegalHoldClient({
             <input
               value={resId}
               onChange={(e) => setResId(e.target.value)}
-              className="rounded-md border border-iron-300 dark:border-dlugomat-700 px-3 h-10 bg-transparent"
+              className="rounded-md border border-ink-300 dark:border-dlugomat-700 px-3 h-10 bg-transparent"
             />
           </label>
           <label className="flex flex-col gap-1 text-sm md:col-span-3">
@@ -160,7 +160,7 @@ export function LegalHoldClient({
               rows={2}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              className="rounded-md border border-iron-300 dark:border-dlugomat-700 px-3 py-2 bg-transparent"
+              className="rounded-md border border-ink-300 dark:border-dlugomat-700 px-3 py-2 bg-transparent"
               placeholder="Sprawa sądowa nr ..., żądanie prokuratury ..., due diligence ..."
             />
           </label>
@@ -173,12 +173,12 @@ export function LegalHoldClient({
       </section>
 
       {/* HOLDS LIST */}
-      <section className="rounded-lg border border-iron-200 dark:border-dlugomat-800 overflow-hidden">
-        <h2 className="p-3 font-semibold border-b border-iron-200 dark:border-dlugomat-800">
+      <section className="rounded-lg border border-ink-200 dark:border-dlugomat-800 overflow-hidden">
+        <h2 className="p-3 font-semibold border-b border-ink-200 dark:border-dlugomat-800">
           Aktywne legal holds ({holds.length})
         </h2>
         <table className="w-full text-sm">
-          <thead className="bg-iron-50 dark:bg-dlugomat-850">
+          <thead className="bg-ink-50 dark:bg-dlugomat-850">
             <tr>
               <th className="text-left p-3">Zasób</th>
               <th className="text-left p-3">Powód</th>
@@ -189,18 +189,18 @@ export function LegalHoldClient({
           <tbody>
             {holds.length === 0 && (
               <tr>
-                <td colSpan={4} className="p-6 text-center text-iron-500">
+                <td colSpan={4} className="p-6 text-center text-ink-500">
                   Brak aktywnych holdów.
                 </td>
               </tr>
             )}
             {holds.map((h) => (
-              <tr key={h.id} className="border-t border-iron-200 dark:border-dlugomat-800">
+              <tr key={h.id} className="border-t border-ink-200 dark:border-dlugomat-800">
                 <td className="p-3 font-mono text-xs">
                   {h.resource_type}:{h.resource_id.slice(0, 8)}…
                 </td>
-                <td className="p-3 text-iron-600 max-w-md truncate">{h.reason}</td>
-                <td className="p-3 text-iron-600">{new Date(h.imposed_at).toLocaleString("pl-PL")}</td>
+                <td className="p-3 text-ink-600 max-w-md truncate">{h.reason}</td>
+                <td className="p-3 text-ink-600">{new Date(h.imposed_at).toLocaleString("pl-PL")}</td>
                 <td className="p-3 text-right">
                   <button onClick={() => release(h.id)} className="text-dlugomat-600 hover:underline">
                     Zwolnij
@@ -213,7 +213,7 @@ export function LegalHoldClient({
       </section>
 
       {/* E-DISCOVERY QUERY */}
-      <section className="rounded-lg border border-iron-200 dark:border-dlugomat-800 p-4 bg-white dark:bg-dlugomat-900">
+      <section className="rounded-lg border border-ink-200 dark:border-dlugomat-800 p-4 bg-white dark:bg-dlugomat-900">
         <h2 className="font-semibold mb-3">e-Discovery query</h2>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
           <label className="flex flex-col gap-1 text-sm">
@@ -221,7 +221,7 @@ export function LegalHoldClient({
             <input
               value={edUser}
               onChange={(e) => setEdUser(e.target.value)}
-              className="rounded-md border border-iron-300 dark:border-dlugomat-700 px-3 h-10 bg-transparent"
+              className="rounded-md border border-ink-300 dark:border-dlugomat-700 px-3 h-10 bg-transparent"
             />
           </label>
           <label className="flex flex-col gap-1 text-sm md:col-span-3">
@@ -229,7 +229,7 @@ export function LegalHoldClient({
             <input
               value={edTextSearch}
               onChange={(e) => setEdTextSearch(e.target.value)}
-              className="rounded-md border border-iron-300 dark:border-dlugomat-700 px-3 h-10 bg-transparent"
+              className="rounded-md border border-ink-300 dark:border-dlugomat-700 px-3 h-10 bg-transparent"
             />
           </label>
           <label className="flex flex-col gap-1 text-sm">
@@ -238,7 +238,7 @@ export function LegalHoldClient({
               type="date"
               value={edFrom}
               onChange={(e) => setEdFrom(e.target.value)}
-              className="rounded-md border border-iron-300 dark:border-dlugomat-700 px-3 h-10 bg-transparent"
+              className="rounded-md border border-ink-300 dark:border-dlugomat-700 px-3 h-10 bg-transparent"
             />
           </label>
           <label className="flex flex-col gap-1 text-sm">
@@ -247,7 +247,7 @@ export function LegalHoldClient({
               type="date"
               value={edTo}
               onChange={(e) => setEdTo(e.target.value)}
-              className="rounded-md border border-iron-300 dark:border-dlugomat-700 px-3 h-10 bg-transparent"
+              className="rounded-md border border-ink-300 dark:border-dlugomat-700 px-3 h-10 bg-transparent"
             />
           </label>
         </div>
@@ -259,12 +259,12 @@ export function LegalHoldClient({
       </section>
 
       {/* QUERIES LIST */}
-      <section className="rounded-lg border border-iron-200 dark:border-dlugomat-800 overflow-hidden">
-        <h2 className="p-3 font-semibold border-b border-iron-200 dark:border-dlugomat-800">
+      <section className="rounded-lg border border-ink-200 dark:border-dlugomat-800 overflow-hidden">
+        <h2 className="p-3 font-semibold border-b border-ink-200 dark:border-dlugomat-800">
           Historia zapytań ({queries.length})
         </h2>
         <table className="w-full text-sm">
-          <thead className="bg-iron-50 dark:bg-dlugomat-850">
+          <thead className="bg-ink-50 dark:bg-dlugomat-850">
             <tr>
               <th className="text-left p-3">Status</th>
               <th className="text-left p-3">Wyniki</th>
@@ -276,13 +276,13 @@ export function LegalHoldClient({
           <tbody>
             {queries.length === 0 && (
               <tr>
-                <td colSpan={5} className="p-6 text-center text-iron-500">
+                <td colSpan={5} className="p-6 text-center text-ink-500">
                   Brak zapytań.
                 </td>
               </tr>
             )}
             {queries.map((q) => (
-              <tr key={q.id} className="border-t border-iron-200 dark:border-dlugomat-800">
+              <tr key={q.id} className="border-t border-ink-200 dark:border-dlugomat-800">
                 <td className="p-3">
                   <span
                     className={
@@ -291,20 +291,20 @@ export function LegalHoldClient({
                         ? "bg-accent-100 text-accent-800"
                         : q.status === "failed"
                         ? "bg-danger-100 text-danger-700"
-                        : "bg-iron-100 text-iron-700")
+                        : "bg-ink-100 text-ink-700")
                     }
                   >
                     {q.status}
                   </span>
                 </td>
                 <td className="p-3 font-mono">{q.items_count}</td>
-                <td className="p-3 text-iron-600">
+                <td className="p-3 text-ink-600">
                   {new Date(q.created_at).toLocaleString("pl-PL")}
                 </td>
-                <td className="p-3 text-iron-600">
+                <td className="p-3 text-ink-600">
                   {q.completed_at ? new Date(q.completed_at).toLocaleString("pl-PL") : "—"}
                 </td>
-                <td className="p-3 text-xs font-mono text-iron-500 max-w-xs truncate">
+                <td className="p-3 text-xs font-mono text-ink-500 max-w-xs truncate">
                   {JSON.stringify(q.query)}
                 </td>
               </tr>

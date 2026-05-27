@@ -19,11 +19,11 @@ export default function AiAsystentPage() {
   return (
     <main className="container mx-auto px-4 py-8 max-w-6xl">
       <div className="mb-6">
-        <p className="text-xs uppercase tracking-wider text-iron-500 mb-2">Asystent AI</p>
-        <h1 className="font-display text-3xl font-semibold text-iron-900 dark:text-iron-50">
+        <p className="text-xs uppercase tracking-wider text-ink-500 mb-2">Asystent AI</p>
+        <h1 className="font-display text-3xl font-semibold text-ink-900 dark:text-ink-50">
           AI Asystent prawny
         </h1>
-        <p className="text-sm text-iron-500 mt-1">
+        <p className="text-sm text-ink-500 mt-1">
           Pyta — odpowiadamy z cytowaniami z bazy orzeczniczej, ustaw i wzorcami pism.
         </p>
       </div>
@@ -33,7 +33,7 @@ export default function AiAsystentPage() {
           <ChatStream
             placeholder="Zadaj pytanie prawne (np. o przedawnienie, egzekucję, koszty sądowe)..."
           />
-          <p className="text-xs text-iron-500 mt-2">
+          <p className="text-xs text-ink-500 mt-2">
             Odpowiedzi mają charakter informacyjny i nie zastępują porady prawnika.
             Wersjonowanie promptów, bezpieczeństwo i RODO — patrz{" "}
             <Link href="/dokumentacja/ai" className="text-accent-700 hover:text-accent-800">
@@ -53,7 +53,7 @@ export default function AiAsystentPage() {
                 <button
                   key={i}
                   type="button"
-                  className="w-full text-left text-sm text-iron-700 dark:text-iron-300 rounded-md border border-iron-200 dark:border-iron-800 px-3 py-2 hover:border-accent-400 hover:text-accent-700 transition focus:outline-none focus-visible:shadow-shield-focus"
+                  className="w-full text-left text-sm text-ink-700 dark:text-ink-300 rounded-md border border-ink-200 dark:border-ink-800 px-3 py-2 hover:border-accent-400 hover:text-accent-700 transition focus:outline-none focus-visible:shadow-shield-focus"
                 >
                   {p}
                 </button>

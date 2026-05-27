@@ -22,8 +22,8 @@ export default async function ApiKeysPage() {
   return (
     <div className="mx-auto flex max-w-4xl flex-col gap-6">
       <header>
-        <h1 className="text-fluid-2xl font-bold text-iron-900 dark:text-white">Klucze API</h1>
-        <p className="mt-1 text-fluid-base text-iron-600 dark:text-iron-300">
+        <h1 className="text-fluid-2xl font-bold text-ink-900 dark:text-white">Klucze API</h1>
+        <p className="mt-1 text-fluid-base text-ink-600 dark:text-ink-300">
           Wygeneruj tokeny dla SDK, Zapier, Make, własnych integracji.
         </p>
       </header>

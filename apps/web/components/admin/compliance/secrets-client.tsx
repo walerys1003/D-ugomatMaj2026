@@ -111,7 +111,7 @@ export function SecretsClient({ initialSecrets }: { initialSecrets: SecretMeta[]
         </div>
       )}
 
-      <section className="rounded-lg border border-iron-200 dark:border-dlugomat-800 p-4 bg-white dark:bg-dlugomat-900">
+      <section className="rounded-lg border border-ink-200 dark:border-dlugomat-800 p-4 bg-white dark:bg-dlugomat-900">
         <h2 className="font-semibold mb-3">Dodaj / zaktualizuj sekret</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <label className="flex flex-col gap-1 text-sm">
@@ -119,7 +119,7 @@ export function SecretsClient({ initialSecrets }: { initialSecrets: SecretMeta[]
             <input
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="rounded-md border border-iron-300 dark:border-dlugomat-700 px-3 h-10 bg-transparent font-mono text-xs"
+              className="rounded-md border border-ink-300 dark:border-dlugomat-700 px-3 h-10 bg-transparent font-mono text-xs"
               placeholder="STRIPE_API_KEY"
             />
           </label>
@@ -129,7 +129,7 @@ export function SecretsClient({ initialSecrets }: { initialSecrets: SecretMeta[]
               type="password"
               value={form.value}
               onChange={(e) => setForm({ ...form, value: e.target.value })}
-              className="rounded-md border border-iron-300 dark:border-dlugomat-700 px-3 h-10 bg-transparent font-mono text-xs"
+              className="rounded-md border border-ink-300 dark:border-dlugomat-700 px-3 h-10 bg-transparent font-mono text-xs"
             />
           </label>
           <label className="flex flex-col gap-1 text-sm md:col-span-2">
@@ -137,7 +137,7 @@ export function SecretsClient({ initialSecrets }: { initialSecrets: SecretMeta[]
             <input
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
-              className="rounded-md border border-iron-300 dark:border-dlugomat-700 px-3 h-10 bg-transparent"
+              className="rounded-md border border-ink-300 dark:border-dlugomat-700 px-3 h-10 bg-transparent"
             />
           </label>
           <label className="flex flex-col gap-1 text-sm">
@@ -148,7 +148,7 @@ export function SecretsClient({ initialSecrets }: { initialSecrets: SecretMeta[]
               onChange={(e) =>
                 setForm({ ...form, rotation_period_days: Number(e.target.value) })
               }
-              className="rounded-md border border-iron-300 dark:border-dlugomat-700 px-3 h-10 bg-transparent"
+              className="rounded-md border border-ink-300 dark:border-dlugomat-700 px-3 h-10 bg-transparent"
             />
           </label>
         </div>
@@ -159,9 +159,9 @@ export function SecretsClient({ initialSecrets }: { initialSecrets: SecretMeta[]
         </div>
       </section>
 
-      <section className="rounded-lg border border-iron-200 dark:border-dlugomat-800 overflow-hidden">
+      <section className="rounded-lg border border-ink-200 dark:border-dlugomat-800 overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-iron-50 dark:bg-dlugomat-850">
+          <thead className="bg-ink-50 dark:bg-dlugomat-850">
             <tr>
               <th className="text-left p-3">Nazwa</th>
               <th className="text-left p-3">Opis</th>
@@ -173,7 +173,7 @@ export function SecretsClient({ initialSecrets }: { initialSecrets: SecretMeta[]
           <tbody>
             {secrets.length === 0 && (
               <tr>
-                <td colSpan={5} className="p-6 text-center text-iron-500">
+                <td colSpan={5} className="p-6 text-center text-ink-500">
                   Brak sekretów w vault.
                 </td>
               </tr>
@@ -188,7 +188,7 @@ export function SecretsClient({ initialSecrets }: { initialSecrets: SecretMeta[]
               return (
                 <tr
                   key={s.id}
-                  className="border-t border-iron-200 dark:border-dlugomat-800"
+                  className="border-t border-ink-200 dark:border-dlugomat-800"
                 >
                   <td className="p-3 font-mono text-xs">
                     {s.name}
@@ -198,20 +198,20 @@ export function SecretsClient({ initialSecrets }: { initialSecrets: SecretMeta[]
                       </span>
                     )}
                   </td>
-                  <td className="p-3 text-iron-600 max-w-xs truncate">
+                  <td className="p-3 text-ink-600 max-w-xs truncate">
                     {s.description ?? "—"}
                   </td>
-                  <td className="p-3 text-iron-600">
+                  <td className="p-3 text-ink-600">
                     {s.last_rotated_at
                       ? new Date(s.last_rotated_at).toLocaleString("pl-PL")
                       : "—"}
                   </td>
-                  <td className="p-3 text-iron-600">
+                  <td className="p-3 text-ink-600">
                     {s.rotation_period_days ? `${s.rotation_period_days} d` : "—"}
                   </td>
                   <td className="p-3 text-right space-x-3">
                     {revealed[s.name] ? (
-                      <code className="bg-iron-100 dark:bg-dlugomat-800 px-2 py-1 rounded text-xs">
+                      <code className="bg-ink-100 dark:bg-dlugomat-800 px-2 py-1 rounded text-xs">
                         {revealed[s.name]}
                       </code>
                     ) : (

@@ -81,7 +81,7 @@ export function StepZobowiazanie({
           aria-invalid={Boolean(errors.kwota_zadluzenia)}
           {...register("kwota_zadluzenia", { valueAsNumber: true })}
         />
-        <p className="text-fluid-xs text-iron-600">
+        <p className="text-fluid-xs text-ink-600">
           Wpisz kwotę z aktualnego wezwania / zawiadomienia.
         </p>
         {errors.kwota_zadluzenia?.message && (

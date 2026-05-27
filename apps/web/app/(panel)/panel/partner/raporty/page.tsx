@@ -57,7 +57,7 @@ export default function PartnerRaportyPage() {
           <h1 className="text-fluid-3xl font-bold tracking-tight text-dlugomat-900 dark:text-white">
             Raporty
           </h1>
-          <p className="mt-1 max-w-2xl text-fluid-base text-iron-600 dark:text-iron-300">
+          <p className="mt-1 max-w-2xl text-fluid-base text-ink-600 dark:text-ink-300">
             Twoje wyniki w czasie. Dane synchronizowane z systemem
             rozliczeń co 30 minut.
           </p>
@@ -101,12 +101,12 @@ export default function PartnerRaportyPage() {
               const h = (m.commission_pln / max) * 100;
               return (
                 <li key={m.label} className="flex flex-1 flex-col items-center gap-2">
-                  <span className="text-fluid-xs tabular-nums text-iron-500">
+                  <span className="text-fluid-xs tabular-nums text-ink-500">
                     {pln(m.commission_pln)}
                   </span>
                   <div
                     aria-hidden
-                    className="w-full overflow-hidden rounded-t-md bg-iron-100 dark:bg-dlugomat-900"
+                    className="w-full overflow-hidden rounded-t-md bg-ink-100 dark:bg-dlugomat-900"
                     style={{ height: 200 }}
                   >
                     <div
@@ -114,7 +114,7 @@ export default function PartnerRaportyPage() {
                       style={{ height: `${h}%`, marginTop: `${100 - h}%` }}
                     />
                   </div>
-                  <span className="text-fluid-xs font-semibold text-iron-700 dark:text-iron-200">
+                  <span className="text-fluid-xs font-semibold text-ink-700 dark:text-ink-200">
                     {m.label}
                   </span>
                 </li>
@@ -130,8 +130,8 @@ export default function PartnerRaportyPage() {
         </CardHeader>
         <CardContent className="overflow-x-auto p-0">
           <table className="w-full text-fluid-sm">
-            <thead className="border-y border-iron-200 bg-iron-50/60 dark:border-dlugomat-800 dark:bg-dlugomat-900/40">
-              <tr className="text-left text-iron-600 dark:text-iron-300">
+            <thead className="border-y border-ink-200 bg-ink-50/60 dark:border-dlugomat-800 dark:bg-dlugomat-900/40">
+              <tr className="text-left text-ink-600 dark:text-ink-300">
                 <th className="px-5 py-3 font-semibold">Miesiąc</th>
                 <th className="px-5 py-3 text-right font-semibold">Prowizja</th>
                 <th className="px-5 py-3 text-right font-semibold">Nowi</th>
@@ -140,7 +140,7 @@ export default function PartnerRaportyPage() {
                 <th className="px-5 py-3 text-right font-semibold">Churn</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-iron-100 dark:divide-dlugomat-800">
+            <tbody className="divide-y divide-ink-100 dark:divide-dlugomat-800">
               {MONTHS.map((m) => (
                 <tr key={m.label}>
                   <td className="px-5 py-3 font-semibold">{m.label}</td>
@@ -172,10 +172,10 @@ function KpiCard({
   return (
     <Card elevation="subtle">
       <CardContent className="flex flex-col gap-1 p-5">
-        <span className="text-fluid-xs font-semibold uppercase tracking-wider text-iron-500">
+        <span className="text-fluid-xs font-semibold uppercase tracking-wider text-ink-500">
           {label}
         </span>
-        <span className="text-fluid-2xl font-bold tabular-nums text-iron-900 dark:text-iron-50">
+        <span className="text-fluid-2xl font-bold tabular-nums text-ink-900 dark:text-ink-50">
           {value}
         </span>
         <span

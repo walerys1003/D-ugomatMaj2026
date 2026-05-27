@@ -38,7 +38,7 @@ export function StepStrony({
       noValidate
     >
       <section className="space-y-4">
-        <h3 className="text-fluid-base font-semibold text-iron-900 dark:text-iron-50">
+        <h3 className="text-fluid-base font-semibold text-ink-900 dark:text-ink-50">
           Powód (wierzyciel)
         </h3>
         <FormField
@@ -65,7 +65,7 @@ export function StepStrony({
       </section>
 
       <section className="space-y-4">
-        <h3 className="text-fluid-base font-semibold text-iron-900 dark:text-iron-50">
+        <h3 className="text-fluid-base font-semibold text-ink-900 dark:text-ink-50">
           Pozwany (Ty)
         </h3>
         <FormField

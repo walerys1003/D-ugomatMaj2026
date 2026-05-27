@@ -67,7 +67,7 @@ export function StepDochodyHistoryczne({
       noValidate
     >
       <Surface elevation="flat" padded="md" className="bg-dlugomat-50/60 dark:bg-dlugomat-900/40">
-        <p className="text-fluid-sm text-iron-700 dark:text-iron-200">
+        <p className="text-fluid-sm text-ink-700 dark:text-ink-200">
           Wymagane przez <strong>art. 491² Pr.up.</strong> — sąd ocenia plan spłaty na podstawie
           dochodów z ostatnich 12 miesięcy. Wpisz każdy miesiąc osobno. Jeśli były miesiące bez
           dochodu, zaznacz to na końcu.

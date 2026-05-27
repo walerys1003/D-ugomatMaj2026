@@ -30,13 +30,13 @@ export default async function SsoPage() {
   return (
     <main className="container mx-auto px-4 py-8 max-w-4xl space-y-6">
       <div>
-        <Link href="/panel/organizacja" className="text-xs text-iron-500 hover:text-iron-700">
+        <Link href="/panel/organizacja" className="text-xs text-ink-500 hover:text-ink-700">
           ← Organizacja
         </Link>
-        <h1 className="font-display text-3xl font-semibold text-iron-900 dark:text-iron-50 mt-2">
+        <h1 className="font-display text-3xl font-semibold text-ink-900 dark:text-ink-50 mt-2">
           Single Sign-On
         </h1>
-        <p className="text-sm text-iron-500 mt-1">
+        <p className="text-sm text-ink-500 mt-1">
           Logowanie jednokrotne przez Twojego dostawcę tożsamości (Okta, Azure AD, Google Workspace).
         </p>
       </div>
@@ -49,14 +49,14 @@ export default async function SsoPage() {
           {sso.enabled ? (
             <div className="flex items-center gap-2 text-sm">
               <span className="w-2 h-2 rounded-full bg-accent-600" />
-              <span className="text-iron-900 dark:text-iron-50">
+              <span className="text-ink-900 dark:text-ink-50">
                 SSO aktywne ({sso.protocol?.toUpperCase()})
               </span>
             </div>
           ) : (
             <div className="flex items-center gap-2 text-sm">
-              <span className="w-2 h-2 rounded-full bg-iron-400" />
-              <span className="text-iron-600 dark:text-iron-400">SSO nieskonfigurowane</span>
+              <span className="w-2 h-2 rounded-full bg-ink-400" />
+              <span className="text-ink-600 dark:text-ink-400">SSO nieskonfigurowane</span>
             </div>
           )}
         </CardContent>
@@ -99,7 +99,7 @@ export default async function SsoPage() {
           <CardTitle>Konfiguracja OIDC</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-iron-600 dark:text-iron-400">
+          <p className="text-sm text-ink-600 dark:text-ink-400">
             Alternatywnie skonfiguruj OpenID Connect, jeśli Twój IdP go preferuje.
           </p>
           <Link
@@ -129,7 +129,7 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="text-sm font-medium text-iron-700 dark:text-iron-300 mb-1.5 block">
+      <span className="text-sm font-medium text-ink-700 dark:text-ink-300 mb-1.5 block">
         {label}
       </span>
       <input
@@ -138,10 +138,10 @@ function Field({
         placeholder={placeholder}
         defaultValue={defaultValue}
         readOnly={readOnly}
-        className={`w-full rounded-lg border border-iron-300 dark:border-iron-700 px-3 py-2 focus:outline-none focus-visible:shadow-shield-focus ${
+        className={`w-full rounded-lg border border-ink-300 dark:border-ink-700 px-3 py-2 focus:outline-none focus-visible:shadow-shield-focus ${
           readOnly
-            ? "bg-iron-50 dark:bg-iron-900 text-iron-500 font-mono text-xs"
-            : "bg-white dark:bg-iron-900"
+            ? "bg-ink-50 dark:bg-ink-900 text-ink-500 font-mono text-xs"
+            : "bg-white dark:bg-ink-900"
         }`}
       />
     </label>

@@ -128,12 +128,12 @@ export function WizardShell({ definition, snapshot, onSubmit }: Props) {
           <div className="space-y-1">
             <h2
               id="wizard-heading"
-              className="font-serif text-fluid-2xl text-iron-900 dark:text-iron-50"
+              className="font-serif text-fluid-2xl text-ink-900 dark:text-ink-50"
             >
               {currentStep.title}
             </h2>
             {currentStep.description && (
-              <p className="text-fluid-sm text-iron-600 dark:text-iron-400">
+              <p className="text-fluid-sm text-ink-600 dark:text-ink-400">
                 {currentStep.description}
               </p>
             )}
@@ -154,7 +154,7 @@ export function WizardShell({ definition, snapshot, onSubmit }: Props) {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
-          className="rounded-2xl border border-iron-200 bg-white p-6 shadow-card dark:border-iron-800 dark:bg-iron-950"
+          className="rounded-2xl border border-ink-200 bg-white p-6 shadow-card dark:border-ink-800 dark:bg-ink-950"
         >
           {/* @ts-expect-error: Components have varying schema types — wizard registry guarantees runtime compatibility */}
           <StepComponent {...stepProps} />
@@ -179,7 +179,7 @@ function SaveIndicator({
         "flex items-center gap-2 text-fluid-xs tabular-nums",
         status === "error"
           ? "text-danger-600 dark:text-danger-400"
-          : "text-iron-500 dark:text-iron-400",
+          : "text-ink-500 dark:text-ink-400",
       )}
     >
       {status === "saving" && (

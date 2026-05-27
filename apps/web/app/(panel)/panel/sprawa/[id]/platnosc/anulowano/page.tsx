@@ -25,7 +25,7 @@ export default function PlatnoscAnulowanoPage({ params }: Props) {
     <div className="mx-auto max-w-2xl space-y-6">
       <Card elevation="pop">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-3 size-12 rounded-full bg-iron-100 p-3 text-iron-600 dark:bg-iron-900/40 dark:text-iron-400">
+          <div className="mx-auto mb-3 size-12 rounded-full bg-ink-100 p-3 text-ink-600 dark:bg-ink-900/40 dark:text-ink-400">
             <XCircle className="size-6" aria-hidden />
           </div>
           <CardTitle>Płatność anulowana</CardTitle>
@@ -45,11 +45,11 @@ export default function PlatnoscAnulowanoPage({ params }: Props) {
         </CardContent>
       </Card>
 
-      <div className="rounded-xl border border-shield-100 bg-shield-50/40 p-4 text-fluid-sm text-iron-800">
+      <div className="rounded-xl border border-shield-100 bg-shield-50/40 p-4 text-fluid-sm text-ink-800">
         <p className="font-medium text-shield-900">
           Spokojnie. Nic nie tracisz.
         </p>
-        <p className="mt-1 text-iron-700">
+        <p className="mt-1 text-ink-700">
           Sprawa pozostaje w statusie „gotowa do opłaty". Wszystkie wprowadzone
           dane są zapisane. Możesz dokończyć płatność, gdy będziesz gotowy(a) —
           nie ma terminu.

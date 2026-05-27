@@ -103,13 +103,13 @@ export default function ZapisanePage() {
     <div className="space-y-8">
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-2">
-          <p className="text-xs uppercase tracking-[0.18em] text-iron-500">
+          <p className="text-xs uppercase tracking-[0.18em] text-ink-500">
             AI asystent · biblioteka promptów
           </p>
           <h1 className="font-display text-fluid-h1 text-dlugomat-950">
             Zapisane prompty
           </h1>
-          <p className="max-w-2xl text-iron-600">
+          <p className="max-w-2xl text-ink-600">
             Twoje sprawdzone szablony zapytań. Używaj zmiennych w nawiasach{" "}
             <code className="text-xs">{"{{nazwa}}"}</code>, aby szybko dostosować prompt
             do konkretnej sprawy.
@@ -164,7 +164,7 @@ export default function ZapisanePage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                <p className="rounded-md bg-iron-50 p-3 text-sm font-mono text-iron-800 leading-relaxed">
+                <p className="rounded-md bg-ink-50 p-3 text-sm font-mono text-ink-800 leading-relaxed">
                   {p.prompt}
                 </p>
                 <div className="flex flex-wrap gap-1.5">

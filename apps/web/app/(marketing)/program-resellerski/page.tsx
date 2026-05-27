@@ -69,10 +69,10 @@ export default function ResellerProgramPage() {
             <span className="h-px w-8 bg-dlugomat-600" />
             Program resellerski · White-label
           </p>
-          <h1 className="font-display text-fluid-5xl font-bold leading-tight text-dlugomat-900 dark:text-iron-50">
+          <h1 className="font-display text-fluid-5xl font-bold leading-tight text-dlugomat-900 dark:text-ink-50">
             Sprzedawaj Długomata. Pod własną marką.
           </h1>
-          <p className="mt-5 text-fluid-lg leading-relaxed text-iron-700 dark:text-iron-200">
+          <p className="mt-5 text-fluid-lg leading-relaxed text-ink-700 dark:text-ink-200">
             Dla kancelarii, software houses i agencji prawnych, które chcą zaoferować
             klientom premium narzędzie do pism procesowych — bez budowania własnego
             zespołu dev i bez wydatku 2-3 milionów na R&D.
@@ -90,7 +90,7 @@ export default function ResellerProgramPage() {
 
       {/* Dlaczego */}
       <section className="container py-12">
-        <h2 className="mb-10 font-display text-fluid-3xl font-bold text-dlugomat-900 dark:text-iron-50">
+        <h2 className="mb-10 font-display text-fluid-3xl font-bold text-dlugomat-900 dark:text-ink-50">
           Dlaczego resellerzy wybierają Długomata
         </h2>
         <div className="grid gap-6 md:grid-cols-3">
@@ -100,7 +100,7 @@ export default function ResellerProgramPage() {
                 3 lata
               </p>
               <h3 className="font-display text-fluid-lg font-semibold">Time-to-market: 0</h3>
-              <p className="text-fluid-sm text-iron-600 dark:text-iron-300">
+              <p className="text-fluid-sm text-ink-600 dark:text-ink-300">
                 Tyle czasu i ~2,5 mln PLN zaoszczędzasz, nie budując własnego silnika
                 AI do pism procesowych. Aktywacja u Ciebie w 14 dni.
               </p>
@@ -112,7 +112,7 @@ export default function ResellerProgramPage() {
                 50/50
               </p>
               <h3 className="font-display text-fluid-lg font-semibold">Najwyższy revenue share w branży</h3>
-              <p className="text-fluid-sm text-iron-600 dark:text-iron-300">
+              <p className="text-fluid-sm text-ink-600 dark:text-ink-300">
                 Enterprise White-Label = 50% z każdej subskrypcji. Konkurencja oferuje
                 15-25%. Skalujesz biznes, nie hostowanie.
               </p>
@@ -124,7 +124,7 @@ export default function ResellerProgramPage() {
                 100%
               </p>
               <h3 className="font-display text-fluid-lg font-semibold">Pełna zgodność RODO + AI Act</h3>
-              <p className="text-fluid-sm text-iron-600 dark:text-iron-300">
+              <p className="text-fluid-sm text-ink-600 dark:text-ink-300">
                 Hosting wyłącznie w UE. Audyt SOC 2 Type II. AI Act compliance pełna —
                 jesteś chroniony, klienci mogą polegać.
               </p>
@@ -135,7 +135,7 @@ export default function ResellerProgramPage() {
 
       {/* Tiers */}
       <section className="container py-16">
-        <h2 className="mb-10 font-display text-fluid-3xl font-bold text-dlugomat-900 dark:text-iron-50">
+        <h2 className="mb-10 font-display text-fluid-3xl font-bold text-dlugomat-900 dark:text-ink-50">
           Trzy poziomy współpracy
         </h2>
         <div className="grid gap-6 lg:grid-cols-3">
@@ -156,24 +156,24 @@ export default function ResellerProgramPage() {
               )}
               <CardContent className="space-y-5 p-8">
                 <div>
-                  <h3 className="font-display text-fluid-2xl font-bold text-dlugomat-900 dark:text-iron-50">
+                  <h3 className="font-display text-fluid-2xl font-bold text-dlugomat-900 dark:text-ink-50">
                     {tier.name}
                   </h3>
-                  <p className="mt-2 text-fluid-xs uppercase tracking-wider text-iron-500">
+                  <p className="mt-2 text-fluid-xs uppercase tracking-wider text-ink-500">
                     Minimalny wolumen
                   </p>
-                  <p className="font-medium text-iron-700 dark:text-iron-200">{tier.minVolume}</p>
+                  <p className="font-medium text-ink-700 dark:text-ink-200">{tier.minVolume}</p>
                 </div>
 
                 <div className="rounded-lg bg-dlugomat-50 p-4 dark:bg-dlugomat-900">
-                  <p className="text-fluid-xs uppercase tracking-wider text-iron-500">Revenue share</p>
-                  <p className="font-display text-fluid-4xl font-bold text-dlugomat-900 dark:text-iron-50">
+                  <p className="text-fluid-xs uppercase tracking-wider text-ink-500">Revenue share</p>
+                  <p className="font-display text-fluid-4xl font-bold text-dlugomat-900 dark:text-ink-50">
                     {tier.revenueShare}
                   </p>
-                  <p className="text-fluid-xs text-iron-500">z każdej subskrypcji klienta</p>
+                  <p className="text-fluid-xs text-ink-500">z każdej subskrypcji klienta</p>
                 </div>
 
-                <ul className="space-y-2 text-fluid-sm text-iron-700 dark:text-iron-200">
+                <ul className="space-y-2 text-fluid-sm text-ink-700 dark:text-ink-200">
                   {tier.features.map((f) => (
                     <li key={f} className="flex items-start gap-2">
                       <span
@@ -206,29 +206,29 @@ export default function ResellerProgramPage() {
         <Card elevation="pop" className="overflow-hidden">
           <CardContent className="grid gap-10 p-10 lg:grid-cols-[1fr_1.2fr]">
             <div>
-              <h2 className="font-display text-fluid-3xl font-bold text-dlugomat-900 dark:text-iron-50">
+              <h2 className="font-display text-fluid-3xl font-bold text-dlugomat-900 dark:text-ink-50">
                 Wyślij zgłoszenie
               </h2>
-              <p className="mt-3 text-fluid-base text-iron-600 dark:text-iron-300">
+              <p className="mt-3 text-fluid-base text-ink-600 dark:text-ink-300">
                 Odzywamy się w 48h roboczych. Pierwsze spotkanie online, bez zobowiązań,
                 z naszym Head of Partnerships.
               </p>
               <dl className="mt-8 space-y-4 text-fluid-sm">
                 <div>
-                  <dt className="font-semibold text-iron-800 dark:text-iron-100">Co przygotujemy na demo</dt>
-                  <dd className="text-iron-600 dark:text-iron-300">
+                  <dt className="font-semibold text-ink-800 dark:text-ink-100">Co przygotujemy na demo</dt>
+                  <dd className="text-ink-600 dark:text-ink-300">
                     Mock-up white-label pod Twoją domeną, kalkulator ROI, draft umowy.
                   </dd>
                 </div>
                 <div>
-                  <dt className="font-semibold text-iron-800 dark:text-iron-100">Onboarding</dt>
-                  <dd className="text-iron-600 dark:text-iron-300">
+                  <dt className="font-semibold text-ink-800 dark:text-ink-100">Onboarding</dt>
+                  <dd className="text-ink-600 dark:text-ink-300">
                     14 dni od podpisania umowy do produkcyjnego startu.
                   </dd>
                 </div>
                 <div>
-                  <dt className="font-semibold text-iron-800 dark:text-iron-100">Pierwsza wypłata</dt>
-                  <dd className="text-iron-600 dark:text-iron-300">
+                  <dt className="font-semibold text-ink-800 dark:text-ink-100">Pierwsza wypłata</dt>
+                  <dd className="text-ink-600 dark:text-ink-300">
                     30 dni od pierwszej zafakturowanej subskrypcji klienta.
                   </dd>
                 </div>
@@ -241,18 +241,18 @@ export default function ResellerProgramPage() {
               className="space-y-4"
             >
               <div>
-                <label htmlFor="company" className="text-fluid-sm font-medium text-iron-800 dark:text-iron-100">
+                <label htmlFor="company" className="text-fluid-sm font-medium text-ink-800 dark:text-ink-100">
                   Firma / kancelaria
                 </label>
                 <input
                   id="company"
                   name="company"
                   required
-                  className="mt-1 w-full rounded-md border border-iron-300 bg-white px-3 py-2 text-fluid-sm focus:border-dlugomat-500 focus:outline-none focus:ring-2 focus:ring-dlugomat-500/30 dark:border-dlugomat-700 dark:bg-dlugomat-900"
+                  className="mt-1 w-full rounded-md border border-ink-300 bg-white px-3 py-2 text-fluid-sm focus:border-dlugomat-500 focus:outline-none focus:ring-2 focus:ring-dlugomat-500/30 dark:border-dlugomat-700 dark:bg-dlugomat-900"
                 />
               </div>
               <div>
-                <label htmlFor="nip" className="text-fluid-sm font-medium text-iron-800 dark:text-iron-100">
+                <label htmlFor="nip" className="text-fluid-sm font-medium text-ink-800 dark:text-ink-100">
                   NIP
                 </label>
                 <input
@@ -260,23 +260,23 @@ export default function ResellerProgramPage() {
                   name="nip"
                   inputMode="numeric"
                   pattern="[0-9]{10}"
-                  className="mt-1 w-full rounded-md border border-iron-300 bg-white px-3 py-2 text-fluid-sm focus:border-dlugomat-500 focus:outline-none focus:ring-2 focus:ring-dlugomat-500/30 dark:border-dlugomat-700 dark:bg-dlugomat-900"
+                  className="mt-1 w-full rounded-md border border-ink-300 bg-white px-3 py-2 text-fluid-sm focus:border-dlugomat-500 focus:outline-none focus:ring-2 focus:ring-dlugomat-500/30 dark:border-dlugomat-700 dark:bg-dlugomat-900"
                 />
               </div>
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
-                  <label htmlFor="contact_name" className="text-fluid-sm font-medium text-iron-800 dark:text-iron-100">
+                  <label htmlFor="contact_name" className="text-fluid-sm font-medium text-ink-800 dark:text-ink-100">
                     Osoba kontaktowa
                   </label>
                   <input
                     id="contact_name"
                     name="contact_name"
                     required
-                    className="mt-1 w-full rounded-md border border-iron-300 bg-white px-3 py-2 text-fluid-sm focus:border-dlugomat-500 focus:outline-none focus:ring-2 focus:ring-dlugomat-500/30 dark:border-dlugomat-700 dark:bg-dlugomat-900"
+                    className="mt-1 w-full rounded-md border border-ink-300 bg-white px-3 py-2 text-fluid-sm focus:border-dlugomat-500 focus:outline-none focus:ring-2 focus:ring-dlugomat-500/30 dark:border-dlugomat-700 dark:bg-dlugomat-900"
                   />
                 </div>
                 <div>
-                  <label htmlFor="email" className="text-fluid-sm font-medium text-iron-800 dark:text-iron-100">
+                  <label htmlFor="email" className="text-fluid-sm font-medium text-ink-800 dark:text-ink-100">
                     Email
                   </label>
                   <input
@@ -284,18 +284,18 @@ export default function ResellerProgramPage() {
                     name="email"
                     type="email"
                     required
-                    className="mt-1 w-full rounded-md border border-iron-300 bg-white px-3 py-2 text-fluid-sm focus:border-dlugomat-500 focus:outline-none focus:ring-2 focus:ring-dlugomat-500/30 dark:border-dlugomat-700 dark:bg-dlugomat-900"
+                    className="mt-1 w-full rounded-md border border-ink-300 bg-white px-3 py-2 text-fluid-sm focus:border-dlugomat-500 focus:outline-none focus:ring-2 focus:ring-dlugomat-500/30 dark:border-dlugomat-700 dark:bg-dlugomat-900"
                   />
                 </div>
               </div>
               <div>
-                <label htmlFor="tier" className="text-fluid-sm font-medium text-iron-800 dark:text-iron-100">
+                <label htmlFor="tier" className="text-fluid-sm font-medium text-ink-800 dark:text-ink-100">
                   Interesujący Cię poziom
                 </label>
                 <select
                   id="tier"
                   name="tier"
-                  className="mt-1 w-full rounded-md border border-iron-300 bg-white px-3 py-2 text-fluid-sm focus:border-dlugomat-500 focus:outline-none focus:ring-2 focus:ring-dlugomat-500/30 dark:border-dlugomat-700 dark:bg-dlugomat-900"
+                  className="mt-1 w-full rounded-md border border-ink-300 bg-white px-3 py-2 text-fluid-sm focus:border-dlugomat-500 focus:outline-none focus:ring-2 focus:ring-dlugomat-500/30 dark:border-dlugomat-700 dark:bg-dlugomat-900"
                 >
                   <option value="">Wybierz…</option>
                   {TIERS.map((t) => (
@@ -306,7 +306,7 @@ export default function ResellerProgramPage() {
                 </select>
               </div>
               <div>
-                <label htmlFor="volume" className="text-fluid-sm font-medium text-iron-800 dark:text-iron-100">
+                <label htmlFor="volume" className="text-fluid-sm font-medium text-ink-800 dark:text-ink-100">
                   Szacowany wolumen klientów / rok
                 </label>
                 <input
@@ -314,21 +314,21 @@ export default function ResellerProgramPage() {
                   name="volume_yearly"
                   inputMode="numeric"
                   placeholder="np. 200"
-                  className="mt-1 w-full rounded-md border border-iron-300 bg-white px-3 py-2 text-fluid-sm focus:border-dlugomat-500 focus:outline-none focus:ring-2 focus:ring-dlugomat-500/30 dark:border-dlugomat-700 dark:bg-dlugomat-900"
+                  className="mt-1 w-full rounded-md border border-ink-300 bg-white px-3 py-2 text-fluid-sm focus:border-dlugomat-500 focus:outline-none focus:ring-2 focus:ring-dlugomat-500/30 dark:border-dlugomat-700 dark:bg-dlugomat-900"
                 />
               </div>
               <div>
-                <label htmlFor="notes" className="text-fluid-sm font-medium text-iron-800 dark:text-iron-100">
+                <label htmlFor="notes" className="text-fluid-sm font-medium text-ink-800 dark:text-ink-100">
                   Dodatkowe informacje
                 </label>
                 <textarea
                   id="notes"
                   name="notes"
                   rows={4}
-                  className="mt-1 w-full rounded-md border border-iron-300 bg-white px-3 py-2 text-fluid-sm focus:border-dlugomat-500 focus:outline-none focus:ring-2 focus:ring-dlugomat-500/30 dark:border-dlugomat-700 dark:bg-dlugomat-900"
+                  className="mt-1 w-full rounded-md border border-ink-300 bg-white px-3 py-2 text-fluid-sm focus:border-dlugomat-500 focus:outline-none focus:ring-2 focus:ring-dlugomat-500/30 dark:border-dlugomat-700 dark:bg-dlugomat-900"
                 />
               </div>
-              <label className="flex items-start gap-2 text-fluid-xs text-iron-600 dark:text-iron-300">
+              <label className="flex items-start gap-2 text-fluid-xs text-ink-600 dark:text-ink-300">
                 <input type="checkbox" name="rodo_consent" required className="mt-0.5" />
                 <span>
                   Wyrażam zgodę na przetwarzanie danych w celu kontaktu w sprawie programu

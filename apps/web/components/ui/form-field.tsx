@@ -49,11 +49,11 @@ export function FormField({
         <Label htmlFor={htmlFor} required={required}>
           {label}
         </Label>
-        {hint ? <span className="text-fluid-xs text-iron-500">{hint}</span> : null}
+        {hint ? <span className="text-fluid-xs text-ink-500">{hint}</span> : null}
       </div>
       {child}
       {help ? (
-        <p id={helpId} className="text-fluid-xs text-iron-500">
+        <p id={helpId} className="text-fluid-xs text-ink-500">
           {help}
         </p>
       ) : null}

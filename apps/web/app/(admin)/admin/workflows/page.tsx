@@ -26,8 +26,8 @@ interface Workflow {
 
 const STATUS_BADGE: Record<Workflow["status"], string> = {
   active: "bg-accent-50 text-accent-700 border-accent-200",
-  paused: "bg-iron-100 text-iron-700 border-iron-200",
-  draft: "bg-iron-100 text-iron-600 border-iron-200",
+  paused: "bg-ink-100 text-ink-700 border-ink-200",
+  draft: "bg-ink-100 text-ink-600 border-ink-200",
   errored: "bg-danger-50 text-danger-700 border-danger-200",
 };
 
@@ -66,13 +66,13 @@ export default async function WorkflowsPage() {
     <main className="container mx-auto px-4 py-8 max-w-7xl space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <Link href="/admin/dashboard" className="text-xs text-iron-500 hover:text-iron-700">
+          <Link href="/admin/dashboard" className="text-xs text-ink-500 hover:text-ink-700">
             ← Admin
           </Link>
-          <h1 className="font-display text-3xl font-semibold text-iron-900 dark:text-iron-50 mt-2">
+          <h1 className="font-display text-3xl font-semibold text-ink-900 dark:text-ink-50 mt-2">
             Workflows
           </h1>
-          <p className="text-sm text-iron-500 mt-1">
+          <p className="text-sm text-ink-500 mt-1">
             {workflows.length} workflow · {workflows.filter((w) => w.status === "active").length}{" "}
             aktywnych · {errored.length} w błędzie
           </p>
@@ -105,12 +105,12 @@ export default async function WorkflowsPage() {
         </CardHeader>
         <CardContent>
           {workflows.length === 0 ? (
-            <p className="text-sm text-iron-500">Brak zdefiniowanych workflow.</p>
+            <p className="text-sm text-ink-500">Brak zdefiniowanych workflow.</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-left border-b border-iron-200 dark:border-iron-800 text-xs uppercase tracking-wider text-iron-500">
+                  <tr className="text-left border-b border-ink-200 dark:border-ink-800 text-xs uppercase tracking-wider text-ink-500">
                     <th className="py-2 pr-3">Workflow</th>
                     <th className="py-2 pr-3">Trigger</th>
                     <th className="py-2 pr-3">Status</th>
@@ -122,12 +122,12 @@ export default async function WorkflowsPage() {
                 </thead>
                 <tbody>
                   {workflows.map((w) => (
-                    <tr key={w.id} className="border-b border-iron-100 dark:border-iron-900">
+                    <tr key={w.id} className="border-b border-ink-100 dark:border-ink-900">
                       <td className="py-3 pr-3">
-                        <div className="font-medium text-iron-900 dark:text-iron-50">{w.name}</div>
-                        <div className="text-xs text-iron-500 line-clamp-1">{w.description}</div>
+                        <div className="font-medium text-ink-900 dark:text-ink-50">{w.name}</div>
+                        <div className="text-xs text-ink-500 line-clamp-1">{w.description}</div>
                       </td>
-                      <td className="py-3 pr-3 text-iron-700 dark:text-iron-300 text-xs">
+                      <td className="py-3 pr-3 text-ink-700 dark:text-ink-300 text-xs">
                         {TRIGGER_LABEL[w.trigger]}
                       </td>
                       <td className="py-3 pr-3">
@@ -153,7 +153,7 @@ export default async function WorkflowsPage() {
                           {w.success_rate_24h_percent.toFixed(1)}%
                         </span>
                       </td>
-                      <td className="py-3 pr-3 text-xs text-iron-500">
+                      <td className="py-3 pr-3 text-xs text-ink-500">
                         {w.next_run_at
                           ? new Date(w.next_run_at).toLocaleString("pl-PL")
                           : "—"}
@@ -182,8 +182,8 @@ function WorkflowRow({ workflow }: { workflow: Workflow }) {
   return (
     <li className="rounded-md border border-danger-200 dark:border-danger-700/40 bg-danger-50/30 dark:bg-danger-700/5 p-3 flex flex-wrap items-center justify-between gap-2">
       <div>
-        <div className="font-medium text-iron-900 dark:text-iron-50">{workflow.name}</div>
-        <div className="text-xs text-iron-500">
+        <div className="font-medium text-ink-900 dark:text-ink-50">{workflow.name}</div>
+        <div className="text-xs text-ink-500">
           Ostatnie: {workflow.last_run_at
             ? new Date(workflow.last_run_at).toLocaleString("pl-PL")
             : "nigdy"}

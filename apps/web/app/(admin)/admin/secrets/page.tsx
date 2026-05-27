@@ -32,7 +32,7 @@ export default async function SecretsPage() {
       <header className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Secret Vault</h1>
-          <p className="text-iron-600 dark:text-iron-300">
+          <p className="text-ink-600 dark:text-ink-300">
             AES-256-GCM envelope (PBKDF2 600k iter). Wartości pokazywane tylko po jawnym
             żądaniu — każde odsłonięcie logowane do audit chain.
           </p>

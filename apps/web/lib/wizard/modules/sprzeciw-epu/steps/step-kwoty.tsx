@@ -93,13 +93,13 @@ export function StepKwoty({
       </div>
 
       <div
-        className="flex items-baseline justify-between rounded-lg border border-iron-200 bg-iron-50 px-4 py-3 dark:border-iron-800 dark:bg-iron-900"
+        className="flex items-baseline justify-between rounded-lg border border-ink-200 bg-ink-50 px-4 py-3 dark:border-ink-800 dark:bg-ink-900"
         aria-live="polite"
       >
-        <span className="text-fluid-sm text-iron-600 dark:text-iron-400">
+        <span className="text-fluid-sm text-ink-600 dark:text-ink-400">
           Razem
         </span>
-        <span className="text-fluid-lg font-semibold tabular-nums text-iron-900 dark:text-iron-50">
+        <span className="text-fluid-lg font-semibold tabular-nums text-ink-900 dark:text-ink-50">
           {formatPLN(total)}
         </span>
       </div>

@@ -18,7 +18,7 @@ interface Anomaly {
 }
 
 const SEVERITY_BADGE: Record<Anomaly["severity"], string> = {
-  low: "bg-iron-100 text-iron-700 border-iron-200",
+  low: "bg-ink-100 text-ink-700 border-ink-200",
   medium: "bg-warn-50 text-warn-700 border-warn-200",
   high: "bg-warn-50 text-warn-800 border-warn-300",
   critical: "bg-danger-50 text-danger-700 border-danger-200",
@@ -28,7 +28,7 @@ const STATUS_BADGE: Record<Anomaly["status"], string> = {
   open: "bg-danger-50 text-danger-700 border-danger-200",
   investigating: "bg-warn-50 text-warn-700 border-warn-200",
   resolved: "bg-accent-50 text-accent-700 border-accent-200",
-  ignored: "bg-iron-100 text-iron-600 border-iron-200",
+  ignored: "bg-ink-100 text-ink-600 border-ink-200",
 };
 
 async function fetchAnomalies(): Promise<Anomaly[]> {
@@ -49,13 +49,13 @@ export default async function AnomaliesPage() {
   return (
     <main className="container mx-auto px-4 py-8 max-w-6xl space-y-6">
       <div>
-        <Link href="/admin/dashboard" className="text-xs text-iron-500 hover:text-iron-700">
+        <Link href="/admin/dashboard" className="text-xs text-ink-500 hover:text-ink-700">
           ← Admin
         </Link>
-        <h1 className="font-display text-3xl font-semibold text-iron-900 dark:text-iron-50 mt-2">
+        <h1 className="font-display text-3xl font-semibold text-ink-900 dark:text-ink-50 mt-2">
           Wykrywanie anomalii
         </h1>
-        <p className="text-sm text-iron-500 mt-1">
+        <p className="text-sm text-ink-500 mt-1">
           Automatyczne wykrywanie odchyleń od baseline w kluczowych metrykach (z-score &gt; 2σ).
         </p>
       </div>
@@ -83,7 +83,7 @@ export default async function AnomaliesPage() {
         </CardHeader>
         <CardContent>
           {anomalies.length === 0 ? (
-            <p className="text-sm text-iron-500">Brak anomalii — system działa stabilnie.</p>
+            <p className="text-sm text-ink-500">Brak anomalii — system działa stabilnie.</p>
           ) : (
             <ul className="space-y-2">
               {anomalies.map((a) => (
@@ -102,7 +102,7 @@ function AnomalyRow({ anomaly, compact = false }: { anomaly: Anomaly; compact?: 
   const deltaPct =
     anomaly.baseline_value !== 0 ? (delta / anomaly.baseline_value) * 100 : 0;
   return (
-    <li className="rounded-lg border border-iron-200 dark:border-iron-800 p-3">
+    <li className="rounded-lg border border-ink-200 dark:border-ink-800 p-3">
       <div className="flex flex-wrap items-baseline justify-between gap-2 mb-1">
         <div className="flex items-center gap-2">
           <span
@@ -110,7 +110,7 @@ function AnomalyRow({ anomaly, compact = false }: { anomaly: Anomaly; compact?: 
           >
             {anomaly.severity}
           </span>
-          <code className="font-mono text-sm text-iron-900 dark:text-iron-50">
+          <code className="font-mono text-sm text-ink-900 dark:text-ink-50">
             {anomaly.metric}
           </code>
           <span
@@ -119,11 +119,11 @@ function AnomalyRow({ anomaly, compact = false }: { anomaly: Anomaly; compact?: 
             {anomaly.status}
           </span>
         </div>
-        <span className="text-xs text-iron-500">
+        <span className="text-xs text-ink-500">
           {new Date(anomaly.detected_at).toLocaleString("pl-PL")}
         </span>
       </div>
-      <div className="text-sm text-iron-700 dark:text-iron-300">
+      <div className="text-sm text-ink-700 dark:text-ink-300">
         Baseline:{" "}
         <span className="font-mono">{anomaly.baseline_value.toLocaleString("pl-PL")}</span> →
         Obserwowane:{" "}
@@ -140,12 +140,12 @@ function AnomalyRow({ anomaly, compact = false }: { anomaly: Anomaly; compact?: 
         </span>
       </div>
       {!compact && anomaly.hypothesis && (
-        <div className="text-xs text-iron-600 dark:text-iron-400 mt-1">
+        <div className="text-xs text-ink-600 dark:text-ink-400 mt-1">
           <strong>Hipoteza:</strong> {anomaly.hypothesis}
         </div>
       )}
       {!compact && anomaly.related_deploy_id && (
-        <div className="text-xs text-iron-500 mt-1">
+        <div className="text-xs text-ink-500 mt-1">
           Powiązany deploy:{" "}
           <code className="font-mono">{anomaly.related_deploy_id.slice(0, 8)}</code>
         </div>

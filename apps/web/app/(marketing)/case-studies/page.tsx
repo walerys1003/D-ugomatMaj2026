@@ -102,16 +102,16 @@ export default async function CaseStudiesPage({
     : CASES;
 
   return (
-    <main className="bg-iron-50 dark:bg-iron-950 pb-20">
-      <section className="bg-white dark:bg-iron-900 border-b border-iron-200 dark:border-iron-800">
+    <main className="bg-ink-50 dark:bg-ink-950 pb-20">
+      <section className="bg-white dark:bg-ink-900 border-b border-ink-200 dark:border-ink-800">
         <div className="container mx-auto px-4 py-12 max-w-4xl">
-          <p className="text-xs uppercase tracking-wider text-iron-500 mb-2">
+          <p className="text-xs uppercase tracking-wider text-ink-500 mb-2">
             Dowody, nie deklaracje
           </p>
-          <h1 className="font-display text-4xl md:text-5xl font-semibold text-iron-900 dark:text-iron-50">
+          <h1 className="font-display text-4xl md:text-5xl font-semibold text-ink-900 dark:text-ink-50">
             Case studies
           </h1>
-          <p className="text-lg text-iron-600 dark:text-iron-300 mt-3 max-w-2xl">
+          <p className="text-lg text-ink-600 dark:text-ink-300 mt-3 max-w-2xl">
             Realne wdrożenia, mierzalne KPI, weryfikowalne wyniki. Każde case study
             potwierdzone przez klienta.
           </p>
@@ -131,8 +131,8 @@ export default async function CaseStudiesPage({
                 href={href}
                 className={`text-sm px-3 py-1.5 rounded-full border transition focus:outline-none focus-visible:shadow-shield-focus ${
                   active
-                    ? "border-iron-900 dark:border-iron-50 bg-iron-900 dark:bg-iron-50 text-iron-50 dark:text-iron-900"
-                    : "border-iron-300 dark:border-iron-700 text-iron-700 dark:text-iron-300 hover:border-iron-400"
+                    ? "border-ink-900 dark:border-ink-50 bg-ink-900 dark:bg-ink-50 text-ink-50 dark:text-ink-900"
+                    : "border-ink-300 dark:border-ink-700 text-ink-700 dark:text-ink-300 hover:border-ink-400"
                 }`}
               >
                 {f.label}
@@ -150,10 +150,10 @@ export default async function CaseStudiesPage({
               >
                 <CardHeader>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-iron-100 dark:bg-iron-800 text-iron-700 dark:text-iron-300">
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-ink-100 dark:bg-ink-800 text-ink-700 dark:text-ink-300">
                       {KIND_LABELS[c.client_kind]}
                     </span>
-                    <span className="text-xs text-iron-500">{c.industry}</span>
+                    <span className="text-xs text-ink-500">{c.industry}</span>
                   </div>
                   <CardTitle className="text-lg" dangerouslySetInnerHTML={{ __html: c.client_name }} />
                 </CardHeader>
@@ -162,17 +162,17 @@ export default async function CaseStudiesPage({
                     <div className="font-display text-2xl font-semibold text-accent-700">
                       {c.result_metric}
                     </div>
-                    <div className="text-xs text-iron-500 uppercase tracking-wider">
+                    <div className="text-xs text-ink-500 uppercase tracking-wider">
                       {c.result_label}
                     </div>
                   </div>
-                  <p className="font-display text-base font-medium text-iron-900 dark:text-iron-50">
+                  <p className="font-display text-base font-medium text-ink-900 dark:text-ink-50">
                     {c.headline}
                   </p>
-                  <p className="text-sm text-iron-600 dark:text-iron-400 line-clamp-2">
+                  <p className="text-sm text-ink-600 dark:text-ink-400 line-clamp-2">
                     {c.summary}
                   </p>
-                  <div className="text-xs text-iron-500 flex items-center justify-between pt-2 border-t border-iron-100 dark:border-iron-900">
+                  <div className="text-xs text-ink-500 flex items-center justify-between pt-2 border-t border-ink-100 dark:border-ink-900">
                     <span>Wdrożenie: {c.duration_months} mies.</span>
                     <span>Czytaj →</span>
                   </div>
@@ -184,7 +184,7 @@ export default async function CaseStudiesPage({
 
         {filtered.length === 0 && (
           <Card elevation="subtle">
-            <CardContent className="pt-6 text-sm text-iron-500">
+            <CardContent className="pt-6 text-sm text-ink-500">
               Brak case studies w tej kategorii.
             </CardContent>
           </Card>

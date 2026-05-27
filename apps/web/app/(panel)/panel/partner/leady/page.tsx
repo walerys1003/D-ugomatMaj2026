@@ -37,7 +37,7 @@ const STATUS_BADGE: Record<Lead["status"], string> = {
   contacted: "bg-warn-50 text-warn-700 border-warn-200",
   qualified: "bg-warn-50 text-warn-700 border-warn-200",
   converted: "bg-accent-50 text-accent-700 border-accent-200",
-  lost: "bg-iron-100 text-iron-600 border-iron-200",
+  lost: "bg-ink-100 text-ink-600 border-ink-200",
 };
 
 const STATUS_LABEL: Record<Lead["status"], string> = {
@@ -69,13 +69,13 @@ export default async function LeadyPage({
   return (
     <main className="container mx-auto px-4 py-8 max-w-6xl space-y-6">
       <div>
-        <Link href="/panel/partner" className="text-xs text-iron-500 hover:text-iron-700">
+        <Link href="/panel/partner" className="text-xs text-ink-500 hover:text-ink-700">
           ← Panel partnera
         </Link>
-        <h1 className="font-display text-3xl font-semibold text-iron-900 dark:text-iron-50 mt-2">
+        <h1 className="font-display text-3xl font-semibold text-ink-900 dark:text-ink-50 mt-2">
           Leady
         </h1>
-        <p className="text-sm text-iron-500 mt-1">
+        <p className="text-sm text-ink-500 mt-1">
           {leads.length} leadów w widoku · {newCount} oczekuje na pierwszy kontakt
         </p>
       </div>
@@ -92,8 +92,8 @@ export default async function LeadyPage({
               href={href}
               className={`text-sm px-3 py-1.5 rounded-full border transition ${
                 active
-                  ? "border-iron-900 dark:border-iron-50 bg-iron-900 dark:bg-iron-50 text-iron-50 dark:text-iron-900"
-                  : "border-iron-300 dark:border-iron-700 text-iron-700 dark:text-iron-300 hover:border-iron-400"
+                  ? "border-ink-900 dark:border-ink-50 bg-ink-900 dark:bg-ink-50 text-ink-50 dark:text-ink-900"
+                  : "border-ink-300 dark:border-ink-700 text-ink-700 dark:text-ink-300 hover:border-ink-400"
               }`}
             >
               {opt.label}
@@ -108,7 +108,7 @@ export default async function LeadyPage({
         </CardHeader>
         <CardContent>
           {leads.length === 0 ? (
-            <div className="space-y-3 text-sm text-iron-500">
+            <div className="space-y-3 text-sm text-ink-500">
               <p>Brak leadów w tym widoku.</p>
               <Link href="/panel/partner/materialy">
                 <Button variant="secondary">Pobierz link partnerski</Button>
@@ -118,7 +118,7 @@ export default async function LeadyPage({
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-left border-b border-iron-200 dark:border-iron-800 text-xs uppercase tracking-wider text-iron-500">
+                  <tr className="text-left border-b border-ink-200 dark:border-ink-800 text-xs uppercase tracking-wider text-ink-500">
                     <th className="py-2 pr-3">Firma / kontakt</th>
                     <th className="py-2 pr-3">Status</th>
                     <th className="py-2 pr-3">Plan</th>
@@ -129,12 +129,12 @@ export default async function LeadyPage({
                 </thead>
                 <tbody>
                   {leads.map((l) => (
-                    <tr key={l.id} className="border-b border-iron-100 dark:border-iron-900">
+                    <tr key={l.id} className="border-b border-ink-100 dark:border-ink-900">
                       <td className="py-3 pr-3">
-                        <div className="font-medium text-iron-900 dark:text-iron-50">
+                        <div className="font-medium text-ink-900 dark:text-ink-50">
                           {l.company_name}
                         </div>
-                        <div className="text-xs text-iron-500">
+                        <div className="text-xs text-ink-500">
                           {l.contact_name} · {l.contact_email}
                         </div>
                       </td>
@@ -145,16 +145,16 @@ export default async function LeadyPage({
                           {STATUS_LABEL[l.status]}
                         </span>
                       </td>
-                      <td className="py-3 pr-3 capitalize text-iron-700 dark:text-iron-300">
+                      <td className="py-3 pr-3 capitalize text-ink-700 dark:text-ink-300">
                         {l.expected_plan}
                       </td>
-                      <td className="py-3 pr-3 font-medium text-iron-900 dark:text-iron-50">
+                      <td className="py-3 pr-3 font-medium text-ink-900 dark:text-ink-50">
                         {l.estimated_mrr_pln.toLocaleString("pl-PL")} zł
                       </td>
-                      <td className="py-3 pr-3 text-xs text-iron-500 font-mono">
+                      <td className="py-3 pr-3 text-xs text-ink-500 font-mono">
                         {l.source}
                       </td>
-                      <td className="py-3 pr-3 text-iron-500 text-xs">
+                      <td className="py-3 pr-3 text-ink-500 text-xs">
                         {l.last_activity_at
                           ? new Date(l.last_activity_at).toLocaleDateString("pl-PL")
                           : new Date(l.created_at).toLocaleDateString("pl-PL")}

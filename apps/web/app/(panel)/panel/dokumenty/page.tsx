@@ -63,13 +63,13 @@ export default async function DokumentyPage({
     <main className="container mx-auto px-4 py-8 max-w-6xl space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-xs uppercase tracking-wider text-iron-500 mb-2">
+          <p className="text-xs uppercase tracking-wider text-ink-500 mb-2">
             Repozytorium
           </p>
-          <h1 className="font-display text-3xl font-semibold text-iron-900 dark:text-iron-50">
+          <h1 className="font-display text-3xl font-semibold text-ink-900 dark:text-ink-50">
             Dokumenty
           </h1>
-          <p className="text-sm text-iron-500 mt-1">
+          <p className="text-sm text-ink-500 mt-1">
             {docs.length} dokumentów · pełnotekstowe wyszukiwanie po OCR
           </p>
         </div>
@@ -86,12 +86,12 @@ export default async function DokumentyPage({
               name="q"
               defaultValue={sp.q}
               placeholder="Szukaj w treści dokumentów (OCR)..."
-              className="rounded-lg border border-iron-300 dark:border-iron-700 bg-white dark:bg-iron-900 px-3 py-2 focus:outline-none focus-visible:shadow-shield-focus"
+              className="rounded-lg border border-ink-300 dark:border-ink-700 bg-white dark:bg-ink-900 px-3 py-2 focus:outline-none focus-visible:shadow-shield-focus"
             />
             <select
               name="kind"
               defaultValue={sp.kind}
-              className="rounded-lg border border-iron-300 dark:border-iron-700 bg-white dark:bg-iron-900 px-3 py-2 focus:outline-none focus-visible:shadow-shield-focus"
+              className="rounded-lg border border-ink-300 dark:border-ink-700 bg-white dark:bg-ink-900 px-3 py-2 focus:outline-none focus-visible:shadow-shield-focus"
             >
               <option value="">Wszystkie typy</option>
               {Object.entries(KIND_LABELS).map(([k, v]) => (
@@ -110,12 +110,12 @@ export default async function DokumentyPage({
       <Card elevation="subtle">
         <CardContent className="pt-6">
           {docs.length === 0 ? (
-            <p className="text-sm text-iron-500">Brak dokumentów.</p>
+            <p className="text-sm text-ink-500">Brak dokumentów.</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-left border-b border-iron-200 dark:border-iron-800 text-xs uppercase tracking-wider text-iron-500">
+                  <tr className="text-left border-b border-ink-200 dark:border-ink-800 text-xs uppercase tracking-wider text-ink-500">
                     <th className="py-2 pr-3">Dokument</th>
                     <th className="py-2 pr-3">Typ</th>
                     <th className="py-2 pr-3">Sprawa</th>
@@ -126,17 +126,17 @@ export default async function DokumentyPage({
                 </thead>
                 <tbody>
                   {docs.map((d) => (
-                    <tr key={d.id} className="border-b border-iron-100 dark:border-iron-900">
+                    <tr key={d.id} className="border-b border-ink-100 dark:border-ink-900">
                       <td className="py-3 pr-3">
-                        <div className="font-medium text-iron-900 dark:text-iron-50 truncate max-w-xs">
+                        <div className="font-medium text-ink-900 dark:text-ink-50 truncate max-w-xs">
                           {d.title}
                         </div>
-                        <div className="text-xs text-iron-500">
+                        <div className="text-xs text-ink-500">
                           {Math.round((d.size_kb / 1024) * 10) / 10} MB
                         </div>
                       </td>
                       <td className="py-3 pr-3">
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-iron-100 dark:bg-iron-800">
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-ink-100 dark:bg-ink-800">
                           {KIND_LABELS[d.kind]}
                         </span>
                       </td>
@@ -149,10 +149,10 @@ export default async function DokumentyPage({
                             {d.case_title}
                           </Link>
                         ) : (
-                          <span className="text-xs text-iron-400">—</span>
+                          <span className="text-xs text-ink-400">—</span>
                         )}
                       </td>
-                      <td className="py-3 pr-3 text-iron-600 dark:text-iron-400 text-xs">
+                      <td className="py-3 pr-3 text-ink-600 dark:text-ink-400 text-xs">
                         {new Date(d.uploaded_at).toLocaleDateString("pl-PL")}
                       </td>
                       <td className="py-3 pr-3">

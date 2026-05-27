@@ -208,7 +208,7 @@ export default async function SzczegolyWydarzeniaPage({ params }: { params: Para
                   {event.participants.map((p) => (
                     <li
                       key={p.name}
-                      className="flex items-center justify-between gap-3 p-3 rounded-md border border-iron-200 bg-white"
+                      className="flex items-center justify-between gap-3 p-3 rounded-md border border-ink-200 bg-white"
                     >
                       <div>
                         <div className="font-medium text-dlugomat-950 text-sm">{p.name}</div>
@@ -235,7 +235,7 @@ export default async function SzczegolyWydarzeniaPage({ params }: { params: Para
                     <li key={doc.id}>
                       <Link
                         href={`/panel/dokumenty/${doc.id}`}
-                        className="flex items-center justify-between gap-3 p-3 rounded-md border border-iron-200 bg-white hover:bg-dlugomat-50 focus-visible:shadow-shield-focus"
+                        className="flex items-center justify-between gap-3 p-3 rounded-md border border-ink-200 bg-white hover:bg-dlugomat-50 focus-visible:shadow-shield-focus"
                       >
                         <div className="flex items-center gap-3">
                           <FileText className="h-4 w-4 text-dlugomat-600" aria-hidden />

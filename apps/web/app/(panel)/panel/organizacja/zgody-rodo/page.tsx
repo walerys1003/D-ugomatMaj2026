@@ -86,7 +86,7 @@ export default function ZgodyRodoPage() {
         <h1 className="text-fluid-3xl font-bold tracking-tight text-dlugomat-900 dark:text-white">
           Zgody RODO
         </h1>
-        <p className="max-w-2xl text-fluid-base text-iron-600 dark:text-iron-300">
+        <p className="max-w-2xl text-fluid-base text-ink-600 dark:text-ink-300">
           Wszystkie zgody administratora organizacji w jednym miejscu.
           Pełna historia zmian dostępna w sekcji Audyt.
         </p>
@@ -139,7 +139,7 @@ export default function ZgodyRodoPage() {
             </CardHeader>
             <CardContent>
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <span className="text-fluid-xs text-iron-500">
+                <span className="text-fluid-xs text-ink-500">
                   {c.granted
                     ? `Udzielona przez ${c.signed_by} · ${c.signed_at}`
                     : "Możesz udzielić zgody w każdej chwili."}

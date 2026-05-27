@@ -117,13 +117,13 @@ export default function AiAsystentHistoriaPage() {
   return (
     <div className="space-y-8">
       <header className="space-y-2">
-        <p className="text-xs uppercase tracking-[0.18em] text-iron-500">
+        <p className="text-xs uppercase tracking-[0.18em] text-ink-500">
           AI asystent · historia
         </p>
         <h1 className="font-display text-fluid-h1 text-dlugomat-950">
           Twoje rozmowy
         </h1>
-        <p className="max-w-2xl text-iron-600">
+        <p className="max-w-2xl text-ink-600">
           Wszystkie rozmowy z asystentem prawnym. Możesz wrócić do dowolnej,
           kontynuować lub przypiąć ją na górze listy.
         </p>
@@ -169,7 +169,7 @@ export default function AiAsystentHistoriaPage() {
             <input
               type="search"
               placeholder="np. komornik wynagrodzenie"
-              className="flex-1 rounded-md border border-iron-300 bg-white px-3 py-2 text-sm focus:border-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus"
+              className="flex-1 rounded-md border border-ink-300 bg-white px-3 py-2 text-sm focus:border-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus"
             />
             <Button type="submit">Szukaj</Button>
           </form>
@@ -216,7 +216,7 @@ function ConversationCard({ c }: { c: Conversation }) {
   return (
     <Link
       href={`/panel/ai-asystent?conv=${c.id}`}
-      className="group block rounded-lg border border-iron-200 bg-white p-5 shadow-card transition hover:shadow-pop focus-visible:outline-none focus-visible:shadow-shield-focus"
+      className="group block rounded-lg border border-ink-200 bg-white p-5 shadow-card transition hover:shadow-pop focus-visible:outline-none focus-visible:shadow-shield-focus"
     >
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
@@ -228,8 +228,8 @@ function ConversationCard({ c }: { c: Conversation }) {
               {c.topic}
             </Badge>
           </div>
-          <p className="mt-2 line-clamp-2 text-sm text-iron-600">{c.preview}</p>
-          <div className="mt-3 flex items-center gap-3 text-xs text-iron-500">
+          <p className="mt-2 line-clamp-2 text-sm text-ink-600">{c.preview}</p>
+          <div className="mt-3 flex items-center gap-3 text-xs text-ink-500">
             <span className="flex items-center gap-1">
               <Clock className="h-3 w-3" aria-hidden />
               {fmtRelative(c.last_message_at)}
@@ -239,7 +239,7 @@ function ConversationCard({ c }: { c: Conversation }) {
           </div>
         </div>
         <ArrowRight
-          className="h-5 w-5 flex-shrink-0 text-iron-400 group-hover:text-dlugomat-700"
+          className="h-5 w-5 flex-shrink-0 text-ink-400 group-hover:text-dlugomat-700"
           aria-hidden
         />
       </div>

@@ -47,7 +47,7 @@ export function StepPlanSplaty({
       noValidate
     >
       <Surface elevation="flat" padded="md" className="bg-dlugomat-50/60 dark:bg-dlugomat-900/40">
-        <p className="text-fluid-sm text-iron-700 dark:text-iron-200">
+        <p className="text-fluid-sm text-ink-700 dark:text-ink-200">
           Standardowy plan spłaty trwa <strong>36 miesięcy</strong> (Pr.up. art. 491¹⁴ ust. 1).
           Krótszy okres wymaga mocniejszego uzasadnienia. Wpisz kwotę, którą realistycznie jesteś
           w stanie spłacać po pokryciu kosztów utrzymania.
@@ -108,13 +108,13 @@ export function StepPlanSplaty({
         )}
       </div>
 
-      <label className="flex items-start gap-3 rounded-lg border border-iron-200 bg-card p-3 dark:border-iron-800">
+      <label className="flex items-start gap-3 rounded-lg border border-ink-200 bg-card p-3 dark:border-ink-800">
         <input
           type="checkbox"
           className="mt-0.5 size-4 accent-dlugomat-700"
           {...register("wnioskuje_umorzenie_reszty")}
         />
-        <span className="text-fluid-sm text-iron-700 dark:text-iron-200">
+        <span className="text-fluid-sm text-ink-700 dark:text-ink-200">
           Wnioskuję o <strong>umorzenie pozostałej części zobowiązań</strong> po zakończeniu planu
           spłaty (art. 491¹⁴ ust. 2 Pr.up.).
         </span>

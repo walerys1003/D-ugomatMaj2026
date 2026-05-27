@@ -33,7 +33,7 @@ export default async function RbacPage() {
       <header className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">RBAC fine-grained</h1>
-          <p className="text-iron-600 dark:text-iron-300">
+          <p className="text-ink-600 dark:text-ink-300">
             Polityki dziedziczenia ról (owner › admin › member › viewer) + ABAC.
           </p>
         </div>

@@ -83,16 +83,16 @@ export default function NotatkiPage() {
 
   return (
     <div className="space-y-6">
-      <Link href="/panel" className="inline-flex items-center gap-2 text-sm text-iron-600 hover:text-dlugomat-900">
+      <Link href="/panel" className="inline-flex items-center gap-2 text-sm text-ink-600 hover:text-dlugomat-900">
         <ArrowLeft className="h-4 w-4" aria-hidden />
         Powrot do panelu
       </Link>
 
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.18em] text-iron-500">Notatki</p>
+          <p className="text-xs uppercase tracking-[0.18em] text-ink-500">Notatki</p>
           <h1 className="font-display text-fluid-h1 text-dlugomat-950">Twoje notatki</h1>
-          <p className="mt-1 text-sm text-iron-600">
+          <p className="mt-1 text-sm text-ink-600">
             {NOTES.length} notatek, {pinned.length} przypietych.
           </p>
         </div>
@@ -105,11 +105,11 @@ export default function NotatkiPage() {
       <div className="flex flex-wrap items-center gap-3">
         <label className="relative flex-1 min-w-[260px]">
           <span className="sr-only">Szukaj w notatkach</span>
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-iron-400" aria-hidden />
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400" aria-hidden />
           <input
             type="search"
             placeholder="Szukaj po tresci, tagu lub sprawie..."
-            className="h-10 w-full rounded-md border border-iron-200 bg-white pl-10 pr-3 text-sm placeholder:text-iron-400 focus-visible:outline-none focus-visible:shadow-shield-focus"
+            className="h-10 w-full rounded-md border border-ink-200 bg-white pl-10 pr-3 text-sm placeholder:text-ink-400 focus-visible:outline-none focus-visible:shadow-shield-focus"
           />
         </label>
         <Button variant="secondary" size="sm">
@@ -120,7 +120,7 @@ export default function NotatkiPage() {
 
       {pinned.length > 0 && (
         <section aria-labelledby="pinned-heading">
-          <h2 id="pinned-heading" className="mb-3 flex items-center gap-2 text-sm font-medium text-iron-700">
+          <h2 id="pinned-heading" className="mb-3 flex items-center gap-2 text-sm font-medium text-ink-700">
             <Pin className="h-4 w-4" aria-hidden />
             Przypiete
           </h2>
@@ -133,7 +133,7 @@ export default function NotatkiPage() {
       )}
 
       <section aria-labelledby="others-heading">
-        <h2 id="others-heading" className="mb-3 text-sm font-medium text-iron-700">Pozostale</h2>
+        <h2 id="others-heading" className="mb-3 text-sm font-medium text-ink-700">Pozostale</h2>
         <div className="grid gap-4 md:grid-cols-2">
           {others.map((n) => (
             <NoteCard key={n.id} note={n} />
@@ -160,14 +160,14 @@ function NoteCard({ note }: { note: Note }) {
             <button
               type="button"
               aria-label={note.pinned ? "Odepnij notatke" : "Przypnij notatke"}
-              className="rounded p-1 text-iron-500 hover:text-dlugomat-900 focus-visible:outline-none focus-visible:shadow-shield-focus"
+              className="rounded p-1 text-ink-500 hover:text-dlugomat-900 focus-visible:outline-none focus-visible:shadow-shield-focus"
             >
               <Pin className={`h-4 w-4 ${note.pinned ? "fill-current" : ""}`} aria-hidden />
             </button>
             <button
               type="button"
               aria-label="Usun notatke"
-              className="rounded p-1 text-iron-500 hover:text-danger focus-visible:outline-none focus-visible:shadow-shield-focus"
+              className="rounded p-1 text-ink-500 hover:text-danger focus-visible:outline-none focus-visible:shadow-shield-focus"
             >
               <Trash2 className="h-4 w-4" aria-hidden />
             </button>
@@ -175,7 +175,7 @@ function NoteCard({ note }: { note: Note }) {
         </div>
       </CardHeader>
       <CardContent>
-        <p className="text-sm text-iron-700">{note.excerpt}</p>
+        <p className="text-sm text-ink-700">{note.excerpt}</p>
         <div className="mt-3 flex flex-wrap gap-1">
           {note.tags.map((t) => (
             <Badge key={t} tone="neutral">{t}</Badge>

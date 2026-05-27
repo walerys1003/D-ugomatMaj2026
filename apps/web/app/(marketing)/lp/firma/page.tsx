@@ -103,7 +103,7 @@ export default function LpFirmaPage() {
         </div>
       </section>
 
-      <section className="py-12 bg-white border-b border-iron-200">
+      <section className="py-12 bg-white border-b border-ink-200">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
             {PROOF_POINTS.map((p) => (
@@ -145,7 +145,7 @@ export default function LpFirmaPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-white border-y border-iron-200">
+      <section className="py-16 bg-white border-y border-ink-200">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <h2 className="font-display text-3xl text-dlugomat-950 mb-10 text-center">Rozwiazania dla branzy</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -192,7 +192,7 @@ export default function LpFirmaPage() {
                   </li>
                 ))}
               </ul>
-              <div className="mt-6 p-4 rounded-md bg-dlugomat-50 border border-iron-200 flex items-center gap-3">
+              <div className="mt-6 p-4 rounded-md bg-dlugomat-50 border border-ink-200 flex items-center gap-3">
                 <Clock className="h-5 w-5 text-accent-600 shrink-0" aria-hidden />
                 <p className="text-sm text-dlugomat-800">
                   Pierwsza rozmowa z zespolem komercyjnym w ciagu 24 godzin od zgloszenia. Bez sztywnego skryptu sprzedazowego.

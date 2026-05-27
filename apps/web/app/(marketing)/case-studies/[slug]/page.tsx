@@ -177,19 +177,19 @@ export default async function CaseStudyDetailPage({
   if (!c) notFound();
 
   return (
-    <main className="bg-iron-50 dark:bg-iron-950 pb-20">
-      <section className="bg-white dark:bg-iron-900 border-b border-iron-200 dark:border-iron-800">
+    <main className="bg-ink-50 dark:bg-ink-950 pb-20">
+      <section className="bg-white dark:bg-ink-900 border-b border-ink-200 dark:border-ink-800">
         <div className="container mx-auto px-4 py-12 max-w-4xl">
-          <Link href="/case-studies" className="text-xs text-iron-500 hover:text-iron-700">
+          <Link href="/case-studies" className="text-xs text-ink-500 hover:text-ink-700">
             ← Wszystkie case studies
           </Link>
           <div className="mt-3 flex flex-wrap items-center gap-2 mb-3">
-            <span className="text-xs px-2 py-0.5 rounded-full bg-iron-100 dark:bg-iron-800 text-iron-700 dark:text-iron-300">
+            <span className="text-xs px-2 py-0.5 rounded-full bg-ink-100 dark:bg-ink-800 text-ink-700 dark:text-ink-300">
               {KIND_LABELS[c.client_kind]}
             </span>
-            <span className="text-xs text-iron-500">{c.industry}</span>
+            <span className="text-xs text-ink-500">{c.industry}</span>
           </div>
-          <h1 className="font-display text-3xl md:text-5xl font-semibold text-iron-900 dark:text-iron-50">
+          <h1 className="font-display text-3xl md:text-5xl font-semibold text-ink-900 dark:text-ink-50">
             {c.client_name}
           </h1>
           <p className="font-display text-xl md:text-2xl text-accent-700 mt-3">
@@ -205,7 +205,7 @@ export default async function CaseStudyDetailPage({
               <CardTitle>Wyzwanie</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-iron-700 dark:text-iron-300 leading-relaxed">
+              <p className="text-ink-700 dark:text-ink-300 leading-relaxed">
                 {c.challenge}
               </p>
             </CardContent>
@@ -218,7 +218,7 @@ export default async function CaseStudyDetailPage({
             <CardContent>
               <ol className="space-y-3">
                 {c.solution.map((s, i) => (
-                  <li key={i} className="flex items-start gap-3 text-sm text-iron-700 dark:text-iron-300">
+                  <li key={i} className="flex items-start gap-3 text-sm text-ink-700 dark:text-ink-300">
                     <span className="flex-shrink-0 w-6 h-6 rounded-full bg-accent-100 dark:bg-accent-700/20 text-accent-700 flex items-center justify-center text-xs font-semibold">
                       {i + 1}
                     </span>
@@ -243,7 +243,7 @@ export default async function CaseStudyDetailPage({
                     <div className="font-display text-2xl font-semibold text-accent-700">
                       {r.metric}
                     </div>
-                    <div className="text-xs text-iron-600 dark:text-iron-400 mt-0.5">
+                    <div className="text-xs text-ink-600 dark:text-ink-400 mt-0.5">
                       {r.label}
                     </div>
                   </div>
@@ -254,11 +254,11 @@ export default async function CaseStudyDetailPage({
 
           <Card elevation="subtle">
             <CardContent className="pt-6">
-              <blockquote className="font-display text-lg text-iron-900 dark:text-iron-50 leading-relaxed border-l-4 border-accent-600 pl-4">
+              <blockquote className="font-display text-lg text-ink-900 dark:text-ink-50 leading-relaxed border-l-4 border-accent-600 pl-4">
                 "{c.testimonial.quote}"
               </blockquote>
-              <div className="text-sm text-iron-600 dark:text-iron-400 mt-3 pl-5">
-                <strong className="text-iron-900 dark:text-iron-50">
+              <div className="text-sm text-ink-600 dark:text-ink-400 mt-3 pl-5">
+                <strong className="text-ink-900 dark:text-ink-50">
                   {c.testimonial.author}
                 </strong>{" "}
                 · {c.testimonial.role}
@@ -274,20 +274,20 @@ export default async function CaseStudyDetailPage({
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
               <div>
-                <div className="text-xs uppercase tracking-wider text-iron-500">Czas wdrożenia</div>
-                <div className="font-medium text-iron-900 dark:text-iron-50">
+                <div className="text-xs uppercase tracking-wider text-ink-500">Czas wdrożenia</div>
+                <div className="font-medium text-ink-900 dark:text-ink-50">
                   {c.duration_months} {c.duration_months === 1 ? "miesiąc" : "miesięcy"}
                 </div>
               </div>
               <div>
-                <div className="text-xs uppercase tracking-wider text-iron-500 mt-2">
+                <div className="text-xs uppercase tracking-wider text-ink-500 mt-2">
                   Użyte moduły
                 </div>
                 <div className="flex flex-wrap gap-1.5 mt-1">
                   {c.modules_used.map((m) => (
                     <span
                       key={m}
-                      className="text-xs px-2 py-0.5 rounded-full bg-iron-100 dark:bg-iron-800 text-iron-700 dark:text-iron-300"
+                      className="text-xs px-2 py-0.5 rounded-full bg-ink-100 dark:bg-ink-800 text-ink-700 dark:text-ink-300"
                     >
                       {m}
                     </span>
@@ -299,7 +299,7 @@ export default async function CaseStudyDetailPage({
 
           <Card elevation="pop">
             <CardContent className="pt-5 space-y-3">
-              <h3 className="font-display font-semibold text-iron-900 dark:text-iron-50">
+              <h3 className="font-display font-semibold text-ink-900 dark:text-ink-50">
                 Chcesz podobne wyniki?
               </h3>
               <Link href="/kontakt?temat=demo">

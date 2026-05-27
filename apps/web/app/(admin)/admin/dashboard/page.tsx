@@ -30,7 +30,7 @@ function formatPLN(grosze: number): string {
 function TrendBadge({ value }: { value: number }) {
   if (value === 0) {
     return (
-      <span className="inline-flex items-center gap-1 text-fluid-xs text-iron-500">
+      <span className="inline-flex items-center gap-1 text-fluid-xs text-ink-500">
         <Minus className="h-3 w-3" />
         bez zmian
       </span>
@@ -84,10 +84,10 @@ export default async function AdminDashboardV2Page() {
         <p className="text-fluid-sm font-semibold uppercase tracking-wider text-dlugomat-600">
           Compliance Console
         </p>
-        <h1 className="text-fluid-3xl font-bold tracking-tight text-iron-900 dark:text-white">
+        <h1 className="text-fluid-3xl font-bold tracking-tight text-ink-900 dark:text-white">
           Dashboard administracyjny
         </h1>
-        <p className="text-fluid-base text-iron-600 dark:text-iron-300">
+        <p className="text-fluid-base text-ink-600 dark:text-ink-300">
           Real-time KPI · ostatnia aktualizacja{" "}
           {new Date(realtime.computed_at).toLocaleTimeString("pl-PL")}
         </p>
@@ -96,7 +96,7 @@ export default async function AdminDashboardV2Page() {
       {/* Alerty */}
       {alerts.length > 0 && (
         <section aria-labelledby="alerts-heading" className="flex flex-col gap-3">
-          <h2 id="alerts-heading" className="text-fluid-lg font-semibold text-iron-900 dark:text-white">
+          <h2 id="alerts-heading" className="text-fluid-lg font-semibold text-ink-900 dark:text-white">
             Status systemu
           </h2>
           <div className="flex flex-wrap gap-3">
@@ -125,7 +125,7 @@ export default async function AdminDashboardV2Page() {
       {/* Real-time KPI */}
       <section aria-labelledby="rt-heading" className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
-          <h2 id="rt-heading" className="text-fluid-lg font-semibold text-iron-900 dark:text-white">
+          <h2 id="rt-heading" className="text-fluid-lg font-semibold text-ink-900 dark:text-white">
             Ostatnia godzina
           </h2>
           <TrendBadge value={realtime.cases_trend} />
@@ -138,8 +138,8 @@ export default async function AdminDashboardV2Page() {
                   <c.icon className="h-5 w-5" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-fluid-xs text-iron-500">{c.label}</span>
-                  <span className="text-fluid-xl font-bold text-iron-900 dark:text-white">{c.value}</span>
+                  <span className="text-fluid-xs text-ink-500">{c.label}</span>
+                  <span className="text-fluid-xl font-bold text-ink-900 dark:text-white">{c.value}</span>
                 </div>
               </CardContent>
             </Card>
@@ -149,7 +149,7 @@ export default async function AdminDashboardV2Page() {
 
       {/* Stan kolejki */}
       <section aria-labelledby="queue-heading" className="flex flex-col gap-3">
-        <h2 id="queue-heading" className="flex items-center gap-2 text-fluid-lg font-semibold text-iron-900 dark:text-white">
+        <h2 id="queue-heading" className="flex items-center gap-2 text-fluid-lg font-semibold text-ink-900 dark:text-white">
           <Zap className="h-5 w-5 text-amber-500" />
           Stan kolejek
         </h2>
@@ -157,8 +157,8 @@ export default async function AdminDashboardV2Page() {
           {queueCards.map((c) => (
             <Card key={c.label}>
               <CardContent className="pt-6">
-                <span className="block text-fluid-xs text-iron-500">{c.label}</span>
-                <span className="mt-1 block text-fluid-xl font-bold text-iron-900 dark:text-white">{c.value}</span>
+                <span className="block text-fluid-xs text-ink-500">{c.label}</span>
+                <span className="mt-1 block text-fluid-xl font-bold text-ink-900 dark:text-white">{c.value}</span>
               </CardContent>
             </Card>
           ))}
@@ -167,7 +167,7 @@ export default async function AdminDashboardV2Page() {
 
       {/* Business KPI */}
       <section aria-labelledby="biz-heading" className="flex flex-col gap-3">
-        <h2 id="biz-heading" className="flex items-center gap-2 text-fluid-lg font-semibold text-iron-900 dark:text-white">
+        <h2 id="biz-heading" className="flex items-center gap-2 text-fluid-lg font-semibold text-ink-900 dark:text-white">
           <Activity className="h-5 w-5 text-emerald-500" />
           Wskaźniki biznesowe (30d)
         </h2>
@@ -175,15 +175,15 @@ export default async function AdminDashboardV2Page() {
           {businessCards.map((c) => (
             <Card key={c.label}>
               <CardContent className="pt-6">
-                <span className="block text-fluid-xs text-iron-500">{c.label}</span>
-                <span className="mt-1 block text-fluid-xl font-bold text-iron-900 dark:text-white">{c.value}</span>
+                <span className="block text-fluid-xs text-ink-500">{c.label}</span>
+                <span className="mt-1 block text-fluid-xl font-bold text-ink-900 dark:text-white">{c.value}</span>
               </CardContent>
             </Card>
           ))}
         </div>
       </section>
 
-      <p className="text-fluid-xs text-iron-400">
+      <p className="text-fluid-xs text-ink-400">
         Auto-refresh co 60s · cache: dynamic · źródło: Supabase
       </p>
     </div>

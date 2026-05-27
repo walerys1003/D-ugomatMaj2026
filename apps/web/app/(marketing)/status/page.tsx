@@ -80,8 +80,8 @@ const STATUS_CONFIG: Record<
   },
   unconfigured: {
     label: "Nie skonfigurowany",
-    dot: "bg-iron-300",
-    banner: "border-iron-200 bg-iron-50 text-iron-700",
+    dot: "bg-ink-300",
+    banner: "border-ink-200 bg-ink-50 text-ink-700",
     description: "Komponent nieustawiony — środowisko deweloperskie.",
   },
   down: {
@@ -101,7 +101,7 @@ export default async function StatusPage() {
         <h1 className="text-3xl font-semibold text-dlugomat-900">
           Status systemu
         </h1>
-        <p className="mt-4 text-iron-600">
+        <p className="mt-4 text-ink-600">
           Nie udało się pobrać aktualnego statusu. Spróbuj odświeżyć stronę
           za chwilę.
         </p>
@@ -119,7 +119,7 @@ export default async function StatusPage() {
         <h1 className="text-3xl font-semibold tracking-tight text-dlugomat-900 sm:text-4xl">
           Status systemu
         </h1>
-        <p className="text-iron-600">
+        <p className="text-ink-600">
           Sprawdzane co 30 sekund. Ostatnia aktualizacja:{" "}
           <time dateTime={status.checked_at} className="font-medium">
             {new Date(status.checked_at).toLocaleString("pl-PL")}
@@ -154,18 +154,18 @@ export default async function StatusPage() {
                       className={`inline-block h-2.5 w-2.5 rounded-full ${cfg.dot}`}
                     />
                     <div>
-                      <p className="font-medium text-iron-900">{c.name}</p>
+                      <p className="font-medium text-ink-900">{c.name}</p>
                       {c.detail ? (
-                        <p className="text-xs text-iron-500">{c.detail}</p>
+                        <p className="text-xs text-ink-500">{c.detail}</p>
                       ) : null}
                     </div>
                   </div>
                   <div className="flex flex-col items-end gap-0.5">
-                    <span className="text-sm font-medium text-iron-700">
+                    <span className="text-sm font-medium text-ink-700">
                       {cfg.label}
                     </span>
                     {typeof c.latency_ms === "number" ? (
-                      <span className="text-xs text-iron-500 tabular-nums">
+                      <span className="text-xs text-ink-500 tabular-nums">
                         {c.latency_ms} ms
                       </span>
                     ) : null}
@@ -177,9 +177,9 @@ export default async function StatusPage() {
         </div>
       </section>
 
-      <section className="mt-12 space-y-3 rounded-lg border border-iron-200 bg-white p-6">
+      <section className="mt-12 space-y-3 rounded-lg border border-ink-200 bg-white p-6">
         <h3 className="font-semibold text-dlugomat-900">Coś nie działa?</h3>
-        <p className="text-sm text-iron-600">
+        <p className="text-sm text-ink-600">
           Jeśli widzisz problem mimo zielonego statusu, napisz do nas:{" "}
           <a
             href="mailto:kontakt@dlugomat.pl"
@@ -189,7 +189,7 @@ export default async function StatusPage() {
           </a>
           . Zwykle odpowiadamy w ciągu kilku godzin.
         </p>
-        <p className="text-xs text-iron-500">
+        <p className="text-xs text-ink-500">
           Środowisko: {status.env} · serwis: {status.service}
         </p>
       </section>

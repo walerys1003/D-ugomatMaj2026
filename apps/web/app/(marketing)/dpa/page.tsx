@@ -156,16 +156,16 @@ const SECTIONS: readonly Section[] = [
           poinformować Administratora o zamiarze dodania lub zmiany
           subprocesora z 30-dniowym wyprzedzeniem (e-mail).
         </p>
-        <div className="overflow-x-auto rounded-lg border border-iron-200 dark:border-dlugomat-700">
+        <div className="overflow-x-auto rounded-lg border border-ink-200 dark:border-dlugomat-700">
           <table className="w-full text-fluid-xs">
-            <thead className="bg-iron-50 dark:bg-dlugomat-800">
+            <thead className="bg-ink-50 dark:bg-dlugomat-800">
               <tr>
                 <th className="p-2 text-left">Subprocesor</th>
                 <th className="p-2 text-left">Cel</th>
                 <th className="p-2 text-left">Lokalizacja</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-iron-200 dark:divide-dlugomat-700">
+            <tbody className="divide-y divide-ink-200 dark:divide-dlugomat-700">
               <tr>
                 <td className="p-2">Supabase Inc.</td>
                 <td className="p-2">Hosting bazy danych + auth + storage</td>
@@ -315,10 +315,10 @@ export default function DpaPage() {
         <Badge variant="outline">RODO art. 28</Badge>
       </div>
 
-      <h1 className="text-fluid-3xl font-extrabold tracking-tight text-iron-900 dark:text-iron-50">
+      <h1 className="text-fluid-3xl font-extrabold tracking-tight text-ink-900 dark:text-ink-50">
         Umowa powierzenia przetwarzania danych (DPA)
       </h1>
-      <p className="mt-3 text-fluid-base text-iron-600 dark:text-iron-300">
+      <p className="mt-3 text-fluid-base text-ink-600 dark:text-ink-300">
         Szablon umowy dla kancelarii prawnych, biur rachunkowych i doradców,
         którzy korzystają z Długomatu w imieniu swoich klientów. Zgodne
         z art. 28 RODO.
@@ -368,13 +368,13 @@ export default function DpaPage() {
             id={s.num.toLowerCase().replace(/[^a-z0-9]/g, "-")}
             className="border-l-2 border-dlugomat-300 pl-5 dark:border-dlugomat-600"
           >
-            <h2 className="text-fluid-xl font-bold text-iron-900 dark:text-iron-50">
+            <h2 className="text-fluid-xl font-bold text-ink-900 dark:text-ink-50">
               <span className="font-mono text-dlugomat-700 dark:text-dlugomat-300">
                 {s.num}
               </span>{" "}
               {s.title}
             </h2>
-            <div className="mt-3 space-y-3 text-fluid-sm text-iron-700 dark:text-iron-200">
+            <div className="mt-3 space-y-3 text-fluid-sm text-ink-700 dark:text-ink-200">
               {s.body}
             </div>
           </section>
@@ -385,10 +385,10 @@ export default function DpaPage() {
         <div className="flex items-start gap-3">
           <Shield className="h-6 w-6 shrink-0 text-dlugomat-700 dark:text-dlugomat-300" />
           <div>
-            <h3 className="text-fluid-lg font-semibold text-iron-900 dark:text-iron-50">
+            <h3 className="text-fluid-lg font-semibold text-ink-900 dark:text-ink-50">
               Kontakt z IOD (Inspektorem Ochrony Danych)
             </h3>
-            <p className="mt-2 text-fluid-sm text-iron-700 dark:text-iron-200">
+            <p className="mt-2 text-fluid-sm text-ink-700 dark:text-ink-200">
               Wszelkie pytania dotyczące umowy powierzenia, audytu lub
               naruszeń kieruj na adres:{" "}
               <a
@@ -402,7 +402,7 @@ export default function DpaPage() {
         </div>
       </div>
 
-      <p className="mt-12 text-fluid-xs text-iron-500 dark:text-iron-400">
+      <p className="mt-12 text-fluid-xs text-ink-500 dark:text-ink-400">
         Ostatnia aktualizacja: 10 maja 2026 r. — wersja 1.0. Zmiany szablonu
         obowiązują od daty publikacji; obowiązujące podpisane DPA pozostają
         w mocy do czasu zawarcia aneksu.

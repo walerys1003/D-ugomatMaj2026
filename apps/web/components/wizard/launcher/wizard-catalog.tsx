@@ -71,9 +71,9 @@ export function WizardCatalog({ items, modules, csrfToken }: Props) {
   return (
     <div className="space-y-6">
       {/* Filters bar */}
-      <div className="sticky top-2 z-10 rounded-xl border border-iron-200 dark:border-dlugomat-800 bg-white/95 dark:bg-dlugomat-900/95 backdrop-blur p-3 grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+      <div className="sticky top-2 z-10 rounded-xl border border-ink-200 dark:border-dlugomat-800 bg-white/95 dark:bg-dlugomat-900/95 backdrop-blur p-3 grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
         <label className="flex flex-col gap-1 text-xs md:col-span-4">
-          <span className="font-medium text-iron-600 dark:text-iron-300">
+          <span className="font-medium text-ink-600 dark:text-ink-300">
             Szukaj
           </span>
           <input
@@ -81,15 +81,15 @@ export function WizardCatalog({ items, modules, csrfToken }: Props) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="np. komornik, sprzeciw, BIK..."
-            className="rounded-md border border-iron-300 dark:border-dlugomat-700 px-3 h-10 bg-transparent text-sm"
+            className="rounded-md border border-ink-300 dark:border-dlugomat-700 px-3 h-10 bg-transparent text-sm"
           />
         </label>
         <label className="flex flex-col gap-1 text-xs md:col-span-3">
-          <span className="font-medium text-iron-600 dark:text-iron-300">Moduł</span>
+          <span className="font-medium text-ink-600 dark:text-ink-300">Moduł</span>
           <select
             value={module}
             onChange={(e) => setModule(e.target.value)}
-            className="rounded-md border border-iron-300 dark:border-dlugomat-700 px-3 h-10 bg-transparent text-sm"
+            className="rounded-md border border-ink-300 dark:border-dlugomat-700 px-3 h-10 bg-transparent text-sm"
           >
             <option value="all">Wszystkie</option>
             {modules.map((m) => (
@@ -100,11 +100,11 @@ export function WizardCatalog({ items, modules, csrfToken }: Props) {
           </select>
         </label>
         <label className="flex flex-col gap-1 text-xs md:col-span-2">
-          <span className="font-medium text-iron-600 dark:text-iron-300">Status</span>
+          <span className="font-medium text-ink-600 dark:text-ink-300">Status</span>
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value as any)}
-            className="rounded-md border border-iron-300 dark:border-dlugomat-700 px-3 h-10 bg-transparent text-sm"
+            className="rounded-md border border-ink-300 dark:border-dlugomat-700 px-3 h-10 bg-transparent text-sm"
           >
             <option value="all">Wszystkie</option>
             <option value="live">Dostępne</option>
@@ -113,25 +113,25 @@ export function WizardCatalog({ items, modules, csrfToken }: Props) {
           </select>
         </label>
         <label className="flex flex-col gap-1 text-xs md:col-span-2">
-          <span className="font-medium text-iron-600 dark:text-iron-300">Sortuj</span>
+          <span className="font-medium text-ink-600 dark:text-ink-300">Sortuj</span>
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as SortKey)}
-            className="rounded-md border border-iron-300 dark:border-dlugomat-700 px-3 h-10 bg-transparent text-sm"
+            className="rounded-md border border-ink-300 dark:border-dlugomat-700 px-3 h-10 bg-transparent text-sm"
           >
             <option value="name">Alfabetycznie</option>
             <option value="price">Po cenie</option>
             <option value="deadline">Po terminie</option>
           </select>
         </label>
-        <div className="md:col-span-1 text-xs text-iron-600 dark:text-iron-300 text-right">
+        <div className="md:col-span-1 text-xs text-ink-600 dark:text-ink-300 text-right">
           {shown}/{total}
         </div>
       </div>
 
       {/* Results grid */}
       {filtered.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-iron-300 dark:border-dlugomat-700 p-8 text-center text-iron-500">
+        <div className="rounded-xl border border-dashed border-ink-300 dark:border-dlugomat-700 p-8 text-center text-ink-500">
           <p className="text-lg font-medium">Brak wyników</p>
           <p className="text-sm mt-1">
             Spróbuj zmienić filtry lub{" "}
@@ -170,12 +170,12 @@ function CatalogCard({
   return (
     <div
       className={
-        "rounded-xl border border-iron-200 dark:border-dlugomat-800 bg-white dark:bg-dlugomat-900 p-4 flex flex-col gap-3 " +
+        "rounded-xl border border-ink-200 dark:border-dlugomat-800 bg-white dark:bg-dlugomat-900 p-4 flex flex-col gap-3 " +
         (isLive ? "transition hover:shadow-lg" : "opacity-70")
       }
     >
       <header className="flex items-start justify-between gap-2">
-        <h3 className="font-serif text-base font-semibold text-iron-900 dark:text-iron-50">
+        <h3 className="font-serif text-base font-semibold text-ink-900 dark:text-ink-50">
           {item.shortTitle}
         </h3>
         <span
@@ -185,20 +185,20 @@ function CatalogCard({
               ? "bg-accent-100 text-accent-800"
               : item.status === "beta"
               ? "bg-warn-100 text-warn-800"
-              : "bg-iron-100 text-iron-700")
+              : "bg-ink-100 text-ink-700")
           }
         >
           {item.module}
         </span>
       </header>
-      <p className="text-sm text-iron-600 dark:text-iron-300 line-clamp-2 grow">
+      <p className="text-sm text-ink-600 dark:text-ink-300 line-clamp-2 grow">
         {item.description}
       </p>
       <div className="flex items-end justify-between gap-2">
         <div className="flex flex-col">
           <span className="text-sm font-medium tabular-nums">{price}</span>
           {item.deadlineDays && (
-            <span className="text-[11px] text-iron-500">
+            <span className="text-[11px] text-ink-500">
               termin: {item.deadlineDays} dni
             </span>
           )}
@@ -215,7 +215,7 @@ function CatalogCard({
             </button>
           </form>
         ) : (
-          <span className="text-xs text-iron-500 italic">Wkrótce</span>
+          <span className="text-xs text-ink-500 italic">Wkrótce</span>
         )}
       </div>
     </div>

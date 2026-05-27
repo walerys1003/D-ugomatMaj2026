@@ -42,7 +42,7 @@ export function StepNiewyplacalnosc({
       className="space-y-5"
       noValidate
     >
-      <div className="rounded-lg border border-shield-100 bg-shield-50/40 p-3 text-sm text-iron-700">
+      <div className="rounded-lg border border-shield-100 bg-shield-50/40 p-3 text-sm text-ink-700">
         Przyczyny niewypłacalności są kluczowe dla sądu — od nich zależy ocena
         moralności płatniczej (art. 491¹ ust. 1 i 491⁴ ust. 1 Pr.up.). Sąd może
         odmówić oddłużenia, jeśli niewypłacalność wynika z rażącego niedbalstwa.
@@ -72,7 +72,7 @@ export function StepNiewyplacalnosc({
                       className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 text-sm transition ${
                         checked
                           ? "border-shield-400 bg-shield-50/60"
-                          : "border-iron-200 hover:border-shield-200"
+                          : "border-ink-200 hover:border-shield-200"
                       }`}
                     >
                       <input
@@ -81,7 +81,7 @@ export function StepNiewyplacalnosc({
                         onChange={() => toggle(p.id)}
                         className="mt-0.5 h-4 w-4"
                       />
-                      <span className="text-iron-800">{p.label}</span>
+                      <span className="text-ink-800">{p.label}</span>
                     </label>
                   );
                 })}
@@ -106,7 +106,7 @@ export function StepNiewyplacalnosc({
           aria-invalid={Boolean(errors.data_powstania_niewyplacalnosci)}
           {...register("data_powstania_niewyplacalnosci")}
         />
-        <p className="text-fluid-xs text-iron-600">
+        <p className="text-fluid-xs text-ink-600">
           Moment, w którym przestałeś regulować zobowiązania (art. 11 Pr.up.).
         </p>
         {errors.data_powstania_niewyplacalnosci?.message && (

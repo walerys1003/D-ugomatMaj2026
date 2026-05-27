@@ -133,13 +133,13 @@ export default function KalendarzAgendaPage() {
     <div className="space-y-8">
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-2">
-          <p className="text-xs uppercase tracking-[0.18em] text-iron-500">
+          <p className="text-xs uppercase tracking-[0.18em] text-ink-500">
             Kalendarz · agenda
           </p>
           <h1 className="font-display text-fluid-h1 text-dlugomat-950">
             Najbliższe wydarzenia
           </h1>
-          <p className="max-w-2xl text-iron-600">
+          <p className="max-w-2xl text-ink-600">
             Chronologiczna lista terminów. Filtruj po typie, by skupić się na tym,
             co najpilniejsze.
           </p>
@@ -150,16 +150,16 @@ export default function KalendarzAgendaPage() {
         </Button>
       </header>
 
-      <nav aria-label="Widoki kalendarza" className="flex gap-1 rounded-md border border-iron-200 bg-iron-50 p-1 w-fit text-sm">
+      <nav aria-label="Widoki kalendarza" className="flex gap-1 rounded-md border border-ink-200 bg-ink-50 p-1 w-fit text-sm">
         <Link
           href="/panel/kalendarz"
-          className="rounded px-3 py-1.5 text-iron-700 hover:bg-white focus-visible:outline-none focus-visible:shadow-shield-focus"
+          className="rounded px-3 py-1.5 text-ink-700 hover:bg-white focus-visible:outline-none focus-visible:shadow-shield-focus"
         >
           Miesiąc
         </Link>
         <Link
           href="/panel/kalendarz/tydzien"
-          className="rounded px-3 py-1.5 text-iron-700 hover:bg-white focus-visible:outline-none focus-visible:shadow-shield-focus"
+          className="rounded px-3 py-1.5 text-ink-700 hover:bg-white focus-visible:outline-none focus-visible:shadow-shield-focus"
         >
           Tydzień
         </Link>
@@ -173,12 +173,12 @@ export default function KalendarzAgendaPage() {
           const { weekday, full } = fmtDate(date);
           return (
             <div key={date}>
-              <div className="mb-3 flex items-baseline gap-3 border-b border-iron-200 pb-2">
+              <div className="mb-3 flex items-baseline gap-3 border-b border-ink-200 pb-2">
                 <h2 className="font-display text-lg text-dlugomat-950">
                   {weekday[0].toUpperCase() + weekday.slice(1)}
                 </h2>
-                <span className="text-sm text-iron-500">{full}</span>
-                <span className="ml-auto text-xs text-iron-500">
+                <span className="text-sm text-ink-500">{full}</span>
+                <span className="ml-auto text-xs text-ink-500">
                   {items.length} {items.length === 1 ? "wydarzenie" : "wydarzeń"}
                 </span>
               </div>
@@ -188,7 +188,7 @@ export default function KalendarzAgendaPage() {
                     <Card>
                       <CardContent className="flex items-start gap-4 p-4">
                         <div className="flex flex-col items-center w-16 flex-shrink-0">
-                          <Clock className="h-4 w-4 text-iron-400" aria-hidden />
+                          <Clock className="h-4 w-4 text-ink-400" aria-hidden />
                           <span className="mt-1 font-mono text-sm font-semibold text-dlugomat-950">
                             {it.time}
                           </span>
@@ -201,8 +201,8 @@ export default function KalendarzAgendaPage() {
                             </Badge>
                           </div>
                           {it.location ? (
-                            <p className="mt-1 flex items-center gap-1 text-sm text-iron-600">
-                              <MapPin className="h-3.5 w-3.5 text-iron-400" aria-hidden />
+                            <p className="mt-1 flex items-center gap-1 text-sm text-ink-600">
+                              <MapPin className="h-3.5 w-3.5 text-ink-400" aria-hidden />
                               {it.location}
                             </p>
                           ) : null}

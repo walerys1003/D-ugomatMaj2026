@@ -94,7 +94,7 @@ export default async function SymulatorPage({ searchParams }: PageProps) {
       <div>
         <Link
           href="/panel/plan-splaty"
-          className="inline-flex items-center gap-2 text-sm text-iron-600 hover:text-dlugomat-900 focus-visible:outline-none focus-visible:shadow-shield-focus rounded"
+          className="inline-flex items-center gap-2 text-sm text-ink-600 hover:text-dlugomat-900 focus-visible:outline-none focus-visible:shadow-shield-focus rounded"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden />
           Wróć do planu spłaty
@@ -102,13 +102,13 @@ export default async function SymulatorPage({ searchParams }: PageProps) {
       </div>
 
       <header className="space-y-2">
-        <p className="text-xs uppercase tracking-[0.18em] text-iron-500">
+        <p className="text-xs uppercase tracking-[0.18em] text-ink-500">
           Plan spłaty · symulator
         </p>
         <h1 className="font-display text-fluid-h1 text-dlugomat-950">
           Zaplanuj harmonogram
         </h1>
-        <p className="max-w-2xl text-iron-600">
+        <p className="max-w-2xl text-ink-600">
           Wprowadź kwotę zadłużenia, liczbę rat i stopę procentową, aby zobaczyć
           szczegółowy harmonogram. Wyniki mają charakter informacyjny — finalne
           warunki ustalisz z wierzycielem.
@@ -126,7 +126,7 @@ export default async function SymulatorPage({ searchParams }: PageProps) {
         <CardContent>
           <form method="get" className="grid gap-4 sm:grid-cols-3">
             <label className="block">
-              <span className="block text-xs uppercase tracking-wide text-iron-500">
+              <span className="block text-xs uppercase tracking-wide text-ink-500">
                 Kwota zadłużenia (PLN)
               </span>
               <input
@@ -135,11 +135,11 @@ export default async function SymulatorPage({ searchParams }: PageProps) {
                 defaultValue={amount}
                 min={500}
                 step={100}
-                className="mt-1 w-full rounded-md border border-iron-300 bg-white px-3 py-2 text-sm focus:border-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus"
+                className="mt-1 w-full rounded-md border border-ink-300 bg-white px-3 py-2 text-sm focus:border-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus"
               />
             </label>
             <label className="block">
-              <span className="block text-xs uppercase tracking-wide text-iron-500">
+              <span className="block text-xs uppercase tracking-wide text-ink-500">
                 Liczba rat (miesięcy)
               </span>
               <input
@@ -148,11 +148,11 @@ export default async function SymulatorPage({ searchParams }: PageProps) {
                 defaultValue={months}
                 min={3}
                 max={120}
-                className="mt-1 w-full rounded-md border border-iron-300 bg-white px-3 py-2 text-sm focus:border-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus"
+                className="mt-1 w-full rounded-md border border-ink-300 bg-white px-3 py-2 text-sm focus:border-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus"
               />
             </label>
             <label className="block">
-              <span className="block text-xs uppercase tracking-wide text-iron-500">
+              <span className="block text-xs uppercase tracking-wide text-ink-500">
                 Stopa roczna (%)
               </span>
               <input
@@ -162,7 +162,7 @@ export default async function SymulatorPage({ searchParams }: PageProps) {
                 min={0}
                 max={25}
                 step={0.1}
-                className="mt-1 w-full rounded-md border border-iron-300 bg-white px-3 py-2 text-sm focus:border-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus"
+                className="mt-1 w-full rounded-md border border-ink-300 bg-white px-3 py-2 text-sm focus:border-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus"
               />
             </label>
             <div className="sm:col-span-3 flex justify-end">
@@ -220,14 +220,14 @@ export default async function SymulatorPage({ searchParams }: PageProps) {
                     className={`block rounded-lg border p-4 transition focus-visible:outline-none focus-visible:shadow-shield-focus ${
                       isCurrent
                         ? "border-dlugomat-700 bg-dlugomat-50"
-                        : "border-iron-200 bg-white hover:bg-iron-50"
+                        : "border-ink-200 bg-white hover:bg-ink-50"
                     }`}
                   >
-                    <p className="text-xs font-medium text-iron-600">{sc.label}</p>
+                    <p className="text-xs font-medium text-ink-600">{sc.label}</p>
                     <p className="mt-2 font-display text-lg text-dlugomat-950">
                       {fmtPLN(inst)}/mies.
                     </p>
-                    <p className="mt-1 text-xs text-iron-500">
+                    <p className="mt-1 text-xs text-ink-500">
                       <TrendingDown className="mr-0.5 inline h-3 w-3" aria-hidden />
                       odsetki: {fmtPLN(totalInt)}
                     </p>
@@ -251,8 +251,8 @@ export default async function SymulatorPage({ searchParams }: PageProps) {
         </CardHeader>
         <CardContent className="px-0">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-iron-200 text-sm">
-              <thead className="bg-iron-50 text-xs uppercase tracking-wide text-iron-600">
+            <table className="min-w-full divide-y divide-ink-200 text-sm">
+              <thead className="bg-ink-50 text-xs uppercase tracking-wide text-ink-600">
                 <tr>
                   <th className="px-4 py-2 text-left">#</th>
                   <th className="px-4 py-2 text-left">Data</th>
@@ -262,28 +262,28 @@ export default async function SymulatorPage({ searchParams }: PageProps) {
                   <th className="px-4 py-2 text-right">Pozostało</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-iron-100 bg-white">
+              <tbody className="divide-y divide-ink-100 bg-white">
                 {schedule.slice(0, 12).map((r) => (
                   <tr key={r.month}>
-                    <td className="px-4 py-2 font-mono text-xs text-iron-500">{r.month}</td>
-                    <td className="px-4 py-2 text-iron-700">{r.date}</td>
+                    <td className="px-4 py-2 font-mono text-xs text-ink-500">{r.month}</td>
+                    <td className="px-4 py-2 text-ink-700">{r.date}</td>
                     <td className="px-4 py-2 text-right font-semibold text-dlugomat-900">
                       {fmtPLN(r.installment)}
                     </td>
-                    <td className="px-4 py-2 text-right text-iron-700">
+                    <td className="px-4 py-2 text-right text-ink-700">
                       {fmtPLN(r.principal)}
                     </td>
                     <td className="px-4 py-2 text-right text-warn">
                       {fmtPLN(r.interest)}
                     </td>
-                    <td className="px-4 py-2 text-right text-iron-700">
+                    <td className="px-4 py-2 text-right text-ink-700">
                       {fmtPLN(r.remaining)}
                     </td>
                   </tr>
                 ))}
                 {schedule.length > 12 ? (
                   <tr>
-                    <td colSpan={6} className="px-4 py-3 text-center text-xs text-iron-500">
+                    <td colSpan={6} className="px-4 py-3 text-center text-xs text-ink-500">
                       …pozostałe {schedule.length - 12} rat ukryte. Pobierz pełny harmonogram poniżej.
                     </td>
                   </tr>

@@ -72,10 +72,10 @@ export default function KontaktPage() {
                   <CardTitle className="mt-3 text-fluid-lg">{c.title}</CardTitle>
                 </CardHeader>
                 <CardContent className="flex flex-1 flex-col gap-4">
-                  <p className="text-fluid-sm text-iron-600 dark:text-iron-300">
+                  <p className="text-fluid-sm text-ink-600 dark:text-ink-300">
                     {c.desc}
                   </p>
-                  <div className="mt-auto flex flex-col gap-2 border-t border-iron-100 pt-4 dark:border-dlugomat-800">
+                  <div className="mt-auto flex flex-col gap-2 border-t border-ink-100 pt-4 dark:border-dlugomat-800">
                     <a
                       href={`mailto:${c.email}`}
                       className="inline-flex items-center gap-2 rounded-md text-fluid-base font-semibold text-dlugomat-700 transition-colors hover:text-dlugomat-600 focus-visible:shadow-shield-focus focus-visible:outline-none dark:text-dlugomat-200"
@@ -83,7 +83,7 @@ export default function KontaktPage() {
                       <Mail className="size-4" aria-hidden />
                       {c.email}
                     </a>
-                    <span className="inline-flex items-center gap-1.5 text-fluid-xs text-iron-500">
+                    <span className="inline-flex items-center gap-1.5 text-fluid-xs text-ink-500">
                       <Clock className="size-3.5" aria-hidden />
                       {c.sla}
                     </span>
@@ -96,66 +96,66 @@ export default function KontaktPage() {
       </section>
 
       {/* COMPANY DETAILS */}
-      <section className="bg-iron-50/60 py-20 sm:py-24 dark:bg-dlugomat-950/40">
+      <section className="bg-ink-50/60 py-20 sm:py-24 dark:bg-dlugomat-950/40">
         <div className="container max-w-3xl">
           <h2 className="text-balance text-fluid-3xl font-bold tracking-tight text-dlugomat-900 dark:text-white">
             Dane rejestrowe
           </h2>
-          <div className="mt-8 rounded-xl border border-iron-200 bg-card p-6 sm:p-8 dark:border-dlugomat-800">
+          <div className="mt-8 rounded-xl border border-ink-200 bg-card p-6 sm:p-8 dark:border-dlugomat-800">
             <dl className="grid gap-4 sm:grid-cols-2">
               <div>
-                <dt className="text-fluid-xs font-semibold uppercase tracking-wider text-iron-500">
+                <dt className="text-fluid-xs font-semibold uppercase tracking-wider text-ink-500">
                   Podmiot prowadzący serwis
                 </dt>
-                <dd className="mt-1 text-fluid-base text-iron-800 dark:text-iron-100">
+                <dd className="mt-1 text-fluid-base text-ink-800 dark:text-ink-100">
                   Długomat sp. z o.o.
                 </dd>
               </div>
               <div>
-                <dt className="text-fluid-xs font-semibold uppercase tracking-wider text-iron-500">
+                <dt className="text-fluid-xs font-semibold uppercase tracking-wider text-ink-500">
                   Adres
                 </dt>
-                <dd className="mt-1 text-fluid-base text-iron-800 dark:text-iron-100">
+                <dd className="mt-1 text-fluid-base text-ink-800 dark:text-ink-100">
                   ul. Przykładowa 1<br />
                   00-001 Warszawa
                 </dd>
               </div>
               <div>
-                <dt className="text-fluid-xs font-semibold uppercase tracking-wider text-iron-500">
+                <dt className="text-fluid-xs font-semibold uppercase tracking-wider text-ink-500">
                   NIP
                 </dt>
-                <dd className="mt-1 font-mono text-fluid-base text-iron-800 dark:text-iron-100">
+                <dd className="mt-1 font-mono text-fluid-base text-ink-800 dark:text-ink-100">
                   000-000-00-00
                 </dd>
               </div>
               <div>
-                <dt className="text-fluid-xs font-semibold uppercase tracking-wider text-iron-500">
+                <dt className="text-fluid-xs font-semibold uppercase tracking-wider text-ink-500">
                   KRS
                 </dt>
-                <dd className="mt-1 font-mono text-fluid-base text-iron-800 dark:text-iron-100">
+                <dd className="mt-1 font-mono text-fluid-base text-ink-800 dark:text-ink-100">
                   0000000000
                 </dd>
               </div>
               <div>
-                <dt className="text-fluid-xs font-semibold uppercase tracking-wider text-iron-500">
+                <dt className="text-fluid-xs font-semibold uppercase tracking-wider text-ink-500">
                   REGON
                 </dt>
-                <dd className="mt-1 font-mono text-fluid-base text-iron-800 dark:text-iron-100">
+                <dd className="mt-1 font-mono text-fluid-base text-ink-800 dark:text-ink-100">
                   000000000
                 </dd>
               </div>
               <div>
-                <dt className="text-fluid-xs font-semibold uppercase tracking-wider text-iron-500">
+                <dt className="text-fluid-xs font-semibold uppercase tracking-wider text-ink-500">
                   Kapitał zakładowy
                 </dt>
-                <dd className="mt-1 text-fluid-base text-iron-800 dark:text-iron-100">
+                <dd className="mt-1 text-fluid-base text-ink-800 dark:text-ink-100">
                   5 000 zł
                 </dd>
               </div>
             </dl>
 
-            <div className="mt-6 rounded-lg border border-iron-100 bg-iron-50 p-4 text-fluid-sm text-iron-600 dark:border-dlugomat-800 dark:bg-dlugomat-900/40 dark:text-iron-300">
-              <strong className="text-dlugomat-900 dark:text-iron-50">
+            <div className="mt-6 rounded-lg border border-ink-100 bg-ink-50 p-4 text-fluid-sm text-ink-600 dark:border-dlugomat-800 dark:bg-dlugomat-900/40 dark:text-ink-300">
+              <strong className="text-dlugomat-900 dark:text-ink-50">
                 Uwaga:
               </strong>{" "}
               Długomat nie jest kancelarią prawną w rozumieniu Prawa o adwokaturze
@@ -179,12 +179,12 @@ export default function KontaktPage() {
             </h2>
           </div>
 
-          <div className="space-y-5 text-fluid-base leading-relaxed text-iron-700 dark:text-iron-200">
-            <div className="rounded-xl border border-iron-200 bg-card p-5 dark:border-dlugomat-800">
-              <h3 className="text-fluid-lg font-semibold text-dlugomat-900 dark:text-iron-50">
+          <div className="space-y-5 text-fluid-base leading-relaxed text-ink-700 dark:text-ink-200">
+            <div className="rounded-xl border border-ink-200 bg-card p-5 dark:border-dlugomat-800">
+              <h3 className="text-fluid-lg font-semibold text-dlugomat-900 dark:text-ink-50">
                 Mam pytanie o moduł lub generowanie pisma
               </h3>
-              <p className="mt-2 text-fluid-sm text-iron-600 dark:text-iron-300">
+              <p className="mt-2 text-fluid-sm text-ink-600 dark:text-ink-300">
                 Najszybciej —{" "}
                 <a
                   href="mailto:pomoc@dlugomat.pl"
@@ -197,11 +197,11 @@ export default function KontaktPage() {
               </p>
             </div>
 
-            <div className="rounded-xl border border-iron-200 bg-card p-5 dark:border-dlugomat-800">
-              <h3 className="text-fluid-lg font-semibold text-dlugomat-900 dark:text-iron-50">
+            <div className="rounded-xl border border-ink-200 bg-card p-5 dark:border-dlugomat-800">
+              <h3 className="text-fluid-lg font-semibold text-dlugomat-900 dark:text-ink-50">
                 Chcę usunąć konto / pobrać swoje dane
               </h3>
-              <p className="mt-2 text-fluid-sm text-iron-600 dark:text-iron-300">
+              <p className="mt-2 text-fluid-sm text-ink-600 dark:text-ink-300">
                 Najszybciej — w panelu, zakładka{" "}
                 <Link
                   href="/panel/ustawienia/rodo"
@@ -221,11 +221,11 @@ export default function KontaktPage() {
               </p>
             </div>
 
-            <div className="rounded-xl border border-iron-200 bg-card p-5 dark:border-dlugomat-800">
-              <h3 className="text-fluid-lg font-semibold text-dlugomat-900 dark:text-iron-50">
+            <div className="rounded-xl border border-ink-200 bg-card p-5 dark:border-dlugomat-800">
+              <h3 className="text-fluid-lg font-semibold text-dlugomat-900 dark:text-ink-50">
                 Mam fakturę z błędnymi danymi
               </h3>
-              <p className="mt-2 text-fluid-sm text-iron-600 dark:text-iron-300">
+              <p className="mt-2 text-fluid-sm text-ink-600 dark:text-ink-300">
                 Korekty faktur — w ciągu 14 dni od wystawienia, bezpłatnie.
                 Napisz na{" "}
                 <a
@@ -238,11 +238,11 @@ export default function KontaktPage() {
               </p>
             </div>
 
-            <div className="rounded-xl border border-iron-200 bg-card p-5 dark:border-dlugomat-800">
-              <h3 className="text-fluid-lg font-semibold text-dlugomat-900 dark:text-iron-50">
+            <div className="rounded-xl border border-ink-200 bg-card p-5 dark:border-dlugomat-800">
+              <h3 className="text-fluid-lg font-semibold text-dlugomat-900 dark:text-ink-50">
                 Sprawa pilna — termin sądowy w ciągu 48h
               </h3>
-              <p className="mt-2 text-fluid-sm text-iron-600 dark:text-iron-300">
+              <p className="mt-2 text-fluid-sm text-ink-600 dark:text-ink-300">
                 Pełen proces w Długomacie to średnio 12 minut. W większości
                 przypadków zdążysz bez kontaktu z nami. Jeżeli coś blokuje
                 generowanie — wpisz w temat maila "PILNE — termin DD.MM" na adres{" "}

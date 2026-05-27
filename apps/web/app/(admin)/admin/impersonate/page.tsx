@@ -33,7 +33,7 @@ export default async function ImpersonatePage() {
       <header className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Impersonacja użytkowników</h1>
-          <p className="text-iron-600 dark:text-iron-300">
+          <p className="text-ink-600 dark:text-ink-300">
             Tymczasowe sesje support — wszystkie działania są logowane do{" "}
             <code>admin_audit_log</code>.
           </p>

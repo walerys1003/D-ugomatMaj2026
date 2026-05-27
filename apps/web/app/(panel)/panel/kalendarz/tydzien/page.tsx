@@ -104,13 +104,13 @@ export default function KalendarzTydzienPage() {
     <div className="space-y-8">
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-2">
-          <p className="text-xs uppercase tracking-[0.18em] text-iron-500">
+          <p className="text-xs uppercase tracking-[0.18em] text-ink-500">
             Kalendarz · widok tygodniowy
           </p>
           <h1 className="font-display text-fluid-h1 text-dlugomat-950">
             Tydzień 20 · 11–17 maja 2026
           </h1>
-          <p className="max-w-2xl text-iron-600">
+          <p className="max-w-2xl text-ink-600">
             Wszystkie terminy sądowe, spotkania oraz deadliny w jednym widoku.
           </p>
         </div>
@@ -129,10 +129,10 @@ export default function KalendarzTydzienPage() {
         </div>
       </header>
 
-      <nav aria-label="Widoki kalendarza" className="flex gap-1 rounded-md border border-iron-200 bg-iron-50 p-1 w-fit text-sm">
+      <nav aria-label="Widoki kalendarza" className="flex gap-1 rounded-md border border-ink-200 bg-ink-50 p-1 w-fit text-sm">
         <Link
           href="/panel/kalendarz"
-          className="rounded px-3 py-1.5 text-iron-700 hover:bg-white focus-visible:outline-none focus-visible:shadow-shield-focus"
+          className="rounded px-3 py-1.5 text-ink-700 hover:bg-white focus-visible:outline-none focus-visible:shadow-shield-focus"
         >
           Miesiąc
         </Link>
@@ -141,7 +141,7 @@ export default function KalendarzTydzienPage() {
         </span>
         <Link
           href="/panel/kalendarz/agenda"
-          className="rounded px-3 py-1.5 text-iron-700 hover:bg-white focus-visible:outline-none focus-visible:shadow-shield-focus"
+          className="rounded px-3 py-1.5 text-ink-700 hover:bg-white focus-visible:outline-none focus-visible:shadow-shield-focus"
         >
           Agenda
         </Link>
@@ -153,9 +153,9 @@ export default function KalendarzTydzienPage() {
             {DAYS.map((d, i) => (
               <div
                 key={d}
-                className="border-b border-iron-200 bg-iron-50 px-3 py-2 text-center"
+                className="border-b border-ink-200 bg-ink-50 px-3 py-2 text-center"
               >
-                <p className="text-xs uppercase tracking-wide text-iron-500">{d}</p>
+                <p className="text-xs uppercase tracking-wide text-ink-500">{d}</p>
                 <p className="font-display text-lg text-dlugomat-950">{DATES[i]}</p>
               </div>
             ))}
@@ -164,18 +164,18 @@ export default function KalendarzTydzienPage() {
               return (
                 <div
                   key={dayIdx}
-                  className="min-h-[260px] border-r border-iron-100 last:border-r-0 p-2 space-y-1.5"
+                  className="min-h-[260px] border-r border-ink-100 last:border-r-0 p-2 space-y-1.5"
                 >
                   {dayEvents.length === 0 ? (
-                    <p className="text-xs text-iron-400 px-1 mt-2">—</p>
+                    <p className="text-xs text-ink-400 px-1 mt-2">—</p>
                   ) : (
                     dayEvents.map((ev) => (
                       <article
                         key={ev.id}
-                        className="rounded-md border border-iron-200 bg-white p-2 text-xs shadow-card"
+                        className="rounded-md border border-ink-200 bg-white p-2 text-xs shadow-card"
                       >
                         <div className="flex items-center justify-between gap-1">
-                          <span className="font-mono text-iron-500">
+                          <span className="font-mono text-ink-500">
                             {ev.kind === "deadline" ? ev.start : `${ev.start}–${ev.end}`}
                           </span>
                           <Badge tone={KIND_TONE[ev.kind]} withDot>
@@ -186,7 +186,7 @@ export default function KalendarzTydzienPage() {
                           {ev.title}
                         </p>
                         {ev.location ? (
-                          <p className="mt-0.5 text-iron-500 truncate">{ev.location}</p>
+                          <p className="mt-0.5 text-ink-500 truncate">{ev.location}</p>
                         ) : null}
                       </article>
                     ))

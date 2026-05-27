@@ -38,8 +38,8 @@ export default async function SecuritySettingsPage() {
       <header className="flex items-center gap-3">
         <ShieldCheck className="h-7 w-7 text-dlugomat-600" />
         <div>
-          <h1 className="text-fluid-2xl font-bold text-iron-900 dark:text-white">Bezpieczeństwo</h1>
-          <p className="text-fluid-base text-iron-600 dark:text-iron-300">
+          <h1 className="text-fluid-2xl font-bold text-ink-900 dark:text-white">Bezpieczeństwo</h1>
+          <p className="text-fluid-base text-ink-600 dark:text-ink-300">
             Druga warstwa ochrony Twojego konta.
           </p>
         </div>

@@ -36,7 +36,7 @@ export function StepZalaczniki({
       className="space-y-5"
       noValidate
     >
-      <div className="rounded-lg border border-shield-100 bg-shield-50/40 p-3 text-sm text-iron-700">
+      <div className="rounded-lg border border-shield-100 bg-shield-50/40 p-3 text-sm text-ink-700">
         Zaznacz załączniki, które już posiadasz lub planujesz dostarczyć do
         sądu. Lista trafi do końcowej części pisma. Brakujące dokumenty można
         dosłać w wyznaczonym terminie (sąd zazwyczaj daje 7 dni).
@@ -66,7 +66,7 @@ export function StepZalaczniki({
                       className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 text-sm transition ${
                         checked
                           ? "border-shield-400 bg-shield-50/60"
-                          : "border-iron-200 hover:border-shield-200"
+                          : "border-ink-200 hover:border-shield-200"
                       }`}
                     >
                       <input
@@ -75,7 +75,7 @@ export function StepZalaczniki({
                         onChange={() => toggle(z.id)}
                         className="mt-0.5 h-4 w-4"
                       />
-                      <span className="text-iron-800">{z.label}</span>
+                      <span className="text-ink-800">{z.label}</span>
                     </label>
                   );
                 })}
@@ -90,7 +90,7 @@ export function StepZalaczniki({
         }}
       />
 
-      <div className="rounded-lg border border-temporal-amber-200 bg-temporal-amber-50/40 p-3 text-sm text-iron-800">
+      <div className="rounded-lg border border-temporal-amber-200 bg-temporal-amber-50/40 p-3 text-sm text-ink-800">
         <strong>Opłata sądowa:</strong> 30 zł (art. 76a ust. 1 ustawy o
         kosztach sądowych w sprawach cywilnych). Wpłata na rachunek
         bankowy sądu — potwierdzenie dołącz do wniosku.

@@ -21,7 +21,7 @@ const STATUS_BADGE: Record<SupportTicket["status"], string> = {
   in_progress: "bg-accent-50 text-accent-700 border-accent-200",
   waiting_user: "bg-warn-50 text-warn-700 border-warn-200",
   resolved: "bg-accent-50 text-accent-700 border-accent-200",
-  closed: "bg-iron-100 text-iron-600 border-iron-200",
+  closed: "bg-ink-100 text-ink-600 border-ink-200",
 };
 
 const STATUS_LABEL: Record<SupportTicket["status"], string> = {
@@ -80,11 +80,11 @@ export default async function WsparciePage() {
     <main className="container mx-auto px-4 py-8 max-w-6xl space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-xs uppercase tracking-wider text-iron-500 mb-2">Pomoc</p>
-          <h1 className="font-display text-3xl font-semibold text-iron-900 dark:text-iron-50">
+          <p className="text-xs uppercase tracking-wider text-ink-500 mb-2">Pomoc</p>
+          <h1 className="font-display text-3xl font-semibold text-ink-900 dark:text-ink-50">
             Wsparcie
           </h1>
-          <p className="text-sm text-iron-500 mt-1">
+          <p className="text-sm text-ink-500 mt-1">
             {openCount} aktywnych zgłoszeń · średni czas odpowiedzi: 2h w godzinach pracy
           </p>
         </div>
@@ -100,22 +100,22 @@ export default async function WsparciePage() {
           </CardHeader>
           <CardContent>
             {tickets.length === 0 ? (
-              <p className="text-sm text-iron-500">
+              <p className="text-sm text-ink-500">
                 Brak zgłoszeń. Napotkałeś problem? Otwórz nowy ticket.
               </p>
             ) : (
-              <ul className="divide-y divide-iron-100 dark:divide-iron-900">
+              <ul className="divide-y divide-ink-100 dark:divide-ink-900">
                 {tickets.map((t) => (
                   <li key={t.id}>
                     <Link
                       href={`/panel/wsparcie/${t.id}`}
-                      className="block py-3 hover:bg-iron-50 dark:hover:bg-iron-900 -mx-2 px-2 rounded-md transition"
+                      className="block py-3 hover:bg-ink-50 dark:hover:bg-ink-900 -mx-2 px-2 rounded-md transition"
                     >
                       <div className="flex flex-wrap items-baseline justify-between gap-2 mb-1">
-                        <div className="font-medium text-iron-900 dark:text-iron-50 flex items-center gap-2">
+                        <div className="font-medium text-ink-900 dark:text-ink-50 flex items-center gap-2">
                           {t.subject}
                           {t.unread_replies > 0 && (
-                            <span className="text-xs px-1.5 py-0.5 rounded-full bg-accent-600 text-iron-50">
+                            <span className="text-xs px-1.5 py-0.5 rounded-full bg-accent-600 text-ink-50">
                               {t.unread_replies}
                             </span>
                           )}
@@ -126,7 +126,7 @@ export default async function WsparciePage() {
                           {STATUS_LABEL[t.status]}
                         </span>
                       </div>
-                      <div className="text-xs text-iron-500">
+                      <div className="text-xs text-ink-500">
                         {CATEGORY_LABEL[t.category]} ·{" "}
                         {new Date(t.updated_at).toLocaleDateString("pl-PL")}
                       </div>
@@ -144,7 +144,7 @@ export default async function WsparciePage() {
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             <div>
-              <div className="text-xs uppercase tracking-wider text-iron-500 mb-0.5">
+              <div className="text-xs uppercase tracking-wider text-ink-500 mb-0.5">
                 E-mail
               </div>
               <a
@@ -155,14 +155,14 @@ export default async function WsparciePage() {
               </a>
             </div>
             <div>
-              <div className="text-xs uppercase tracking-wider text-iron-500 mb-0.5">
+              <div className="text-xs uppercase tracking-wider text-ink-500 mb-0.5">
                 Telefon (Enterprise)
               </div>
-              <div className="text-iron-900 dark:text-iron-50">+48 22 000 00 00</div>
-              <div className="text-xs text-iron-500">Pn–Pt 9:00–17:00</div>
+              <div className="text-ink-900 dark:text-ink-50">+48 22 000 00 00</div>
+              <div className="text-xs text-ink-500">Pn–Pt 9:00–17:00</div>
             </div>
             <div>
-              <div className="text-xs uppercase tracking-wider text-iron-500 mb-0.5">
+              <div className="text-xs uppercase tracking-wider text-ink-500 mb-0.5">
                 Status systemu
               </div>
               <Link
@@ -185,12 +185,12 @@ export default async function WsparciePage() {
             {FAQ_ITEMS.map((f, i) => (
               <details
                 key={i}
-                className="rounded-lg border border-iron-200 dark:border-iron-800 px-4 py-3"
+                className="rounded-lg border border-ink-200 dark:border-ink-800 px-4 py-3"
               >
-                <summary className="text-sm font-medium text-iron-900 dark:text-iron-50 cursor-pointer">
+                <summary className="text-sm font-medium text-ink-900 dark:text-ink-50 cursor-pointer">
                   {f.q}
                 </summary>
-                <p className="text-sm text-iron-600 dark:text-iron-400 mt-2">{f.a}</p>
+                <p className="text-sm text-ink-600 dark:text-ink-400 mt-2">{f.a}</p>
               </details>
             ))}
           </div>

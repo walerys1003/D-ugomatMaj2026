@@ -11,16 +11,16 @@ export const metadata: Metadata = {
 
 export default function KosztyPostepowaniaPage() {
   return (
-    <main className="bg-iron-50 dark:bg-iron-950 pb-24">
-      <section className="border-b border-iron-200 dark:border-iron-800 bg-white dark:bg-iron-900">
+    <main className="bg-ink-50 dark:bg-ink-950 pb-24">
+      <section className="border-b border-ink-200 dark:border-ink-800 bg-white dark:bg-ink-900">
         <div className="container mx-auto px-4 py-12 max-w-4xl">
-          <p className="text-xs uppercase tracking-wider text-iron-500 mb-3">
+          <p className="text-xs uppercase tracking-wider text-ink-500 mb-3">
             Kalkulatory prawne · 3 z 5
           </p>
-          <h1 className="font-display text-4xl md:text-5xl font-semibold text-iron-900 dark:text-iron-50 mb-4">
+          <h1 className="font-display text-4xl md:text-5xl font-semibold text-ink-900 dark:text-ink-50 mb-4">
             Kalkulator kosztów postępowania
           </h1>
-          <p className="text-lg text-iron-700 dark:text-iron-300 max-w-2xl">
+          <p className="text-lg text-ink-700 dark:text-ink-300 max-w-2xl">
             Oszacuj, ile zapłacisz za pozew, apelację i komornika. Wszystkie stawki
             zgodnie z aktualną ustawą o kosztach sądowych w sprawach cywilnych.
           </p>
@@ -36,7 +36,7 @@ export default function KosztyPostepowaniaPage() {
           <CardHeader>
             <CardTitle>Nie stać Cię na opłatę?</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3 text-sm text-iron-700 dark:text-iron-300">
+          <CardContent className="space-y-3 text-sm text-ink-700 dark:text-ink-300">
             <p>
               Możesz złożyć wniosek o zwolnienie z kosztów sądowych w całości lub
               w części, albo o rozłożenie opłaty na raty (art. 100-103 UKSC).

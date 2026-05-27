@@ -83,10 +83,10 @@ export default async function MojeZadluzeniePage() {
         <h1 className="text-fluid-3xl font-bold tracking-tight text-dlugomat-900 dark:text-white">
           Moje zadłużenie
         </h1>
-        <p className="max-w-2xl text-fluid-base text-iron-600 dark:text-iron-300">
+        <p className="max-w-2xl text-fluid-base text-ink-600 dark:text-ink-300">
           Aktualny obraz Twoich spraw długowych. Wszystkie kwoty są wyliczane na
           dzień:{" "}
-          <span className="font-semibold tabular-nums text-iron-900 dark:text-iron-100">
+          <span className="font-semibold tabular-nums text-ink-900 dark:text-ink-100">
             {formatDatePL(new Date())}
           </span>
           . Pamiętaj — odsetki naliczają się codziennie.
@@ -145,11 +145,11 @@ export default async function MojeZadluzeniePage() {
               <CardDescription>
                 Odsetki ustawowe za opóźnienie naliczają się codziennie. Jeśli
                 widzisz nakaz zapłaty — termin na sprzeciw to{" "}
-                <span className="font-semibold text-iron-900 dark:text-iron-50">
+                <span className="font-semibold text-ink-900 dark:text-ink-50">
                   14 dni
                 </span>{" "}
                 od doręczenia (EPU) lub{" "}
-                <span className="font-semibold text-iron-900 dark:text-iron-50">
+                <span className="font-semibold text-ink-900 dark:text-ink-50">
                   2 tygodnie
                 </span>{" "}
                 w postępowaniu zwykłym.
@@ -201,8 +201,8 @@ export default async function MojeZadluzeniePage() {
           <Card elevation="subtle" className="overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-fluid-sm">
-                <thead className="border-b border-iron-200 bg-iron-50/60 dark:border-dlugomat-800 dark:bg-dlugomat-900/40">
-                  <tr className="text-left text-iron-600 dark:text-iron-300">
+                <thead className="border-b border-ink-200 bg-ink-50/60 dark:border-dlugomat-800 dark:bg-dlugomat-900/40">
+                  <tr className="text-left text-ink-600 dark:text-ink-300">
                     <th className="px-5 py-3 font-semibold">Wierzyciel</th>
                     <th className="px-5 py-3 font-semibold">Sygnatura</th>
                     <th className="px-5 py-3 text-right font-semibold">Kapitał</th>
@@ -212,21 +212,21 @@ export default async function MojeZadluzeniePage() {
                     <th className="px-5 py-3 font-semibold">Akcja</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-iron-100 dark:divide-dlugomat-800">
+                <tbody className="divide-y divide-ink-100 dark:divide-dlugomat-800">
                   {rows.map((r) => (
                     <tr
                       key={r.id}
-                      className="hover:bg-iron-50/40 dark:hover:bg-dlugomat-900/30"
+                      className="hover:bg-ink-50/40 dark:hover:bg-dlugomat-900/30"
                     >
                       <td className="px-5 py-3">
                         <Link
                           href={`/panel/sprawa/${r.id}`}
-                          className="font-semibold text-iron-900 hover:text-dlugomat-700 dark:text-iron-50 dark:hover:text-dlugomat-300"
+                          className="font-semibold text-ink-900 hover:text-dlugomat-700 dark:text-ink-50 dark:hover:text-dlugomat-300"
                         >
                           {r.creditor}
                         </Link>
                       </td>
-                      <td className="px-5 py-3 font-mono text-fluid-xs text-iron-500">
+                      <td className="px-5 py-3 font-mono text-fluid-xs text-ink-500">
                         {r.caseSignature}
                       </td>
                       <td className="px-5 py-3 text-right tabular-nums">
@@ -252,8 +252,8 @@ export default async function MojeZadluzeniePage() {
                     </tr>
                   ))}
                 </tbody>
-                <tfoot className="border-t border-iron-200 bg-iron-50/60 dark:border-dlugomat-800 dark:bg-dlugomat-900/40">
-                  <tr className="text-iron-900 dark:text-iron-50">
+                <tfoot className="border-t border-ink-200 bg-ink-50/60 dark:border-dlugomat-800 dark:bg-dlugomat-900/40">
+                  <tr className="text-ink-900 dark:text-ink-50">
                     <td colSpan={2} className="px-5 py-3 font-semibold">
                       Razem
                     </td>
@@ -332,14 +332,14 @@ function KpiCard({
           <span className={`grid size-9 place-items-center rounded-lg ${ring}`}>
             {icon}
           </span>
-          <span className="text-fluid-xs font-semibold uppercase tracking-wider text-iron-500">
+          <span className="text-fluid-xs font-semibold uppercase tracking-wider text-ink-500">
             {label}
           </span>
         </div>
-        <div className="text-fluid-2xl font-bold tabular-nums text-iron-900 dark:text-iron-50">
+        <div className="text-fluid-2xl font-bold tabular-nums text-ink-900 dark:text-ink-50">
           {value}
         </div>
-        <p className="text-fluid-xs text-iron-500">{hint}</p>
+        <p className="text-fluid-xs text-ink-500">{hint}</p>
       </CardContent>
     </Card>
   );
@@ -359,7 +359,7 @@ function NextStep({
   return (
     <Link
       href={href}
-      className="group flex items-start gap-3 rounded-xl border border-iron-200 bg-white p-4 transition hover:border-dlugomat-400 hover:shadow-card dark:border-iron-800 dark:bg-iron-950"
+      className="group flex items-start gap-3 rounded-xl border border-ink-200 bg-white p-4 transition hover:border-dlugomat-400 hover:shadow-card dark:border-ink-800 dark:bg-ink-950"
     >
       <span
         aria-hidden
@@ -368,12 +368,12 @@ function NextStep({
         {icon}
       </span>
       <span className="flex flex-col">
-        <span className="text-fluid-sm font-semibold text-iron-900 dark:text-iron-50">
+        <span className="text-fluid-sm font-semibold text-ink-900 dark:text-ink-50">
           {title}
         </span>
-        <span className="text-fluid-xs text-iron-500">{desc}</span>
+        <span className="text-fluid-xs text-ink-500">{desc}</span>
       </span>
-      <ArrowRight className="ml-auto size-4 self-center text-iron-400 transition group-hover:translate-x-0.5 group-hover:text-dlugomat-600" />
+      <ArrowRight className="ml-auto size-4 self-center text-ink-400 transition group-hover:translate-x-0.5 group-hover:text-dlugomat-600" />
     </Link>
   );
 }

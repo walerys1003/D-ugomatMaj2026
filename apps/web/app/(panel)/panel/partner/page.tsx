@@ -42,10 +42,10 @@ export default async function PartnerPage() {
       <main className="container mx-auto px-4 py-12 max-w-4xl">
         <Card elevation="subtle">
           <CardContent className="pt-6 space-y-3">
-            <h1 className="font-display text-2xl font-semibold text-iron-900 dark:text-iron-50">
+            <h1 className="font-display text-2xl font-semibold text-ink-900 dark:text-ink-50">
               Witaj w programie partnerskim
             </h1>
-            <p className="text-sm text-iron-600 dark:text-iron-400">
+            <p className="text-sm text-ink-600 dark:text-ink-400">
               Nie jesteś jeszcze partnerem Długomat. Dołącz do programu i zarabiaj
               30–50% z każdej subskrypcji.
             </p>
@@ -61,11 +61,11 @@ export default async function PartnerPage() {
   return (
     <main className="container mx-auto px-4 py-8 max-w-6xl space-y-6">
       <div>
-        <p className="text-xs uppercase tracking-wider text-iron-500 mb-2">Panel partnera</p>
-        <h1 className="font-display text-3xl font-semibold text-iron-900 dark:text-iron-50">
+        <p className="text-xs uppercase tracking-wider text-ink-500 mb-2">Panel partnera</p>
+        <h1 className="font-display text-3xl font-semibold text-ink-900 dark:text-ink-50">
           {o.partner_name}
         </h1>
-        <p className="text-sm text-iron-500 mt-1">
+        <p className="text-sm text-ink-500 mt-1">
           Poziom {TIER_LABEL[o.tier]} · {o.revenue_share_percent}% revenue share
         </p>
       </div>
@@ -87,7 +87,7 @@ export default async function PartnerPage() {
               <div className="font-display text-3xl font-semibold text-accent-700">
                 {o.next_payout_amount.toLocaleString("pl-PL")} zł
               </div>
-              <div className="text-sm text-iron-500 mt-1">
+              <div className="text-sm text-ink-500 mt-1">
                 Termin: {new Date(o.next_payout_date).toLocaleDateString("pl-PL")}
               </div>
             </div>
@@ -131,10 +131,10 @@ function Stat({
   return (
     <Card elevation="subtle">
       <CardContent className="pt-5">
-        <div className="text-xs uppercase tracking-wider text-iron-500 mb-1">{label}</div>
+        <div className="text-xs uppercase tracking-wider text-ink-500 mb-1">{label}</div>
         <div
           className={`font-display text-2xl font-semibold ${
-            highlight ? "text-accent-700" : "text-iron-900 dark:text-iron-50"
+            highlight ? "text-accent-700" : "text-ink-900 dark:text-ink-50"
           }`}
         >
           {value}
@@ -152,7 +152,7 @@ function PartnerLink({ href, title, desc }: { href: string; title: string; desc:
           <CardTitle className="text-base">{title}</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-iron-600 dark:text-iron-400">{desc}</p>
+          <p className="text-sm text-ink-600 dark:text-ink-400">{desc}</p>
         </CardContent>
       </Card>
     </Link>

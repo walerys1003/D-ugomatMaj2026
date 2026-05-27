@@ -159,7 +159,7 @@ export default function CaseStudiesTematycznePage() {
                   className={`inline-flex items-center gap-2 px-4 py-2 rounded-md border text-sm font-medium focus-visible:shadow-shield-focus focus-visible:outline-none ${
                     idx === 0
                       ? "bg-dlugomat-900 text-white border-dlugomat-900"
-                      : "bg-white text-dlugomat-800 border-iron-300 hover:bg-dlugomat-50"
+                      : "bg-white text-dlugomat-800 border-ink-300 hover:bg-dlugomat-50"
                   }`}
                   aria-pressed={idx === 0}
                 >
@@ -167,7 +167,7 @@ export default function CaseStudiesTematycznePage() {
                   {theme.label}
                   <span
                     className={`ml-1 text-xs px-1.5 py-0.5 rounded ${
-                      idx === 0 ? "bg-white/20" : "bg-iron-100 text-dlugomat-700"
+                      idx === 0 ? "bg-white/20" : "bg-ink-100 text-dlugomat-700"
                     }`}
                   >
                     {theme.count}

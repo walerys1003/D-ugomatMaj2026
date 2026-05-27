@@ -34,7 +34,7 @@ export function StepKomornikDluznik({
       className="space-y-5"
       noValidate
     >
-      <p className="text-fluid-sm text-iron-700">
+      <p className="text-fluid-sm text-ink-700">
         Podaj swoje dane — wpiszemy je w nagłówek pisma. PESEL jest opcjonalny,
         ale przy egzekucji znacząco przyspiesza identyfikację sprawy w
         kancelarii.

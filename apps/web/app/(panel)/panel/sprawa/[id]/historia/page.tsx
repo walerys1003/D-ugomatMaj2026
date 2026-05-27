@@ -185,7 +185,7 @@ export default async function SprawaHistoriaPage({ params }: PageProps) {
       <div>
         <Link
           href={`/panel/sprawa/${id}`}
-          className="inline-flex items-center gap-2 text-sm text-iron-600 hover:text-dlugomat-900 focus-visible:outline-none focus-visible:shadow-shield-focus rounded"
+          className="inline-flex items-center gap-2 text-sm text-ink-600 hover:text-dlugomat-900 focus-visible:outline-none focus-visible:shadow-shield-focus rounded"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden />
           Wróć do sprawy
@@ -194,13 +194,13 @@ export default async function SprawaHistoriaPage({ params }: PageProps) {
 
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-2">
-          <p className="text-xs uppercase tracking-[0.18em] text-iron-500">
+          <p className="text-xs uppercase tracking-[0.18em] text-ink-500">
             Sprawa · {id} · pełna historia
           </p>
           <h1 className="font-display text-fluid-h1 text-dlugomat-950">
             Historia zdarzeń
           </h1>
-          <p className="max-w-2xl text-iron-600">
+          <p className="max-w-2xl text-ink-600">
             Każde zdarzenie jest niezmienne i podpisane kryptograficznie.
             Historia stanowi dowód w razie sporu.
           </p>
@@ -252,13 +252,13 @@ export default async function SprawaHistoriaPage({ params }: PageProps) {
           <CardDescription>Sortowanie: czas malejąco (najnowsze na górze)</CardDescription>
         </CardHeader>
         <CardContent>
-          <ol className="relative border-l border-iron-200 pl-6 space-y-5">
+          <ol className="relative border-l border-ink-200 pl-6 space-y-5">
             {EVENTS.map((ev) => {
               const Icon = TYPE_ICON[ev.type];
               return (
                 <li key={ev.id} className="relative">
                   <span
-                    className="absolute -left-[31px] mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full border border-iron-200 bg-white"
+                    className="absolute -left-[31px] mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full border border-ink-200 bg-white"
                     aria-hidden
                   >
                     <Icon className="h-3.5 w-3.5 text-dlugomat-700" />
@@ -268,20 +268,20 @@ export default async function SprawaHistoriaPage({ params }: PageProps) {
                       <Badge tone={TYPE_TONE[ev.type]} withDot>
                         {TYPE_LABEL[ev.type]}
                       </Badge>
-                      <span className="text-xs text-iron-500">{fmtDate(ev.ts)}</span>
-                      <span aria-hidden className="text-iron-400">·</span>
-                      <span className="text-xs text-iron-600">{ev.actor}</span>
+                      <span className="text-xs text-ink-500">{fmtDate(ev.ts)}</span>
+                      <span aria-hidden className="text-ink-400">·</span>
+                      <span className="text-xs text-ink-600">{ev.actor}</span>
                     </div>
                     <p className="text-sm font-medium text-dlugomat-900">{ev.title}</p>
                     {ev.detail ? (
-                      <p className="text-sm text-iron-600">{ev.detail}</p>
+                      <p className="text-sm text-ink-600">{ev.detail}</p>
                     ) : null}
                     {ev.meta ? (
-                      <dl className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-iron-500">
+                      <dl className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-ink-500">
                         {Object.entries(ev.meta).map(([k, v]) => (
                           <div key={k} className="inline-flex items-center gap-1">
                             <dt className="uppercase tracking-wide">{k}:</dt>
-                            <dd className="text-iron-700">{v}</dd>
+                            <dd className="text-ink-700">{v}</dd>
                           </div>
                         ))}
                       </dl>

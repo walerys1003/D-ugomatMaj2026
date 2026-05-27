@@ -121,7 +121,7 @@ export default async function NotatkaPage({ params }: { params: Params }) {
                       <li key={doc.id}>
                         <Link
                           href={`/panel/dokumenty/${doc.id}`}
-                          className="flex items-center justify-between gap-3 p-3 rounded-md border border-iron-200 bg-white hover:bg-dlugomat-50 focus-visible:shadow-shield-focus"
+                          className="flex items-center justify-between gap-3 p-3 rounded-md border border-ink-200 bg-white hover:bg-dlugomat-50 focus-visible:shadow-shield-focus"
                         >
                           <span className="text-sm text-dlugomat-900">{doc.name}</span>
                           <span className="text-xs text-accent-700">Otworz</span>

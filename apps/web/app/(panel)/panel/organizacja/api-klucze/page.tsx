@@ -68,7 +68,7 @@ export default function ApiKluczePage() {
           <h1 className="text-fluid-3xl font-bold tracking-tight text-dlugomat-900 dark:text-white">
             Klucze API
           </h1>
-          <p className="mt-1 max-w-2xl text-fluid-base text-iron-600 dark:text-iron-300">
+          <p className="mt-1 max-w-2xl text-fluid-base text-ink-600 dark:text-ink-300">
             Bearer tokens dla integracji serwer-do-serwera. Klucz pokażemy
             tylko raz w chwili utworzenia — zapisz go w sejfie sekretów.
           </p>
@@ -104,8 +104,8 @@ export default function ApiKluczePage() {
       <Card elevation="subtle" className="overflow-hidden">
         <CardContent className="p-0">
           <table className="w-full text-fluid-sm">
-            <thead className="border-b border-iron-200 bg-iron-50/60 dark:border-dlugomat-800 dark:bg-dlugomat-900/40">
-              <tr className="text-left text-iron-600 dark:text-iron-300">
+            <thead className="border-b border-ink-200 bg-ink-50/60 dark:border-dlugomat-800 dark:bg-dlugomat-900/40">
+              <tr className="text-left text-ink-600 dark:text-ink-300">
                 <th className="px-5 py-3 font-semibold">Nazwa</th>
                 <th className="px-5 py-3 font-semibold">Klucz</th>
                 <th className="px-5 py-3 font-semibold">Uprawnienia</th>
@@ -113,7 +113,7 @@ export default function ApiKluczePage() {
                 <th className="px-5 py-3" />
               </tr>
             </thead>
-            <tbody className="divide-y divide-iron-100 dark:divide-dlugomat-800">
+            <tbody className="divide-y divide-ink-100 dark:divide-dlugomat-800">
               {KEYS.map((k) => (
                 <tr key={k.id}>
                   <td className="px-5 py-3">
@@ -122,20 +122,20 @@ export default function ApiKluczePage() {
                         aria-hidden
                         className="size-4 text-dlugomat-600"
                       />
-                      <span className="font-semibold text-iron-900 dark:text-iron-50">
+                      <span className="font-semibold text-ink-900 dark:text-ink-50">
                         {k.name}
                       </span>
                     </span>
-                    <span className="block text-fluid-xs text-iron-500">
+                    <span className="block text-fluid-xs text-ink-500">
                       Utworzony przez {k.created_by} · {k.created_at}
                     </span>
                   </td>
                   <td className="px-5 py-3">
-                    <code className="flex items-center gap-1 rounded bg-iron-100 px-2 py-1 font-mono text-fluid-xs text-iron-800 dark:bg-dlugomat-900 dark:text-iron-100">
+                    <code className="flex items-center gap-1 rounded bg-ink-100 px-2 py-1 font-mono text-fluid-xs text-ink-800 dark:bg-dlugomat-900 dark:text-ink-100">
                       {k.prefix}_••••••••
                       <EyeOff
                         aria-hidden
-                        className="size-3 text-iron-400"
+                        className="size-3 text-ink-400"
                       />
                     </code>
                   </td>
@@ -148,7 +148,7 @@ export default function ApiKluczePage() {
                       ))}
                     </div>
                   </td>
-                  <td className="px-5 py-3 text-fluid-xs text-iron-500">
+                  <td className="px-5 py-3 text-fluid-xs text-ink-500">
                     {k.last_used_at ? (
                       <>
                         {new Date(k.last_used_at).toLocaleString("pl-PL")}

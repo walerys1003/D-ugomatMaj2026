@@ -16,7 +16,7 @@ export function PageSkeletonCards({ count = 4 }: { count?: number }) {
       </div>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {Array.from({ length: count }).map((_, i) => (
-          <div key={i} className="rounded-xl border border-iron-200 p-4 dark:border-dlugomat-700">
+          <div key={i} className="rounded-xl border border-ink-200 p-4 dark:border-dlugomat-700">
             <Skeleton className="h-4 w-20" />
             <Skeleton className="mt-2 h-7 w-32" />
             <Skeleton className="mt-3 h-3 w-full" />
@@ -35,7 +35,7 @@ export function PageSkeletonList({ rows = 5 }: { rows?: number }) {
         {Array.from({ length: rows }).map((_, i) => (
           <div
             key={i}
-            className="flex items-center gap-3 rounded-lg border border-iron-200 p-3 dark:border-dlugomat-700"
+            className="flex items-center gap-3 rounded-lg border border-ink-200 p-3 dark:border-dlugomat-700"
           >
             <Skeleton className="h-10 w-10 rounded-full" />
             <div className="flex flex-1 flex-col gap-2">

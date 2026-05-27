@@ -154,24 +154,24 @@ function renderCell(value: boolean | string) {
   }
   if (value === false) {
     return (
-      <span className="inline-flex items-center text-iron-300 dark:text-iron-700">
+      <span className="inline-flex items-center text-ink-300 dark:text-ink-700">
         <Minus className="w-4 h-4" aria-label="Nie" />
       </span>
     );
   }
-  return <span className="text-iron-700 dark:text-iron-300">{value}</span>;
+  return <span className="text-ink-700 dark:text-ink-300">{value}</span>;
 }
 
 export default function PorownaniePlanowPage() {
   return (
-    <main className="bg-iron-50 dark:bg-iron-950 pb-20">
-      <section className="bg-white dark:bg-iron-900 border-b border-iron-200 dark:border-iron-800">
+    <main className="bg-ink-50 dark:bg-ink-950 pb-20">
+      <section className="bg-white dark:bg-ink-900 border-b border-ink-200 dark:border-ink-800">
         <div className="container mx-auto px-4 py-12 text-center max-w-3xl">
-          <p className="text-xs uppercase tracking-wider text-iron-500 mb-2">Cennik</p>
-          <h1 className="font-display text-4xl md:text-5xl font-semibold text-iron-900 dark:text-iron-50">
+          <p className="text-xs uppercase tracking-wider text-ink-500 mb-2">Cennik</p>
+          <h1 className="font-display text-4xl md:text-5xl font-semibold text-ink-900 dark:text-ink-50">
             Porównanie planów
           </h1>
-          <p className="text-lg text-iron-600 dark:text-iron-300 mt-3">
+          <p className="text-lg text-ink-600 dark:text-ink-300 mt-3">
             Wszystkie funkcje w jednej tabeli. Bez gwiazdek, bez ukrytych opłat.
           </p>
         </div>
@@ -181,9 +181,9 @@ export default function PorownaniePlanowPage() {
         <Card elevation="pop" className="overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="sticky top-0 z-10 bg-white dark:bg-iron-900">
-                <tr className="border-b border-iron-200 dark:border-iron-800">
-                  <th className="text-left py-4 px-4 w-1/3 text-iron-500 text-xs uppercase tracking-wider font-medium">
+              <thead className="sticky top-0 z-10 bg-white dark:bg-ink-900">
+                <tr className="border-b border-ink-200 dark:border-ink-800">
+                  <th className="text-left py-4 px-4 w-1/3 text-ink-500 text-xs uppercase tracking-wider font-medium">
                     Funkcja
                   </th>
                   {PLANS.map((plan) => (
@@ -195,11 +195,11 @@ export default function PorownaniePlanowPage() {
                           : ""
                       }`}
                     >
-                      <div className="font-display text-lg font-semibold text-iron-900 dark:text-iron-50">
+                      <div className="font-display text-lg font-semibold text-ink-900 dark:text-ink-50">
                         {plan.name}
                       </div>
-                      <div className="text-xs text-iron-500 mt-0.5">
-                        <span className="font-medium text-iron-900 dark:text-iron-50">
+                      <div className="text-xs text-ink-500 mt-0.5">
+                        <span className="font-medium text-ink-900 dark:text-ink-50">
                           {plan.price}
                         </span>
                         {plan.period}
@@ -211,10 +211,10 @@ export default function PorownaniePlanowPage() {
               <tbody>
                 {FEATURES.map((group) => (
                   <>
-                    <tr key={`${group.category}-header`} className="bg-iron-50 dark:bg-iron-950">
+                    <tr key={`${group.category}-header`} className="bg-ink-50 dark:bg-ink-950">
                       <td
                         colSpan={5}
-                        className="py-2 px-4 text-xs uppercase tracking-wider text-iron-600 dark:text-iron-400 font-medium"
+                        className="py-2 px-4 text-xs uppercase tracking-wider text-ink-600 dark:text-ink-400 font-medium"
                       >
                         {group.category}
                       </td>
@@ -222,12 +222,12 @@ export default function PorownaniePlanowPage() {
                     {group.items.map((item, i) => (
                       <tr
                         key={`${group.category}-${i}`}
-                        className="border-b border-iron-100 dark:border-iron-900"
+                        className="border-b border-ink-100 dark:border-ink-900"
                       >
-                        <td className="py-3 px-4 text-iron-700 dark:text-iron-300">
+                        <td className="py-3 px-4 text-ink-700 dark:text-ink-300">
                           {item.name}
                           {item.description && (
-                            <div className="text-xs text-iron-500 mt-0.5">
+                            <div className="text-xs text-ink-500 mt-0.5">
                               {item.description}
                             </div>
                           )}
@@ -282,12 +282,12 @@ export default function PorownaniePlanowPage() {
         </Card>
 
         <Card elevation="subtle" className="mt-6">
-          <CardContent className="pt-6 text-center text-sm text-iron-600 dark:text-iron-400 space-y-2">
+          <CardContent className="pt-6 text-center text-sm text-ink-600 dark:text-ink-400 space-y-2">
             <p>
               Wszystkie plany zawierają: szyfrowanie AES-256, kopię zapasową, zgodność z RODO.
               Możesz zmienić plan w dowolnej chwili — rozliczenie pro rata.
             </p>
-            <p className="text-xs text-iron-500">
+            <p className="text-xs text-ink-500">
               Pytania? Zobacz <Link href="/cennik" className="text-accent-700 hover:underline">cennik</Link> lub
               napisz na <a href="mailto:sprzedaz@dlugomat.pl" className="text-accent-700 hover:underline">sprzedaz@dlugomat.pl</a>.
             </p>

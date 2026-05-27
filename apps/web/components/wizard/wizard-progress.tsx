@@ -46,7 +46,7 @@ export function WizardProgress({
                 isCurrent &&
                   "border-dlugomat-600 bg-dlugomat-600 text-white",
                 isFuture &&
-                  "border-iron-300 bg-white text-iron-500 dark:border-iron-700 dark:bg-iron-900 dark:text-iron-400",
+                  "border-ink-300 bg-white text-ink-500 dark:border-ink-700 dark:bg-ink-900 dark:text-ink-400",
               )}
             >
               {isDone ? <Check className="size-3.5" aria-hidden /> : idx + 1}
@@ -55,8 +55,8 @@ export function WizardProgress({
               className={cn(
                 "hidden whitespace-nowrap sm:inline",
                 isCurrent
-                  ? "font-medium text-iron-900 dark:text-iron-50"
-                  : "text-iron-500 dark:text-iron-400",
+                  ? "font-medium text-ink-900 dark:text-ink-50"
+                  : "text-ink-500 dark:text-ink-400",
               )}
             >
               {step.title}
@@ -64,7 +64,7 @@ export function WizardProgress({
             {idx < steps.length - 1 && (
               <span
                 aria-hidden
-                className="hidden h-px w-6 bg-iron-300 dark:bg-iron-700 sm:inline-block"
+                className="hidden h-px w-6 bg-ink-300 dark:bg-ink-700 sm:inline-block"
               />
             )}
           </li>

@@ -147,7 +147,7 @@ export function GenerationOverlay({
               })}
             </ol>
 
-            <p className="mt-5 border-t border-shield-50 pt-3 text-fluid-xs text-iron-600">
+            <p className="mt-5 border-t border-shield-50 pt-3 text-fluid-xs text-ink-600">
               Generowanie zwykle zajmuje 8–15 sekund. Twoje dane są przetwarzane
               w bezpiecznym środowisku — żadne treści nie trafiają do trenowania
               modeli.
@@ -191,7 +191,7 @@ function PhaseItem({
             ? "bg-shield-500 text-white"
             : state === "done"
               ? "bg-hope-500 text-white"
-              : "bg-iron-100 text-iron-400"
+              : "bg-ink-100 text-ink-400"
         }`}
         aria-hidden
       >
@@ -204,7 +204,7 @@ function PhaseItem({
       <div className="min-w-0">
         <p className="text-fluid-sm font-medium text-shield-900">{label}</p>
         {state === "active" && (
-          <p className="text-fluid-xs text-iron-600">{detail}</p>
+          <p className="text-fluid-xs text-ink-600">{detail}</p>
         )}
       </div>
     </li>

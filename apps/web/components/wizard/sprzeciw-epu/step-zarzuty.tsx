@@ -65,7 +65,7 @@ export function StepZarzuty({
                         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dlugomat-500/50",
                         active
                           ? "border-dlugomat-500 bg-dlugomat-50 dark:bg-dlugomat-900/40"
-                          : "border-iron-200 hover:border-iron-300 dark:border-dlugomat-800 dark:hover:border-dlugomat-700",
+                          : "border-ink-200 hover:border-ink-300 dark:border-dlugomat-800 dark:hover:border-dlugomat-700",
                       )}
                     >
                       <span
@@ -73,7 +73,7 @@ export function StepZarzuty({
                           "mt-0.5 inline-flex size-4 shrink-0 items-center justify-center rounded border",
                           active
                             ? "border-dlugomat-500 bg-dlugomat-500 text-white"
-                            : "border-iron-300 dark:border-dlugomat-700",
+                            : "border-ink-300 dark:border-dlugomat-700",
                         )}
                         aria-hidden
                       >
@@ -108,7 +108,7 @@ export function StepZarzuty({
           rows={4}
           maxLength={2000}
           placeholder="Np. roszczenie pochodzi z umowy z 2014 r., a powództwo wniesione w 2025 r."
-          className="w-full rounded-md border border-iron-200 bg-background px-3 py-2 text-fluid-sm text-foreground shadow-subtle focus:border-dlugomat-500 focus:outline-none focus:ring-2 focus:ring-dlugomat-500/30 dark:border-dlugomat-800"
+          className="w-full rounded-md border border-ink-200 bg-background px-3 py-2 text-fluid-sm text-foreground shadow-subtle focus:border-dlugomat-500 focus:outline-none focus:ring-2 focus:ring-dlugomat-500/30 dark:border-dlugomat-800"
         />
       </FormField>
 

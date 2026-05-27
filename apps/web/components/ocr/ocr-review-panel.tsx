@@ -72,7 +72,7 @@ export function OcrReviewPanel({ result, forceCaseType }: OcrReviewPanelProps) {
         <h2 className="text-xl font-semibold text-shield-950">
           {humanIntent(parsed.intent)}
         </h2>
-        <div className="flex flex-wrap items-center gap-3 text-xs text-iron-600">
+        <div className="flex flex-wrap items-center gap-3 text-xs text-ink-600">
           <span>
             OCR: <strong>{result.provider}</strong>
           </span>
@@ -101,7 +101,7 @@ export function OcrReviewPanel({ result, forceCaseType }: OcrReviewPanelProps) {
             className="h-5 w-5 shrink-0 text-temporal-amber-700"
             aria-hidden
           />
-          <p className="text-iron-800">
+          <p className="text-ink-800">
             Skan był słabszej jakości. Sprawdź dokładnie wszystkie pola
             i popraw je w kreatorze, jeżeli to konieczne.
           </p>
@@ -120,7 +120,7 @@ export function OcrReviewPanel({ result, forceCaseType }: OcrReviewPanelProps) {
       )}
 
       <div className="flex flex-col gap-2 border-t border-shield-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-xs text-iron-600">
+        <p className="text-xs text-ink-600">
           Potwierdzasz, że dane będą używane wyłącznie do przygotowania pisma.
           Pełne wartości (np. PESEL) nie opuszczają Twojego konta.
         </p>
@@ -145,11 +145,11 @@ function ParsedFields({ parsed }: { parsed: ParsedDocument }) {
   if (parsed.intent === "pismo_komornika") return <KomornikFields p={parsed} />;
   if (parsed.intent === "raport_bik") return <BikFields p={parsed} />;
   return (
-    <div className="rounded-lg border border-iron-200 bg-iron-50/60 p-4 text-sm">
-      <p className="font-medium text-iron-900">
+    <div className="rounded-lg border border-ink-200 bg-ink-50/60 p-4 text-sm">
+      <p className="font-medium text-ink-900">
         Nie udało się rozpoznać typu dokumentu.
       </p>
-      <ul className="mt-2 list-disc pl-5 text-iron-700">
+      <ul className="mt-2 list-disc pl-5 text-ink-700">
         {parsed.hints.map((h, i) => (
           <li key={i}>{h}</li>
         ))}
@@ -247,14 +247,14 @@ function Field({
   const display = value ?? "—";
   return (
     <div className={cn("min-w-0", wide && "sm:col-span-2")}>
-      <dt className="text-xs uppercase tracking-wide text-iron-500">
+      <dt className="text-xs uppercase tracking-wide text-ink-500">
         {label}
       </dt>
       <dd
         className={cn(
           "mt-0.5 break-words text-sm text-shield-900",
           emphasize && "font-semibold tabular-nums",
-          !value && "italic text-iron-400",
+          !value && "italic text-ink-400",
         )}
       >
         {display}
@@ -268,7 +268,7 @@ function PeselField({ pesel }: { pesel: string | null }) {
   if (!pesel) return <Field label="PESEL" value={null} />;
   return (
     <div className="min-w-0">
-      <dt className="text-xs uppercase tracking-wide text-iron-500">PESEL</dt>
+      <dt className="text-xs uppercase tracking-wide text-ink-500">PESEL</dt>
       <dd className="mt-0.5 flex items-center gap-2">
         <span className="font-mono tabular-nums text-sm text-shield-900">
           {show ? pesel : maskPesel(pesel)}
@@ -277,7 +277,7 @@ function PeselField({ pesel }: { pesel: string | null }) {
           type="button"
           onClick={() => setShow((s) => !s)}
           aria-label={show ? "Ukryj PESEL" : "Pokaż PESEL"}
-          className="rounded p-1 text-iron-500 hover:bg-shield-50 hover:text-shield-700"
+          className="rounded p-1 text-ink-500 hover:bg-shield-50 hover:text-shield-700"
         >
           {show ? (
             <EyeOff className="h-3.5 w-3.5" />

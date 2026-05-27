@@ -105,7 +105,7 @@ export function SecurityClient({ mfaEnabled: initialEnabled, webauthnCredentials
 
       {!enabled && !setup && (
         <div className="flex flex-col gap-2">
-          <p className="text-fluid-sm text-iron-600 dark:text-iron-300">
+          <p className="text-fluid-sm text-ink-600 dark:text-ink-300">
             MFA znacząco zmniejsza ryzyko przejęcia konta nawet w razie wycieku hasła.
           </p>
           <Button onClick={startSetup} disabled={pending}>
@@ -116,12 +116,12 @@ export function SecurityClient({ mfaEnabled: initialEnabled, webauthnCredentials
       )}
 
       {setup && (
-        <div className="flex flex-col gap-3 rounded-lg border border-iron-200 p-4 dark:border-dlugomat-700">
+        <div className="flex flex-col gap-3 rounded-lg border border-ink-200 p-4 dark:border-dlugomat-700">
           <h3 className="text-fluid-base font-semibold">1. Zeskanuj kod QR</h3>
           {setup.qr_data_url && (
             <img src={setup.qr_data_url} alt="QR code MFA" className="h-48 w-48 rounded-md border" />
           )}
-          <p className="text-fluid-xs text-iron-500">
+          <p className="text-fluid-xs text-ink-500">
             Lub wprowadź ręcznie: <code className="font-mono">{setup.secret}</code>
           </p>
           <h3 className="text-fluid-base font-semibold">2. Wpisz 6-cyfrowy kod z aplikacji</h3>
@@ -140,10 +140,10 @@ export function SecurityClient({ mfaEnabled: initialEnabled, webauthnCredentials
           {setup.backup_codes?.length > 0 && (
             <div className="mt-2 flex flex-col gap-1">
               <h3 className="text-fluid-base font-semibold">3. Zachowaj kody zapasowe</h3>
-              <p className="text-fluid-xs text-iron-500">
+              <p className="text-fluid-xs text-ink-500">
                 Każdy kod można użyć raz. Schowaj je w menedżerze haseł.
               </p>
-              <div className="mt-1 grid grid-cols-2 gap-1 rounded-md bg-iron-50 p-3 font-mono text-fluid-sm dark:bg-dlugomat-950">
+              <div className="mt-1 grid grid-cols-2 gap-1 rounded-md bg-ink-50 p-3 font-mono text-fluid-sm dark:bg-dlugomat-950">
                 {setup.backup_codes.map((c) => (
                   <span key={c}>{c}</span>
                 ))}
@@ -160,26 +160,26 @@ export function SecurityClient({ mfaEnabled: initialEnabled, webauthnCredentials
         </Button>
       )}
 
-      <div className="border-t border-iron-200 pt-4 dark:border-dlugomat-700">
+      <div className="border-t border-ink-200 pt-4 dark:border-dlugomat-700">
         <h3 className="flex items-center gap-2 text-fluid-base font-semibold">
           <Fingerprint className="h-4 w-4" />
           Klucze bezpieczeństwa (Passkey / WebAuthn)
         </h3>
-        <p className="mt-1 text-fluid-sm text-iron-600 dark:text-iron-300">
+        <p className="mt-1 text-fluid-sm text-ink-600 dark:text-ink-300">
           Logowanie odciskiem palca, Touch ID, klucze YubiKey.
         </p>
         {creds.length === 0 ? (
-          <p className="mt-3 text-fluid-sm text-iron-500">Brak zarejestrowanych kluczy.</p>
+          <p className="mt-3 text-fluid-sm text-ink-500">Brak zarejestrowanych kluczy.</p>
         ) : (
           <ul className="mt-3 flex flex-col gap-2">
             {creds.map((c) => (
               <li
                 key={c.id}
-                className="flex items-center justify-between gap-2 rounded-md border border-iron-200 px-3 py-2 dark:border-dlugomat-700"
+                className="flex items-center justify-between gap-2 rounded-md border border-ink-200 px-3 py-2 dark:border-dlugomat-700"
               >
                 <div className="flex flex-col">
                   <span className="text-fluid-sm font-medium">{c.device_name ?? "Nienazwane urządzenie"}</span>
-                  <span className="text-fluid-xs text-iron-500">
+                  <span className="text-fluid-xs text-ink-500">
                     Dodano {new Date(c.created_at).toLocaleDateString("pl-PL")}
                   </span>
                 </div>
@@ -190,7 +190,7 @@ export function SecurityClient({ mfaEnabled: initialEnabled, webauthnCredentials
             ))}
           </ul>
         )}
-        <p className="mt-3 text-fluid-xs text-iron-500">
+        <p className="mt-3 text-fluid-xs text-ink-500">
           <KeyRound className="mr-1 inline h-3 w-3" />
           Rejestracja Passkey wymaga obsługi przeglądarki — użyj przycisku „Dodaj passkey" w toku logowania.
         </p>

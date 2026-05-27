@@ -35,8 +35,8 @@ export function StepStrony({
 
   return (
     <form onSubmit={onValid} className="space-y-6" noValidate>
-      <fieldset className="rounded-xl border border-iron-200 dark:border-dlugomat-800 p-4">
-        <legend className="px-2 text-fluid-xs uppercase tracking-wide text-iron-500">
+      <fieldset className="rounded-xl border border-ink-200 dark:border-dlugomat-800 p-4">
+        <legend className="px-2 text-fluid-xs uppercase tracking-wide text-ink-500">
           Powód (wierzyciel)
         </legend>
         <div className="grid gap-4 sm:grid-cols-2">
@@ -61,8 +61,8 @@ export function StepStrony({
         </div>
       </fieldset>
 
-      <fieldset className="rounded-xl border border-iron-200 dark:border-dlugomat-800 p-4">
-        <legend className="px-2 text-fluid-xs uppercase tracking-wide text-iron-500">
+      <fieldset className="rounded-xl border border-ink-200 dark:border-dlugomat-800 p-4">
+        <legend className="px-2 text-fluid-xs uppercase tracking-wide text-ink-500">
           Pozwany (Ty)
         </legend>
         <div className="grid gap-4 sm:grid-cols-2">

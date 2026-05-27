@@ -14,12 +14,12 @@ export default function ResetPasswordPage() {
         <h1 className="text-fluid-3xl font-bold tracking-tight text-dlugomat-900 dark:text-white">
           Zresetuj hasło
         </h1>
-        <p className="mt-1 text-fluid-sm text-iron-600 dark:text-iron-300">
+        <p className="mt-1 text-fluid-sm text-ink-600 dark:text-ink-300">
           Podaj e-mail — wyślemy link, którym ustawisz nowe hasło.
         </p>
       </div>
       <ResetPasswordForm />
-      <p className="text-fluid-sm text-iron-600 dark:text-iron-300">
+      <p className="text-fluid-sm text-ink-600 dark:text-ink-300">
         Pamiętasz hasło?{" "}
         <Link href="/auth/sign-in" className="font-semibold text-dlugomat-700 hover:underline dark:text-dlugomat-300">
           Wróć do logowania

@@ -21,7 +21,7 @@ const LOGOS = ["Gazeta Prawna", "Rzeczpospolita", "Puls Biznesu", "Money.pl", "F
  */
 export function SocialProof() {
   return (
-    <section aria-labelledby="proof-title" className="bg-iron-50/60 py-16">
+    <section aria-labelledby="proof-title" className="bg-ink-50/60 py-16">
       <div className="container px-6">
         <header className="mx-auto max-w-2xl text-center">
           <p className="text-xs uppercase tracking-wide text-dlugomat-500">Zaufanie</p>

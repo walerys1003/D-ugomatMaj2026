@@ -56,11 +56,11 @@ export function SignUpForm({ next }: { next?: string }) {
     return (
       <div className="rounded-xl border border-accent-200 bg-accent-50 p-5 text-fluid-sm text-accent-800">
         <h2 className="text-fluid-lg font-semibold text-accent-700">Konto utworzone</h2>
-        <p className="mt-2 text-iron-700">
+        <p className="mt-2 text-ink-700">
           Wysłaliśmy link aktywacyjny na <strong>{verificationSent}</strong>. Kliknij go, aby
           potwierdzić e-mail i zalogować się.
         </p>
-        <p className="mt-3 text-iron-600">
+        <p className="mt-3 text-ink-600">
           Nie widzisz wiadomości? Sprawdź folder spam — czasem trafia tam pierwsza próba.
         </p>
       </div>
@@ -114,10 +114,10 @@ export function SignUpForm({ next }: { next?: string }) {
         />
       </FormField>
 
-      <label className="flex items-start gap-3 text-fluid-sm text-iron-700 dark:text-iron-300">
+      <label className="flex items-start gap-3 text-fluid-sm text-ink-700 dark:text-ink-300">
         <input
           type="checkbox"
-          className="mt-1 size-4 rounded border-iron-300 text-dlugomat-600 focus-visible:shadow-shield-focus focus-visible:outline-none"
+          className="mt-1 size-4 rounded border-ink-300 text-dlugomat-600 focus-visible:shadow-shield-focus focus-visible:outline-none"
           {...form.register("accept")}
         />
         <span>
@@ -138,10 +138,10 @@ export function SignUpForm({ next }: { next?: string }) {
         </p>
       ) : null}
 
-      <label className="flex items-start gap-3 text-fluid-sm text-iron-700 dark:text-iron-300">
+      <label className="flex items-start gap-3 text-fluid-sm text-ink-700 dark:text-ink-300">
         <input
           type="checkbox"
-          className="mt-1 size-4 rounded border-iron-300 text-dlugomat-600 focus-visible:shadow-shield-focus focus-visible:outline-none"
+          className="mt-1 size-4 rounded border-ink-300 text-dlugomat-600 focus-visible:shadow-shield-focus focus-visible:outline-none"
           {...form.register("marketing")}
         />
         <span>Chcę otrzymywać przydatne porady prawne na e-mail (możesz wypisać się jednym kliknięciem).</span>

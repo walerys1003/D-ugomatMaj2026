@@ -69,7 +69,7 @@ export function StepZarzuty({
                           "hover:border-dlugomat-400 focus-within:ring-2 focus-within:ring-dlugomat-500/40",
                           checked
                             ? "border-dlugomat-500 bg-dlugomat-50/60 dark:border-dlugomat-400 dark:bg-dlugomat-950/40"
-                            : "border-iron-200 dark:border-iron-800",
+                            : "border-ink-200 dark:border-ink-800",
                         )}
                       >
                         <input
@@ -79,10 +79,10 @@ export function StepZarzuty({
                           onChange={() => toggle(opt.id)}
                         />
                         <span className="space-y-1">
-                          <span className="block text-fluid-sm font-medium text-iron-900 dark:text-iron-50">
+                          <span className="block text-fluid-sm font-medium text-ink-900 dark:text-ink-50">
                             {opt.label}
                           </span>
-                          <span className="block text-fluid-xs text-iron-600 dark:text-iron-400">
+                          <span className="block text-fluid-xs text-ink-600 dark:text-ink-400">
                             {opt.helper}
                           </span>
                         </span>
@@ -107,9 +107,9 @@ export function StepZarzuty({
           rows={5}
           maxLength={2000}
           className={cn(
-            "w-full rounded-md border border-iron-200 bg-white px-3 py-2 text-fluid-sm text-iron-900",
-            "placeholder:text-iron-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dlugomat-500/40",
-            "dark:border-iron-800 dark:bg-iron-950 dark:text-iron-50",
+            "w-full rounded-md border border-ink-200 bg-white px-3 py-2 text-fluid-sm text-ink-900",
+            "placeholder:text-ink-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dlugomat-500/40",
+            "dark:border-ink-800 dark:bg-ink-950 dark:text-ink-50",
           )}
           placeholder="Np. brak umowy z powodem, zapłaciłem(-am) całość 2 lata temu…"
           {...register("okolicznosci")}

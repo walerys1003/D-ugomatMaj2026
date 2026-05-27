@@ -34,7 +34,7 @@ export default async function RevenuePage() {
   if (!data) {
     return (
       <main className="container mx-auto px-4 py-12 max-w-6xl">
-        <p className="text-iron-600">Brak danych.</p>
+        <p className="text-ink-600">Brak danych.</p>
       </main>
     );
   }
@@ -42,13 +42,13 @@ export default async function RevenuePage() {
   return (
     <main className="container mx-auto px-4 py-8 max-w-7xl space-y-6">
       <div>
-        <Link href="/admin/dashboard" className="text-xs text-iron-500 hover:text-iron-700">
+        <Link href="/admin/dashboard" className="text-xs text-ink-500 hover:text-ink-700">
           ← Admin
         </Link>
-        <h1 className="font-display text-3xl font-semibold text-iron-900 dark:text-iron-50 mt-2">
+        <h1 className="font-display text-3xl font-semibold text-ink-900 dark:text-ink-50 mt-2">
           Revenue
         </h1>
-        <p className="text-sm text-iron-500 mt-1">
+        <p className="text-sm text-ink-500 mt-1">
           MRR · ARR · NRR · ruch przychodów w czasie
         </p>
       </div>
@@ -104,7 +104,7 @@ export default async function RevenuePage() {
         <CardContent>
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left border-b border-iron-200 dark:border-iron-800 text-xs uppercase tracking-wider text-iron-500">
+              <tr className="text-left border-b border-ink-200 dark:border-ink-800 text-xs uppercase tracking-wider text-ink-500">
                 <th className="py-2 pr-3">Plan</th>
                 <th className="py-2 pr-3 text-right">Subskrypcje</th>
                 <th className="py-2 pr-3 text-right">MRR</th>
@@ -117,16 +117,16 @@ export default async function RevenuePage() {
                 return (
                   <tr
                     key={row.plan}
-                    className="border-b border-iron-100 dark:border-iron-900"
+                    className="border-b border-ink-100 dark:border-ink-900"
                   >
-                    <td className="py-2 pr-3 capitalize font-medium text-iron-900 dark:text-iron-50">
+                    <td className="py-2 pr-3 capitalize font-medium text-ink-900 dark:text-ink-50">
                       {row.plan}
                     </td>
                     <td className="py-2 pr-3 text-right">{row.subs}</td>
                     <td className="py-2 pr-3 text-right font-medium">
                       {row.mrr_pln.toLocaleString("pl-PL")} zł
                     </td>
-                    <td className="py-2 pr-3 text-right text-iron-500">
+                    <td className="py-2 pr-3 text-right text-ink-500">
                       {share.toFixed(1)}%
                     </td>
                   </tr>
@@ -154,8 +154,8 @@ function BigStat({
   return (
     <Card elevation="pop">
       <CardContent className="pt-5">
-        <div className="text-xs uppercase tracking-wider text-iron-500 mb-1">{label}</div>
-        <div className="font-display text-2xl font-semibold text-iron-900 dark:text-iron-50">
+        <div className="text-xs uppercase tracking-wider text-ink-500 mb-1">{label}</div>
+        <div className="font-display text-2xl font-semibold text-ink-900 dark:text-ink-50">
           {value}
         </div>
         {typeof delta === "number" && (
@@ -187,8 +187,8 @@ function MovementCard({
   color: string;
 }) {
   return (
-    <div className="rounded-lg border border-iron-200 dark:border-iron-800 px-4 py-3">
-      <div className="text-xs uppercase tracking-wider text-iron-500 mb-1">{label}</div>
+    <div className="rounded-lg border border-ink-200 dark:border-ink-800 px-4 py-3">
+      <div className="text-xs uppercase tracking-wider text-ink-500 mb-1">{label}</div>
       <div className={`font-display text-xl font-semibold ${color}`}>
         {value >= 0 ? "+" : ""}
         {value.toLocaleString("pl-PL")} zł

@@ -19,11 +19,11 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         aria-invalid={invalid || undefined}
         className={cn(
           "flex h-11 w-full rounded-md border bg-background px-3 py-2 text-fluid-sm",
-          "placeholder:text-iron-400 text-iron-900 dark:text-iron-100",
+          "placeholder:text-ink-400 text-ink-900 dark:text-ink-100",
           "transition-shadow duration-base ease-shield-out",
-          "border-iron-200 dark:border-dlugomat-800",
+          "border-ink-200 dark:border-dlugomat-800",
           "focus:border-dlugomat-500 focus:outline-none focus:shadow-shield-focus",
-          "disabled:cursor-not-allowed disabled:bg-iron-50 disabled:text-iron-400",
+          "disabled:cursor-not-allowed disabled:bg-ink-50 disabled:text-ink-400",
           invalid && "border-danger-500 focus:border-danger-500 focus:shadow-[0_0_0_3px_hsl(var(--danger-500)/0.35)]",
           className
         )}
@@ -49,11 +49,11 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         aria-invalid={invalid || undefined}
         className={cn(
           "flex min-h-[88px] w-full rounded-md border bg-background px-3 py-2 text-fluid-sm",
-          "placeholder:text-iron-400 text-iron-900 dark:text-iron-100",
+          "placeholder:text-ink-400 text-ink-900 dark:text-ink-100",
           "transition-shadow duration-base ease-shield-out",
-          "border-iron-200 dark:border-dlugomat-800",
+          "border-ink-200 dark:border-dlugomat-800",
           "focus:border-dlugomat-500 focus:outline-none focus:shadow-shield-focus",
-          "disabled:cursor-not-allowed disabled:bg-iron-50 disabled:text-iron-400",
+          "disabled:cursor-not-allowed disabled:bg-ink-50 disabled:text-ink-400",
           "resize-y",
           invalid && "border-danger-500 focus:border-danger-500",
           className

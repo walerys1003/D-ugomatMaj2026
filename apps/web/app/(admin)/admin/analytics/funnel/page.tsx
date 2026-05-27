@@ -49,13 +49,13 @@ export default async function FunnelPage({
   return (
     <main className="container mx-auto px-4 py-8 max-w-6xl space-y-6">
       <div>
-        <Link href="/admin/dashboard" className="text-xs text-iron-500 hover:text-iron-700">
+        <Link href="/admin/dashboard" className="text-xs text-ink-500 hover:text-ink-700">
           ← Admin
         </Link>
-        <h1 className="font-display text-3xl font-semibold text-iron-900 dark:text-iron-50 mt-2">
+        <h1 className="font-display text-3xl font-semibold text-ink-900 dark:text-ink-50 mt-2">
           Lejek konwersji
         </h1>
-        <p className="text-sm text-iron-500 mt-1">
+        <p className="text-sm text-ink-500 mt-1">
           Od pierwszej wizyty do płatnej subskrypcji
         </p>
       </div>
@@ -67,8 +67,8 @@ export default async function FunnelPage({
             href={`/admin/analytics/funnel?range=${r.value}`}
             className={`text-sm px-3 py-1.5 rounded-full border ${
               range === r.value
-                ? "border-iron-900 bg-iron-900 text-iron-50"
-                : "border-iron-300 text-iron-700 hover:border-iron-400"
+                ? "border-ink-900 bg-ink-900 text-ink-50"
+                : "border-ink-300 text-ink-700 hover:border-ink-400"
             }`}
           >
             {r.label}
@@ -90,7 +90,7 @@ export default async function FunnelPage({
         </CardHeader>
         <CardContent>
           {!data || data.steps.length === 0 ? (
-            <p className="text-sm text-iron-500">Brak danych.</p>
+            <p className="text-sm text-ink-500">Brak danych.</p>
           ) : (
             <ul className="space-y-3">
               {data.steps.map((s, i) => {
@@ -98,31 +98,31 @@ export default async function FunnelPage({
                 return (
                   <li key={s.key}>
                     <div className="flex items-baseline justify-between text-sm mb-1">
-                      <span className="font-medium text-iron-900 dark:text-iron-50">
+                      <span className="font-medium text-ink-900 dark:text-ink-50">
                         {i + 1}. {s.label}
                       </span>
-                      <span className="text-iron-600 dark:text-iron-400">
+                      <span className="text-ink-600 dark:text-ink-400">
                         {s.users.toLocaleString("pl-PL")} użytkowników
                       </span>
                     </div>
-                    <div className="relative h-9 rounded-md bg-iron-100 dark:bg-iron-800 overflow-hidden">
+                    <div className="relative h-9 rounded-md bg-ink-100 dark:bg-ink-800 overflow-hidden">
                       <div
                         className="absolute inset-y-0 left-0 bg-accent-600 dark:bg-accent-500 transition-all"
                         style={{ width: `${Math.max(2, width)}%` }}
                       />
                       <div className="relative h-full flex items-center justify-between px-3 text-xs">
-                        <span className="text-iron-50 font-medium drop-shadow">
+                        <span className="text-ink-50 font-medium drop-shadow">
                           {width.toFixed(1)}% z TOP
                         </span>
                         {i > 0 && (
-                          <span className="text-iron-700 dark:text-iron-300">
+                          <span className="text-ink-700 dark:text-ink-300">
                             {s.conversion_from_previous_percent.toFixed(1)}% z poprz.
                           </span>
                         )}
                       </div>
                     </div>
                     {s.avg_time_to_next_minutes !== null && i < data.steps.length - 1 && (
-                      <div className="text-xs text-iron-500 mt-1">
+                      <div className="text-xs text-ink-500 mt-1">
                         Średni czas do następnego: {s.avg_time_to_next_minutes} min
                       </div>
                     )}

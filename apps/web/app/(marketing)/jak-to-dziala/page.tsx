@@ -160,14 +160,14 @@ export default function JakToDzialaPage() {
                         Krok {step.n}
                       </span>
                       <CardTitle className="text-fluid-2xl">{step.title}</CardTitle>
-                      <p className="text-fluid-base text-iron-700 dark:text-iron-200">
+                      <p className="text-fluid-base text-ink-700 dark:text-ink-200">
                         {step.short}
                       </p>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-fluid-sm leading-relaxed text-iron-600 dark:text-iron-300">
+                  <p className="text-fluid-sm leading-relaxed text-ink-600 dark:text-ink-300">
                     {step.long}
                   </p>
                 </CardContent>
@@ -178,7 +178,7 @@ export default function JakToDzialaPage() {
       </section>
 
       {/* PRINCIPLES */}
-      <section className="bg-iron-50/60 py-20 sm:py-24 dark:bg-dlugomat-950/40">
+      <section className="bg-ink-50/60 py-20 sm:py-24 dark:bg-dlugomat-950/40">
         <div className="container">
           <div className="mx-auto max-w-2xl text-center">
             <p className="text-fluid-sm font-semibold uppercase tracking-wider text-dlugomat-600">
@@ -200,7 +200,7 @@ export default function JakToDzialaPage() {
                     <CardTitle className="mt-3 text-fluid-lg">{p.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-fluid-sm text-iron-600 dark:text-iron-300">
+                    <p className="text-fluid-sm text-ink-600 dark:text-ink-300">
                       {p.desc}
                     </p>
                   </CardContent>
@@ -259,10 +259,10 @@ export default function JakToDzialaPage() {
                 <p className="font-mono text-fluid-xs font-semibold uppercase tracking-wider text-dlugomat-600">
                   {step.day}
                 </p>
-                <h3 className="mt-1 text-fluid-lg font-semibold text-dlugomat-900 dark:text-iron-50">
+                <h3 className="mt-1 text-fluid-lg font-semibold text-dlugomat-900 dark:text-ink-50">
                   {step.title}
                 </h3>
-                <p className="mt-1 text-fluid-sm text-iron-600 dark:text-iron-300">
+                <p className="mt-1 text-fluid-sm text-ink-600 dark:text-ink-300">
                   {step.desc}
                 </p>
               </li>
@@ -272,7 +272,7 @@ export default function JakToDzialaPage() {
       </section>
 
       {/* FAQ */}
-      <section className="bg-iron-50/60 py-20 sm:py-24 dark:bg-dlugomat-950/40">
+      <section className="bg-ink-50/60 py-20 sm:py-24 dark:bg-dlugomat-950/40">
         <div className="container max-w-3xl">
           <div className="text-center">
             <p className="text-fluid-sm font-semibold uppercase tracking-wider text-dlugomat-600">

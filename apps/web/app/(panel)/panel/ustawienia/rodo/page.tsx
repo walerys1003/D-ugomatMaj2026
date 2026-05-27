@@ -32,10 +32,10 @@ export default function RodoSettingsPage() {
         <p className="text-fluid-sm font-semibold uppercase tracking-wider text-dlugomat-600">
           Ustawienia · RODO
         </p>
-        <h1 className="text-fluid-3xl font-semibold text-iron-900">
+        <h1 className="text-fluid-3xl font-semibold text-ink-900">
           Twoje dane osobowe
         </h1>
-        <p className="text-iron-600">
+        <p className="text-ink-600">
           Pełna kontrola nad danymi przetwarzanymi przez Długomat — pobieranie,
           usuwanie, transparentność.
         </p>
@@ -58,7 +58,7 @@ export default function RodoSettingsPage() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <ul className="list-disc space-y-1 pl-5 text-fluid-sm text-iron-700">
+          <ul className="list-disc space-y-1 pl-5 text-fluid-sm text-ink-700">
             <li>
               PESEL osób trzecich (np. współpozwanych) jest zaszyfrowany w bazie
               i w eksporcie zastąpiony etykietą <code>[encrypted_at_rest]</code>.

@@ -26,7 +26,7 @@ export default function BialaEtykietaPage() {
           <h1 className="text-fluid-3xl font-bold tracking-tight text-dlugomat-900 dark:text-white">
             White-label
           </h1>
-          <p className="mt-1 max-w-2xl text-fluid-base text-iron-600 dark:text-iron-300">
+          <p className="mt-1 max-w-2xl text-fluid-base text-ink-600 dark:text-ink-300">
             Klient nie musi wiedzieć, że korzystasz z Długomatu. Customizujesz
             logo, kolor primary, domenę panelu i nadawcę e-maili.
           </p>
@@ -95,7 +95,7 @@ export default function BialaEtykietaPage() {
           <CardTitle className="mt-2 text-fluid-xl">Custom domena panelu</CardTitle>
           <CardDescription>
             Twoi klienci logują się np. pod{" "}
-            <code className="rounded bg-iron-100 px-1.5 py-0.5 font-mono text-fluid-xs dark:bg-dlugomat-900">
+            <code className="rounded bg-ink-100 px-1.5 py-0.5 font-mono text-fluid-xs dark:bg-dlugomat-900">
               panel.kancelaria-kowalska.pl
             </code>{" "}
             zamiast app.dlugomat.pl. Dodajemy rekord CNAME, certyfikat Let&apos;s Encrypt OK.
@@ -163,16 +163,16 @@ function Field({
 }) {
   return (
     <label className="flex flex-col gap-1.5">
-      <span className="text-fluid-xs font-semibold uppercase tracking-wider text-iron-600 dark:text-iron-300">
+      <span className="text-fluid-xs font-semibold uppercase tracking-wider text-ink-600 dark:text-ink-300">
         {label}
       </span>
       {kind === "file" ? (
-        <div className="flex items-center gap-2 rounded-lg border border-dashed border-iron-300 bg-iron-50/40 p-3 text-fluid-sm text-iron-500 dark:border-dlugomat-800 dark:bg-dlugomat-900/30">
+        <div className="flex items-center gap-2 rounded-lg border border-dashed border-ink-300 bg-ink-50/40 p-3 text-fluid-sm text-ink-500 dark:border-dlugomat-800 dark:bg-dlugomat-900/30">
           <ImageIcon className="size-4" aria-hidden />
           Kliknij lub przeciągnij plik
         </div>
       ) : kind === "status" ? (
-        <div className="rounded-lg border border-iron-200 bg-iron-50/40 px-3 py-2 text-fluid-sm dark:border-iron-800 dark:bg-dlugomat-900/30">
+        <div className="rounded-lg border border-ink-200 bg-ink-50/40 px-3 py-2 text-fluid-sm dark:border-ink-800 dark:bg-dlugomat-900/30">
           <Badge tone="warning" withDot>
             {value}
           </Badge>
@@ -181,11 +181,11 @@ function Field({
         <input
           type="text"
           placeholder={placeholder}
-          className="h-11 rounded-lg border border-iron-200 bg-white px-3 text-fluid-sm focus-visible:shadow-shield-focus focus-visible:outline-none dark:border-iron-800 dark:bg-iron-950"
+          className="h-11 rounded-lg border border-ink-200 bg-white px-3 text-fluid-sm focus-visible:shadow-shield-focus focus-visible:outline-none dark:border-ink-800 dark:bg-ink-950"
         />
       )}
       {helper ? (
-        <span className="text-fluid-xs text-iron-500">{helper}</span>
+        <span className="text-fluid-xs text-ink-500">{helper}</span>
       ) : null}
     </label>
   );

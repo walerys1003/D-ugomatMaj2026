@@ -47,12 +47,12 @@ export default async function ListingDetailPage({ params }: Props) {
     <article className="bg-white pb-20 dark:bg-dlugomat-950">
       {/* Header */}
       <header className="container py-10 lg:py-14">
-        <nav aria-label="Okruszki" className="mb-6 text-fluid-xs text-iron-500">
+        <nav aria-label="Okruszki" className="mb-6 text-fluid-xs text-ink-500">
           <Link href="/marketplace" className="hover:text-dlugomat-700">
             Marketplace
           </Link>
-          <span className="mx-2 text-iron-300">/</span>
-          <span className="text-iron-700 dark:text-iron-200">{l.title}</span>
+          <span className="mx-2 text-ink-300">/</span>
+          <span className="text-ink-700 dark:text-ink-200">{l.title}</span>
         </nav>
 
         <div className="grid gap-10 lg:grid-cols-[2fr_1fr] lg:gap-16">
@@ -68,35 +68,35 @@ export default async function ListingDetailPage({ params }: Props) {
                 </Badge>
               )}
             </div>
-            <h1 className="font-display text-fluid-5xl font-bold leading-tight text-dlugomat-900 dark:text-iron-50">
+            <h1 className="font-display text-fluid-5xl font-bold leading-tight text-dlugomat-900 dark:text-ink-50">
               {l.title}
             </h1>
-            <p className="mt-4 text-fluid-lg leading-relaxed text-iron-700 dark:text-iron-200">
+            <p className="mt-4 text-fluid-lg leading-relaxed text-ink-700 dark:text-ink-200">
               {l.tagline}
             </p>
 
-            <dl className="mt-8 grid grid-cols-2 gap-y-4 border-y border-iron-200 py-6 text-fluid-sm dark:border-dlugomat-800 md:grid-cols-4">
+            <dl className="mt-8 grid grid-cols-2 gap-y-4 border-y border-ink-200 py-6 text-fluid-sm dark:border-dlugomat-800 md:grid-cols-4">
               <div>
-                <dt className="text-iron-500">Dostawca</dt>
-                <dd className="mt-1 font-semibold text-dlugomat-900 dark:text-iron-50">
+                <dt className="text-ink-500">Dostawca</dt>
+                <dd className="mt-1 font-semibold text-dlugomat-900 dark:text-ink-50">
                   {l.vendor.name}
                 </dd>
               </div>
               <div>
-                <dt className="text-iron-500">Instalacje</dt>
-                <dd className="mt-1 font-semibold text-dlugomat-900 dark:text-iron-50">
+                <dt className="text-ink-500">Instalacje</dt>
+                <dd className="mt-1 font-semibold text-dlugomat-900 dark:text-ink-50">
                   {l.install_count.toLocaleString("pl-PL")}
                 </dd>
               </div>
               <div>
-                <dt className="text-iron-500">Ocena</dt>
-                <dd className="mt-1 font-semibold text-dlugomat-900 dark:text-iron-50">
+                <dt className="text-ink-500">Ocena</dt>
+                <dd className="mt-1 font-semibold text-dlugomat-900 dark:text-ink-50">
                   {l.rating_avg.toFixed(1)} / 5 ({l.rating_count})
                 </dd>
               </div>
               <div>
-                <dt className="text-iron-500">Cena</dt>
-                <dd className="mt-1 font-semibold text-dlugomat-900 dark:text-iron-50">
+                <dt className="text-ink-500">Cena</dt>
+                <dd className="mt-1 font-semibold text-dlugomat-900 dark:text-ink-50">
                   {PRICE_MODEL_LABELS[l.price_model]}
                   {l.price_pln != null && l.price_pln > 0 && ` · ${l.price_pln} zł`}
                 </dd>
@@ -127,7 +127,7 @@ export default async function ListingDetailPage({ params }: Props) {
                     <Link href={l.changelog_url}>Historia zmian</Link>
                   </Button>
                 )}
-                <p className="text-center text-fluid-xs text-iron-500">
+                <p className="text-center text-fluid-xs text-ink-500">
                   Instalacja wymaga aktywnego konta. Bez zobowiązań — odinstaluj
                   w dowolnym momencie z panelu.
                 </p>
@@ -142,7 +142,7 @@ export default async function ListingDetailPage({ params }: Props) {
         <div className="prose prose-lg max-w-none dark:prose-invert">
           <h2 className="font-display text-fluid-2xl font-semibold">Opis</h2>
           <div
-            className="text-iron-700 dark:text-iron-200"
+            className="text-ink-700 dark:text-ink-200"
             dangerouslySetInnerHTML={{ __html: l.description_md }}
           />
 
@@ -156,7 +156,7 @@ export default async function ListingDetailPage({ params }: Props) {
                     key={i}
                     src={url}
                     alt={`${l.title} screenshot ${i + 1}`}
-                    className="rounded-lg border border-iron-200 dark:border-dlugomat-800"
+                    className="rounded-lg border border-ink-200 dark:border-dlugomat-800"
                     loading="lazy"
                   />
                 ))}
@@ -181,7 +181,7 @@ export default async function ListingDetailPage({ params }: Props) {
         <aside className="space-y-6">
           <Card elevation="subtle">
             <CardContent className="space-y-3 p-6">
-              <h3 className="font-display text-fluid-lg font-semibold text-dlugomat-900 dark:text-iron-50">
+              <h3 className="font-display text-fluid-lg font-semibold text-dlugomat-900 dark:text-ink-50">
                 Tagi
               </h3>
               <div className="flex flex-wrap gap-2">
@@ -196,10 +196,10 @@ export default async function ListingDetailPage({ params }: Props) {
 
           <Card elevation="subtle">
             <CardContent className="space-y-3 p-6">
-              <h3 className="font-display text-fluid-lg font-semibold text-dlugomat-900 dark:text-iron-50">
+              <h3 className="font-display text-fluid-lg font-semibold text-dlugomat-900 dark:text-ink-50">
                 Wsparcie
               </h3>
-              <p className="text-fluid-sm text-iron-600 dark:text-iron-300">
+              <p className="text-fluid-sm text-ink-600 dark:text-ink-300">
                 Problemy z {l.title}? Skontaktuj się bezpośrednio z dostawcą lub przez nasz support.
               </p>
               <Button asChild variant="ghost" size="sm" className="w-full">

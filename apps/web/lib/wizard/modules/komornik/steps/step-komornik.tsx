@@ -35,7 +35,7 @@ export function StepKomornikKancelaria({
       className="space-y-5"
       noValidate
     >
-      <p className="text-fluid-sm text-iron-700">
+      <p className="text-fluid-sm text-ink-700">
         Skopiuj dane z otrzymanego pisma od komornika — najczęściej z nagłówka
         zawiadomienia o wszczęciu egzekucji albo postanowienia o zajęciu.
       </p>

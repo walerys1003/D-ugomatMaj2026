@@ -47,7 +47,7 @@ export function SkanerClient() {
             <ScanLine className="h-4 w-4" aria-hidden />
             Wybierz typ dokumentu (opcjonalnie)
           </h2>
-          <p className="mt-1 text-xs text-iron-600">
+          <p className="mt-1 text-xs text-ink-600">
             Jeśli wiesz, jaki dokument skanujesz — zaznacz to tutaj. Pomaga to
             naszemu parserowi. Jeśli nie wiesz — zostaw "Wykryj automatycznie",
             poradzimy sobie.
@@ -146,7 +146,7 @@ function IntentChip({
       className={`rounded-lg border px-3 py-2 text-left text-sm transition-colors ${
         active
           ? "border-shield-500 bg-shield-50 text-shield-900"
-          : "border-iron-200 bg-white text-iron-800 hover:border-shield-300 hover:bg-shield-50/40"
+          : "border-ink-200 bg-white text-ink-800 hover:border-shield-300 hover:bg-shield-50/40"
       }`}
     >
       {label}
@@ -169,7 +169,7 @@ function PrivacyTile({
         {icon}
         {title}
       </div>
-      <p className="mt-1 text-xs leading-relaxed text-iron-700">{body}</p>
+      <p className="mt-1 text-xs leading-relaxed text-ink-700">{body}</p>
     </li>
   );
 }

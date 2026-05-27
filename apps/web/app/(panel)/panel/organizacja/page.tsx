@@ -21,8 +21,8 @@ export default function OrganizacjaPage() {
   return (
     <main className="container mx-auto px-4 py-8 max-w-6xl">
       <div className="mb-8">
-        <p className="text-xs uppercase tracking-wider text-iron-500 mb-2">Organizacja</p>
-        <h1 className="font-display text-3xl font-semibold text-iron-900 dark:text-iron-50">
+        <p className="text-xs uppercase tracking-wider text-ink-500 mb-2">Organizacja</p>
+        <h1 className="font-display text-3xl font-semibold text-ink-900 dark:text-ink-50">
           Zarządzanie organizacją
         </h1>
       </div>
@@ -50,7 +50,7 @@ export default function OrganizacjaPage() {
                   <CardTitle className="text-base">{s.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-iron-600 dark:text-iron-400">{s.desc}</p>
+                  <p className="text-sm text-ink-600 dark:text-ink-400">{s.desc}</p>
                 </CardContent>
               </Card>
             </Link>

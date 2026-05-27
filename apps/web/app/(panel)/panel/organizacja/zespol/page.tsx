@@ -18,7 +18,7 @@ export default async function ZespolPage() {
   if (!org) {
     return (
       <main className="container mx-auto px-4 py-12 max-w-4xl">
-        <p className="text-iron-600">Brak aktywnej organizacji.</p>
+        <p className="text-ink-600">Brak aktywnej organizacji.</p>
       </main>
     );
   }
@@ -31,13 +31,13 @@ export default async function ZespolPage() {
   return (
     <main className="container mx-auto px-4 py-8 max-w-6xl space-y-6">
       <div>
-        <Link href="/panel/organizacja" className="text-xs text-iron-500 hover:text-iron-700">
+        <Link href="/panel/organizacja" className="text-xs text-ink-500 hover:text-ink-700">
           ← Organizacja
         </Link>
-        <h1 className="font-display text-3xl font-semibold text-iron-900 dark:text-iron-50 mt-2">
+        <h1 className="font-display text-3xl font-semibold text-ink-900 dark:text-ink-50 mt-2">
           Zespół
         </h1>
-        <p className="text-sm text-iron-500 mt-1">
+        <p className="text-sm text-ink-500 mt-1">
           {members.length} {members.length === 1 ? "członek" : "członków"} ·{" "}
           {org.seats_used}/{org.seats_total} miejsc
         </p>
@@ -58,12 +58,12 @@ export default async function ZespolPage() {
         </CardHeader>
         <CardContent>
           {members.length === 0 ? (
-            <p className="text-sm text-iron-500">Brak członków.</p>
+            <p className="text-sm text-ink-500">Brak członków.</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-left border-b border-iron-200 dark:border-iron-800 text-xs uppercase tracking-wider text-iron-500">
+                  <tr className="text-left border-b border-ink-200 dark:border-ink-800 text-xs uppercase tracking-wider text-ink-500">
                     <th className="py-2 pr-3">Osoba</th>
                     <th className="py-2 pr-3">Rola</th>
                     <th className="py-2 pr-3">Dołączył(a)</th>
@@ -74,23 +74,23 @@ export default async function ZespolPage() {
                   {members.map((m) => (
                     <tr
                       key={m.id}
-                      className="border-b border-iron-100 dark:border-iron-900"
+                      className="border-b border-ink-100 dark:border-ink-900"
                     >
                       <td className="py-3 pr-3">
-                        <div className="font-medium text-iron-900 dark:text-iron-50">
+                        <div className="font-medium text-ink-900 dark:text-ink-50">
                           {m.user_name}
                         </div>
-                        <div className="text-xs text-iron-500">{m.user_email}</div>
+                        <div className="text-xs text-ink-500">{m.user_email}</div>
                       </td>
                       <td className="py-3 pr-3">
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-iron-100 dark:bg-iron-800">
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-ink-100 dark:bg-ink-800">
                           {ROLE_LABELS[m.role]}
                         </span>
                       </td>
-                      <td className="py-3 pr-3 text-iron-600 dark:text-iron-400">
+                      <td className="py-3 pr-3 text-ink-600 dark:text-ink-400">
                         {new Date(m.joined_at).toLocaleDateString("pl-PL")}
                       </td>
-                      <td className="py-3 pr-3 text-iron-500">
+                      <td className="py-3 pr-3 text-ink-500">
                         {m.last_active_at
                           ? new Date(m.last_active_at).toLocaleDateString("pl-PL")
                           : "—"}
@@ -110,12 +110,12 @@ export default async function ZespolPage() {
             <CardTitle>Oczekujące zaproszenia ({pending.length})</CardTitle>
           </CardHeader>
           <CardContent>
-            <ul className="divide-y divide-iron-100 dark:divide-iron-900">
+            <ul className="divide-y divide-ink-100 dark:divide-ink-900">
               {pending.map((inv) => (
                 <li key={inv.id} className="flex items-center justify-between py-3 text-sm">
                   <div>
-                    <div className="font-medium text-iron-900 dark:text-iron-50">{inv.email}</div>
-                    <div className="text-xs text-iron-500">
+                    <div className="font-medium text-ink-900 dark:text-ink-50">{inv.email}</div>
+                    <div className="text-xs text-ink-500">
                       Rola: {ROLE_LABELS[inv.role]} · ważne do{" "}
                       {new Date(inv.expires_at).toLocaleDateString("pl-PL")}
                     </div>

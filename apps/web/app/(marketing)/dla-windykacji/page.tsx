@@ -45,16 +45,16 @@ const CAPABILITIES = [
 
 export default function DlaWindykacjiPage() {
   return (
-    <main className="bg-iron-50 dark:bg-iron-950 pb-20">
-      <section className="bg-white dark:bg-iron-900 border-b border-iron-200 dark:border-iron-800">
+    <main className="bg-ink-50 dark:bg-ink-950 pb-20">
+      <section className="bg-white dark:bg-ink-900 border-b border-ink-200 dark:border-ink-800">
         <div className="container mx-auto px-4 py-16 max-w-5xl">
-          <p className="text-xs uppercase tracking-wider text-iron-500 mb-3">
+          <p className="text-xs uppercase tracking-wider text-ink-500 mb-3">
             Dla działów windykacji i firm zarządzających portfelami
           </p>
-          <h1 className="font-display text-4xl md:text-6xl font-semibold text-iron-900 dark:text-iron-50 leading-[1.05] max-w-3xl">
+          <h1 className="font-display text-4xl md:text-6xl font-semibold text-ink-900 dark:text-ink-50 leading-[1.05] max-w-3xl">
             Recovery, którego nie da się zrobić ręcznie.
           </h1>
-          <p className="text-lg md:text-xl text-iron-600 dark:text-iron-300 mt-4 max-w-2xl">
+          <p className="text-lg md:text-xl text-ink-600 dark:text-ink-300 mt-4 max-w-2xl">
             Długomat obsługuje portfele wierzytelności od 100 spraw do 50 000+ z
             zachowaniem compliance i pełnej kontroli operacyjnej.
           </p>
@@ -69,7 +69,7 @@ export default function DlaWindykacjiPage() {
         </div>
       </section>
 
-      <section className="border-y border-iron-200 dark:border-iron-800 bg-white dark:bg-iron-900">
+      <section className="border-y border-ink-200 dark:border-ink-800 bg-white dark:bg-ink-900">
         <div className="container mx-auto px-4 py-10">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {KPIS.map((k, i) => (
@@ -77,14 +77,14 @@ export default function DlaWindykacjiPage() {
                 key={i}
                 className={`text-center md:text-left ${
                   i > 0
-                    ? "md:border-l md:border-iron-200 dark:md:border-iron-800 md:pl-6"
+                    ? "md:border-l md:border-ink-200 dark:md:border-ink-800 md:pl-6"
                     : ""
                 }`}
               >
-                <div className="font-display text-3xl md:text-4xl font-semibold text-iron-900 dark:text-iron-50 tabular-nums">
+                <div className="font-display text-3xl md:text-4xl font-semibold text-ink-900 dark:text-ink-50 tabular-nums">
                   {k.value}
                 </div>
-                <div className="text-xs uppercase tracking-wider text-iron-500 mt-1">
+                <div className="text-xs uppercase tracking-wider text-ink-500 mt-1">
                   {k.label}
                 </div>
               </div>
@@ -94,10 +94,10 @@ export default function DlaWindykacjiPage() {
       </section>
 
       <section className="container mx-auto px-4 py-16 max-w-5xl">
-        <h2 className="font-display text-3xl font-semibold text-iron-900 dark:text-iron-50 mb-2">
+        <h2 className="font-display text-3xl font-semibold text-ink-900 dark:text-ink-50 mb-2">
           Możliwości platformy
         </h2>
-        <p className="text-iron-600 dark:text-iron-400 mb-10 max-w-2xl">
+        <p className="text-ink-600 dark:text-ink-400 mb-10 max-w-2xl">
           Wszystko, czego potrzebuje sprawny dział windykacji — od importu portfela
           po raporty dla zarządu.
         </p>
@@ -108,7 +108,7 @@ export default function DlaWindykacjiPage() {
                 <CardTitle className="text-base">{c.title}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-iron-600 dark:text-iron-400">{c.desc}</p>
+                <p className="text-sm text-ink-600 dark:text-ink-400">{c.desc}</p>
               </CardContent>
             </Card>
           ))}
@@ -118,10 +118,10 @@ export default function DlaWindykacjiPage() {
       <section className="container mx-auto px-4 max-w-4xl">
         <Card elevation="pop">
           <CardContent className="pt-8 pb-8 text-center space-y-4">
-            <h2 className="font-display text-2xl md:text-3xl font-semibold text-iron-900 dark:text-iron-50">
+            <h2 className="font-display text-2xl md:text-3xl font-semibold text-ink-900 dark:text-ink-50">
               Proof of Concept w 30 dni
             </h2>
-            <p className="text-iron-600 dark:text-iron-300 max-w-2xl mx-auto">
+            <p className="text-ink-600 dark:text-ink-300 max-w-2xl mx-auto">
               Wgrywamy próbkę 100-500 spraw z Twojego portfela, konfigurujemy reguły,
               uruchamiamy w sandboxie. Po 30 dniach dostajesz raport z mierzalną
               skutecznością — bez zobowiązań.

@@ -150,13 +150,13 @@ export default function EksportRodoPage() {
                   <label
                     key={cat.id}
                     htmlFor={`cat-${cat.id}`}
-                    className="flex items-start gap-3 p-3 rounded-md border border-iron-300 cursor-pointer hover:bg-dlugomat-50 has-[:checked]:border-accent-500 has-[:checked]:bg-accent-50 transition-colors"
+                    className="flex items-start gap-3 p-3 rounded-md border border-ink-300 cursor-pointer hover:bg-dlugomat-50 has-[:checked]:border-accent-500 has-[:checked]:bg-accent-50 transition-colors"
                   >
                     <input
                       type="checkbox"
                       id={`cat-${cat.id}`}
                       defaultChecked={cat.default}
-                      className="mt-1 h-4 w-4 text-accent-600 border-iron-400 rounded focus-visible:shadow-shield-focus"
+                      className="mt-1 h-4 w-4 text-accent-600 border-ink-400 rounded focus-visible:shadow-shield-focus"
                     />
                     <div className="flex-1">
                       <div className="flex items-center justify-between gap-3">
@@ -170,7 +170,7 @@ export default function EksportRodoPage() {
                   </label>
                 ))}
               </div>
-              <div className="mt-4 p-3 rounded-md bg-dlugomat-50 border border-iron-200 flex items-center justify-between">
+              <div className="mt-4 p-3 rounded-md bg-dlugomat-50 border border-ink-200 flex items-center justify-between">
                 <span className="text-sm text-dlugomat-800">Przewidywany rozmiar pakietu</span>
                 <span className="font-medium text-dlugomat-950">{(totalSize / 1024).toFixed(1)} MB</span>
               </div>
@@ -188,14 +188,14 @@ export default function EksportRodoPage() {
                   <label
                     key={fmt.id}
                     htmlFor={`fmt-${fmt.id}`}
-                    className="flex items-start gap-3 p-3 rounded-md border border-iron-300 cursor-pointer hover:bg-dlugomat-50 has-[:checked]:border-accent-500 has-[:checked]:bg-accent-50 transition-colors"
+                    className="flex items-start gap-3 p-3 rounded-md border border-ink-300 cursor-pointer hover:bg-dlugomat-50 has-[:checked]:border-accent-500 has-[:checked]:bg-accent-50 transition-colors"
                   >
                     <input
                       type="radio"
                       name="format"
                       id={`fmt-${fmt.id}`}
                       defaultChecked={idx === 0}
-                      className="mt-1 h-4 w-4 text-accent-600 border-iron-400 focus-visible:shadow-shield-focus"
+                      className="mt-1 h-4 w-4 text-accent-600 border-ink-400 focus-visible:shadow-shield-focus"
                     />
                     <div className="flex-1">
                       <div className="font-medium text-dlugomat-950">{fmt.label}</div>
@@ -246,7 +246,7 @@ export default function EksportRodoPage() {
               {PREVIOUS_EXPORTS.map((exp) => (
                 <li
                   key={exp.id}
-                  className="flex items-center justify-between gap-3 p-3 rounded-md border border-iron-200 bg-white"
+                  className="flex items-center justify-between gap-3 p-3 rounded-md border border-ink-200 bg-white"
                 >
                   <div className="flex items-center gap-3">
                     <FileText className="h-4 w-4 text-dlugomat-600 shrink-0" aria-hidden />

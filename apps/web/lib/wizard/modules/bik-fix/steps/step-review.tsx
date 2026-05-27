@@ -62,12 +62,12 @@ export function StepBikReview({
       className="space-y-5"
       noValidate
     >
-      <section className="rounded-2xl border border-iron-200 bg-white shadow-subtle dark:border-iron-800 dark:bg-iron-950">
-        <header className="border-b border-iron-200 px-5 py-3 dark:border-iron-800">
-          <h3 className="text-fluid-base font-semibold text-iron-900 dark:text-iron-50">
+      <section className="rounded-2xl border border-ink-200 bg-white shadow-subtle dark:border-ink-800 dark:bg-ink-950">
+        <header className="border-b border-ink-200 px-5 py-3 dark:border-ink-800">
+          <h3 className="text-fluid-base font-semibold text-ink-900 dark:text-ink-50">
             {VARIANT_LABELS[variant] ?? variant}
           </h3>
-          <p className="text-fluid-xs text-iron-600 dark:text-iron-400">
+          <p className="text-fluid-xs text-ink-600 dark:text-ink-400">
             Podstawa prawna: {VARIANT_ART[variant] ?? "—"}
           </p>
         </header>
@@ -99,29 +99,29 @@ export function StepBikReview({
           />
         </dl>
 
-        <div className="border-t border-iron-200 px-5 py-4 dark:border-iron-800">
-          <p className="text-fluid-xs uppercase tracking-wide text-iron-500">
+        <div className="border-t border-ink-200 px-5 py-4 dark:border-ink-800">
+          <p className="text-fluid-xs uppercase tracking-wide text-ink-500">
             Zarzuty
           </p>
           {zarzutyLabels.length > 0 ? (
-            <ul className="mt-2 list-disc space-y-1 pl-5 text-fluid-sm text-iron-800 dark:text-iron-200">
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-fluid-sm text-ink-800 dark:text-ink-200">
               {zarzutyLabels.map((l, i) => (
                 <li key={i}>{l}</li>
               ))}
             </ul>
           ) : (
-            <p className="mt-2 text-fluid-sm text-iron-500">
+            <p className="mt-2 text-fluid-sm text-ink-500">
               Brak — wróć do kroku „Zarzuty".
             </p>
           )}
         </div>
 
         {allAnswers.okolicznosci && (
-          <div className="border-t border-iron-200 px-5 py-4 dark:border-iron-800">
-            <p className="text-fluid-xs uppercase tracking-wide text-iron-500">
+          <div className="border-t border-ink-200 px-5 py-4 dark:border-ink-800">
+            <p className="text-fluid-xs uppercase tracking-wide text-ink-500">
               Okoliczności
             </p>
-            <p className="mt-1 whitespace-pre-line text-fluid-sm text-iron-800 dark:text-iron-200">
+            <p className="mt-1 whitespace-pre-line text-fluid-sm text-ink-800 dark:text-ink-200">
               {allAnswers.okolicznosci}
             </p>
           </div>
@@ -130,11 +130,11 @@ export function StepBikReview({
         {(variant === "reklamacja_bik" || variant === "skarga_uodo") &&
           (allAnswers.data_reklamacji_bank ||
             allAnswers.data_reklamacji_bik) && (
-            <div className="border-t border-iron-200 px-5 py-4 dark:border-iron-800">
-              <p className="text-fluid-xs uppercase tracking-wide text-iron-500">
+            <div className="border-t border-ink-200 px-5 py-4 dark:border-ink-800">
+              <p className="text-fluid-xs uppercase tracking-wide text-ink-500">
                 Historia ścieżki reklamacyjnej
               </p>
-              <ul className="mt-1 space-y-1 text-fluid-sm text-iron-800 dark:text-iron-200">
+              <ul className="mt-1 space-y-1 text-fluid-sm text-ink-800 dark:text-ink-200">
                 {allAnswers.data_reklamacji_bank && (
                   <li>
                     Reklamacja w banku:{" "}
@@ -167,7 +167,7 @@ export function StepBikReview({
                 "hover:border-dlugomat-400 focus-within:ring-2 focus-within:ring-dlugomat-500/40",
                 field.value
                   ? "border-dlugomat-500 bg-dlugomat-50/60 dark:border-dlugomat-400 dark:bg-dlugomat-950/40"
-                  : "border-iron-200 dark:border-iron-800",
+                  : "border-ink-200 dark:border-ink-800",
               )}
             >
               <input
@@ -177,7 +177,7 @@ export function StepBikReview({
                 checked={Boolean(field.value)}
                 onChange={(e) => field.onChange(e.target.checked)}
               />
-              <span className="text-fluid-sm text-iron-800 dark:text-iron-200">
+              <span className="text-fluid-sm text-ink-800 dark:text-ink-200">
                 Potwierdzam, że dane są zgodne z prawdą i mam podstawy faktyczne
                 do zgłoszenia powyższych zarzutów. Rozumiem, że pismo jest
                 projektem przygotowanym przez Długomat — odpowiedzialność za
@@ -214,15 +214,15 @@ function ReviewRow({
 }) {
   return (
     <div className="space-y-0.5">
-      <dt className="text-fluid-xs uppercase tracking-wide text-iron-500">
+      <dt className="text-fluid-xs uppercase tracking-wide text-ink-500">
         {label}
       </dt>
       <dd
         className={cn(
           "text-fluid-sm",
           highlight
-            ? "font-semibold text-iron-900 dark:text-iron-50"
-            : "text-iron-800 dark:text-iron-200",
+            ? "font-semibold text-ink-900 dark:text-ink-50"
+            : "text-ink-800 dark:text-ink-200",
         )}
       >
         {value || "—"}

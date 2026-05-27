@@ -158,13 +158,13 @@ export default function UlubionePage() {
                 <input
                   type="search"
                   placeholder="Szukaj wsrod ulubionych..."
-                  className="w-full pl-10 pr-3 py-2 rounded-md border border-iron-300 bg-white text-dlugomat-950 placeholder:text-dlugomat-500 focus-visible:shadow-shield-focus focus-visible:outline-none"
+                  className="w-full pl-10 pr-3 py-2 rounded-md border border-ink-300 bg-white text-dlugomat-950 placeholder:text-dlugomat-500 focus-visible:shadow-shield-focus focus-visible:outline-none"
                   aria-label="Szukaj w ulubionych"
                 />
               </div>
               <button
                 type="button"
-                className="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-iron-300 bg-white text-dlugomat-900 text-sm font-medium hover:bg-dlugomat-50 focus-visible:shadow-shield-focus focus-visible:outline-none"
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-ink-300 bg-white text-dlugomat-900 text-sm font-medium hover:bg-dlugomat-50 focus-visible:shadow-shield-focus focus-visible:outline-none"
               >
                 <Filter className="h-4 w-4" aria-hidden />
                 Filtry
@@ -180,13 +180,13 @@ export default function UlubionePage() {
                   className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium border focus-visible:shadow-shield-focus focus-visible:outline-none ${
                     idx === 0
                       ? "bg-dlugomat-900 text-white border-dlugomat-900"
-                      : "bg-white text-dlugomat-800 border-iron-300 hover:bg-dlugomat-50"
+                      : "bg-white text-dlugomat-800 border-ink-300 hover:bg-dlugomat-50"
                   }`}
                 >
                   {tab.label}
                   <span
                     className={`text-xs px-1.5 py-0.5 rounded ${
-                      idx === 0 ? "bg-white/20" : "bg-iron-100 text-dlugomat-700"
+                      idx === 0 ? "bg-white/20" : "bg-ink-100 text-dlugomat-700"
                     }`}
                   >
                     {COUNTS[tab.id]}
@@ -219,7 +219,7 @@ export default function UlubionePage() {
                     <button
                       type="button"
                       aria-label="Usun z ulubionych"
-                      className="p-1.5 rounded-md text-warn hover:bg-iron-100 focus-visible:shadow-shield-focus focus-visible:outline-none"
+                      className="p-1.5 rounded-md text-warn hover:bg-ink-100 focus-visible:shadow-shield-focus focus-visible:outline-none"
                     >
                       <Star className="h-4 w-4 fill-current" aria-hidden />
                     </button>
@@ -231,7 +231,7 @@ export default function UlubionePage() {
                       </Badge>
                     ))}
                   </div>
-                  <div className="flex items-center justify-between pt-3 border-t border-iron-100 text-xs text-dlugomat-600">
+                  <div className="flex items-center justify-between pt-3 border-t border-ink-100 text-xs text-dlugomat-600">
                     <span>Dodano {dateFmt.format(new Date(fav.addedAt))}</span>
                     <Link
                       href={fav.href}

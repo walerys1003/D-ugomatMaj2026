@@ -81,7 +81,7 @@ export function ImpersonationClient({
 
   return (
     <div className="space-y-6">
-      <section className="rounded-lg border border-iron-200 dark:border-dlugomat-800 p-4 bg-white dark:bg-dlugomat-900">
+      <section className="rounded-lg border border-ink-200 dark:border-dlugomat-800 p-4 bg-white dark:bg-dlugomat-900">
         <h2 className="font-semibold mb-3">Rozpocznij nową sesję</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <label className="flex flex-col gap-1 text-sm">
@@ -90,7 +90,7 @@ export function ImpersonationClient({
               type="text"
               value={targetUserId}
               onChange={(e) => setTargetUserId(e.target.value)}
-              className="rounded-md border border-iron-300 dark:border-dlugomat-700 px-3 h-10 bg-transparent"
+              className="rounded-md border border-ink-300 dark:border-dlugomat-700 px-3 h-10 bg-transparent"
               placeholder="00000000-0000-0000-0000-000000000000"
             />
           </label>
@@ -99,7 +99,7 @@ export function ImpersonationClient({
             <select
               value={scope}
               onChange={(e) => setScope(e.target.value as Scope)}
-              className="rounded-md border border-iron-300 dark:border-dlugomat-700 px-3 h-10 bg-transparent"
+              className="rounded-md border border-ink-300 dark:border-dlugomat-700 px-3 h-10 bg-transparent"
             >
               <option value="read_only">read_only — tylko podgląd</option>
               <option value="support">support — odpowiedzi na ticket</option>
@@ -113,7 +113,7 @@ export function ImpersonationClient({
               rows={2}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              className="rounded-md border border-iron-300 dark:border-dlugomat-700 px-3 py-2 bg-transparent"
+              className="rounded-md border border-ink-300 dark:border-dlugomat-700 px-3 py-2 bg-transparent"
               placeholder="Ticket #12345 — użytkownik nie widzi swojej sprawy."
             />
           </label>
@@ -125,7 +125,7 @@ export function ImpersonationClient({
               max={240}
               value={ttlMin}
               onChange={(e) => setTtlMin(Number(e.target.value))}
-              className="rounded-md border border-iron-300 dark:border-dlugomat-700 px-3 h-10 bg-transparent"
+              className="rounded-md border border-ink-300 dark:border-dlugomat-700 px-3 h-10 bg-transparent"
             />
           </label>
         </div>
@@ -139,19 +139,19 @@ export function ImpersonationClient({
           <div className="mt-4 rounded-md border border-accent-300 bg-accent-50 p-3 text-sm">
             <strong>Token (pokazywany jednorazowo):</strong>
             <pre className="mt-1 overflow-auto text-xs">{createdToken}</pre>
-            <p className="text-iron-600 mt-2">
+            <p className="text-ink-600 mt-2">
               Skopiuj go teraz — po zamknięciu modala nie będzie już dostępny.
             </p>
           </div>
         )}
       </section>
 
-      <section className="rounded-lg border border-iron-200 dark:border-dlugomat-800 overflow-hidden">
-        <h2 className="p-3 font-semibold border-b border-iron-200 dark:border-dlugomat-800">
+      <section className="rounded-lg border border-ink-200 dark:border-dlugomat-800 overflow-hidden">
+        <h2 className="p-3 font-semibold border-b border-ink-200 dark:border-dlugomat-800">
           Aktywne sesje ({sessions.length})
         </h2>
         <table className="w-full text-sm">
-          <thead className="bg-iron-50 dark:bg-dlugomat-850">
+          <thead className="bg-ink-50 dark:bg-dlugomat-850">
             <tr>
               <th className="text-left p-3">Cel</th>
               <th className="text-left p-3">Scope</th>
@@ -163,13 +163,13 @@ export function ImpersonationClient({
           <tbody>
             {sessions.length === 0 && (
               <tr>
-                <td colSpan={5} className="p-6 text-center text-iron-500">
+                <td colSpan={5} className="p-6 text-center text-ink-500">
                   Brak aktywnych sesji impersonacji.
                 </td>
               </tr>
             )}
             {sessions.map((s) => (
-              <tr key={s.id} className="border-t border-iron-200 dark:border-dlugomat-800">
+              <tr key={s.id} className="border-t border-ink-200 dark:border-dlugomat-800">
                 <td className="p-3 font-mono text-xs">{s.target_user_id.slice(0, 8)}…</td>
                 <td className="p-3">
                   <span
@@ -178,17 +178,17 @@ export function ImpersonationClient({
                       (s.scope === "full"
                         ? "bg-danger-100 text-danger-700"
                         : s.scope === "debug"
-                        ? "bg-iron-100 text-iron-700"
+                        ? "bg-ink-100 text-ink-700"
                         : "bg-accent-100 text-accent-800")
                     }
                   >
                     {s.scope}
                   </span>
                 </td>
-                <td className="p-3 text-iron-600 dark:text-iron-300 max-w-md truncate">
+                <td className="p-3 text-ink-600 dark:text-ink-300 max-w-md truncate">
                   {s.reason ?? "—"}
                 </td>
-                <td className="p-3 text-iron-600">
+                <td className="p-3 text-ink-600">
                   {new Date(s.expires_at).toLocaleString("pl-PL")}
                 </td>
                 <td className="p-3 text-right">

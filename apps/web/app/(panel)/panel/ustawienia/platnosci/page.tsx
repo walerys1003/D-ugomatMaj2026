@@ -58,8 +58,8 @@ export default async function PaymentsSettingsPage() {
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6">
       <header>
-        <h1 className="text-fluid-2xl font-bold text-iron-900 dark:text-white">Płatności i subskrypcja</h1>
-        <p className="mt-1 text-fluid-base text-iron-600 dark:text-iron-300">
+        <h1 className="text-fluid-2xl font-bold text-ink-900 dark:text-white">Płatności i subskrypcja</h1>
+        <p className="mt-1 text-fluid-base text-ink-600 dark:text-ink-300">
           Faktury VAT-PL, historia transakcji, zarządzanie planem.
         </p>
       </header>
@@ -98,25 +98,25 @@ export default async function PaymentsSettingsPage() {
             <div className="flex flex-col gap-3">
               <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                 <div className="flex flex-col">
-                  <span className="text-fluid-xs text-iron-500">Cena</span>
+                  <span className="text-fluid-xs text-ink-500">Cena</span>
                   <span className="text-fluid-lg font-semibold">
                     {formatPLN(subscription.amount_grosze ?? 0)}
                   </span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-fluid-xs text-iron-500">Cykl</span>
+                  <span className="text-fluid-xs text-ink-500">Cykl</span>
                   <span className="text-fluid-lg font-semibold">
                     {subscription.cycle === "annual" ? "Roczny" : "Miesięczny"}
                   </span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-fluid-xs text-iron-500">Następna płatność</span>
+                  <span className="text-fluid-xs text-ink-500">Następna płatność</span>
                   <span className="text-fluid-lg font-semibold">
                     {formatDate(subscription.current_period_end)}
                   </span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-fluid-xs text-iron-500">Auto-odnowienie</span>
+                  <span className="text-fluid-xs text-ink-500">Auto-odnowienie</span>
                   <span className="text-fluid-lg font-semibold">
                     {subscription.cancel_at_period_end ? "Nie" : "Tak"}
                   </span>
@@ -139,7 +139,7 @@ export default async function PaymentsSettingsPage() {
             </div>
           ) : (
             <div className="flex flex-col gap-3">
-              <p className="text-fluid-sm text-iron-600 dark:text-iron-300">
+              <p className="text-fluid-sm text-ink-600 dark:text-ink-300">
                 Korzystasz z planu pay-per-case (płatność za sprawę). Subskrypcja daje nielimitowane sprawy, wyższe limity AI i priorytetowy support.
               </p>
               <Button asChild>
@@ -161,12 +161,12 @@ export default async function PaymentsSettingsPage() {
         </CardHeader>
         <CardContent>
           {!invoices || invoices.length === 0 ? (
-            <p className="text-fluid-sm text-iron-500">Nie masz jeszcze faktur.</p>
+            <p className="text-fluid-sm text-ink-500">Nie masz jeszcze faktur.</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full border-collapse text-fluid-sm">
                 <thead>
-                  <tr className="border-b border-iron-200 text-left text-fluid-xs uppercase tracking-wider text-iron-500 dark:border-dlugomat-700">
+                  <tr className="border-b border-ink-200 text-left text-fluid-xs uppercase tracking-wider text-ink-500 dark:border-dlugomat-700">
                     <th className="py-2 pr-3">Numer</th>
                     <th className="py-2 pr-3">Data</th>
                     <th className="py-2 pr-3">Kwota</th>
@@ -176,7 +176,7 @@ export default async function PaymentsSettingsPage() {
                 </thead>
                 <tbody>
                   {invoices.map((inv: any) => (
-                    <tr key={inv.id} className="border-b border-iron-100 dark:border-dlugomat-800">
+                    <tr key={inv.id} className="border-b border-ink-100 dark:border-dlugomat-800">
                       <td className="py-2 pr-3 font-mono">{inv.invoice_number}</td>
                       <td className="py-2 pr-3">{formatDate(inv.issue_date)}</td>
                       <td className="py-2 pr-3 font-medium">{formatPLN(inv.total_gross_grosze)}</td>
@@ -210,17 +210,17 @@ export default async function PaymentsSettingsPage() {
         </CardHeader>
         <CardContent>
           {!payments || payments.length === 0 ? (
-            <p className="text-fluid-sm text-iron-500">Brak transakcji.</p>
+            <p className="text-fluid-sm text-ink-500">Brak transakcji.</p>
           ) : (
             <ul className="flex flex-col gap-1">
               {payments.map((p: any) => (
                 <li
                   key={p.id}
-                  className="flex items-center justify-between gap-3 border-b border-iron-100 py-2 last:border-b-0 dark:border-dlugomat-800"
+                  className="flex items-center justify-between gap-3 border-b border-ink-100 py-2 last:border-b-0 dark:border-dlugomat-800"
                 >
                   <div className="flex flex-col">
                     <span className="text-fluid-sm font-medium">{p.description ?? "Płatność"}</span>
-                    <span className="text-fluid-xs text-iron-500">
+                    <span className="text-fluid-xs text-ink-500">
                       {new Date(p.created_at).toLocaleString("pl-PL")}
                     </span>
                   </div>

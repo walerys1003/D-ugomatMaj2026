@@ -67,13 +67,13 @@ export default async function MaterialyPage() {
   return (
     <main className="container mx-auto px-4 py-8 max-w-6xl space-y-6">
       <div>
-        <Link href="/panel/partner" className="text-xs text-iron-500 hover:text-iron-700">
+        <Link href="/panel/partner" className="text-xs text-ink-500 hover:text-ink-700">
           ← Panel partnera
         </Link>
-        <h1 className="font-display text-3xl font-semibold text-iron-900 dark:text-iron-50 mt-2">
+        <h1 className="font-display text-3xl font-semibold text-ink-900 dark:text-ink-50 mt-2">
           Materiały marketingowe
         </h1>
-        <p className="text-sm text-iron-500 mt-1">
+        <p className="text-sm text-ink-500 mt-1">
           Wszystko, czego potrzebujesz, aby promować Długomat — gotowe do pobrania.
         </p>
       </div>
@@ -84,7 +84,7 @@ export default async function MaterialyPage() {
             <CardTitle>Twój link partnerski</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <code className="block font-mono text-xs px-3 py-2 rounded-md bg-iron-100 dark:bg-iron-800 break-all">
+            <code className="block font-mono text-xs px-3 py-2 rounded-md bg-ink-100 dark:bg-ink-800 break-all">
               {links.referral_link}
             </code>
             <div className="flex flex-wrap gap-2">
@@ -98,7 +98,7 @@ export default async function MaterialyPage() {
                 <Button variant="ghost">Zobacz leady</Button>
               </Link>
             </div>
-            <p className="text-xs text-iron-500">
+            <p className="text-xs text-ink-500">
               UTM: <code className="font-mono">{links.utm_params}</code>
             </p>
           </CardContent>
@@ -110,14 +110,14 @@ export default async function MaterialyPage() {
         if (groupAssets.length === 0) return null;
         return (
           <section key={group.key} className="space-y-3">
-            <h2 className="font-display text-xl font-semibold text-iron-900 dark:text-iron-50">
+            <h2 className="font-display text-xl font-semibold text-ink-900 dark:text-ink-50">
               {group.title}
             </h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {groupAssets.map((a) => (
                 <Card key={a.id} elevation="subtle">
                   {a.preview_url && (
-                    <div className="aspect-video bg-iron-100 dark:bg-iron-800 overflow-hidden rounded-t-lg">
+                    <div className="aspect-video bg-ink-100 dark:bg-ink-800 overflow-hidden rounded-t-lg">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={a.preview_url}
@@ -130,15 +130,15 @@ export default async function MaterialyPage() {
                     <CardTitle className="text-base">{a.title}</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
-                    <p className="text-sm text-iron-600 dark:text-iron-400 line-clamp-2">
+                    <p className="text-sm text-ink-600 dark:text-ink-400 line-clamp-2">
                       {a.description}
                     </p>
-                    <div className="flex items-center justify-between text-xs text-iron-500">
+                    <div className="flex items-center justify-between text-xs text-ink-500">
                       <span className="uppercase">
                         {a.format}
                         {a.size_kb ? ` · ${Math.round(a.size_kb / 1024 * 10) / 10} MB` : ""}
                       </span>
-                      <span className="px-2 py-0.5 rounded-full bg-iron-100 dark:bg-iron-800">
+                      <span className="px-2 py-0.5 rounded-full bg-ink-100 dark:bg-ink-800">
                         {KIND_LABELS[a.kind]}
                       </span>
                     </div>
@@ -158,7 +158,7 @@ export default async function MaterialyPage() {
       {assets.length === 0 && (
         <Card elevation="subtle">
           <CardContent className="pt-6">
-            <p className="text-sm text-iron-500">
+            <p className="text-sm text-ink-500">
               Materiały będą dostępne wkrótce — w międzyczasie skorzystaj z linku
               partnerskiego powyżej.
             </p>

@@ -60,19 +60,19 @@ const PROFILE: Profile = {
 };
 
 const inputCls =
-  "w-full rounded-md border border-iron-300 bg-white px-3 py-2 text-sm text-dlugomat-900 focus:border-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus";
+  "w-full rounded-md border border-ink-300 bg-white px-3 py-2 text-sm text-dlugomat-900 focus:border-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus";
 
 export default function ProfilPage() {
   return (
     <div className="space-y-8">
       <header className="space-y-2">
-        <p className="text-xs uppercase tracking-[0.18em] text-iron-500">
+        <p className="text-xs uppercase tracking-[0.18em] text-ink-500">
           Konto · profil
         </p>
         <h1 className="font-display text-fluid-h1 text-dlugomat-950">
           Twój profil
         </h1>
-        <p className="max-w-2xl text-iron-600">
+        <p className="max-w-2xl text-ink-600">
           Dane profilowe wykorzystywane są do uzupełniania pism oraz weryfikacji
           tożsamości. Wszystkie zmiany są audytowane.
         </p>
@@ -90,16 +90,16 @@ export default function ProfilPage() {
                 <button
                   type="button"
                   aria-label="Zmień awatar"
-                  className="absolute -bottom-1 -right-1 inline-flex h-8 w-8 items-center justify-center rounded-full border border-iron-200 bg-white shadow-card focus-visible:outline-none focus-visible:shadow-shield-focus"
+                  className="absolute -bottom-1 -right-1 inline-flex h-8 w-8 items-center justify-center rounded-full border border-ink-200 bg-white shadow-card focus-visible:outline-none focus-visible:shadow-shield-focus"
                 >
                   <Camera className="h-4 w-4 text-dlugomat-700" aria-hidden />
                 </button>
               </div>
               <p className="font-display text-lg text-dlugomat-950">{PROFILE.full_name}</p>
-              <p className="text-sm text-iron-600">{PROFILE.email}</p>
+              <p className="text-sm text-ink-600">{PROFILE.email}</p>
             </div>
 
-            <div className="space-y-2 border-t border-iron-100 pt-4">
+            <div className="space-y-2 border-t border-ink-100 pt-4">
               <StatusRow
                 label="E-mail zweryfikowany"
                 ok={PROFILE.email_verified}
@@ -111,7 +111,7 @@ export default function ProfilPage() {
               <StatusRow label="MFA aktywne" ok={PROFILE.mfa_enabled} />
             </div>
 
-            <p className="border-t border-iron-100 pt-3 text-xs text-iron-500">
+            <p className="border-t border-ink-100 pt-3 text-xs text-ink-500">
               Konto utworzone: {PROFILE.created_at}
             </p>
           </CardContent>
@@ -213,7 +213,7 @@ export default function ProfilPage() {
             ].map((opt) => (
               <label
                 key={opt.value}
-                className="flex items-start gap-3 rounded-md border border-iron-200 p-3 cursor-pointer hover:bg-iron-50"
+                className="flex items-start gap-3 rounded-md border border-ink-200 p-3 cursor-pointer hover:bg-ink-50"
               >
                 <input
                   type="radio"
@@ -224,7 +224,7 @@ export default function ProfilPage() {
                 />
                 <div>
                   <p className="font-medium text-dlugomat-900">{opt.label}</p>
-                  <p className="text-xs text-iron-500">{opt.desc}</p>
+                  <p className="text-xs text-ink-500">{opt.desc}</p>
                 </div>
               </label>
             ))}
@@ -271,12 +271,12 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-iron-500">
+      <span className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-ink-500">
         {Icon ? <Icon className="h-3.5 w-3.5" aria-hidden /> : null}
         {label}
       </span>
       <div className="mt-1">{children}</div>
-      {hint ? <span className="mt-1 block text-xs text-iron-500">{hint}</span> : null}
+      {hint ? <span className="mt-1 block text-xs text-ink-500">{hint}</span> : null}
     </label>
   );
 }
@@ -284,7 +284,7 @@ function Field({
 function StatusRow({ label, ok }: { label: string; ok: boolean }) {
   return (
     <div className="flex items-center justify-between text-sm">
-      <span className="text-iron-700">{label}</span>
+      <span className="text-ink-700">{label}</span>
       {ok ? (
         <Badge tone="success" withDot>
           <CheckCircle2 className="mr-1 h-3 w-3" aria-hidden />

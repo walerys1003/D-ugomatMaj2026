@@ -42,7 +42,7 @@ export function StepBikZarzuty({
       className="space-y-5"
       noValidate
     >
-      <div className="rounded-lg border border-shield-100 bg-shield-50/30 p-3 text-fluid-sm text-iron-700">
+      <div className="rounded-lg border border-shield-100 bg-shield-50/30 p-3 text-fluid-sm text-ink-700">
         Zaznacz wszystkie nieprawidłowości, które dotyczą Twojego wpisu.
         Każda z nich zostanie rozwinięta w piśmie z odpowiednią podstawą prawną
         (art. 70a Pr. bank., art. 16/17 RODO, art. 6 ust. 1 RODO).
@@ -81,7 +81,7 @@ export function StepBikZarzuty({
                           "focus:outline-none focus-visible:ring-2 focus-visible:ring-shield-500 focus-visible:ring-offset-2",
                           active
                             ? "border-shield-500 bg-shield-50/70"
-                            : "border-iron-200 bg-white hover:border-shield-300 hover:bg-shield-50/30",
+                            : "border-ink-200 bg-white hover:border-shield-300 hover:bg-shield-50/30",
                         )}
                       >
                         <span
@@ -89,17 +89,17 @@ export function StepBikZarzuty({
                             "mt-0.5 grid size-5 shrink-0 place-items-center rounded-md border",
                             active
                               ? "border-shield-500 bg-shield-500 text-white"
-                              : "border-iron-300 bg-white",
+                              : "border-ink-300 bg-white",
                           )}
                           aria-hidden
                         >
                           {active && <Check className="size-3.5" />}
                         </span>
                         <span className="min-w-0 flex-1">
-                          <span className="block text-fluid-sm font-medium text-iron-900">
+                          <span className="block text-fluid-sm font-medium text-ink-900">
                             {opt.label}
                           </span>
-                          <span className="mt-0.5 block text-fluid-xs text-iron-600">
+                          <span className="mt-0.5 block text-fluid-xs text-ink-600">
                             {opt.helper}
                           </span>
                         </span>

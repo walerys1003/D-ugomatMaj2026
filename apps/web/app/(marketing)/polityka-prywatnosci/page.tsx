@@ -77,7 +77,7 @@ const DATA_CATEGORIES = [
 export default function PolitykaPrywatnosciPage() {
   return (
     <div className="min-h-screen bg-dlugomat-50">
-      <section className="bg-white border-b border-iron-200">
+      <section className="bg-white border-b border-ink-200">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <Badge tone="info" className="mb-4">Dokumenty prawne</Badge>
@@ -174,7 +174,7 @@ export default function PolitykaPrywatnosciPage() {
                     {DATA_CATEGORIES.map((cat) => (
                       <li
                         key={cat.category}
-                        className="p-3 rounded-md border border-iron-200 bg-white"
+                        className="p-3 rounded-md border border-ink-200 bg-white"
                       >
                         <div className="font-medium text-dlugomat-950 text-sm">{cat.category}</div>
                         <div className="text-sm text-dlugomat-700 mt-0.5">{cat.items}</div>
@@ -253,7 +253,7 @@ export default function PolitykaPrywatnosciPage() {
                     z 12-letnim doswiadczeniem.
                   </p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
-                    <div className="p-3 rounded-md border border-iron-200 bg-white">
+                    <div className="p-3 rounded-md border border-ink-200 bg-white">
                       <div className="text-xs uppercase tracking-wide text-dlugomat-600 mb-1">Email IOD</div>
                       <a
                         href="mailto:iod@dlugomat.pl"
@@ -262,7 +262,7 @@ export default function PolitykaPrywatnosciPage() {
                         iod@dlugomat.pl
                       </a>
                     </div>
-                    <div className="p-3 rounded-md border border-iron-200 bg-white">
+                    <div className="p-3 rounded-md border border-ink-200 bg-white">
                       <div className="text-xs uppercase tracking-wide text-dlugomat-600 mb-1">Telefon</div>
                       <div className="text-sm font-medium text-dlugomat-950">+48 22 123 45 67 wew. 200</div>
                     </div>

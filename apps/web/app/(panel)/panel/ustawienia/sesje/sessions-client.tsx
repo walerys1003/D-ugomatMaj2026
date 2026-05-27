@@ -63,13 +63,13 @@ export function SessionsClient() {
   };
 
   if (loading) {
-    return <p className="text-fluid-sm text-iron-500">Wczytuję sesje...</p>;
+    return <p className="text-fluid-sm text-ink-500">Wczytuję sesje...</p>;
   }
   if (err) {
     return <p className="text-fluid-sm text-rose-600">{err}</p>;
   }
   if (sessions.length === 0) {
-    return <p className="text-fluid-sm text-iron-500">Brak aktywnych sesji.</p>;
+    return <p className="text-fluid-sm text-ink-500">Brak aktywnych sesji.</p>;
   }
 
   return (
@@ -86,10 +86,10 @@ export function SessionsClient() {
           return (
             <li
               key={s.id}
-              className="flex items-start justify-between gap-3 rounded-lg border border-iron-200 p-3 dark:border-dlugomat-700"
+              className="flex items-start justify-between gap-3 rounded-lg border border-ink-200 p-3 dark:border-dlugomat-700"
             >
               <div className="flex items-start gap-3">
-                <div className="rounded-md bg-iron-100 p-2 dark:bg-dlugomat-800">
+                <div className="rounded-md bg-ink-100 p-2 dark:bg-dlugomat-800">
                   <Icon className="h-4 w-4" />
                 </div>
                 <div className="flex flex-col">
@@ -102,16 +102,16 @@ export function SessionsClient() {
                     )}
                   </div>
                   {s.user_agent && (
-                    <span className="text-fluid-xs text-iron-500" title={s.user_agent}>
+                    <span className="text-fluid-xs text-ink-500" title={s.user_agent}>
                       {s.user_agent.slice(0, 90)}
                       {s.user_agent.length > 90 ? "…" : ""}
                     </span>
                   )}
-                  <span className="mt-1 inline-flex items-center gap-1 text-fluid-xs text-iron-500">
+                  <span className="mt-1 inline-flex items-center gap-1 text-fluid-xs text-ink-500">
                     <Globe className="h-3 w-3" />
                     {[s.geo_city, s.geo_country].filter(Boolean).join(", ") || s.ip || "Nieznana lokalizacja"}
                   </span>
-                  <span className="text-fluid-xs text-iron-400">
+                  <span className="text-fluid-xs text-ink-400">
                     Ostatnia aktywność: {new Date(s.last_seen_at).toLocaleString("pl-PL")}
                   </span>
                 </div>

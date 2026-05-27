@@ -37,12 +37,12 @@ export default async function PrecedentDetailPage({ params }: Props) {
   return (
     <article className="bg-white pb-20 dark:bg-dlugomat-950">
       <header className="container py-10">
-        <nav aria-label="Okruszki" className="mb-6 text-fluid-xs text-iron-500">
+        <nav aria-label="Okruszki" className="mb-6 text-fluid-xs text-ink-500">
           <Link href="/precedensy" className="hover:text-dlugomat-700">
             Orzecznictwo
           </Link>
-          <span className="mx-2 text-iron-300">/</span>
-          <span className="font-mono text-iron-700 dark:text-iron-200">{p.signature}</span>
+          <span className="mx-2 text-ink-300">/</span>
+          <span className="font-mono text-ink-700 dark:text-ink-200">{p.signature}</span>
         </nav>
 
         <div className="grid gap-10 lg:grid-cols-[2fr_1fr] lg:gap-16">
@@ -54,7 +54,7 @@ export default async function PrecedentDetailPage({ params }: Props) {
               <Badge variant="outline" className="bg-dlugomat-50 text-dlugomat-700 dark:bg-dlugomat-900">
                 {COURT_LABELS[p.court]}
               </Badge>
-              <span className="text-fluid-sm text-iron-500">
+              <span className="text-fluid-sm text-ink-500">
                 {new Date(p.date).toLocaleDateString("pl-PL", {
                   year: "numeric",
                   month: "long",
@@ -63,28 +63,28 @@ export default async function PrecedentDetailPage({ params }: Props) {
               </span>
             </div>
 
-            <h1 className="font-display text-fluid-4xl font-bold leading-tight text-dlugomat-900 dark:text-iron-50">
+            <h1 className="font-display text-fluid-4xl font-bold leading-tight text-dlugomat-900 dark:text-ink-50">
               {p.thesis}
             </h1>
 
-            <p className="mt-3 text-fluid-sm text-iron-500">{p.court_name}</p>
+            <p className="mt-3 text-fluid-sm text-ink-500">{p.court_name}</p>
           </div>
 
           <aside className="lg:sticky lg:top-24">
             <Card elevation="pop">
               <CardContent className="space-y-4 p-6">
-                <h2 className="font-display text-fluid-sm font-semibold uppercase tracking-wider text-iron-500">
+                <h2 className="font-display text-fluid-sm font-semibold uppercase tracking-wider text-ink-500">
                   Powiązane moduły Długomata
                 </h2>
                 {p.related_modules.length === 0 ? (
-                  <p className="text-fluid-sm text-iron-500">Brak bezpośredniego mapowania.</p>
+                  <p className="text-fluid-sm text-ink-500">Brak bezpośredniego mapowania.</p>
                 ) : (
                   <ul className="space-y-2">
                     {p.related_modules.map((m) => (
                       <li key={m}>
                         <Link
                           href={`/moduly/${m.toLowerCase()}`}
-                          className="flex items-center justify-between rounded-md border border-iron-200 px-3 py-2 text-fluid-sm font-medium text-iron-800 transition-colors hover:border-dlugomat-300 hover:bg-dlugomat-50 dark:border-dlugomat-800 dark:text-iron-200 dark:hover:bg-dlugomat-900"
+                          className="flex items-center justify-between rounded-md border border-ink-200 px-3 py-2 text-fluid-sm font-medium text-ink-800 transition-colors hover:border-dlugomat-300 hover:bg-dlugomat-50 dark:border-dlugomat-800 dark:text-ink-200 dark:hover:bg-dlugomat-900"
                         >
                           <span>Moduł {m}</span>
                           <span aria-hidden className="text-dlugomat-500">→</span>
@@ -93,7 +93,7 @@ export default async function PrecedentDetailPage({ params }: Props) {
                     ))}
                   </ul>
                 )}
-                <div className="border-t border-iron-200 pt-4 dark:border-dlugomat-800">
+                <div className="border-t border-ink-200 pt-4 dark:border-dlugomat-800">
                   <Button asChild variant="success" size="lg" className="w-full">
                     <Link href="/auth/sign-up">Wykorzystaj w sprawie</Link>
                   </Button>
@@ -108,7 +108,7 @@ export default async function PrecedentDetailPage({ params }: Props) {
         <div className="prose prose-lg max-w-none dark:prose-invert">
           <h2 className="font-display text-fluid-2xl font-semibold">Pełna teza</h2>
           <div className="rounded-lg border-l-4 border-dlugomat-700 bg-dlugomat-50 p-6 not-prose dark:bg-dlugomat-900">
-            <p className="text-fluid-base leading-relaxed text-iron-800 dark:text-iron-100">
+            <p className="text-fluid-base leading-relaxed text-ink-800 dark:text-ink-100">
               {p.thesis_full}
             </p>
           </div>
@@ -120,7 +120,7 @@ export default async function PrecedentDetailPage({ params }: Props) {
                 {p.legal_basis.map((b) => (
                   <li
                     key={b}
-                    className="flex items-start gap-2 rounded-md bg-iron-50 px-4 py-2 font-mono text-fluid-sm text-iron-800 dark:bg-dlugomat-900 dark:text-iron-200"
+                    className="flex items-start gap-2 rounded-md bg-ink-50 px-4 py-2 font-mono text-fluid-sm text-ink-800 dark:bg-dlugomat-900 dark:text-ink-200"
                   >
                     <span aria-hidden className="mt-1 inline-block size-1.5 shrink-0 rounded-full bg-dlugomat-500" />
                     {b}
@@ -143,8 +143,8 @@ export default async function PrecedentDetailPage({ params }: Props) {
             </>
           )}
 
-          <div className="not-prose mt-12 rounded-lg border border-iron-200 bg-iron-50 p-5 text-fluid-sm text-iron-600 dark:border-dlugomat-800 dark:bg-dlugomat-900 dark:text-iron-300">
-            <strong className="text-iron-800 dark:text-iron-100">Disclaimer:</strong> Teza
+          <div className="not-prose mt-12 rounded-lg border border-ink-200 bg-ink-50 p-5 text-fluid-sm text-ink-600 dark:border-dlugomat-800 dark:bg-dlugomat-900 dark:text-ink-300">
+            <strong className="text-ink-800 dark:text-ink-100">Disclaimer:</strong> Teza
             i podstawy prawne mają charakter informacyjny. Konkretne stosowanie do Twojej
             sprawy wymaga indywidualnej analizy — generator Długomata robi to automatycznie,
             uwzględniając stan faktyczny i daty.
@@ -154,24 +154,24 @@ export default async function PrecedentDetailPage({ params }: Props) {
         <aside className="space-y-6">
           <Card elevation="subtle">
             <CardContent className="space-y-3 p-6">
-              <h3 className="font-display text-fluid-sm font-semibold uppercase tracking-wider text-iron-500">
+              <h3 className="font-display text-fluid-sm font-semibold uppercase tracking-wider text-ink-500">
                 Kategoria
               </h3>
               <Badge variant="outline" className="bg-dlugomat-50 dark:bg-dlugomat-900">
                 {p.category}
               </Badge>
 
-              <h3 className="mt-4 font-display text-fluid-sm font-semibold uppercase tracking-wider text-iron-500">
+              <h3 className="mt-4 font-display text-fluid-sm font-semibold uppercase tracking-wider text-ink-500">
                 Trafność w wyszukiwaniu
               </h3>
               <div className="flex items-center gap-2">
-                <div className="h-2 flex-1 overflow-hidden rounded-full bg-iron-100 dark:bg-dlugomat-900">
+                <div className="h-2 flex-1 overflow-hidden rounded-full bg-ink-100 dark:bg-dlugomat-900">
                   <div
                     className="h-full bg-accent-500"
                     style={{ width: `${Math.round(p.relevance_score * 100)}%` }}
                   />
                 </div>
-                <span className="font-mono text-fluid-sm text-iron-700 dark:text-iron-200">
+                <span className="font-mono text-fluid-sm text-ink-700 dark:text-ink-200">
                   {Math.round(p.relevance_score * 100)}%
                 </span>
               </div>

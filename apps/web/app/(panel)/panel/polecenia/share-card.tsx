@@ -109,7 +109,7 @@ export function ReferralCodeShareCard({ code, link }: Props) {
               readOnly
               value={link}
               onFocus={(e) => e.currentTarget.select()}
-              className="min-w-0 flex-1 rounded-md border border-iron-200 bg-white px-3 py-1.5 text-sm text-iron-800"
+              className="min-w-0 flex-1 rounded-md border border-ink-200 bg-white px-3 py-1.5 text-sm text-ink-800"
             />
             <Button
               type="button"
@@ -132,7 +132,7 @@ export function ReferralCodeShareCard({ code, link }: Props) {
             </Button>
             <a
               href={mailto}
-              className="inline-flex items-center gap-1 rounded-md border border-iron-200 bg-white px-3 py-1.5 text-sm text-iron-700 hover:bg-iron-50"
+              className="inline-flex items-center gap-1 rounded-md border border-ink-200 bg-white px-3 py-1.5 text-sm text-ink-700 hover:bg-ink-50"
             >
               <Mail className="h-4 w-4" /> E-mail
             </a>

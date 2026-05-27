@@ -51,7 +51,7 @@ export function StepUzasadnienie({
       noValidate
     >
       <Surface elevation="flat" padded="md" className="bg-dlugomat-50/60 dark:bg-dlugomat-900/40">
-        <p className="text-fluid-sm text-iron-700 dark:text-iron-200">
+        <p className="text-fluid-sm text-ink-700 dark:text-ink-200">
           Pełny wniosek wymaga rozszerzonego uzasadnienia (Pr.up. art. 491² ust. 4). Trzy bloki
           — każdy z min. liczbą znaków. AI Długomata skompiluje je w finalny tekst, ale samodzielne
           pisanie zwiększa szanse na pozytywne rozpatrzenie.

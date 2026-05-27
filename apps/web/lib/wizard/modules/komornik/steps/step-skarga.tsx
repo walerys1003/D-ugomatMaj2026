@@ -46,7 +46,7 @@ export function StepSkarga({
       className="space-y-5"
       noValidate
     >
-      <div className="flex items-start gap-3 rounded-lg border border-temporal-amber-200 bg-temporal-amber-50/60 p-3 text-fluid-sm text-iron-800">
+      <div className="flex items-start gap-3 rounded-lg border border-temporal-amber-200 bg-temporal-amber-50/60 p-3 text-fluid-sm text-ink-800">
         <Clock className="mt-0.5 size-4 text-temporal-amber-700" aria-hidden />
         <div>
           <p className="font-semibold text-temporal-amber-900">

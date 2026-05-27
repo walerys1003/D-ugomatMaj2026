@@ -28,17 +28,17 @@ export default function GlobalError({
 
   return (
     <html lang="pl">
-      <body className="bg-iron-50 antialiased">
+      <body className="bg-ink-50 antialiased">
         <main className="mx-auto flex min-h-screen max-w-lg flex-col items-center justify-center gap-4 px-6 text-center">
           <div className="rounded-full bg-rose-100 p-4 text-rose-600">
             <AlertTriangle className="h-8 w-8" />
           </div>
-          <h1 className="text-2xl font-bold text-iron-900">Wystąpił krytyczny błąd</h1>
-          <p className="text-iron-600">
+          <h1 className="text-2xl font-bold text-ink-900">Wystąpił krytyczny błąd</h1>
+          <p className="text-ink-600">
             Strona spotkała się z nieoczekiwanym problemem. Nasi inżynierowie zostali automatycznie powiadomieni.
           </p>
           {error.digest && (
-            <code className="rounded bg-iron-100 px-2 py-1 font-mono text-xs text-iron-700">
+            <code className="rounded bg-ink-100 px-2 py-1 font-mono text-xs text-ink-700">
               Digest: {error.digest}
             </code>
           )}
@@ -52,7 +52,7 @@ export default function GlobalError({
             </button>
             <a
               href="/"
-              className="inline-flex items-center gap-2 rounded-md border border-iron-300 px-4 py-2 text-sm font-medium text-iron-700 hover:bg-iron-100"
+              className="inline-flex items-center gap-2 rounded-md border border-ink-300 px-4 py-2 text-sm font-medium text-ink-700 hover:bg-ink-100"
             >
               Strona główna
             </a>

@@ -14,14 +14,14 @@ export default function RegulaminPage() {
   return (
     <article className="container py-16 sm:py-20">
       <div className="mx-auto max-w-3xl">
-        <header className="border-b border-iron-200 pb-8 dark:border-dlugomat-800">
+        <header className="border-b border-ink-200 pb-8 dark:border-dlugomat-800">
           <p className="text-fluid-sm font-semibold uppercase tracking-wider text-dlugomat-600">
             Dokumenty prawne
           </p>
           <h1 className="mt-2 text-balance text-fluid-5xl font-bold tracking-tight text-dlugomat-900 dark:text-white">
             Regulamin serwisu Długomat
           </h1>
-          <p className="mt-3 text-fluid-sm text-iron-500">
+          <p className="mt-3 text-fluid-sm text-ink-500">
             Wersja obowiązująca od: {UPDATED}
           </p>
         </header>
@@ -352,9 +352,9 @@ export default function RegulaminPage() {
           </ol>
         </div>
 
-        <div className="mt-12 rounded-xl border border-iron-200 bg-iron-50/60 p-5 text-fluid-sm text-iron-600 dark:border-dlugomat-800 dark:bg-dlugomat-950/40 dark:text-iron-300">
+        <div className="mt-12 rounded-xl border border-ink-200 bg-ink-50/60 p-5 text-fluid-sm text-ink-600 dark:border-dlugomat-800 dark:bg-dlugomat-950/40 dark:text-ink-300">
           <p>
-            <strong className="text-dlugomat-900 dark:text-iron-50">
+            <strong className="text-dlugomat-900 dark:text-ink-50">
               Pytania o regulamin?
             </strong>{" "}
             Napisz na{" "}

@@ -35,7 +35,7 @@ export function StepZglaszajacy({
       className="space-y-5"
       noValidate
     >
-      <div className="rounded-lg border border-shield-100 bg-shield-50/30 p-3 text-fluid-sm text-iron-700">
+      <div className="rounded-lg border border-shield-100 bg-shield-50/30 p-3 text-fluid-sm text-ink-700">
         Te dane trafią na początek pisma — dlatego wpisz je dokładnie tak, jak
         figurują w dokumentach bankowych (imię, nazwisko, adres zameldowania).
       </div>

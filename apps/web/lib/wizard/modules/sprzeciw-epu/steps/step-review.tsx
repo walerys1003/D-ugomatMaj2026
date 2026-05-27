@@ -47,12 +47,12 @@ export function StepReview({
       className="space-y-6"
       noValidate
     >
-      <section className="rounded-xl border border-iron-200 bg-white shadow-subtle dark:border-iron-800 dark:bg-iron-950">
-        <header className="border-b border-iron-200 px-5 py-3 dark:border-iron-800">
-          <h3 className="text-fluid-base font-semibold text-iron-900 dark:text-iron-50">
+      <section className="rounded-xl border border-ink-200 bg-white shadow-subtle dark:border-ink-800 dark:bg-ink-950">
+        <header className="border-b border-ink-200 px-5 py-3 dark:border-ink-800">
+          <h3 className="text-fluid-base font-semibold text-ink-900 dark:text-ink-50">
             Podsumowanie sprawy
           </h3>
-          <p className="text-fluid-xs text-iron-600 dark:text-iron-400">
+          <p className="text-fluid-xs text-ink-600 dark:text-ink-400">
             Sprawdź dane przed wygenerowaniem pisma — będzie można je później skorygować.
           </p>
         </header>
@@ -66,18 +66,18 @@ export function StepReview({
           <ReviewRow label="Kwota główna" value={formatPLN(Number(a.kwota_glowna ?? 0))} />
           <ReviewRow label="Razem (z odsetkami i kosztami)" value={formatPLN(total)} highlight />
         </dl>
-        <div className="border-t border-iron-200 px-5 py-4 dark:border-iron-800">
-          <p className="text-fluid-xs uppercase tracking-wide text-iron-500">
+        <div className="border-t border-ink-200 px-5 py-4 dark:border-ink-800">
+          <p className="text-fluid-xs uppercase tracking-wide text-ink-500">
             Zarzuty
           </p>
           {zarzutyLabels.length > 0 ? (
-            <ul className="mt-2 list-disc space-y-1 pl-5 text-fluid-sm text-iron-800 dark:text-iron-200">
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-fluid-sm text-ink-800 dark:text-ink-200">
               {zarzutyLabels.map((label) => (
                 <li key={label}>{label}</li>
               ))}
             </ul>
           ) : (
-            <p className="mt-2 text-fluid-sm text-iron-500">Brak — wróć do kroku 4.</p>
+            <p className="mt-2 text-fluid-sm text-ink-500">Brak — wróć do kroku 4.</p>
           )}
         </div>
       </section>
@@ -97,7 +97,7 @@ export function StepReview({
                 "hover:border-dlugomat-400 focus-within:ring-2 focus-within:ring-dlugomat-500/40",
                 field.value
                   ? "border-dlugomat-500 bg-dlugomat-50/60 dark:border-dlugomat-400 dark:bg-dlugomat-950/40"
-                  : "border-iron-200 dark:border-iron-800",
+                  : "border-ink-200 dark:border-ink-800",
               )}
             >
               <input
@@ -107,7 +107,7 @@ export function StepReview({
                 checked={Boolean(field.value)}
                 onChange={(e) => field.onChange(e.target.checked)}
               />
-              <span className="text-fluid-sm text-iron-800 dark:text-iron-200">
+              <span className="text-fluid-sm text-ink-800 dark:text-ink-200">
                 Oświadczam, że podane dane są zgodne z prawdą oraz że Długomat
                 generuje pismo na ich podstawie. Pismo zostanie udostępnione do
                 pobrania po opłacie i przed jego złożeniem ponoszę pełną odpowiedzialność za jego treść.
@@ -140,15 +140,15 @@ function ReviewRow({
 }) {
   return (
     <div className="space-y-0.5">
-      <dt className="text-fluid-xs uppercase tracking-wide text-iron-500">
+      <dt className="text-fluid-xs uppercase tracking-wide text-ink-500">
         {label}
       </dt>
       <dd
         className={cn(
           "text-fluid-sm",
           highlight
-            ? "font-semibold text-iron-900 dark:text-iron-50"
-            : "text-iron-800 dark:text-iron-200",
+            ? "font-semibold text-ink-900 dark:text-ink-50"
+            : "text-ink-800 dark:text-ink-200",
         )}
       >
         {value || "—"}

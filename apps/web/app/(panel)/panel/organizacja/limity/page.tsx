@@ -110,9 +110,9 @@ export default function LimityPage() {
         <h1 className="text-fluid-3xl font-bold tracking-tight text-dlugomat-900 dark:text-white">
           Limity i zużycie
         </h1>
-        <p className="max-w-2xl text-fluid-base text-iron-600 dark:text-iron-300">
+        <p className="max-w-2xl text-fluid-base text-ink-600 dark:text-ink-300">
           Aktualne wykorzystanie zasobów dla planu{" "}
-          <strong className="text-iron-900 dark:text-iron-50">Pro</strong>.
+          <strong className="text-ink-900 dark:text-ink-50">Pro</strong>.
           Limity zerują się pierwszego dnia każdego miesiąca.
         </p>
       </header>
@@ -158,7 +158,7 @@ export default function LimityPage() {
             <Card key={l.id} elevation="subtle">
               <CardHeader>
                 <div className="flex items-baseline justify-between gap-3">
-                  <span className="text-fluid-xs font-semibold uppercase tracking-wider text-iron-500">
+                  <span className="text-fluid-xs font-semibold uppercase tracking-wider text-ink-500">
                     {l.resource}
                   </span>
                   <Badge tone={STATUS_TONE[l.status]} withDot>
@@ -167,7 +167,7 @@ export default function LimityPage() {
                 </div>
                 <CardTitle className="mt-2 text-fluid-2xl tabular-nums">
                   {l.used.toLocaleString("pl-PL")}{" "}
-                  <span className="text-fluid-base font-medium text-iron-500">
+                  <span className="text-fluid-base font-medium text-ink-500">
                     / {l.total.toLocaleString("pl-PL")} {l.unit}
                   </span>
                 </CardTitle>
@@ -179,14 +179,14 @@ export default function LimityPage() {
                 ) : null}
               </CardHeader>
               <CardContent>
-                <div className="h-2 overflow-hidden rounded-full bg-iron-100 dark:bg-dlugomat-900">
+                <div className="h-2 overflow-hidden rounded-full bg-ink-100 dark:bg-dlugomat-900">
                   <div
                     className={`h-full ${fillColor(l.status)} transition-all`}
                     style={{ width: `${pct}%` }}
                     aria-label={`${pct}% wykorzystane`}
                   />
                 </div>
-                <p className="mt-2 text-fluid-xs tabular-nums text-iron-500">
+                <p className="mt-2 text-fluid-xs tabular-nums text-ink-500">
                   {pct}% wykorzystane
                 </p>
               </CardContent>

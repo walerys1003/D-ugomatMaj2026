@@ -155,38 +155,38 @@ export function PlanSplatyClient() {
           </CardTitle>
           <CardDescription>
             Pierwsza rata{" "}
-            <span className="font-semibold text-iron-900 dark:text-iron-50">
+            <span className="font-semibold text-ink-900 dark:text-ink-50">
               {pln(form.monthlyCapacity)}
             </span>
             , ostatnia{" "}
-            <span className="font-semibold text-iron-900 dark:text-iron-50">
+            <span className="font-semibold text-ink-900 dark:text-ink-50">
               {pln(schedule.lastAmount)}
             </span>
             . Łącznie do zapłaty: {pln(schedule.totalPaid)}.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto rounded-lg border border-iron-200 dark:border-dlugomat-800">
+          <div className="overflow-x-auto rounded-lg border border-ink-200 dark:border-dlugomat-800">
             <table className="w-full text-fluid-sm">
-              <thead className="bg-iron-50/60 dark:bg-dlugomat-900/40">
-                <tr className="text-left text-iron-600 dark:text-iron-300">
+              <thead className="bg-ink-50/60 dark:bg-dlugomat-900/40">
+                <tr className="text-left text-ink-600 dark:text-ink-300">
                   <th className="px-4 py-2 font-semibold">Rata</th>
                   <th className="px-4 py-2 font-semibold">Termin</th>
                   <th className="px-4 py-2 text-right font-semibold">Kwota</th>
                   <th className="px-4 py-2 text-right font-semibold">Pozostało</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-iron-100 dark:divide-dlugomat-800">
+              <tbody className="divide-y divide-ink-100 dark:divide-dlugomat-800">
                 {schedule.items.slice(0, 12).map((it) => (
                   <tr key={it.idx}>
-                    <td className="px-4 py-2 font-mono text-fluid-xs text-iron-500">
+                    <td className="px-4 py-2 font-mono text-fluid-xs text-ink-500">
                       #{String(it.idx).padStart(2, "0")}
                     </td>
                     <td className="px-4 py-2 tabular-nums">
                       {new Date(it.date).toLocaleDateString("pl-PL")}
                     </td>
                     <td className="px-4 py-2 text-right tabular-nums">{pln(it.amount)}</td>
-                    <td className="px-4 py-2 text-right tabular-nums text-iron-500">
+                    <td className="px-4 py-2 text-right tabular-nums text-ink-500">
                       {pln(it.remaining)}
                     </td>
                   </tr>
@@ -195,7 +195,7 @@ export function PlanSplatyClient() {
                   <tr>
                     <td
                       colSpan={4}
-                      className="px-4 py-2 text-center text-fluid-xs text-iron-500"
+                      className="px-4 py-2 text-center text-fluid-xs text-ink-500"
                     >
                       … pozostałe {schedule.items.length - 12} rat w pełnym PDF
                     </td>
@@ -250,7 +250,7 @@ function Field({
 }) {
   return (
     <label htmlFor={id} className={`flex flex-col gap-1.5 ${className ?? ""}`}>
-      <span className="text-fluid-xs font-semibold uppercase tracking-wider text-iron-600 dark:text-iron-300">
+      <span className="text-fluid-xs font-semibold uppercase tracking-wider text-ink-600 dark:text-ink-300">
         {label}
       </span>
       <input
@@ -263,7 +263,7 @@ function Field({
         onChange={(e) =>
           onChange(type === "number" ? Number(e.target.value) : e.target.value)
         }
-        className="h-11 rounded-lg border border-iron-200 bg-white px-3 text-fluid-sm text-iron-900 placeholder:text-iron-400 focus-visible:shadow-shield-focus focus-visible:outline-none dark:border-iron-800 dark:bg-iron-950 dark:text-iron-50"
+        className="h-11 rounded-lg border border-ink-200 bg-white px-3 text-fluid-sm text-ink-900 placeholder:text-ink-400 focus-visible:shadow-shield-focus focus-visible:outline-none dark:border-ink-800 dark:bg-ink-950 dark:text-ink-50"
       />
     </label>
   );

@@ -39,7 +39,7 @@ export function StepWierzytelnosc({
       className="space-y-5"
       noValidate
     >
-      <div className="rounded-lg border border-shield-100 bg-shield-50/40 p-3 text-sm text-iron-700">
+      <div className="rounded-lg border border-shield-100 bg-shield-50/40 p-3 text-sm text-ink-700">
         Wskaż pierwotnego wierzyciela (najczęściej bank lub firma
         pożyczkowa) — to fundament żądania udokumentowania cesji
         oraz zarzutu przedawnienia.
@@ -100,7 +100,7 @@ export function StepWierzytelnosc({
             aria-invalid={Boolean(errors.data_wymagalnosci)}
             {...register("data_wymagalnosci")}
           />
-          <p className="text-fluid-xs text-iron-600">
+          <p className="text-fluid-xs text-ink-600">
             Kluczowa dla zarzutu przedawnienia (art. 117 KC).
           </p>
           {errors.data_wymagalnosci?.message && (

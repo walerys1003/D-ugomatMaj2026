@@ -12,16 +12,16 @@ export const metadata: Metadata = {
 
 export default function RoiPage() {
   return (
-    <main className="bg-iron-50 dark:bg-iron-950 pb-24">
-      <section className="border-b border-iron-200 dark:border-iron-800 bg-white dark:bg-iron-900">
+    <main className="bg-ink-50 dark:bg-ink-950 pb-24">
+      <section className="border-b border-ink-200 dark:border-ink-800 bg-white dark:bg-ink-900">
         <div className="container mx-auto px-4 py-12 max-w-4xl">
-          <p className="text-xs uppercase tracking-wider text-iron-500 mb-3">
+          <p className="text-xs uppercase tracking-wider text-ink-500 mb-3">
             Kalkulatory prawne · 5 z 5
           </p>
-          <h1 className="font-display text-4xl md:text-5xl font-semibold text-iron-900 dark:text-iron-50 mb-4">
+          <h1 className="font-display text-4xl md:text-5xl font-semibold text-ink-900 dark:text-ink-50 mb-4">
             ROI: Długomat vs kancelaria
           </h1>
-          <p className="text-lg text-iron-700 dark:text-iron-300 max-w-2xl">
+          <p className="text-lg text-ink-700 dark:text-ink-300 max-w-2xl">
             Porównaj koszty obsługi prawnej z Długomatem do tradycyjnego modelu
             kancelaryjnego. Zobacz, ile zaoszczędzisz rocznie.
           </p>
@@ -38,7 +38,7 @@ export default function RoiPage() {
             <CardTitle>Gotowy zacząć oszczędzać?</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <p className="text-sm text-iron-700 dark:text-iron-300">
+            <p className="text-sm text-ink-700 dark:text-ink-300">
               Wypróbuj Długomat za darmo przez 14 dni — bez karty kredytowej.
             </p>
             <div className="flex flex-wrap gap-2">

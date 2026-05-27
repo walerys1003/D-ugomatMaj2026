@@ -93,7 +93,7 @@ export function RoiB2BCalculator() {
             Policz oszczędność
           </Button>
 
-          <p className="text-xs text-iron-500">
+          <p className="text-xs text-ink-500">
             Założenie: Długomat skraca czas pracy nad pismem o 75%. Walidowane na
             danych klientów segmentu kancelarie i działy windykacji.
           </p>
@@ -106,12 +106,12 @@ export function RoiB2BCalculator() {
         </CardHeader>
         <CardContent>
           {!result && (
-            <p className="text-sm text-iron-500">Wypełnij dane, aby zobaczyć ROI.</p>
+            <p className="text-sm text-ink-500">Wypełnij dane, aby zobaczyć ROI.</p>
           )}
           {result && (
             <div className="space-y-4">
               <div className="rounded-lg bg-accent-50 dark:bg-accent-700/10 p-4 border border-accent-200 dark:border-accent-700/30">
-                <div className="text-xs uppercase tracking-wider text-iron-500 mb-1">
+                <div className="text-xs uppercase tracking-wider text-ink-500 mb-1">
                   Czysty zysk rocznie
                 </div>
                 <div className="font-display text-3xl font-semibold text-accent-700">
@@ -144,9 +144,9 @@ export function RoiB2BCalculator() {
                 )}
               </div>
 
-              <form method="post" action="/api/leads/roi-b2b" className="pt-3 border-t border-iron-200 dark:border-iron-800">
+              <form method="post" action="/api/leads/roi-b2b" className="pt-3 border-t border-ink-200 dark:border-ink-800">
                 <label className="block mb-2">
-                  <span className="text-xs font-medium text-iron-700 dark:text-iron-300 mb-1 block">
+                  <span className="text-xs font-medium text-ink-700 dark:text-ink-300 mb-1 block">
                     Wyślij raport PDF na e-mail
                   </span>
                   <input
@@ -154,7 +154,7 @@ export function RoiB2BCalculator() {
                     name="email"
                     required
                     placeholder="adres@firma.pl"
-                    className="w-full rounded-lg border border-iron-300 dark:border-iron-700 bg-white dark:bg-iron-900 px-3 py-2 text-sm focus:outline-none focus-visible:shadow-shield-focus"
+                    className="w-full rounded-lg border border-ink-300 dark:border-ink-700 bg-white dark:bg-ink-900 px-3 py-2 text-sm focus:outline-none focus-visible:shadow-shield-focus"
                   />
                 </label>
                 <input type="hidden" name="payload" value={JSON.stringify(result)} />
@@ -173,8 +173,8 @@ export function RoiB2BCalculator() {
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-2">
-      <span className="text-iron-600 dark:text-iron-400">{label}</span>
-      <span className="font-medium text-iron-900 dark:text-iron-50 tabular-nums">{value}</span>
+      <span className="text-ink-600 dark:text-ink-400">{label}</span>
+      <span className="font-medium text-ink-900 dark:text-ink-50 tabular-nums">{value}</span>
     </div>
   );
 }
@@ -194,7 +194,7 @@ function NumField({
 }) {
   return (
     <label className="block">
-      <span className="text-sm font-medium text-iron-700 dark:text-iron-300 mb-1.5 block">
+      <span className="text-sm font-medium text-ink-700 dark:text-ink-300 mb-1.5 block">
         {label}
       </span>
       <input
@@ -203,7 +203,7 @@ function NumField({
         step={step}
         value={value}
         onChange={(e) => onChange(Number(e.target.value) || 0)}
-        className="w-full rounded-lg border border-iron-300 dark:border-iron-700 bg-white dark:bg-iron-900 px-3 py-2 text-iron-900 dark:text-iron-50 focus:outline-none focus-visible:shadow-shield-focus"
+        className="w-full rounded-lg border border-ink-300 dark:border-ink-700 bg-white dark:bg-ink-900 px-3 py-2 text-ink-900 dark:text-ink-50 focus:outline-none focus-visible:shadow-shield-focus"
       />
     </label>
   );

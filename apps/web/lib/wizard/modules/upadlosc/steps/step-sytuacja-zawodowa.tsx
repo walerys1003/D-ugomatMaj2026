@@ -49,7 +49,7 @@ export function StepSytuacjaZawodowa({
       className="space-y-5"
       noValidate
     >
-      <div className="rounded-lg border border-shield-100 bg-shield-50/40 p-3 text-sm text-iron-700">
+      <div className="rounded-lg border border-shield-100 bg-shield-50/40 p-3 text-sm text-ink-700">
         Sąd ocenia, czy spełniasz definicję konsumenta (art. 491¹ Pr.up.).
         Były przedsiębiorca też może złożyć wniosek — pod warunkiem zamknięcia
         działalności.
@@ -70,7 +70,7 @@ export function StepSytuacjaZawodowa({
                     className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-sm transition ${
                       checked
                         ? "border-shield-400 bg-shield-50/60"
-                        : "border-iron-200 hover:border-shield-200"
+                        : "border-ink-200 hover:border-shield-200"
                     }`}
                   >
                     <input
@@ -81,7 +81,7 @@ export function StepSytuacjaZawodowa({
                       onChange={() => field.onChange(s.id)}
                       className="h-4 w-4"
                     />
-                    <span className="text-iron-800">{s.label}</span>
+                    <span className="text-ink-800">{s.label}</span>
                   </label>
                 );
               })}
@@ -129,7 +129,7 @@ export function StepSytuacjaZawodowa({
                     className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-sm transition ${
                       checked
                         ? "border-shield-400 bg-shield-50/60"
-                        : "border-iron-200 hover:border-shield-200"
+                        : "border-ink-200 hover:border-shield-200"
                     }`}
                   >
                     <input
@@ -140,7 +140,7 @@ export function StepSytuacjaZawodowa({
                       onChange={() => field.onChange(f.id)}
                       className="h-4 w-4"
                     />
-                    <span className="text-iron-800">{f.label}</span>
+                    <span className="text-ink-800">{f.label}</span>
                   </label>
                 );
               })}

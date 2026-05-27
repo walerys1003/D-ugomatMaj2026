@@ -21,11 +21,11 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           <h2 className="text-fluid-3xl font-bold leading-tight text-white">
             Twoja sprawa to nasz priorytet — bez paniki, bez chaosu.
           </h2>
-          <p className="mt-3 text-fluid-base text-iron-200">
+          <p className="mt-3 text-fluid-base text-ink-200">
             Wszystkie dane szyfrowane w spoczynku (AES-256) i podczas transmisji
             (TLS 1.3). Pełna zgodność z RODO. Twoje dokumenty widzisz tylko Ty.
           </p>
-          <ul className="mt-6 space-y-2 text-fluid-sm text-iron-200">
+          <ul className="mt-6 space-y-2 text-fluid-sm text-ink-200">
             <li className="flex items-start gap-2">
               <span aria-hidden className="mt-1.5 size-1.5 rounded-full bg-accent-400" />
               Konto zakładasz w 30 sekund — magic-link lub e-mail+hasło
@@ -40,7 +40,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             </li>
           </ul>
         </div>
-        <p className="relative text-fluid-xs text-iron-300">
+        <p className="relative text-fluid-xs text-ink-300">
           © {new Date().getFullYear()} Długomat
         </p>
       </aside>

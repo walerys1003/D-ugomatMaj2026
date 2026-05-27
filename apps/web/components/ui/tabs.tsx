@@ -13,8 +13,8 @@ export const TabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "inline-flex h-10 items-center gap-1 rounded-lg bg-iron-100 p-1 text-iron-600",
-      "dark:bg-dlugomat-850 dark:text-iron-300",
+      "inline-flex h-10 items-center gap-1 rounded-lg bg-ink-100 p-1 text-ink-600",
+      "dark:bg-dlugomat-850 dark:text-ink-300",
       className
     )}
     {...props}
@@ -35,7 +35,7 @@ export const TabsTrigger = React.forwardRef<
       "focus-visible:shadow-shield-focus focus-visible:outline-none",
       "disabled:pointer-events-none disabled:opacity-50",
       "data-[state=active]:bg-background data-[state=active]:text-dlugomat-800 data-[state=active]:shadow-card",
-      "dark:data-[state=active]:bg-dlugomat-900 dark:data-[state=active]:text-iron-50",
+      "dark:data-[state=active]:bg-dlugomat-900 dark:data-[state=active]:text-ink-50",
       className
     )}
     {...props}

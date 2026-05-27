@@ -22,7 +22,7 @@ export function ThemeToggle({ className }: { className?: string }) {
           variant="ghost"
           size="icon"
           aria-label={`Motyw — aktualny: ${theme === "system" ? `system (${resolved})` : theme}`}
-          className={cn("text-iron-600 dark:text-iron-300", className)}
+          className={cn("text-ink-600 dark:text-ink-300", className)}
         >
           {resolved === "dark" ? <Moon className="size-4" /> : <Sun className="size-4" />}
         </Button>
@@ -31,17 +31,17 @@ export function ThemeToggle({ className }: { className?: string }) {
         <DropdownMenuItem onSelect={() => setTheme("light")}>
           <Sun className="size-4" />
           <span>Jasny</span>
-          {theme === "light" ? <span className="ml-auto text-fluid-xs text-iron-500">✓</span> : null}
+          {theme === "light" ? <span className="ml-auto text-fluid-xs text-ink-500">✓</span> : null}
         </DropdownMenuItem>
         <DropdownMenuItem onSelect={() => setTheme("dark")}>
           <Moon className="size-4" />
           <span>Ciemny</span>
-          {theme === "dark" ? <span className="ml-auto text-fluid-xs text-iron-500">✓</span> : null}
+          {theme === "dark" ? <span className="ml-auto text-fluid-xs text-ink-500">✓</span> : null}
         </DropdownMenuItem>
         <DropdownMenuItem onSelect={() => setTheme("system")}>
           <Monitor className="size-4" />
           <span>Systemowy</span>
-          {theme === "system" ? <span className="ml-auto text-fluid-xs text-iron-500">✓</span> : null}
+          {theme === "system" ? <span className="ml-auto text-fluid-xs text-ink-500">✓</span> : null}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

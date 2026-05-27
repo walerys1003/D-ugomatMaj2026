@@ -34,7 +34,7 @@ export function StepSad({
       className="space-y-5"
       noValidate
     >
-      <div className="rounded-lg border border-shield-100 bg-shield-50/40 p-3 text-sm text-iron-700">
+      <div className="rounded-lg border border-shield-100 bg-shield-50/40 p-3 text-sm text-ink-700">
         Wniosek o upadłość konsumencką składasz do <strong>sądu rejonowego —
         wydziału gospodarczego (upadłościowego)</strong> właściwego dla Twojego
         miejsca zwykłego pobytu (art. 18 Pr.up.).

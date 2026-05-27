@@ -44,7 +44,7 @@ export default async function ComplianceDashboard() {
       <header className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Compliance Dashboard</h1>
-          <p className="text-iron-600 dark:text-iron-300">
+          <p className="text-ink-600 dark:text-ink-300">
             Raporty regulacyjne: DPIA · RoPA · SOC2 · łańcuch audytu.
           </p>
         </div>
@@ -71,10 +71,10 @@ export default async function ComplianceDashboard() {
 
 function KpiCard({ label, count, hint }: { label: string; count: number; hint: string }) {
   return (
-    <div className="rounded-lg border border-iron-200 dark:border-dlugomat-800 p-4 bg-white dark:bg-dlugomat-900">
-      <div className="text-sm text-iron-600 dark:text-iron-300">{label}</div>
+    <div className="rounded-lg border border-ink-200 dark:border-dlugomat-800 p-4 bg-white dark:bg-dlugomat-900">
+      <div className="text-sm text-ink-600 dark:text-ink-300">{label}</div>
       <div className="text-3xl font-bold mt-1">{count}</div>
-      <div className="text-xs text-iron-500 mt-2">{hint}</div>
+      <div className="text-xs text-ink-500 mt-2">{hint}</div>
     </div>
   );
 }

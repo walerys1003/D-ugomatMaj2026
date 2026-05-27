@@ -76,7 +76,7 @@ export function StepDluznik({
           aria-invalid={Boolean(errors.dluznik_pesel)}
           {...register("dluznik_pesel")}
         />
-        <p className="text-fluid-xs text-iron-600">
+        <p className="text-fluid-xs text-ink-600">
           PESEL pojawi się w piśmie zamaskowany (XXX*****1234).
         </p>
         {errors.dluznik_pesel?.message && (

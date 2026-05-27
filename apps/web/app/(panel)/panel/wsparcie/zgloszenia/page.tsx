@@ -124,13 +124,13 @@ export default function WsparcieZgloszeniaPage() {
     <div className="space-y-8">
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-2">
-          <p className="text-xs uppercase tracking-[0.18em] text-iron-500">
+          <p className="text-xs uppercase tracking-[0.18em] text-ink-500">
             Wsparcie · moje zgłoszenia
           </p>
           <h1 className="font-display text-fluid-h1 text-dlugomat-950">
             Twoje zgłoszenia
           </h1>
-          <p className="max-w-2xl text-iron-600">
+          <p className="max-w-2xl text-ink-600">
             Wszystkie Twoje zgłoszenia do działu wsparcia. Średni czas pierwszej
             odpowiedzi to 2 godziny w dni robocze.
           </p>
@@ -141,10 +141,10 @@ export default function WsparcieZgloszeniaPage() {
         </Button>
       </header>
 
-      <nav aria-label="Widoki wsparcia" className="flex gap-1 rounded-md border border-iron-200 bg-iron-50 p-1 w-fit text-sm">
+      <nav aria-label="Widoki wsparcia" className="flex gap-1 rounded-md border border-ink-200 bg-ink-50 p-1 w-fit text-sm">
         <Link
           href="/panel/wsparcie"
-          className="rounded px-3 py-1.5 text-iron-700 hover:bg-white focus-visible:outline-none focus-visible:shadow-shield-focus"
+          className="rounded px-3 py-1.5 text-ink-700 hover:bg-white focus-visible:outline-none focus-visible:shadow-shield-focus"
         >
           Strona główna
         </Link>
@@ -153,7 +153,7 @@ export default function WsparcieZgloszeniaPage() {
         </span>
         <Link
           href="/panel/wsparcie/baza-wiedzy"
-          className="rounded px-3 py-1.5 text-iron-700 hover:bg-white focus-visible:outline-none focus-visible:shadow-shield-focus"
+          className="rounded px-3 py-1.5 text-ink-700 hover:bg-white focus-visible:outline-none focus-visible:shadow-shield-focus"
         >
           Baza wiedzy
         </Link>
@@ -185,12 +185,12 @@ export default function WsparcieZgloszeniaPage() {
           <li key={t.id}>
             <Link
               href={`/panel/wsparcie/zgloszenia/${t.id}`}
-              className="group block rounded-lg border border-iron-200 bg-white p-5 shadow-card transition hover:shadow-pop focus-visible:outline-none focus-visible:shadow-shield-focus"
+              className="group block rounded-lg border border-ink-200 bg-white p-5 shadow-card transition hover:shadow-pop focus-visible:outline-none focus-visible:shadow-shield-focus"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-mono text-xs text-iron-500">{t.id}</span>
+                    <span className="font-mono text-xs text-ink-500">{t.id}</span>
                     <Badge tone={STATUS_TONE[t.status]} withDot>
                       {STATUS_LABEL[t.status]}
                     </Badge>
@@ -207,7 +207,7 @@ export default function WsparcieZgloszeniaPage() {
                   <h3 className="mt-2 font-semibold text-dlugomat-950 group-hover:text-dlugomat-700">
                     {t.subject}
                   </h3>
-                  <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-iron-500">
+                  <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-ink-500">
                     <span className="flex items-center gap-1">
                       <Clock className="h-3 w-3" aria-hidden />
                       Utworzone: {fmtDate(t.created_at)}
@@ -226,7 +226,7 @@ export default function WsparcieZgloszeniaPage() {
                   </div>
                 </div>
                 <ArrowRight
-                  className="h-5 w-5 flex-shrink-0 text-iron-400 group-hover:text-dlugomat-700"
+                  className="h-5 w-5 flex-shrink-0 text-ink-400 group-hover:text-dlugomat-700"
                   aria-hidden
                 />
               </div>

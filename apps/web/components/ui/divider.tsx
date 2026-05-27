@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 /**
  * Divider — kanoniczna kreska rozdzielająca.
  *
- * Zastępuje rozsiane `border-t border-iron-200`, które w dark mode bywały
+ * Zastępuje rozsiane `border-t border-ink-200`, które w dark mode bywały
  * niewidoczne. Używa kolorów semantycznych z tokens. Opcjonalna etykieta
  * (np. „LUB", „Sekcja 2") wyrównana do środka.
  */
@@ -24,7 +24,7 @@ export function Divider({
       <div
         role="separator"
         aria-orientation="vertical"
-        className={cn("h-full w-px bg-iron-200 dark:bg-iron-800", className)}
+        className={cn("h-full w-px bg-ink-200 dark:bg-ink-800", className)}
         {...props}
       />
     );
@@ -33,12 +33,12 @@ export function Divider({
     return (
       <div
         role="separator"
-        className={cn("flex items-center gap-3 text-fluid-xs text-iron-500", className)}
+        className={cn("flex items-center gap-3 text-fluid-xs text-ink-500", className)}
         {...props}
       >
-        <span className="h-px flex-1 bg-iron-200 dark:bg-iron-800" />
+        <span className="h-px flex-1 bg-ink-200 dark:bg-ink-800" />
         <span className="uppercase tracking-[0.18em]">{label}</span>
-        <span className="h-px flex-1 bg-iron-200 dark:bg-iron-800" />
+        <span className="h-px flex-1 bg-ink-200 dark:bg-ink-800" />
       </div>
     );
   }
@@ -46,7 +46,7 @@ export function Divider({
     <div
       role="separator"
       aria-orientation="horizontal"
-      className={cn("h-px w-full bg-iron-200 dark:bg-iron-800", className)}
+      className={cn("h-px w-full bg-ink-200 dark:bg-ink-800", className)}
       {...props}
     />
   );

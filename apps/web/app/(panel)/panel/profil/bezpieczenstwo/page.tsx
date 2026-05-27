@@ -43,18 +43,18 @@ const AUDIT: ReadonlyArray<AuditEntry> = [
 export default function BezpieczenstwoPage() {
   return (
     <div className="space-y-6">
-      <Link href="/panel/profil" className="inline-flex items-center gap-2 text-sm text-iron-600 hover:text-dlugomat-900">
+      <Link href="/panel/profil" className="inline-flex items-center gap-2 text-sm text-ink-600 hover:text-dlugomat-900">
         <ArrowLeft className="h-4 w-4" aria-hidden />
         Powrot do profilu
       </Link>
 
       <header>
-        <p className="text-xs uppercase tracking-[0.18em] text-iron-500">Profil</p>
+        <p className="text-xs uppercase tracking-[0.18em] text-ink-500">Profil</p>
         <h1 className="font-display text-fluid-h1 text-dlugomat-950 flex items-center gap-3">
           <ShieldCheck className="h-7 w-7 text-dlugomat-700" aria-hidden />
           Bezpieczenstwo konta
         </h1>
-        <p className="mt-1 text-sm text-iron-600">
+        <p className="mt-1 text-sm text-ink-600">
           Haslo, dwuetapowa weryfikacja, aktywne sesje i historia logowan.
         </p>
       </header>
@@ -66,7 +66,7 @@ export default function BezpieczenstwoPage() {
             <CardTitle className="font-display text-fluid-h3 text-accent-700">Silne</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-iron-500">Zmienione 13 dni temu</p>
+            <p className="text-xs text-ink-500">Zmienione 13 dni temu</p>
           </CardContent>
         </Card>
         <Card urgency="normal">
@@ -75,7 +75,7 @@ export default function BezpieczenstwoPage() {
             <CardTitle className="font-display text-fluid-h3 text-dlugomat-950">TOTP</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-iron-500">Authy · aktywne</p>
+            <p className="text-xs text-ink-500">Authy · aktywne</p>
           </CardContent>
         </Card>
         <Card>
@@ -84,7 +84,7 @@ export default function BezpieczenstwoPage() {
             <CardTitle className="font-display text-fluid-h3 text-dlugomat-950">{SESSIONS.length}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-iron-500">Biezaca: MacBook Pro · Warszawa</p>
+            <p className="text-xs text-ink-500">Biezaca: MacBook Pro · Warszawa</p>
           </CardContent>
         </Card>
       </section>
@@ -100,12 +100,12 @@ export default function BezpieczenstwoPage() {
         <CardContent className="space-y-3">
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="flex flex-col gap-1 text-sm">
-              <span className="text-iron-700">Aktualne haslo</span>
-              <input type="password" className="h-10 rounded-md border border-iron-200 px-3 focus-visible:outline-none focus-visible:shadow-shield-focus" />
+              <span className="text-ink-700">Aktualne haslo</span>
+              <input type="password" className="h-10 rounded-md border border-ink-200 px-3 focus-visible:outline-none focus-visible:shadow-shield-focus" />
             </label>
             <label className="flex flex-col gap-1 text-sm">
-              <span className="text-iron-700">Nowe haslo</span>
-              <input type="password" className="h-10 rounded-md border border-iron-200 px-3 focus-visible:outline-none focus-visible:shadow-shield-focus" />
+              <span className="text-ink-700">Nowe haslo</span>
+              <input type="password" className="h-10 rounded-md border border-ink-200 px-3 focus-visible:outline-none focus-visible:shadow-shield-focus" />
             </label>
           </div>
           <Button variant="primary">Zmien haslo</Button>
@@ -121,17 +121,17 @@ export default function BezpieczenstwoPage() {
           <CardDescription>Aplikacja TOTP (Authy, Google Authenticator) lub klucz WebAuthn.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
-          <div className="flex items-center justify-between rounded-md border border-iron-200 bg-iron-50/50 p-3">
+          <div className="flex items-center justify-between rounded-md border border-ink-200 bg-ink-50/50 p-3">
             <div>
               <p className="text-sm font-medium text-dlugomat-900">TOTP — Authy</p>
-              <p className="text-xs text-iron-500">Wlaczone od 2026-03-12</p>
+              <p className="text-xs text-ink-500">Wlaczone od 2026-03-12</p>
             </div>
             <Badge tone="success" withDot>Aktywne</Badge>
           </div>
-          <div className="flex items-center justify-between rounded-md border border-iron-200 p-3">
+          <div className="flex items-center justify-between rounded-md border border-ink-200 p-3">
             <div>
               <p className="text-sm font-medium text-dlugomat-900">Klucz sprzetowy (WebAuthn)</p>
-              <p className="text-xs text-iron-500">Brak skonfigurowanych kluczy</p>
+              <p className="text-xs text-ink-500">Brak skonfigurowanych kluczy</p>
             </div>
             <Button variant="secondary" size="sm">Dodaj klucz</Button>
           </div>
@@ -146,12 +146,12 @@ export default function BezpieczenstwoPage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <ul className="divide-y divide-iron-100">
+          <ul className="divide-y divide-ink-100">
             {SESSIONS.map((s) => (
               <li key={s.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-3">
                 <div>
                   <p className="text-sm font-medium text-dlugomat-900">{s.device}</p>
-                  <p className="text-xs text-iron-500">{s.location} · {s.ip} · {s.last_active}</p>
+                  <p className="text-xs text-ink-500">{s.location} · {s.ip} · {s.last_active}</p>
                 </div>
                 {s.current ? (
                   <Badge tone="info" withDot>Biezaca sesja</Badge>
@@ -172,14 +172,14 @@ export default function BezpieczenstwoPage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <ul className="divide-y divide-iron-100">
+          <ul className="divide-y divide-ink-100">
             {AUDIT.map((a) => (
               <li key={a.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-3">
                 <div className="flex items-center gap-3">
                   {!a.ok && <AlertTriangle className="h-4 w-4 text-danger" aria-hidden />}
                   <span className="text-sm text-dlugomat-900">{a.action}</span>
                 </div>
-                <div className="flex items-center gap-3 text-xs text-iron-500">
+                <div className="flex items-center gap-3 text-xs text-ink-500">
                   <span className="font-mono">{a.ip}</span>
                   <span>{a.when}</span>
                   <Badge tone={a.ok ? "success" : "danger"}>{a.ok ? "OK" : "Blad"}</Badge>

@@ -53,13 +53,13 @@ export default async function AudytPage({
   return (
     <main className="container mx-auto px-4 py-8 max-w-6xl space-y-6">
       <div>
-        <Link href="/panel/organizacja" className="text-xs text-iron-500 hover:text-iron-700">
+        <Link href="/panel/organizacja" className="text-xs text-ink-500 hover:text-ink-700">
           ← Organizacja
         </Link>
-        <h1 className="font-display text-3xl font-semibold text-iron-900 dark:text-iron-50 mt-2">
+        <h1 className="font-display text-3xl font-semibold text-ink-900 dark:text-ink-50 mt-2">
           Dziennik audytu
         </h1>
-        <p className="text-sm text-iron-500 mt-1">
+        <p className="text-sm text-ink-500 mt-1">
           Niezmienialny log działań w Twojej organizacji. Retencja: 365 dni (Enterprise: 7 lat).
         </p>
       </div>
@@ -72,12 +72,12 @@ export default async function AudytPage({
               name="actor"
               placeholder="E-mail użytkownika"
               defaultValue={sp.actor}
-              className="rounded-lg border border-iron-300 dark:border-iron-700 bg-white dark:bg-iron-900 px-3 py-2 text-sm focus:outline-none focus-visible:shadow-shield-focus"
+              className="rounded-lg border border-ink-300 dark:border-ink-700 bg-white dark:bg-ink-900 px-3 py-2 text-sm focus:outline-none focus-visible:shadow-shield-focus"
             />
             <select
               name="action"
               defaultValue={sp.action}
-              className="rounded-lg border border-iron-300 dark:border-iron-700 bg-white dark:bg-iron-900 px-3 py-2 text-sm focus:outline-none focus-visible:shadow-shield-focus"
+              className="rounded-lg border border-ink-300 dark:border-ink-700 bg-white dark:bg-ink-900 px-3 py-2 text-sm focus:outline-none focus-visible:shadow-shield-focus"
             >
               <option value="">Wszystkie akcje</option>
               {Object.entries(ACTION_LABELS).map(([k, v]) => (
@@ -88,7 +88,7 @@ export default async function AudytPage({
             </select>
             <button
               type="submit"
-              className="rounded-lg bg-iron-900 text-iron-50 px-4 py-2 text-sm hover:bg-iron-800 focus:outline-none focus-visible:shadow-shield-focus"
+              className="rounded-lg bg-ink-900 text-ink-50 px-4 py-2 text-sm hover:bg-ink-800 focus:outline-none focus-visible:shadow-shield-focus"
             >
               Filtruj
             </button>
@@ -102,12 +102,12 @@ export default async function AudytPage({
         </CardHeader>
         <CardContent>
           {logs.length === 0 ? (
-            <p className="text-sm text-iron-500">Brak zdarzeń w tym zakresie.</p>
+            <p className="text-sm text-ink-500">Brak zdarzeń w tym zakresie.</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-left border-b border-iron-200 dark:border-iron-800 text-xs uppercase tracking-wider text-iron-500">
+                  <tr className="text-left border-b border-ink-200 dark:border-ink-800 text-xs uppercase tracking-wider text-ink-500">
                     <th className="py-2 pr-3">Czas</th>
                     <th className="py-2 pr-3">Aktor</th>
                     <th className="py-2 pr-3">Akcja</th>
@@ -117,22 +117,22 @@ export default async function AudytPage({
                 </thead>
                 <tbody>
                   {logs.map((l) => (
-                    <tr key={l.id} className="border-b border-iron-100 dark:border-iron-900">
-                      <td className="py-2.5 pr-3 text-iron-600 dark:text-iron-400 font-mono text-xs">
+                    <tr key={l.id} className="border-b border-ink-100 dark:border-ink-900">
+                      <td className="py-2.5 pr-3 text-ink-600 dark:text-ink-400 font-mono text-xs">
                         {new Date(l.created_at).toLocaleString("pl-PL")}
                       </td>
-                      <td className="py-2.5 pr-3 text-iron-900 dark:text-iron-50">
+                      <td className="py-2.5 pr-3 text-ink-900 dark:text-ink-50">
                         {l.actor_email}
                       </td>
                       <td className="py-2.5 pr-3">
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-iron-100 dark:bg-iron-800">
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-ink-100 dark:bg-ink-800">
                           {ACTION_LABELS[l.action] ?? l.action}
                         </span>
                       </td>
-                      <td className="py-2.5 pr-3 text-iron-600 dark:text-iron-400 font-mono text-xs">
+                      <td className="py-2.5 pr-3 text-ink-600 dark:text-ink-400 font-mono text-xs">
                         {l.resource_type}:{l.resource_id.slice(0, 8)}
                       </td>
-                      <td className="py-2.5 pr-3 text-iron-500 font-mono text-xs">{l.ip}</td>
+                      <td className="py-2.5 pr-3 text-ink-500 font-mono text-xs">{l.ip}</td>
                     </tr>
                   ))}
                 </tbody>

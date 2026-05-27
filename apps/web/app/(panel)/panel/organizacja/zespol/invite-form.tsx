@@ -43,12 +43,12 @@ export function InviteForm({ orgId }: { orgId: string }) {
           placeholder="adres@firma.pl"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="rounded-lg border border-iron-300 dark:border-iron-700 bg-white dark:bg-iron-900 px-3 py-2 focus:outline-none focus-visible:shadow-shield-focus"
+          className="rounded-lg border border-ink-300 dark:border-ink-700 bg-white dark:bg-ink-900 px-3 py-2 focus:outline-none focus-visible:shadow-shield-focus"
         />
         <select
           value={role}
           onChange={(e) => setRole(e.target.value as OrgRole)}
-          className="rounded-lg border border-iron-300 dark:border-iron-700 bg-white dark:bg-iron-900 px-3 py-2 focus:outline-none focus-visible:shadow-shield-focus"
+          className="rounded-lg border border-ink-300 dark:border-ink-700 bg-white dark:bg-ink-900 px-3 py-2 focus:outline-none focus-visible:shadow-shield-focus"
         >
           {ASSIGNABLE_ROLES.map((r) => (
             <option key={r} value={r}>

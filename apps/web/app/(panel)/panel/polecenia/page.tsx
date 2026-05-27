@@ -42,7 +42,7 @@ function statusLabel(status: string): { label: string; tone: string } {
     case "rejected":
       return { label: "Odrzucona", tone: "text-rose-600 bg-rose-50" };
     default:
-      return { label: status, tone: "text-iron-600 bg-iron-50" };
+      return { label: status, tone: "text-ink-600 bg-ink-50" };
   }
 }
 
@@ -70,7 +70,7 @@ export default async function PoleceniaPage() {
         <h1 className="text-2xl font-semibold tracking-tight text-dlugomat-900">
           Program polecający
         </h1>
-        <p className="max-w-2xl text-sm text-iron-600">
+        <p className="max-w-2xl text-sm text-ink-600">
           Polecaj Długomat znajomym, którzy potrzebują pomocy z długami.
           Otrzymasz {Number(code.reward_pct).toFixed(0)}% prowizji od każdej
           opłaconej sprawy. Wypłaty miesięczne, po zaksięgowaniu płatności.
@@ -82,7 +82,7 @@ export default async function PoleceniaPage() {
       <section className="grid gap-4 sm:grid-cols-3">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-sm font-medium text-iron-700">
+            <CardTitle className="flex items-center gap-2 text-sm font-medium text-ink-700">
               <Users className="h-4 w-4" /> Kliknięcia
             </CardTitle>
           </CardHeader>
@@ -90,13 +90,13 @@ export default async function PoleceniaPage() {
             <p className="text-2xl font-semibold tabular-nums">
               {code.total_clicks.toLocaleString("pl-PL")}
             </p>
-            <p className="text-xs text-iron-500">łączna liczba wejść</p>
+            <p className="text-xs text-ink-500">łączna liczba wejść</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-sm font-medium text-iron-700">
+            <CardTitle className="flex items-center gap-2 text-sm font-medium text-ink-700">
               <Share2 className="h-4 w-4" /> Konwersje
             </CardTitle>
           </CardHeader>
@@ -104,13 +104,13 @@ export default async function PoleceniaPage() {
             <p className="text-2xl font-semibold tabular-nums">
               {code.total_signups.toLocaleString("pl-PL")}
             </p>
-            <p className="text-xs text-iron-500">opłacone polecenia</p>
+            <p className="text-xs text-ink-500">opłacone polecenia</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-sm font-medium text-iron-700">
+            <CardTitle className="flex items-center gap-2 text-sm font-medium text-ink-700">
               <TrendingUp className="h-4 w-4" /> Zarobione
             </CardTitle>
           </CardHeader>
@@ -118,7 +118,7 @@ export default async function PoleceniaPage() {
             <p className="text-2xl font-semibold tabular-nums">
               {formatPln(totalEarned)}
             </p>
-            <p className="text-xs text-iron-500">
+            <p className="text-xs text-ink-500">
               wypłacone {formatPln(totalEarnedPaid)} · do wypłaty{" "}
               {formatPln(totalEarnedApproved)}
             </p>
@@ -132,14 +132,14 @@ export default async function PoleceniaPage() {
         </h2>
         {stats.recentConversions.length === 0 ? (
           <Card>
-            <CardContent className="py-12 text-center text-sm text-iron-500">
+            <CardContent className="py-12 text-center text-sm text-ink-500">
               Brak polecień. Udostępnij swój link i zacznij zarabiać.
             </CardContent>
           </Card>
         ) : (
-          <div className="overflow-hidden rounded-lg border border-iron-200 bg-white">
+          <div className="overflow-hidden rounded-lg border border-ink-200 bg-white">
             <table className="w-full text-sm">
-              <thead className="bg-iron-50 text-iron-600">
+              <thead className="bg-ink-50 text-ink-600">
                 <tr>
                   <th className="px-4 py-2 text-left font-medium">Data</th>
                   <th className="px-4 py-2 text-left font-medium">Kod</th>
@@ -152,15 +152,15 @@ export default async function PoleceniaPage() {
                   <th className="px-4 py-2 text-left font-medium">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-iron-100">
+              <tbody className="divide-y divide-ink-100">
                 {stats.recentConversions.map((c) => {
                   const s = statusLabel(c.status);
                   return (
                     <tr key={c.id}>
-                      <td className="px-4 py-2 text-iron-600">
+                      <td className="px-4 py-2 text-ink-600">
                         {new Date(c.created_at).toLocaleDateString("pl-PL")}
                       </td>
-                      <td className="px-4 py-2 font-mono text-xs text-iron-500">
+                      <td className="px-4 py-2 font-mono text-xs text-ink-500">
                         {c.code}
                       </td>
                       <td className="px-4 py-2 text-right tabular-nums">
@@ -187,11 +187,11 @@ export default async function PoleceniaPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-sm font-medium text-iron-700">
+          <CardTitle className="text-sm font-medium text-ink-700">
             Jak to działa?
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-2 text-sm text-iron-600">
+        <CardContent className="space-y-2 text-sm text-ink-600">
           <p>
             <strong>1.</strong> Udostępnij swój link osobom, które mogą
             potrzebować pomocy z długami (komornik, sprzeciw EPU, BIK).
@@ -208,7 +208,7 @@ export default async function PoleceniaPage() {
             <strong>4.</strong> Wypłaty miesięczne — minimalna kwota wypłaty:
             100&nbsp;zł.
           </p>
-          <p className="pt-2 text-xs text-iron-500">
+          <p className="pt-2 text-xs text-ink-500">
             Anti-fraud: nie można polecać samego siebie ani wielokrotnie tego
             samego użytkownika. W przypadku zwrotu pieniędzy klientowi
             prowizja jest cofana.

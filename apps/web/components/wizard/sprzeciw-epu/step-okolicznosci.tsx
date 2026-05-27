@@ -45,23 +45,23 @@ export function StepOkolicznosci({
           rows={6}
           maxLength={4000}
           placeholder="Np. umowa z 2014 r. została scedowana na fundusz w 2024 r., wcześniej nikt się ze mną nie kontaktował…"
-          className="w-full rounded-md border border-iron-200 bg-background px-3 py-2 text-fluid-sm text-foreground shadow-subtle focus:border-dlugomat-500 focus:outline-none focus:ring-2 focus:ring-dlugomat-500/30 dark:border-dlugomat-800"
+          className="w-full rounded-md border border-ink-200 bg-background px-3 py-2 text-fluid-sm text-foreground shadow-subtle focus:border-dlugomat-500 focus:outline-none focus:ring-2 focus:ring-dlugomat-500/30 dark:border-dlugomat-800"
         />
       </FormField>
 
-      <fieldset className="rounded-xl border border-iron-200 dark:border-dlugomat-800 p-4">
-        <legend className="px-2 text-fluid-xs uppercase tracking-wide text-iron-500">
+      <fieldset className="rounded-xl border border-ink-200 dark:border-dlugomat-800 p-4">
+        <legend className="px-2 text-fluid-xs uppercase tracking-wide text-ink-500">
           Cesja wierzytelności
         </legend>
         <label className="flex items-start gap-3">
           <input
             type="checkbox"
             {...form.register("cesja")}
-            className="mt-1 size-4 rounded border-iron-300 text-dlugomat-500 focus:ring-dlugomat-500"
+            className="mt-1 size-4 rounded border-ink-300 text-dlugomat-500 focus:ring-dlugomat-500"
           />
           <span className="text-fluid-sm text-foreground">
             Powodem jest fundusz / firma windykacyjna, która kupiła wierzytelność
-            <span className="block text-fluid-xs text-iron-600 dark:text-iron-400">
+            <span className="block text-fluid-xs text-ink-600 dark:text-ink-400">
               Często warto żądać przedłożenia umowy cesji.
             </span>
           </span>

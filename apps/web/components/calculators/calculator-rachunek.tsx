@@ -106,10 +106,10 @@ export function CalculatorRachunek() {
   return (
     <Card elevation="subtle" className="p-6">
       <div className="mb-4">
-        <h3 className="text-lg font-semibold text-iron-900 dark:text-iron-100">
+        <h3 className="text-lg font-semibold text-ink-900 dark:text-ink-100">
           Kalkulator kwoty wolnej z rachunku bankowego
         </h3>
-        <p className="mt-1 text-sm text-iron-600 dark:text-iron-300">
+        <p className="mt-1 text-sm text-ink-600 dark:text-ink-300">
           art. 54 ust. 1 Prawa bankowego — limit 75% minimalnego wynagrodzenia
           miesięcznie. Świadczenia z art. 833 § 6 KPC (500+, alimenty)
           chronione dodatkowo.
@@ -182,17 +182,17 @@ export function CalculatorRachunek() {
 
       {result ? (
         <div className="mt-6 space-y-4">
-          <div className="grid grid-cols-1 gap-3 rounded-md border border-iron-200 bg-iron-50 p-4 dark:border-dlugomat-800 dark:bg-dlugomat-900 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 rounded-md border border-ink-200 bg-ink-50 p-4 dark:border-dlugomat-800 dark:bg-dlugomat-900 sm:grid-cols-3">
             <div>
-              <div className="text-xs uppercase tracking-wide text-iron-500">
+              <div className="text-xs uppercase tracking-wide text-ink-500">
                 Limit UFG (75% min. wynagr.)
               </div>
-              <div className="font-semibold text-iron-900 dark:text-iron-100">
+              <div className="font-semibold text-ink-900 dark:text-ink-100">
                 {formatPLN(result.limitMiesiecznyGrosze)}
               </div>
             </div>
             <div>
-              <div className="text-xs uppercase tracking-wide text-iron-500">
+              <div className="text-xs uppercase tracking-wide text-ink-500">
                 Łącznie chronione
               </div>
               <div className="font-semibold text-success-700 dark:text-success-400">
@@ -200,7 +200,7 @@ export function CalculatorRachunek() {
               </div>
             </div>
             <div>
-              <div className="text-xs uppercase tracking-wide text-iron-500">
+              <div className="text-xs uppercase tracking-wide text-ink-500">
                 Do zajęcia przez komornika
               </div>
               <div className="font-semibold text-danger-700 dark:text-danger-400">
@@ -209,11 +209,11 @@ export function CalculatorRachunek() {
             </div>
           </div>
 
-          <p className="text-sm text-iron-700 dark:text-iron-200">
+          <p className="text-sm text-ink-700 dark:text-ink-200">
             {result.objasnienie}
           </p>
 
-          <p className="text-xs text-iron-500 dark:text-iron-400">
+          <p className="text-xs text-ink-500 dark:text-ink-400">
             Podstawa prawna: {result.podstawaPrawna}. Wynik ma charakter
             informacyjny i nie stanowi porady prawnej. W przypadku wątpliwości
             skonsultuj się z radcą prawnym lub adwokatem.

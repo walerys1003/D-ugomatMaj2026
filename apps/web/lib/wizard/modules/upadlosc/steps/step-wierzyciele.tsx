@@ -48,7 +48,7 @@ export function StepWierzyciele({
       className="space-y-5"
       noValidate
     >
-      <div className="rounded-lg border border-shield-100 bg-shield-50/40 p-3 text-sm text-iron-700">
+      <div className="rounded-lg border border-shield-100 bg-shield-50/40 p-3 text-sm text-ink-700">
         Spis wierzycieli musi być pełny (art. 22a ust. 1 pkt 1 Pr.up.). Wpisz
         każdego wierzyciela osobno — banki, fundusze, komorników, osoby fizyczne,
         ZUS, urzędy skarbowe.
@@ -58,10 +58,10 @@ export function StepWierzyciele({
         {fields.map((field, index) => (
           <div
             key={field.id}
-            className="rounded-lg border border-iron-200 bg-white p-4 shadow-sm"
+            className="rounded-lg border border-ink-200 bg-white p-4 shadow-sm"
           >
             <div className="mb-3 flex items-center justify-between">
-              <span className="text-fluid-sm font-medium text-iron-700">
+              <span className="text-fluid-sm font-medium text-ink-700">
                 Wierzyciel #{index + 1}
               </span>
               {fields.length > 1 && (
@@ -167,7 +167,7 @@ export function StepWierzyciele({
         Dodaj kolejnego wierzyciela
       </Button>
 
-      <div className="rounded-lg border border-shield-200 bg-shield-50/40 p-3 text-sm text-iron-800">
+      <div className="rounded-lg border border-shield-200 bg-shield-50/40 p-3 text-sm text-ink-800">
         Łączna kwota zobowiązań:{" "}
         <strong>
           {new Intl.NumberFormat("pl-PL", {

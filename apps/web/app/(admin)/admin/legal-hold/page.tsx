@@ -42,7 +42,7 @@ export default async function LegalHoldPage() {
       <header className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Legal Hold &amp; e-Discovery</h1>
-          <p className="text-iron-600 dark:text-iron-300">
+          <p className="text-ink-600 dark:text-ink-300">
             Tamper-evident wstrzymanie usuwania danych + zapytania śledcze z chain-of-custody.
           </p>
         </div>

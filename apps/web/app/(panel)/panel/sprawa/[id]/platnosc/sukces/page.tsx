@@ -98,21 +98,21 @@ export default async function PlatnoscSukcesPage({
 
         <CardContent className="space-y-4">
           {payment && (
-            <dl className="grid gap-2 rounded-xl border border-iron-200 bg-iron-50/60 p-4 text-fluid-sm dark:border-iron-800 dark:bg-iron-900/40">
+            <dl className="grid gap-2 rounded-xl border border-ink-200 bg-ink-50/60 p-4 text-fluid-sm dark:border-ink-800 dark:bg-ink-900/40">
               <div className="flex justify-between gap-3">
-                <dt className="text-iron-600 dark:text-iron-400">Produkt</dt>
-                <dd className="text-right font-medium text-iron-900 dark:text-iron-100">
+                <dt className="text-ink-600 dark:text-ink-400">Produkt</dt>
+                <dd className="text-right font-medium text-ink-900 dark:text-ink-100">
                   {payment.product_name}
                 </dd>
               </div>
               <div className="flex justify-between gap-3">
-                <dt className="text-iron-600 dark:text-iron-400">Kwota</dt>
-                <dd className="text-right font-medium text-iron-900 dark:text-iron-100">
+                <dt className="text-ink-600 dark:text-ink-400">Kwota</dt>
+                <dd className="text-right font-medium text-ink-900 dark:text-ink-100">
                   {formatPriceGrosze(payment.amount)}
                 </dd>
               </div>
               <div className="flex justify-between gap-3">
-                <dt className="text-iron-600 dark:text-iron-400">Status</dt>
+                <dt className="text-ink-600 dark:text-ink-400">Status</dt>
                 <dd className="text-right">
                   <Badge tone={isStillPending ? "info" : "success"}>
                     {isStillPending ? "Przetwarzanie" : "Opłacono"}
@@ -121,20 +121,20 @@ export default async function PlatnoscSukcesPage({
               </div>
               {payment.paid_at && (
                 <div className="flex justify-between gap-3">
-                  <dt className="text-iron-600 dark:text-iron-400">
+                  <dt className="text-ink-600 dark:text-ink-400">
                     Czas zapłaty
                   </dt>
-                  <dd className="text-right text-iron-800 dark:text-iron-200">
+                  <dd className="text-right text-ink-800 dark:text-ink-200">
                     {formatDateTimePL(new Date(payment.paid_at))}
                   </dd>
                 </div>
               )}
               {payment.fakturownia_invoice_number && (
                 <div className="flex justify-between gap-3">
-                  <dt className="text-iron-600 dark:text-iron-400">
+                  <dt className="text-ink-600 dark:text-ink-400">
                     Faktura VAT
                   </dt>
-                  <dd className="text-right text-iron-800 dark:text-iron-200">
+                  <dd className="text-right text-ink-800 dark:text-ink-200">
                     {payment.fakturownia_invoice_url ? (
                       <a
                         href={payment.fakturownia_invoice_url}
@@ -167,7 +167,7 @@ export default async function PlatnoscSukcesPage({
         </CardContent>
       </Card>
 
-      <p className="text-center text-fluid-xs text-iron-500 dark:text-iron-400">
+      <p className="text-center text-fluid-xs text-ink-500 dark:text-ink-400">
         Jeżeli faktura nie pojawi się w ciągu 5 minut — napisz na{" "}
         <a
           href="mailto:pomoc@dlugomat.pl"

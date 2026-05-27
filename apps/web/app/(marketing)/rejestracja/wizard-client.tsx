@@ -94,8 +94,8 @@ export function RegistrationWizard() {
               <div
                 className={`flex items-center justify-center w-7 h-7 rounded-full text-xs font-semibold ${
                   step >= s
-                    ? "bg-accent-600 text-iron-50"
-                    : "bg-iron-100 dark:bg-iron-800 text-iron-500"
+                    ? "bg-accent-600 text-ink-50"
+                    : "bg-ink-100 dark:bg-ink-800 text-ink-500"
                 }`}
                 aria-current={step === s ? "step" : undefined}
               >
@@ -104,7 +104,7 @@ export function RegistrationWizard() {
               {s < 3 && (
                 <div
                   className={`flex-1 h-px ${
-                    step > s ? "bg-accent-600" : "bg-iron-200 dark:bg-iron-800"
+                    step > s ? "bg-accent-600" : "bg-ink-200 dark:bg-ink-800"
                   }`}
                 />
               )}
@@ -115,10 +115,10 @@ export function RegistrationWizard() {
         {step === 1 && (
           <div className="space-y-4">
             <div>
-              <h2 className="font-display text-xl font-semibold text-iron-900 dark:text-iron-50">
+              <h2 className="font-display text-xl font-semibold text-ink-900 dark:text-ink-50">
                 Kto będzie korzystał z konta?
               </h2>
-              <p className="text-sm text-iron-500 mt-1">
+              <p className="text-sm text-ink-500 mt-1">
                 Dopasujemy widoki i moduły do Twoich potrzeb.
               </p>
             </div>
@@ -134,13 +134,13 @@ export function RegistrationWizard() {
                   className={`text-left rounded-lg border p-4 transition focus:outline-none focus-visible:shadow-shield-focus ${
                     form.kind === opt.value
                       ? "border-accent-600 bg-accent-50 dark:bg-accent-700/10"
-                      : "border-iron-300 dark:border-iron-700 hover:border-iron-400"
+                      : "border-ink-300 dark:border-ink-700 hover:border-ink-400"
                   }`}
                 >
-                  <div className="font-medium text-iron-900 dark:text-iron-50 mb-1">
+                  <div className="font-medium text-ink-900 dark:text-ink-50 mb-1">
                     {opt.title}
                   </div>
-                  <div className="text-xs text-iron-600 dark:text-iron-400">{opt.desc}</div>
+                  <div className="text-xs text-ink-600 dark:text-ink-400">{opt.desc}</div>
                 </button>
               ))}
             </div>
@@ -150,10 +150,10 @@ export function RegistrationWizard() {
         {step === 2 && (
           <div className="space-y-4">
             <div>
-              <h2 className="font-display text-xl font-semibold text-iron-900 dark:text-iron-50">
+              <h2 className="font-display text-xl font-semibold text-ink-900 dark:text-ink-50">
                 Dane kontaktowe
               </h2>
-              <p className="text-sm text-iron-500 mt-1">
+              <p className="text-sm text-ink-500 mt-1">
                 Potrzebujemy adresu e-mail do założenia konta.
               </p>
             </div>
@@ -208,10 +208,10 @@ export function RegistrationWizard() {
         {step === 3 && (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <h2 className="font-display text-xl font-semibold text-iron-900 dark:text-iron-50">
+              <h2 className="font-display text-xl font-semibold text-ink-900 dark:text-ink-50">
                 Ostatni krok
               </h2>
-              <p className="text-sm text-iron-500 mt-1">
+              <p className="text-sm text-ink-500 mt-1">
                 Ustaw hasło i potwierdź warunki.
               </p>
             </div>
@@ -225,7 +225,7 @@ export function RegistrationWizard() {
               onChange={(v) => update("password", v)}
             />
 
-            <label className="flex gap-2 text-sm text-iron-700 dark:text-iron-300 cursor-pointer">
+            <label className="flex gap-2 text-sm text-ink-700 dark:text-ink-300 cursor-pointer">
               <input
                 type="checkbox"
                 checked={form.terms_accepted}
@@ -246,7 +246,7 @@ export function RegistrationWizard() {
               </span>
             </label>
 
-            <label className="flex gap-2 text-sm text-iron-700 dark:text-iron-300 cursor-pointer">
+            <label className="flex gap-2 text-sm text-ink-700 dark:text-ink-300 cursor-pointer">
               <input
                 type="checkbox"
                 checked={form.marketing_consent}
@@ -274,7 +274,7 @@ export function RegistrationWizard() {
               </Button>
             </div>
 
-            <p className="text-xs text-iron-500 text-center">
+            <p className="text-xs text-ink-500 text-center">
               Masz już konto?{" "}
               <a href="/logowanie" className="text-accent-700 hover:underline">
                 Zaloguj się
@@ -306,7 +306,7 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="text-sm font-medium text-iron-700 dark:text-iron-300 mb-1.5 block">
+      <span className="text-sm font-medium text-ink-700 dark:text-ink-300 mb-1.5 block">
         {label}
         {required && <span className="text-danger-600 ml-0.5">*</span>}
       </span>
@@ -317,7 +317,7 @@ function Field({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full rounded-lg border border-iron-300 dark:border-iron-700 bg-white dark:bg-iron-900 px-3 py-2 text-iron-900 dark:text-iron-50 focus:outline-none focus-visible:shadow-shield-focus"
+        className="w-full rounded-lg border border-ink-300 dark:border-ink-700 bg-white dark:bg-ink-900 px-3 py-2 text-ink-900 dark:text-ink-50 focus:outline-none focus-visible:shadow-shield-focus"
       />
     </label>
   );

@@ -44,7 +44,7 @@ export function StepMajatek({
       className="space-y-5"
       noValidate
     >
-      <div className="rounded-lg border border-temporal-amber-200 bg-temporal-amber-50/40 p-3 text-sm text-iron-800">
+      <div className="rounded-lg border border-temporal-amber-200 bg-temporal-amber-50/40 p-3 text-sm text-ink-800">
         <strong>Ważne:</strong> wykaz majątku musi być kompletny i prawdziwy.
         Ukrycie składników to przestępstwo (art. 522 Pr.up.) i prowadzi do
         umorzenia postępowania bez oddłużenia.
@@ -54,14 +54,14 @@ export function StepMajatek({
         control={control}
         name="posiada_nieruchomosc"
         render={({ field }) => (
-          <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-iron-200 p-3 text-sm hover:border-shield-200">
+          <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-ink-200 p-3 text-sm hover:border-shield-200">
             <input
               type="checkbox"
               checked={field.value}
               onChange={(e) => field.onChange(e.target.checked)}
               className="mt-0.5 h-4 w-4"
             />
-            <span className="text-iron-800">
+            <span className="text-ink-800">
               Posiadam nieruchomość (mieszkanie, dom, działka, udział)
             </span>
           </label>
@@ -90,14 +90,14 @@ export function StepMajatek({
         control={control}
         name="posiada_pojazd"
         render={({ field }) => (
-          <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-iron-200 p-3 text-sm hover:border-shield-200">
+          <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-ink-200 p-3 text-sm hover:border-shield-200">
             <input
               type="checkbox"
               checked={field.value}
               onChange={(e) => field.onChange(e.target.checked)}
               className="mt-0.5 h-4 w-4"
             />
-            <span className="text-iron-800">
+            <span className="text-ink-800">
               Posiadam pojazd mechaniczny (auto, motocykl, przyczepa)
             </span>
           </label>

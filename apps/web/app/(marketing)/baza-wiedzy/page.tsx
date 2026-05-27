@@ -273,7 +273,7 @@ export default function BazaWiedzyPage() {
       </section>
 
       {/* ARTICLES */}
-      <section className="bg-iron-50/60 py-20 sm:py-24 dark:bg-dlugomat-950/40">
+      <section className="bg-ink-50/60 py-20 sm:py-24 dark:bg-dlugomat-950/40">
         <div className="container">
           <div className="mx-auto max-w-2xl text-center">
             <p className="text-fluid-sm font-semibold uppercase tracking-wider text-dlugomat-600">
@@ -297,7 +297,7 @@ export default function BazaWiedzyPage() {
                   <CardHeader className="gap-3">
                     <div className="flex items-center gap-2">
                       <Badge tone="info">{article.category}</Badge>
-                      <span className="text-fluid-xs text-iron-500">
+                      <span className="text-fluid-xs text-ink-500">
                         {article.readingMinutes} min czytania
                       </span>
                     </div>
@@ -317,7 +317,7 @@ export default function BazaWiedzyPage() {
             ))}
           </div>
 
-          <p className="mt-12 text-center text-fluid-sm text-iron-600 dark:text-iron-300">
+          <p className="mt-12 text-center text-fluid-sm text-ink-600 dark:text-ink-300">
             Kolejne artykuły publikujemy co tydzień. Aktualizujemy istniejące przy
             każdej zmianie przepisów. Wszystkie powołania do KPC, KC i orzeczeń
             SN są aktualne na dzień publikacji.

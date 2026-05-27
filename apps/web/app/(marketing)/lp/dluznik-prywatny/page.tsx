@@ -62,7 +62,7 @@ const FAQ = [
 export default function LpDluznikPrywatnyPage() {
   return (
     <div className="min-h-screen bg-dlugomat-50">
-      <section className="bg-white border-b border-iron-200">
+      <section className="bg-white border-b border-ink-200">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -141,7 +141,7 @@ export default function LpDluznikPrywatnyPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-white border-y border-iron-200">
+      <section className="py-16 bg-white border-y border-ink-200">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <h2 className="font-display text-3xl text-dlugomat-950 mb-10 text-center">Dlaczego osoby prywatne wybieraja Dlugomat</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

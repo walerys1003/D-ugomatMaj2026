@@ -55,12 +55,12 @@ export function StepReview({
             Odpowiedź na wezwanie funduszu (cesja)
           </span>
         </div>
-        <p className="mt-1 text-fluid-xs text-iron-700">
+        <p className="mt-1 text-fluid-xs text-ink-700">
           art. 509–512 KC, art. 117 KC
         </p>
       </div>
 
-      <dl className="grid gap-3 rounded-xl border border-iron-200 bg-white p-4 text-fluid-sm sm:grid-cols-2">
+      <dl className="grid gap-3 rounded-xl border border-ink-200 bg-white p-4 text-fluid-sm sm:grid-cols-2">
         <Row label="Wnioskodawca" value={a.dluznik_nazwa} />
         <Row label="Adres" value={a.dluznik_adres} />
         <Row label="Fundusz / windykator" value={a.fundusz_nazwa} />
@@ -82,9 +82,9 @@ export function StepReview({
       </dl>
 
       {zarzutyLabels.length > 0 && (
-        <div className="rounded-xl border border-iron-200 bg-white p-4 text-fluid-sm">
-          <h4 className="mb-2 font-semibold text-iron-900">Zarzuty</h4>
-          <ul className="list-disc pl-5 text-iron-800">
+        <div className="rounded-xl border border-ink-200 bg-white p-4 text-fluid-sm">
+          <h4 className="mb-2 font-semibold text-ink-900">Zarzuty</h4>
+          <ul className="list-disc pl-5 text-ink-800">
             {zarzutyLabels.map((l) => (
               <li key={l}>{l}</li>
             ))}
@@ -93,11 +93,11 @@ export function StepReview({
       )}
 
       {a.okolicznosci && (
-        <div className="rounded-xl border border-iron-200 bg-white p-4 text-fluid-sm">
-          <h4 className="mb-1 font-semibold text-iron-900">
+        <div className="rounded-xl border border-ink-200 bg-white p-4 text-fluid-sm">
+          <h4 className="mb-1 font-semibold text-ink-900">
             Dodatkowe okoliczności
           </h4>
-          <p className="whitespace-pre-line text-iron-800">{a.okolicznosci}</p>
+          <p className="whitespace-pre-line text-ink-800">{a.okolicznosci}</p>
         </div>
       )}
 
@@ -106,7 +106,7 @@ export function StepReview({
           "flex items-start gap-3 rounded-xl border p-4 text-fluid-sm transition-all",
           errors.consent_truth
             ? "border-temporal-red-300 bg-temporal-red-50/40"
-            : "border-iron-200 bg-white",
+            : "border-ink-200 bg-white",
         )}
       >
         <input
@@ -114,7 +114,7 @@ export function StepReview({
           className="mt-0.5 size-4 accent-shield-600"
           {...register("consent_truth")}
         />
-        <span className="text-iron-800">
+        <span className="text-ink-800">
           Potwierdzam, że dane podane w formularzu są zgodne z prawdą,
           a załączniki — autentyczne. Rozumiem, że pismo zostanie wygenerowane
           na ich podstawie.
@@ -143,10 +143,10 @@ export function StepReview({
 function Row({ label, value }: { label: string; value?: string | number }) {
   return (
     <div className="flex flex-col">
-      <dt className="text-fluid-xs uppercase tracking-wide text-iron-600">
+      <dt className="text-fluid-xs uppercase tracking-wide text-ink-600">
         {label}
       </dt>
-      <dd className="text-iron-900">
+      <dd className="text-ink-900">
         {value !== undefined && value !== "" ? value : "—"}
       </dd>
     </div>

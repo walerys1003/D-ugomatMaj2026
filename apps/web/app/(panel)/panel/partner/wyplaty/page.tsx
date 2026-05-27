@@ -27,7 +27,7 @@ async function fetchPayouts(): Promise<Payout[]> {
 }
 
 const STATUS_BADGE: Record<Payout["status"], string> = {
-  scheduled: "bg-iron-100 text-iron-700 border-iron-200",
+  scheduled: "bg-ink-100 text-ink-700 border-ink-200",
   processing: "bg-warn-50 text-warn-700 border-warn-200",
   paid: "bg-accent-50 text-accent-700 border-accent-200",
   failed: "bg-danger-50 text-danger-700 border-danger-200",
@@ -49,13 +49,13 @@ export default async function WyplatyPage() {
   return (
     <main className="container mx-auto px-4 py-8 max-w-6xl space-y-6">
       <div>
-        <Link href="/panel/partner" className="text-xs text-iron-500 hover:text-iron-700">
+        <Link href="/panel/partner" className="text-xs text-ink-500 hover:text-ink-700">
           ← Panel partnera
         </Link>
-        <h1 className="font-display text-3xl font-semibold text-iron-900 dark:text-iron-50 mt-2">
+        <h1 className="font-display text-3xl font-semibold text-ink-900 dark:text-ink-50 mt-2">
           Historia wypłat
         </h1>
-        <p className="text-sm text-iron-500 mt-1">
+        <p className="text-sm text-ink-500 mt-1">
           Łącznie wypłacono: {totalPaid.toLocaleString("pl-PL")} zł
         </p>
       </div>
@@ -66,12 +66,12 @@ export default async function WyplatyPage() {
         </CardHeader>
         <CardContent>
           {payouts.length === 0 ? (
-            <p className="text-sm text-iron-500">Brak wypłat — pierwsza po zakończeniu okresu rozliczeniowego.</p>
+            <p className="text-sm text-ink-500">Brak wypłat — pierwsza po zakończeniu okresu rozliczeniowego.</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-left border-b border-iron-200 dark:border-iron-800 text-xs uppercase tracking-wider text-iron-500">
+                  <tr className="text-left border-b border-ink-200 dark:border-ink-800 text-xs uppercase tracking-wider text-ink-500">
                     <th className="py-2 pr-3">Okres</th>
                     <th className="py-2 pr-3">Kwota</th>
                     <th className="py-2 pr-3">Status</th>
@@ -81,12 +81,12 @@ export default async function WyplatyPage() {
                 </thead>
                 <tbody>
                   {payouts.map((p) => (
-                    <tr key={p.id} className="border-b border-iron-100 dark:border-iron-900">
-                      <td className="py-2.5 pr-3 text-iron-600 dark:text-iron-400">
+                    <tr key={p.id} className="border-b border-ink-100 dark:border-ink-900">
+                      <td className="py-2.5 pr-3 text-ink-600 dark:text-ink-400">
                         {new Date(p.period_start).toLocaleDateString("pl-PL")} —{" "}
                         {new Date(p.period_end).toLocaleDateString("pl-PL")}
                       </td>
-                      <td className="py-2.5 pr-3 font-medium text-iron-900 dark:text-iron-50">
+                      <td className="py-2.5 pr-3 font-medium text-ink-900 dark:text-ink-50">
                         {p.amount_pln.toLocaleString("pl-PL")} zł
                       </td>
                       <td className="py-2.5 pr-3">
@@ -96,7 +96,7 @@ export default async function WyplatyPage() {
                           {STATUS_LABEL[p.status]}
                         </span>
                       </td>
-                      <td className="py-2.5 pr-3 text-iron-600 dark:text-iron-400">
+                      <td className="py-2.5 pr-3 text-ink-600 dark:text-ink-400">
                         {p.paid_at ? new Date(p.paid_at).toLocaleDateString("pl-PL") : "—"}
                       </td>
                       <td className="py-2.5 pr-3">
@@ -108,7 +108,7 @@ export default async function WyplatyPage() {
                             {p.invoice_number ?? "Pobierz"}
                           </a>
                         ) : (
-                          <span className="text-iron-400">—</span>
+                          <span className="text-ink-400">—</span>
                         )}
                       </td>
                     </tr>

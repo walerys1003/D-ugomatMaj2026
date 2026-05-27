@@ -111,7 +111,7 @@ export default function RodoPage() {
                   <CardTitle className="mt-3 text-fluid-lg">{right.title}</CardTitle>
                 </CardHeader>
                 <CardContent className="flex flex-1 flex-col gap-4">
-                  <p className="text-fluid-sm text-iron-600 dark:text-iron-300">
+                  <p className="text-fluid-sm text-ink-600 dark:text-ink-300">
                     {right.desc}
                   </p>
                   <div className="mt-auto">
@@ -139,22 +139,22 @@ export default function RodoPage() {
       </section>
 
       {/* IOD CONTACT */}
-      <section className="bg-iron-50/60 py-20 sm:py-24 dark:bg-dlugomat-950/40">
+      <section className="bg-ink-50/60 py-20 sm:py-24 dark:bg-dlugomat-950/40">
         <div className="container max-w-3xl">
           <h2 className="text-balance text-fluid-3xl font-bold tracking-tight text-dlugomat-900 dark:text-white">
             Inspektor Ochrony Danych (IOD)
           </h2>
-          <p className="mt-3 text-fluid-base text-iron-700 dark:text-iron-200">
+          <p className="mt-3 text-fluid-base text-ink-700 dark:text-ink-200">
             We wszystkich sprawach dotyczących przetwarzania danych osobowych
             możesz kontaktować się bezpośrednio z naszym Inspektorem Ochrony
             Danych. IOD odpowiada w terminie maksymalnie 30 dni — wymóg z art.
             12 ust. 3 RODO.
           </p>
 
-          <div className="mt-8 rounded-xl border border-iron-200 bg-card p-6 dark:border-dlugomat-800">
+          <div className="mt-8 rounded-xl border border-ink-200 bg-card p-6 dark:border-dlugomat-800">
             <dl className="grid gap-4 sm:grid-cols-2">
               <div>
-                <dt className="text-fluid-xs font-semibold uppercase tracking-wider text-iron-500">
+                <dt className="text-fluid-xs font-semibold uppercase tracking-wider text-ink-500">
                   Adres e-mail
                 </dt>
                 <dd className="mt-1">
@@ -167,10 +167,10 @@ export default function RodoPage() {
                 </dd>
               </div>
               <div>
-                <dt className="text-fluid-xs font-semibold uppercase tracking-wider text-iron-500">
+                <dt className="text-fluid-xs font-semibold uppercase tracking-wider text-ink-500">
                   Adres korespondencyjny
                 </dt>
-                <dd className="mt-1 text-fluid-base text-iron-800 dark:text-iron-100">
+                <dd className="mt-1 text-fluid-base text-ink-800 dark:text-ink-100">
                   Długomat sp. z o.o.
                   <br />
                   IOD
@@ -189,25 +189,25 @@ export default function RodoPage() {
           <h2 className="text-balance text-fluid-3xl font-bold tracking-tight text-dlugomat-900 dark:text-white">
             Skarga do organu nadzorczego
           </h2>
-          <p className="mt-3 text-fluid-base text-iron-700 dark:text-iron-200">
+          <p className="mt-3 text-fluid-base text-ink-700 dark:text-ink-200">
             Jeżeli uważasz, że przetwarzamy Twoje dane z naruszeniem przepisów —
             masz prawo wnieść skargę do Prezesa Urzędu Ochrony Danych Osobowych
             (PUODO). Procedura jest bezpłatna, a UODO ma kompetencje do
             nakazania korekty oraz nałożenia kary administracyjnej.
           </p>
 
-          <div className="mt-8 rounded-xl border border-iron-200 bg-card p-6 dark:border-dlugomat-800">
+          <div className="mt-8 rounded-xl border border-ink-200 bg-card p-6 dark:border-dlugomat-800">
             <dl className="grid gap-4 sm:grid-cols-2">
               <div>
-                <dt className="text-fluid-xs font-semibold uppercase tracking-wider text-iron-500">
+                <dt className="text-fluid-xs font-semibold uppercase tracking-wider text-ink-500">
                   Urząd
                 </dt>
-                <dd className="mt-1 text-fluid-base text-iron-800 dark:text-iron-100">
+                <dd className="mt-1 text-fluid-base text-ink-800 dark:text-ink-100">
                   Urząd Ochrony Danych Osobowych
                 </dd>
               </div>
               <div>
-                <dt className="text-fluid-xs font-semibold uppercase tracking-wider text-iron-500">
+                <dt className="text-fluid-xs font-semibold uppercase tracking-wider text-ink-500">
                   Strona
                 </dt>
                 <dd className="mt-1">
@@ -222,19 +222,19 @@ export default function RodoPage() {
                 </dd>
               </div>
               <div>
-                <dt className="text-fluid-xs font-semibold uppercase tracking-wider text-iron-500">
+                <dt className="text-fluid-xs font-semibold uppercase tracking-wider text-ink-500">
                   Adres
                 </dt>
-                <dd className="mt-1 text-fluid-base text-iron-800 dark:text-iron-100">
+                <dd className="mt-1 text-fluid-base text-ink-800 dark:text-ink-100">
                   ul. Stawki 2<br />
                   00-193 Warszawa
                 </dd>
               </div>
               <div>
-                <dt className="text-fluid-xs font-semibold uppercase tracking-wider text-iron-500">
+                <dt className="text-fluid-xs font-semibold uppercase tracking-wider text-ink-500">
                   Telefon
                 </dt>
-                <dd className="mt-1 font-mono text-fluid-base text-iron-800 dark:text-iron-100">
+                <dd className="mt-1 font-mono text-fluid-base text-ink-800 dark:text-ink-100">
                   +48 22 531 03 00
                 </dd>
               </div>
@@ -244,18 +244,18 @@ export default function RodoPage() {
       </section>
 
       {/* BASICS */}
-      <section className="bg-iron-50/60 py-20 sm:py-24 dark:bg-dlugomat-950/40">
+      <section className="bg-ink-50/60 py-20 sm:py-24 dark:bg-dlugomat-950/40">
         <div className="container max-w-3xl">
           <h2 className="text-balance text-fluid-3xl font-bold tracking-tight text-dlugomat-900 dark:text-white">
             Najważniejsze fakty
           </h2>
 
-          <div className="mt-8 space-y-5 text-fluid-base leading-relaxed text-iron-700 dark:text-iron-200">
-            <div className="rounded-xl border border-iron-200 bg-card p-5 dark:border-dlugomat-800">
-              <h3 className="text-fluid-lg font-semibold text-dlugomat-900 dark:text-iron-50">
+          <div className="mt-8 space-y-5 text-fluid-base leading-relaxed text-ink-700 dark:text-ink-200">
+            <div className="rounded-xl border border-ink-200 bg-card p-5 dark:border-dlugomat-800">
+              <h3 className="text-fluid-lg font-semibold text-dlugomat-900 dark:text-ink-50">
                 Gdzie są moje dane?
               </h3>
-              <p className="mt-2 text-fluid-sm text-iron-600 dark:text-iron-300">
+              <p className="mt-2 text-fluid-sm text-ink-600 dark:text-ink-300">
                 W całości na serwerach Supabase w regionie Frankfurt
                 (eu-central-1). Bez transferu poza Europejski Obszar
                 Gospodarczy. Wyjątek: zapytania do modeli AI Anthropic
@@ -264,11 +264,11 @@ export default function RodoPage() {
               </p>
             </div>
 
-            <div className="rounded-xl border border-iron-200 bg-card p-5 dark:border-dlugomat-800">
-              <h3 className="text-fluid-lg font-semibold text-dlugomat-900 dark:text-iron-50">
+            <div className="rounded-xl border border-ink-200 bg-card p-5 dark:border-dlugomat-800">
+              <h3 className="text-fluid-lg font-semibold text-dlugomat-900 dark:text-ink-50">
                 Jak są chronione?
               </h3>
-              <p className="mt-2 text-fluid-sm text-iron-600 dark:text-iron-300">
+              <p className="mt-2 text-fluid-sm text-ink-600 dark:text-ink-300">
                 Szyfrowanie TLS 1.3 in-transit, AES-256 at-rest. Row-Level
                 Security z trybem FORCE — ani inny użytkownik, ani my (bez
                 Twojej zgody) nie mamy dostępu do Twoich pism. PESEL maskowany
@@ -276,11 +276,11 @@ export default function RodoPage() {
               </p>
             </div>
 
-            <div className="rounded-xl border border-iron-200 bg-card p-5 dark:border-dlugomat-800">
-              <h3 className="text-fluid-lg font-semibold text-dlugomat-900 dark:text-iron-50">
+            <div className="rounded-xl border border-ink-200 bg-card p-5 dark:border-dlugomat-800">
+              <h3 className="text-fluid-lg font-semibold text-dlugomat-900 dark:text-ink-50">
                 Jak długo są przechowywane?
               </h3>
-              <p className="mt-2 text-fluid-sm text-iron-600 dark:text-iron-300">
+              <p className="mt-2 text-fluid-sm text-ink-600 dark:text-ink-300">
                 Dane konta — przez okres istnienia konta. Dokumenty (skany,
                 pisma) — domyślnie 30 dni od ostatniej aktywności w sprawie,
                 potem automatycznie usuwane. Dokumenty księgowe (faktury) — 5
@@ -289,11 +289,11 @@ export default function RodoPage() {
               </p>
             </div>
 
-            <div className="rounded-xl border border-iron-200 bg-card p-5 dark:border-dlugomat-800">
-              <h3 className="text-fluid-lg font-semibold text-dlugomat-900 dark:text-iron-50">
+            <div className="rounded-xl border border-ink-200 bg-card p-5 dark:border-dlugomat-800">
+              <h3 className="text-fluid-lg font-semibold text-dlugomat-900 dark:text-ink-50">
                 Czy używacie cookies?
               </h3>
-              <p className="mt-2 text-fluid-sm text-iron-600 dark:text-iron-300">
+              <p className="mt-2 text-fluid-sm text-ink-600 dark:text-ink-300">
                 Tylko niezbędne (sesja, CSRF, ustawienia bezpieczeństwa).
                 Cookies analityczne i marketingowe — wyłącznie po Twojej
                 wyraźnej zgodzie (opt-in, nie opt-out). Pełna lista i kontrola

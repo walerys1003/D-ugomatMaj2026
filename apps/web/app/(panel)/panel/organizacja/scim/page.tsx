@@ -29,13 +29,13 @@ export default async function ScimPage() {
   return (
     <main className="container mx-auto px-4 py-8 max-w-4xl space-y-6">
       <div>
-        <Link href="/panel/organizacja" className="text-xs text-iron-500 hover:text-iron-700">
+        <Link href="/panel/organizacja" className="text-xs text-ink-500 hover:text-ink-700">
           ← Organizacja
         </Link>
-        <h1 className="font-display text-3xl font-semibold text-iron-900 dark:text-iron-50 mt-2">
+        <h1 className="font-display text-3xl font-semibold text-ink-900 dark:text-ink-50 mt-2">
           SCIM Provisioning
         </h1>
-        <p className="text-sm text-iron-500 mt-1">
+        <p className="text-sm text-ink-500 mt-1">
           Automatyczna synchronizacja użytkowników z Twojego IdP (Okta, Azure AD, OneLogin)
           poprzez standard SCIM 2.0.
         </p>
@@ -49,21 +49,21 @@ export default async function ScimPage() {
           <div className="flex items-center gap-2">
             <span
               className={`w-2 h-2 rounded-full ${
-                scim.enabled ? "bg-accent-600" : "bg-iron-400"
+                scim.enabled ? "bg-accent-600" : "bg-ink-400"
               }`}
             />
-            <span className="text-iron-900 dark:text-iron-50">
+            <span className="text-ink-900 dark:text-ink-50">
               {scim.enabled ? "Aktywne" : "Nieaktywne"}
             </span>
           </div>
           {scim.last_sync_at && (
-            <div className="text-iron-500">
+            <div className="text-ink-500">
               Ostatnia synchronizacja:{" "}
               {new Date(scim.last_sync_at).toLocaleString("pl-PL")}
             </div>
           )}
           {typeof scim.users_synced === "number" && (
-            <div className="text-iron-500">
+            <div className="text-ink-500">
               Zsynchronizowanych użytkowników: {scim.users_synced}
             </div>
           )}
@@ -76,14 +76,14 @@ export default async function ScimPage() {
         </CardHeader>
         <CardContent className="space-y-4 text-sm">
           <div>
-            <div className="text-xs uppercase tracking-wider text-iron-500 mb-1">Tenant URL</div>
-            <code className="block font-mono text-xs px-3 py-2 rounded-md bg-iron-100 dark:bg-iron-800 break-all">
+            <div className="text-xs uppercase tracking-wider text-ink-500 mb-1">Tenant URL</div>
+            <code className="block font-mono text-xs px-3 py-2 rounded-md bg-ink-100 dark:bg-ink-800 break-all">
               {scim.tenant_url ?? "https://app.dlugomat.pl/api/scim/v2"}
             </code>
           </div>
           <div>
-            <div className="text-xs uppercase tracking-wider text-iron-500 mb-1">Bearer token</div>
-            <code className="block font-mono text-xs px-3 py-2 rounded-md bg-iron-100 dark:bg-iron-800">
+            <div className="text-xs uppercase tracking-wider text-ink-500 mb-1">Bearer token</div>
+            <code className="block font-mono text-xs px-3 py-2 rounded-md bg-ink-100 dark:bg-ink-800">
               {scim.bearer_token_preview ?? "•••••••••• (wygeneruj nowy)"}
             </code>
           </div>
@@ -100,7 +100,7 @@ export default async function ScimPage() {
           <CardTitle>Wspierane operacje SCIM 2.0</CardTitle>
         </CardHeader>
         <CardContent>
-          <ul className="space-y-1 text-sm text-iron-700 dark:text-iron-300 list-disc list-inside">
+          <ul className="space-y-1 text-sm text-ink-700 dark:text-ink-300 list-disc list-inside">
             <li>Tworzenie i aktualizacja użytkowników (Users)</li>
             <li>Dezaktywacja (active = false) i kasowanie</li>
             <li>Mapowanie ról przez grupy (Groups → Role mapping)</li>

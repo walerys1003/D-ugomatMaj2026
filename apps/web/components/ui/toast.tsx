@@ -80,7 +80,7 @@ export const Toast = React.forwardRef<
       <div className="flex-1">{children}</div>
       <ToastPrimitive.Close
         aria-label="Zamknij powiadomienie"
-        className="absolute right-2 top-2 rounded-md p-1 text-iron-500 hover:bg-iron-100 dark:hover:bg-dlugomat-850"
+        className="absolute right-2 top-2 rounded-md p-1 text-ink-500 hover:bg-ink-100 dark:hover:bg-dlugomat-850"
       >
         <X className="size-4" />
       </ToastPrimitive.Close>
@@ -95,7 +95,7 @@ export const ToastTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ToastPrimitive.Title
     ref={ref}
-    className={cn("text-fluid-sm font-semibold text-dlugomat-900 dark:text-iron-50", className)}
+    className={cn("text-fluid-sm font-semibold text-dlugomat-900 dark:text-ink-50", className)}
     {...props}
   />
 ));
@@ -107,7 +107,7 @@ export const ToastDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ToastPrimitive.Description
     ref={ref}
-    className={cn("mt-1 text-fluid-xs text-iron-700 dark:text-iron-300", className)}
+    className={cn("mt-1 text-fluid-xs text-ink-700 dark:text-ink-300", className)}
     {...props}
   />
 ));

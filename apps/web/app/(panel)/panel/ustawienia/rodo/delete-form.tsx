@@ -67,8 +67,8 @@ export function DeleteAccountForm() {
       0,
     );
     return (
-      <div className="rounded-lg border border-shield-200 bg-shield-50/40 p-5 text-sm text-iron-800">
-        <h3 className="mb-2 font-semibold text-iron-900">
+      <div className="rounded-lg border border-shield-200 bg-shield-50/40 p-5 text-sm text-ink-800">
+        <h3 className="mb-2 font-semibold text-ink-900">
           Konto usunięte — podsumowanie
         </h3>
         <ul className="list-disc space-y-1 pl-5">
@@ -77,12 +77,12 @@ export function DeleteAccountForm() {
           <li>Płatności zanonimizowanych: <strong>{totalAnon}</strong></li>
           <li>
             Anonimowy hash konta:{" "}
-            <code className="rounded bg-iron-100 px-1 py-0.5 text-xs">
+            <code className="rounded bg-ink-100 px-1 py-0.5 text-xs">
               {result.user_id_anon}
             </code>
           </li>
         </ul>
-        <p className="mt-3 text-iron-600">
+        <p className="mt-3 text-ink-600">
           Za 6 sekund nastąpi automatyczne przekierowanie na stronę główną.
           Twoja sesja została unieważniona.
         </p>
@@ -92,7 +92,7 @@ export function DeleteAccountForm() {
 
   return (
     <form onSubmit={onSubmit} className="space-y-4" noValidate>
-      <div className="rounded-lg border border-temporal-amber-300 bg-temporal-amber-50/40 p-3 text-sm text-iron-800">
+      <div className="rounded-lg border border-temporal-amber-300 bg-temporal-amber-50/40 p-3 text-sm text-ink-800">
         <div className="flex items-start gap-2">
           <AlertTriangle
             className="mt-0.5 h-4 w-4 shrink-0 text-temporal-amber-600"
@@ -113,7 +113,7 @@ export function DeleteAccountForm() {
       <div className="space-y-1.5">
         <Label htmlFor="confirm">
           Aby potwierdzić, wpisz dokładnie:{" "}
-          <code className="rounded bg-iron-100 px-1 py-0.5 text-xs">
+          <code className="rounded bg-ink-100 px-1 py-0.5 text-xs">
             USUŃ MOJE KONTO
           </code>
         </Label>

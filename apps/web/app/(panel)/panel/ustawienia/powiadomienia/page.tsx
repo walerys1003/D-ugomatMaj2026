@@ -96,18 +96,18 @@ const GROUPS = ["Sprawy i terminy", "Platnosci", "Marketing"] as const;
 export default function PowiadomieniaPage() {
   return (
     <div className="space-y-6">
-      <Link href="/panel/ustawienia" className="inline-flex items-center gap-2 text-sm text-iron-600 hover:text-dlugomat-900">
+      <Link href="/panel/ustawienia" className="inline-flex items-center gap-2 text-sm text-ink-600 hover:text-dlugomat-900">
         <ArrowLeft className="h-4 w-4" aria-hidden />
         Powrot do ustawien
       </Link>
 
       <header>
-        <p className="text-xs uppercase tracking-[0.18em] text-iron-500">Ustawienia</p>
+        <p className="text-xs uppercase tracking-[0.18em] text-ink-500">Ustawienia</p>
         <h1 className="font-display text-fluid-h1 text-dlugomat-950 flex items-center gap-3">
           <Bell className="h-7 w-7 text-dlugomat-700" aria-hidden />
           Powiadomienia
         </h1>
-        <p className="mt-1 text-sm text-iron-600">
+        <p className="mt-1 text-sm text-ink-600">
           Wybierz, ktore wydarzenia maja dotrzec i jakim kanalem. Krytyczne terminy zawsze trafia do skrzynki w aplikacji.
         </p>
       </header>
@@ -117,7 +117,7 @@ export default function PowiadomieniaPage() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="text-sm font-medium text-dlugomat-900">Tryb skupienia (Do Not Disturb)</p>
-              <p className="text-xs text-iron-500">Wycisza powiadomienia push i SMS w godzinach 22:00 — 07:00.</p>
+              <p className="text-xs text-ink-500">Wycisza powiadomienia push i SMS w godzinach 22:00 — 07:00.</p>
             </div>
             <Button variant="secondary" size="sm">Wlaczone · 22:00–07:00</Button>
           </div>
@@ -134,7 +134,7 @@ export default function PowiadomieniaPage() {
             </CardHeader>
             <CardContent className="p-0">
               <table className="w-full text-sm">
-                <thead className="border-y border-iron-100 bg-iron-50/50 text-xs uppercase tracking-wide text-iron-600">
+                <thead className="border-y border-ink-100 bg-ink-50/50 text-xs uppercase tracking-wide text-ink-600">
                   <tr>
                     <th className="px-5 py-2 text-left font-medium">Typ powiadomienia</th>
                     {CHANNELS.map((c) => {
@@ -150,14 +150,14 @@ export default function PowiadomieniaPage() {
                     })}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-iron-100">
+                <tbody className="divide-y divide-ink-100">
                   {groupRows.map((r) => (
                     <tr key={r.id}>
                       <td className="px-5 py-3">
                         <div className="flex items-start gap-2">
                           <div>
                             <p className="text-sm font-medium text-dlugomat-900">{r.title}</p>
-                            <p className="mt-0.5 text-xs text-iron-500">{r.desc}</p>
+                            <p className="mt-0.5 text-xs text-ink-500">{r.desc}</p>
                           </div>
                           {r.recommended && <Badge tone="info">Polecane</Badge>}
                         </div>
@@ -171,7 +171,7 @@ export default function PowiadomieniaPage() {
                             <input
                               type="checkbox"
                               defaultChecked={r.channels[c.key]}
-                              className="h-4 w-4 rounded border-iron-300 text-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus"
+                              className="h-4 w-4 rounded border-ink-300 text-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus"
                             />
                           </label>
                         </td>

@@ -32,14 +32,14 @@ export default function NowaSprawaPage() {
       <header className="space-y-2">
         <Link
           href="/panel"
-          className="text-fluid-xs text-iron-500 hover:text-iron-700 dark:text-iron-400 dark:hover:text-iron-200"
+          className="text-fluid-xs text-ink-500 hover:text-ink-700 dark:text-ink-400 dark:hover:text-ink-200"
         >
           ← Panel
         </Link>
-        <h1 className="font-serif text-fluid-3xl text-iron-900 dark:text-iron-50">
+        <h1 className="font-serif text-fluid-3xl text-ink-900 dark:text-ink-50">
           Nowa sprawa
         </h1>
-        <p className="text-fluid-sm text-iron-600 dark:text-iron-400">
+        <p className="text-fluid-sm text-ink-600 dark:text-ink-400">
           Wybierz moduł i typ pisma. Możesz wrócić do nieukończonej sprawy w dowolnym momencie — auto-zapis działa od pierwszego kroku.
         </p>
       </header>
@@ -59,7 +59,7 @@ export default function NowaSprawaPage() {
           <h2 className="mt-1 font-serif text-fluid-lg text-shield-950">
             Nie wiesz, z czym masz do czynienia? Wgraj skan.
           </h2>
-          <p className="text-fluid-sm text-iron-700">
+          <p className="text-fluid-sm text-ink-700">
             Rozpoznamy nakaz EPU, pismo komornika lub raport BIK i podpowiemy
             właściwy moduł. Skan jest bezpłatny.
           </p>
@@ -77,10 +77,10 @@ export default function NowaSprawaPage() {
           <section key={mod} className="space-y-3">
             <header className="flex flex-wrap items-baseline justify-between gap-3">
               <div>
-                <h2 className="font-serif text-fluid-xl text-iron-900 dark:text-iron-50">
+                <h2 className="font-serif text-fluid-xl text-ink-900 dark:text-ink-50">
                   {mod} · {meta.title}
                 </h2>
-                <p className="text-fluid-sm text-iron-600 dark:text-iron-400">
+                <p className="text-fluid-sm text-ink-600 dark:text-ink-400">
                   {meta.tagline}
                 </p>
               </div>
@@ -109,7 +109,7 @@ export default function NowaSprawaPage() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="flex items-center justify-between gap-3">
-                      <span className="text-fluid-sm font-medium text-iron-800 dark:text-iron-200 tabular-nums">
+                      <span className="text-fluid-sm font-medium text-ink-800 dark:text-ink-200 tabular-nums">
                         {t.priceGrosze === 0 ? "Bezpłatnie" : formatPLN(t.priceGrosze / 100)}
                       </span>
                       {isLive ? (

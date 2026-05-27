@@ -25,8 +25,8 @@ export function EmptyState({
     <div
       className={cn(
         "flex flex-col items-center justify-center gap-4 rounded-xl",
-        "border border-dashed border-iron-200 dark:border-dlugomat-800",
-        "bg-iron-50/60 dark:bg-dlugomat-900/40",
+        "border border-dashed border-ink-200 dark:border-dlugomat-800",
+        "bg-ink-50/60 dark:bg-dlugomat-900/40",
         "p-8 text-center",
         className
       )}
@@ -41,11 +41,11 @@ export function EmptyState({
         </div>
       ) : null}
       <div className="flex flex-col gap-1">
-        <h4 className="text-fluid-lg font-semibold text-dlugomat-900 dark:text-iron-50">
+        <h4 className="text-fluid-lg font-semibold text-dlugomat-900 dark:text-ink-50">
           {title}
         </h4>
         {description ? (
-          <p className="max-w-md text-fluid-sm text-iron-600 dark:text-iron-300">
+          <p className="max-w-md text-fluid-sm text-ink-600 dark:text-ink-300">
             {description}
           </p>
         ) : null}

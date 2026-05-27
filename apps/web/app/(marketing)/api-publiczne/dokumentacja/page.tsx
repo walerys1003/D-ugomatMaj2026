@@ -159,7 +159,7 @@ export default function ApiDokumentacjaPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-left text-xs uppercase tracking-wide text-dlugomat-600 border-b border-iron-200">
+                  <tr className="text-left text-xs uppercase tracking-wide text-dlugomat-600 border-b border-ink-200">
                     <th className="py-2 pr-3">Metoda</th>
                     <th className="py-2 pr-3">Sciezka</th>
                     <th className="py-2 pr-3">Opis</th>
@@ -168,14 +168,14 @@ export default function ApiDokumentacjaPage() {
                 </thead>
                 <tbody>
                   {ENDPOINTS.map((e) => (
-                    <tr key={`${e.method}-${e.path}`} className="border-b border-iron-100 last:border-0">
+                    <tr key={`${e.method}-${e.path}`} className="border-b border-ink-100 last:border-0">
                       <td className="py-2.5 pr-3">
                         <Badge tone={METHOD_TONE[e.method]}>{e.method}</Badge>
                       </td>
                       <td className="py-2.5 pr-3 font-mono text-xs text-dlugomat-900">{e.path}</td>
                       <td className="py-2.5 pr-3 text-dlugomat-800">{e.description}</td>
                       <td className="py-2.5">
-                        <code className="text-xs bg-iron-100 px-1.5 py-0.5 rounded text-dlugomat-800">{e.scope}</code>
+                        <code className="text-xs bg-ink-100 px-1.5 py-0.5 rounded text-dlugomat-800">{e.scope}</code>
                       </td>
                     </tr>
                   ))}
@@ -204,7 +204,7 @@ export default function ApiDokumentacjaPage() {
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {SDKS.map((sdk) => (
-                <div key={sdk.lang} className="p-3 rounded-md border border-iron-300 bg-white">
+                <div key={sdk.lang} className="p-3 rounded-md border border-ink-300 bg-white">
                   <div className="font-medium text-dlugomat-950 text-sm mb-2">{sdk.lang}</div>
                   <pre className="text-xs font-mono bg-dlugomat-950 text-dlugomat-50 p-2 rounded overflow-x-auto">
                     {sdk.install}

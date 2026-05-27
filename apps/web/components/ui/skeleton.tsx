@@ -11,7 +11,7 @@ export function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivEl
       role="status"
       aria-label="Ładowanie"
       className={cn(
-        "animate-pulse rounded-md bg-iron-200/70 dark:bg-dlugomat-850/70",
+        "animate-pulse rounded-md bg-ink-200/70 dark:bg-dlugomat-850/70",
         className
       )}
       {...props}

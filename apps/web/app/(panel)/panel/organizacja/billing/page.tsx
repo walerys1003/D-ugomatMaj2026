@@ -31,7 +31,7 @@ const STATUS_BADGE: Record<Invoice["status"], string> = {
   paid: "bg-accent-50 text-accent-700 border-accent-200",
   open: "bg-warn-50 text-warn-700 border-warn-200",
   overdue: "bg-danger-50 text-danger-700 border-danger-200",
-  void: "bg-iron-100 text-iron-600 border-iron-200",
+  void: "bg-ink-100 text-ink-600 border-ink-200",
 };
 
 const STATUS_LABEL: Record<Invoice["status"], string> = {
@@ -46,7 +46,7 @@ export default async function BillingPage() {
   if (!org) {
     return (
       <main className="container mx-auto px-4 py-12 max-w-4xl">
-        <p className="text-iron-600">Brak aktywnej organizacji.</p>
+        <p className="text-ink-600">Brak aktywnej organizacji.</p>
       </main>
     );
   }
@@ -54,10 +54,10 @@ export default async function BillingPage() {
   return (
     <main className="container mx-auto px-4 py-8 max-w-6xl space-y-6">
       <div>
-        <Link href="/panel/organizacja" className="text-xs text-iron-500 hover:text-iron-700">
+        <Link href="/panel/organizacja" className="text-xs text-ink-500 hover:text-ink-700">
           ← Organizacja
         </Link>
-        <h1 className="font-display text-3xl font-semibold text-iron-900 dark:text-iron-50 mt-2">
+        <h1 className="font-display text-3xl font-semibold text-ink-900 dark:text-ink-50 mt-2">
           Rozliczenia
         </h1>
       </div>
@@ -69,23 +69,23 @@ export default async function BillingPage() {
           </CardHeader>
           <CardContent className="space-y-3">
             <div>
-              <div className="text-xs uppercase tracking-wider text-iron-500">Plan</div>
-              <div className="font-display text-2xl font-semibold text-iron-900 dark:text-iron-50 capitalize">
+              <div className="text-xs uppercase tracking-wider text-ink-500">Plan</div>
+              <div className="font-display text-2xl font-semibold text-ink-900 dark:text-ink-50 capitalize">
                 {org.plan}
               </div>
             </div>
             <div>
-              <div className="text-xs uppercase tracking-wider text-iron-500 mb-1">
+              <div className="text-xs uppercase tracking-wider text-ink-500 mb-1">
                 Wykorzystanie miejsc
               </div>
               <div className="flex items-center gap-2 text-sm">
-                <div className="flex-1 h-2 rounded-full bg-iron-100 dark:bg-iron-800 overflow-hidden">
+                <div className="flex-1 h-2 rounded-full bg-ink-100 dark:bg-ink-800 overflow-hidden">
                   <div
                     className="h-full bg-accent-600"
                     style={{ width: `${(org.seats_used / org.seats_total) * 100}%` }}
                   />
                 </div>
-                <span className="text-iron-700 dark:text-iron-300 font-medium">
+                <span className="text-ink-700 dark:text-ink-300 font-medium">
                   {org.seats_used} / {org.seats_total}
                 </span>
               </div>
@@ -127,12 +127,12 @@ export default async function BillingPage() {
         </CardHeader>
         <CardContent>
           {invoices.length === 0 ? (
-            <p className="text-sm text-iron-500">Brak faktur.</p>
+            <p className="text-sm text-ink-500">Brak faktur.</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-left border-b border-iron-200 dark:border-iron-800 text-xs uppercase tracking-wider text-iron-500">
+                  <tr className="text-left border-b border-ink-200 dark:border-ink-800 text-xs uppercase tracking-wider text-ink-500">
                     <th className="py-2 pr-3">Numer</th>
                     <th className="py-2 pr-3">Kwota</th>
                     <th className="py-2 pr-3">Status</th>
@@ -142,11 +142,11 @@ export default async function BillingPage() {
                 </thead>
                 <tbody>
                   {invoices.map((inv) => (
-                    <tr key={inv.id} className="border-b border-iron-100 dark:border-iron-900">
-                      <td className="py-2.5 pr-3 font-mono text-xs text-iron-900 dark:text-iron-50">
+                    <tr key={inv.id} className="border-b border-ink-100 dark:border-ink-900">
+                      <td className="py-2.5 pr-3 font-mono text-xs text-ink-900 dark:text-ink-50">
                         {inv.number}
                       </td>
-                      <td className="py-2.5 pr-3 font-medium text-iron-900 dark:text-iron-50">
+                      <td className="py-2.5 pr-3 font-medium text-ink-900 dark:text-ink-50">
                         {inv.amount_pln.toLocaleString("pl-PL")} zł
                       </td>
                       <td className="py-2.5 pr-3">
@@ -156,7 +156,7 @@ export default async function BillingPage() {
                           {STATUS_LABEL[inv.status]}
                         </span>
                       </td>
-                      <td className="py-2.5 pr-3 text-iron-600 dark:text-iron-400">
+                      <td className="py-2.5 pr-3 text-ink-600 dark:text-ink-400">
                         {new Date(inv.due_at).toLocaleDateString("pl-PL")}
                       </td>
                       <td className="py-2.5 pr-3 text-right">
@@ -190,14 +190,14 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="text-xs font-medium text-iron-700 dark:text-iron-300 mb-1 block">
+      <span className="text-xs font-medium text-ink-700 dark:text-ink-300 mb-1 block">
         {label}
       </span>
       <input
         type="text"
         name={name}
         placeholder={placeholder}
-        className="w-full rounded-lg border border-iron-300 dark:border-iron-700 bg-white dark:bg-iron-900 px-3 py-2 focus:outline-none focus-visible:shadow-shield-focus"
+        className="w-full rounded-lg border border-ink-300 dark:border-ink-700 bg-white dark:bg-ink-900 px-3 py-2 focus:outline-none focus-visible:shadow-shield-focus"
       />
     </label>
   );

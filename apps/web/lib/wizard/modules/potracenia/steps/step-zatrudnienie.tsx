@@ -105,8 +105,8 @@ export function StepZatrudnienie({
                   "rounded-lg border px-3 py-2 text-left text-fluid-sm transition-all",
                   "focus:outline-none focus-visible:ring-2 focus-visible:ring-shield-500",
                   active
-                    ? "border-shield-500 bg-shield-50/70 text-iron-900"
-                    : "border-iron-200 bg-white text-iron-800 hover:border-shield-300",
+                    ? "border-shield-500 bg-shield-50/70 text-ink-900"
+                    : "border-ink-200 bg-white text-ink-800 hover:border-shield-300",
                 )}
               >
                 {f.label}
@@ -134,7 +134,7 @@ export function StepZatrudnienie({
           aria-invalid={Boolean(errors.wynagrodzenie_netto)}
           {...register("wynagrodzenie_netto", { valueAsNumber: true })}
         />
-        <p className="text-fluid-xs text-iron-600">
+        <p className="text-fluid-xs text-ink-600">
           Potrzebne, aby wskazać kwotę wolną od potrąceń (minimalne wynagrodzenie).
         </p>
         {errors.wynagrodzenie_netto?.message && (

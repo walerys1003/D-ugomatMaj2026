@@ -93,10 +93,10 @@ export default function ProgramPartnerskiPage() {
         <Badge tone="warning" withDot>
           Program w przygotowaniu
         </Badge>
-        <h1 className="mt-4 text-fluid-h1 font-semibold tracking-tight text-iron-900 dark:text-white">
+        <h1 className="mt-4 text-fluid-h1 font-semibold tracking-tight text-ink-900 dark:text-white">
           Program partnerski Długomatu
         </h1>
-        <p className="mt-4 text-fluid-md text-iron-600 dark:text-iron-300">
+        <p className="mt-4 text-fluid-md text-ink-600 dark:text-ink-300">
           Polecasz Długomat — dostajesz 20% od pierwszego zakupu każdego polecanego klienta.
           Bez ukrytych warunków, bez minimalnych wolumenów, bez exclusivity.
         </p>
@@ -113,7 +113,7 @@ export default function ProgramPartnerskiPage() {
             <CardTitle>Zapisz się na listę pre-launch</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-fluid-sm text-iron-600 dark:text-iron-300">
+            <p className="text-fluid-sm text-ink-600 dark:text-ink-300">
               Wyślij wiadomość na{" "}
               <a className="font-semibold text-dlugomat-700 underline dark:text-dlugomat-300" href="mailto:partnerstwa@dlugomat.pl?subject=Program%20partnerski%20%E2%80%94%20zapis%20na%20pre-launch">
                 partnerstwa@dlugomat.pl
@@ -121,7 +121,7 @@ export default function ProgramPartnerskiPage() {
               z tematem &bdquo;Program partnerski&rdquo; i krótkim opisem (kim jesteś,
               jaką masz publikę / klientelę). Odpowiadamy w ciągu 3 dni roboczych.
             </p>
-            <p className="mt-4 text-fluid-xs text-iron-500">
+            <p className="mt-4 text-fluid-xs text-ink-500">
               Zapisanie na listę nie jest jeszcze umową — formalne warunki dostaniesz
               w momencie startu programu.
             </p>
@@ -142,7 +142,7 @@ export default function ProgramPartnerskiPage() {
 
       {/* Dla kogo */}
       <section className="mt-20">
-        <h2 className="text-center text-fluid-h2 font-semibold text-iron-900 dark:text-white">
+        <h2 className="text-center text-fluid-h2 font-semibold text-ink-900 dark:text-white">
           Dla kogo to ma sens
         </h2>
         <div className="mt-10 grid gap-6 md:grid-cols-3">
@@ -153,7 +153,7 @@ export default function ProgramPartnerskiPage() {
                 <CardTitle className="mt-3 text-fluid-h4">{title}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-fluid-sm text-iron-600 dark:text-iron-300">{desc}</p>
+                <p className="text-fluid-sm text-ink-600 dark:text-ink-300">{desc}</p>
               </CardContent>
             </Card>
           ))}
@@ -162,12 +162,12 @@ export default function ProgramPartnerskiPage() {
 
       {/* Jak to działa */}
       <section className="mt-20">
-        <h2 className="text-center text-fluid-h2 font-semibold text-iron-900 dark:text-white">
+        <h2 className="text-center text-fluid-h2 font-semibold text-ink-900 dark:text-white">
           Jak to działa
         </h2>
         <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {HOW_IT_WORKS.map(({ n, title, desc }) => (
-            <Card key={n} elevation="flat" className="border-iron-200 dark:border-dlugomat-800">
+            <Card key={n} elevation="flat" className="border-ink-200 dark:border-dlugomat-800">
               <CardHeader>
                 <span className="font-mono text-fluid-h2 text-dlugomat-300 dark:text-dlugomat-700">
                   {n}
@@ -175,7 +175,7 @@ export default function ProgramPartnerskiPage() {
                 <CardTitle className="text-fluid-h4">{title}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-fluid-sm text-iron-600 dark:text-iron-300">{desc}</p>
+                <p className="text-fluid-sm text-ink-600 dark:text-ink-300">{desc}</p>
               </CardContent>
             </Card>
           ))}
@@ -192,7 +192,7 @@ export default function ProgramPartnerskiPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ul className="space-y-3 text-fluid-sm text-iron-700 dark:text-iron-200">
+            <ul className="space-y-3 text-fluid-sm text-ink-700 dark:text-ink-200">
               {[
                 "Prowizja: 20% netto od pierwszego zakupu każdego polecanego klienta.",
                 "Cookie attribution: 30 dni od kliknięcia w link partnerski.",
@@ -215,27 +215,27 @@ export default function ProgramPartnerskiPage() {
 
       {/* FAQ */}
       <section className="mt-20 mx-auto max-w-3xl">
-        <h2 className="text-center text-fluid-h2 font-semibold text-iron-900 dark:text-white">
+        <h2 className="text-center text-fluid-h2 font-semibold text-ink-900 dark:text-white">
           Najczęstsze pytania
         </h2>
         <div className="mt-10 space-y-4">
           {FAQ.map((item) => (
             <details
               key={item.q}
-              className="group rounded-lg border border-iron-200 bg-white p-5 transition-colors open:bg-iron-50 dark:border-dlugomat-800 dark:bg-dlugomat-950 dark:open:bg-dlugomat-900/40"
+              className="group rounded-lg border border-ink-200 bg-white p-5 transition-colors open:bg-ink-50 dark:border-dlugomat-800 dark:bg-dlugomat-950 dark:open:bg-dlugomat-900/40"
             >
-              <summary className="cursor-pointer list-none text-fluid-md font-semibold text-iron-900 marker:hidden dark:text-white">
+              <summary className="cursor-pointer list-none text-fluid-md font-semibold text-ink-900 marker:hidden dark:text-white">
                 <span className="flex items-start justify-between gap-3">
                   <span>{item.q}</span>
                   <span
                     aria-hidden
-                    className="mt-1 h-5 w-5 shrink-0 rounded-full border border-iron-300 text-center text-iron-500 transition-transform group-open:rotate-45 dark:border-dlugomat-700 dark:text-iron-300"
+                    className="mt-1 h-5 w-5 shrink-0 rounded-full border border-ink-300 text-center text-ink-500 transition-transform group-open:rotate-45 dark:border-dlugomat-700 dark:text-ink-300"
                   >
                     +
                   </span>
                 </span>
               </summary>
-              <p className="mt-3 text-fluid-sm text-iron-600 dark:text-iron-300">{item.a}</p>
+              <p className="mt-3 text-fluid-sm text-ink-600 dark:text-ink-300">{item.a}</p>
             </details>
           ))}
         </div>
@@ -244,7 +244,7 @@ export default function ProgramPartnerskiPage() {
       {/* Final CTA */}
       <section className="mt-20 rounded-xl bg-dlugomat-900 p-10 text-center text-white">
         <h2 className="text-fluid-h2 font-semibold">Gotowy/a, żeby polecać Długomat?</h2>
-        <p className="mx-auto mt-3 max-w-xl text-fluid-sm text-iron-300">
+        <p className="mx-auto mt-3 max-w-xl text-fluid-sm text-ink-300">
           Zostaw nam e-mail z krótkim opisem siebie — odpowiemy w 3 dni roboczych
           i wyślemy formalne warunki, kiedy program ruszy.
         </p>

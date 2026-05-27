@@ -47,8 +47,8 @@ export function NotificationsForm({ initial }: Props) {
   const toggle = (key: keyof Prefs) => () => update(key, !prefs[key] as any);
 
   const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
-    <div className="flex flex-col gap-2 border-b border-iron-200 py-3 last:border-b-0 dark:border-dlugomat-700">
-      <h3 className="text-fluid-sm font-semibold uppercase tracking-wider text-iron-500">{title}</h3>
+    <div className="flex flex-col gap-2 border-b border-ink-200 py-3 last:border-b-0 dark:border-dlugomat-700">
+      <h3 className="text-fluid-sm font-semibold uppercase tracking-wider text-ink-500">{title}</h3>
       <div className="flex flex-col gap-2">{children}</div>
     </div>
   );
@@ -68,9 +68,9 @@ export function NotificationsForm({ initial }: Props) {
   }) => (
     <label className="flex items-start justify-between gap-3 py-1 cursor-pointer">
       <div className="flex flex-col">
-        <span className="text-fluid-sm font-medium text-iron-900 dark:text-iron-100">{label}</span>
+        <span className="text-fluid-sm font-medium text-ink-900 dark:text-ink-100">{label}</span>
         {description && (
-          <span className="text-fluid-xs text-iron-500 dark:text-iron-400">{description}</span>
+          <span className="text-fluid-xs text-ink-500 dark:text-ink-400">{description}</span>
         )}
       </div>
       <button
@@ -81,7 +81,7 @@ export function NotificationsForm({ initial }: Props) {
         disabled={disabled}
         onClick={onChange}
         className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${
-          checked ? "bg-dlugomat-600" : "bg-iron-300 dark:bg-dlugomat-700"
+          checked ? "bg-dlugomat-600" : "bg-ink-300 dark:bg-dlugomat-700"
         } ${disabled ? "opacity-50" : ""}`}
       >
         <span
@@ -152,7 +152,7 @@ export function NotificationsForm({ initial }: Props) {
                 type="time"
                 value={prefs.push_quiet_start}
                 onChange={(e) => update("push_quiet_start", e.target.value)}
-                className="h-9 rounded-md border border-iron-200 bg-white px-2 text-fluid-sm dark:border-dlugomat-700 dark:bg-dlugomat-900"
+                className="h-9 rounded-md border border-ink-200 bg-white px-2 text-fluid-sm dark:border-dlugomat-700 dark:bg-dlugomat-900"
               />
             </div>
             <div className="flex flex-col gap-1">
@@ -162,7 +162,7 @@ export function NotificationsForm({ initial }: Props) {
                 type="time"
                 value={prefs.push_quiet_end}
                 onChange={(e) => update("push_quiet_end", e.target.value)}
-                className="h-9 rounded-md border border-iron-200 bg-white px-2 text-fluid-sm dark:border-dlugomat-700 dark:bg-dlugomat-900"
+                className="h-9 rounded-md border border-ink-200 bg-white px-2 text-fluid-sm dark:border-dlugomat-700 dark:bg-dlugomat-900"
               />
             </div>
           </div>
@@ -176,7 +176,7 @@ export function NotificationsForm({ initial }: Props) {
             id="dig"
             value={prefs.digest_frequency}
             onChange={(e) => update("digest_frequency", e.target.value as Prefs["digest_frequency"])}
-            className="h-10 rounded-md border border-iron-200 bg-white px-3 text-fluid-sm dark:border-dlugomat-700 dark:bg-dlugomat-900"
+            className="h-10 rounded-md border border-ink-200 bg-white px-3 text-fluid-sm dark:border-dlugomat-700 dark:bg-dlugomat-900"
           >
             <option value="off">Wyłączone</option>
             <option value="daily">Codziennie (rano)</option>
@@ -185,7 +185,7 @@ export function NotificationsForm({ initial }: Props) {
         </div>
       </Section>
 
-      <div className="mt-2 flex items-center gap-2 text-fluid-xs text-iron-500">
+      <div className="mt-2 flex items-center gap-2 text-fluid-xs text-ink-500">
         {pending ? (
           <span>Zapisuję...</span>
         ) : saved ? (

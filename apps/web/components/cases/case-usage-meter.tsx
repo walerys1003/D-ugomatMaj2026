@@ -37,16 +37,16 @@ export async function CaseUsageMeter({ caseId }: { caseId: string }) {
     <div
       role="region"
       aria-label="Zużycie AI w tej sprawie"
-      className="rounded-xl border border-iron-200 bg-iron-50/40 p-4 text-fluid-xs dark:border-iron-800 dark:bg-iron-900/40"
+      className="rounded-xl border border-ink-200 bg-ink-50/40 p-4 text-fluid-xs dark:border-ink-800 dark:bg-ink-900/40"
     >
       <div className="mb-3 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2 font-medium text-iron-800 dark:text-iron-200">
+        <div className="flex items-center gap-2 font-medium text-ink-800 dark:text-ink-200">
           <Sparkles className="size-3.5 text-shield-600" aria-hidden />
           Zużycie AI w tej sprawie
         </div>
         <Badge tone={tone}>{capPct}% z limitu</Badge>
       </div>
-      <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-iron-700 dark:text-iron-300 sm:grid-cols-4">
+      <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-ink-700 dark:text-ink-300 sm:grid-cols-4">
         <Stat label="Generacji" value={String(usage.generations)} />
         <Stat label="Walidacji (Haiku)" value={String(usage.validations)} />
         <Stat label="Tokenów" value={formatThousands(totalTokens)} />
@@ -56,7 +56,7 @@ export async function CaseUsageMeter({ caseId }: { caseId: string }) {
           hint={`limit $${BUDGET_LIMITS.caseCapUsd.toFixed(2)}`}
         />
       </dl>
-      <p className="mt-3 text-iron-500 dark:text-iron-400">
+      <p className="mt-3 text-ink-500 dark:text-ink-400">
         Koszt AI to wydatek po naszej stronie — dla Ciebie sprawa jest rozliczana
         ryczałtowo wg cennika modułu (D-{caseId.slice(0, 4)}).
       </p>
@@ -75,11 +75,11 @@ function Stat({
 }) {
   return (
     <div>
-      <dt className="text-iron-500 dark:text-iron-400">{label}</dt>
-      <dd className="font-semibold text-iron-900 dark:text-iron-100">
+      <dt className="text-ink-500 dark:text-ink-400">{label}</dt>
+      <dd className="font-semibold text-ink-900 dark:text-ink-100">
         {value}
         {hint && (
-          <span className="ml-1 font-normal text-iron-500 dark:text-iron-400">
+          <span className="ml-1 font-normal text-ink-500 dark:text-ink-400">
             ({hint})
           </span>
         )}

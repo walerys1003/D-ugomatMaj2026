@@ -186,7 +186,7 @@ export default async function BezpieczenstwoSzczegolyPage({ params }: { params: 
               <CardContent>
                 <ul className="space-y-3">
                   {std.controls.map((c) => (
-                    <li key={c.id} className="flex items-start gap-3 p-3 rounded-md border border-iron-200 bg-white">
+                    <li key={c.id} className="flex items-start gap-3 p-3 rounded-md border border-ink-200 bg-white">
                       <Badge tone="neutral" className="shrink-0">
                         {c.id}
                       </Badge>
@@ -234,7 +234,7 @@ export default async function BezpieczenstwoSzczegolyPage({ params }: { params: 
                   {std.reports.map((r) => (
                     <li
                       key={r.id}
-                      className="flex items-center justify-between gap-3 p-3 rounded-md border border-iron-200 bg-white"
+                      className="flex items-center justify-between gap-3 p-3 rounded-md border border-ink-200 bg-white"
                     >
                       <div className="min-w-0">
                         <div className="text-sm font-medium text-dlugomat-950 truncate">{r.name}</div>

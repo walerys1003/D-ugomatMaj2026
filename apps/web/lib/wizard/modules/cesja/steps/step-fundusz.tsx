@@ -35,7 +35,7 @@ export function StepFundusz({
       className="space-y-5"
       noValidate
     >
-      <div className="rounded-lg border border-shield-100 bg-shield-50/40 p-3 text-sm text-iron-700">
+      <div className="rounded-lg border border-shield-100 bg-shield-50/40 p-3 text-sm text-ink-700">
         Dane funduszu sekurytyzacyjnego lub firmy windykacyjnej, która
         skierowała do Ciebie wezwanie. Znajdziesz je w nagłówku pisma.
       </div>

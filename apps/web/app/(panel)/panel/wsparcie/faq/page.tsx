@@ -166,7 +166,7 @@ export default function FaqPanelPage() {
               <input
                 type="search"
                 placeholder="Szukaj w bazie wiedzy..."
-                className="w-full pl-10 pr-3 py-2.5 rounded-md border border-iron-300 bg-white text-dlugomat-950 placeholder:text-dlugomat-500 focus-visible:shadow-shield-focus focus-visible:outline-none"
+                className="w-full pl-10 pr-3 py-2.5 rounded-md border border-ink-300 bg-white text-dlugomat-950 placeholder:text-dlugomat-500 focus-visible:shadow-shield-focus focus-visible:outline-none"
                 aria-label="Szukaj w FAQ"
               />
             </div>
@@ -178,14 +178,14 @@ export default function FaqPanelPage() {
                   className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium border focus-visible:shadow-shield-focus focus-visible:outline-none ${
                     idx === 0
                       ? "bg-dlugomat-900 text-white border-dlugomat-900"
-                      : "bg-white text-dlugomat-800 border-iron-300 hover:bg-dlugomat-50"
+                      : "bg-white text-dlugomat-800 border-ink-300 hover:bg-dlugomat-50"
                   }`}
                   aria-pressed={idx === 0}
                 >
                   {cat.label}
                   <span
                     className={`text-xs px-1.5 py-0.5 rounded ${
-                      idx === 0 ? "bg-white/20" : "bg-iron-100 text-dlugomat-700"
+                      idx === 0 ? "bg-white/20" : "bg-ink-100 text-dlugomat-700"
                     }`}
                   >
                     {cat.count}
@@ -209,7 +209,7 @@ export default function FaqPanelPage() {
                     <p className="text-dlugomat-800 text-sm leading-relaxed">{item.answer}</p>
                   </div>
                 </div>
-                <div className="mt-4 pt-3 border-t border-iron-100 flex items-center justify-between text-xs text-dlugomat-600">
+                <div className="mt-4 pt-3 border-t border-ink-100 flex items-center justify-between text-xs text-dlugomat-600">
                   <span>
                     Pomocne dla {item.helpful} osob z {item.views} odwiedzin
                   </span>

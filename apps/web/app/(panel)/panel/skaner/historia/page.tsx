@@ -151,7 +151,7 @@ export default function SkanerHistoriaPage() {
       <div>
         <Link
           href="/panel/skaner"
-          className="inline-flex items-center gap-2 text-sm text-iron-600 hover:text-dlugomat-900 focus-visible:outline-none focus-visible:shadow-shield-focus rounded"
+          className="inline-flex items-center gap-2 text-sm text-ink-600 hover:text-dlugomat-900 focus-visible:outline-none focus-visible:shadow-shield-focus rounded"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden />
           Wróć do skanera
@@ -160,13 +160,13 @@ export default function SkanerHistoriaPage() {
 
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-2">
-          <p className="text-xs uppercase tracking-[0.18em] text-iron-500">
+          <p className="text-xs uppercase tracking-[0.18em] text-ink-500">
             Skaner nakazu · historia
           </p>
           <h1 className="font-display text-fluid-h1 text-dlugomat-950">
             Twoje analizy
           </h1>
-          <p className="max-w-2xl text-iron-600">
+          <p className="max-w-2xl text-ink-600">
             Wszystkie skany są szyfrowane i przechowywane w EU przez 7 lat
             (zgodnie z wymogiem zachowania dokumentów księgowych).
           </p>
@@ -224,8 +224,8 @@ export default function SkanerHistoriaPage() {
         <CardContent>
           <form method="get" className="grid gap-3 sm:grid-cols-4">
             <label className="block">
-              <span className="block text-xs uppercase tracking-wide text-iron-500">Typ dokumentu</span>
-              <select className="mt-1 w-full rounded-md border border-iron-300 bg-white px-3 py-2 text-sm focus:border-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus">
+              <span className="block text-xs uppercase tracking-wide text-ink-500">Typ dokumentu</span>
+              <select className="mt-1 w-full rounded-md border border-ink-300 bg-white px-3 py-2 text-sm focus:border-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus">
                 <option value="">Wszystkie</option>
                 <option>nakaz zapłaty</option>
                 <option>pozew</option>
@@ -234,8 +234,8 @@ export default function SkanerHistoriaPage() {
               </select>
             </label>
             <label className="block">
-              <span className="block text-xs uppercase tracking-wide text-iron-500">Ryzyko</span>
-              <select className="mt-1 w-full rounded-md border border-iron-300 bg-white px-3 py-2 text-sm focus:border-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus">
+              <span className="block text-xs uppercase tracking-wide text-ink-500">Ryzyko</span>
+              <select className="mt-1 w-full rounded-md border border-ink-300 bg-white px-3 py-2 text-sm focus:border-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus">
                 <option value="">Każde</option>
                 <option>niskie (0–39)</option>
                 <option>średnie (40–69)</option>
@@ -243,17 +243,17 @@ export default function SkanerHistoriaPage() {
               </select>
             </label>
             <label className="block">
-              <span className="block text-xs uppercase tracking-wide text-iron-500">Od daty</span>
+              <span className="block text-xs uppercase tracking-wide text-ink-500">Od daty</span>
               <input
                 type="date"
-                className="mt-1 w-full rounded-md border border-iron-300 bg-white px-3 py-2 text-sm focus:border-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus"
+                className="mt-1 w-full rounded-md border border-ink-300 bg-white px-3 py-2 text-sm focus:border-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus"
               />
             </label>
             <label className="block">
-              <span className="block text-xs uppercase tracking-wide text-iron-500">Do daty</span>
+              <span className="block text-xs uppercase tracking-wide text-ink-500">Do daty</span>
               <input
                 type="date"
-                className="mt-1 w-full rounded-md border border-iron-300 bg-white px-3 py-2 text-sm focus:border-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus"
+                className="mt-1 w-full rounded-md border border-ink-300 bg-white px-3 py-2 text-sm focus:border-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus"
               />
             </label>
           </form>
@@ -265,12 +265,12 @@ export default function SkanerHistoriaPage() {
           <li key={s.id}>
             <Link
               href={`/panel/skaner/${s.id}`}
-              className="group block rounded-lg border border-iron-200 bg-white p-5 shadow-card transition hover:shadow-pop focus-visible:outline-none focus-visible:shadow-shield-focus"
+              className="group block rounded-lg border border-ink-200 bg-white p-5 shadow-card transition hover:shadow-pop focus-visible:outline-none focus-visible:shadow-shield-focus"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-mono text-xs text-iron-500">{s.id}</span>
+                    <span className="font-mono text-xs text-ink-500">{s.id}</span>
                     <Badge tone="info">{s.doc_type}</Badge>
                     <Badge tone={STATUS_TONE[s.status]} withDot>
                       {s.status === "done" ? "ukończony" : s.status === "in_progress" ? "w trakcie" : "błąd"}
@@ -285,8 +285,8 @@ export default function SkanerHistoriaPage() {
                   <h3 className="mt-2 font-medium text-dlugomat-950 group-hover:text-dlugomat-700">
                     {s.filename}
                   </h3>
-                  <p className="mt-1 text-sm text-iron-600">{s.recommendation}</p>
-                  <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-iron-500">
+                  <p className="mt-1 text-sm text-ink-600">{s.recommendation}</p>
+                  <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-ink-500">
                     <span>{fmtDate(s.ts)}</span>
                     <span aria-hidden>·</span>
                     <span>{s.pages} {s.pages === 1 ? "strona" : "stron"}</span>
@@ -307,7 +307,7 @@ export default function SkanerHistoriaPage() {
                   </div>
                 </div>
                 <ArrowRight
-                  className="h-5 w-5 flex-shrink-0 text-iron-400 group-hover:text-dlugomat-700"
+                  className="h-5 w-5 flex-shrink-0 text-ink-400 group-hover:text-dlugomat-700"
                   aria-hidden
                 />
               </div>

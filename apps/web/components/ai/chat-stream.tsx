@@ -116,14 +116,14 @@ export function ChatStream({
   }
 
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-iron-900 rounded-lg border border-iron-200 dark:border-iron-800 overflow-hidden">
+    <div className="flex flex-col h-full bg-white dark:bg-ink-900 rounded-lg border border-ink-200 dark:border-ink-800 overflow-hidden">
       <div
         ref={scrollRef}
         className="flex-1 overflow-y-auto p-4 space-y-4"
         style={{ minHeight: "400px", maxHeight: "60vh" }}
       >
         {messages.length === 0 && (
-          <div className="text-center text-sm text-iron-500 py-12">
+          <div className="text-center text-sm text-ink-500 py-12">
             Zacznij rozmowę — asystent odpowie z cytowaniami z bazy orzeczniczej.
           </div>
         )}
@@ -135,14 +135,14 @@ export function ChatStream({
             <div
               className={`max-w-[85%] rounded-lg px-3.5 py-2.5 text-sm whitespace-pre-wrap ${
                 m.role === "user"
-                  ? "bg-iron-900 text-iron-50 dark:bg-iron-50 dark:text-iron-900"
-                  : "bg-iron-50 dark:bg-iron-800 text-iron-900 dark:text-iron-50 border border-iron-200 dark:border-iron-700"
+                  ? "bg-ink-900 text-ink-50 dark:bg-ink-50 dark:text-ink-900"
+                  : "bg-ink-50 dark:bg-ink-800 text-ink-900 dark:text-ink-50 border border-ink-200 dark:border-ink-700"
               }`}
             >
               {m.content || (streaming && i === messages.length - 1 ? "▍" : "")}
               {m.citations && m.citations.length > 0 && (
-                <div className="mt-2 pt-2 border-t border-iron-200 dark:border-iron-700 space-y-1">
-                  <div className="text-xs uppercase tracking-wider text-iron-500">
+                <div className="mt-2 pt-2 border-t border-ink-200 dark:border-ink-700 space-y-1">
+                  <div className="text-xs uppercase tracking-wider text-ink-500">
                     Źródła
                   </div>
                   {m.citations.map((c, ci) => (
@@ -161,7 +161,7 @@ export function ChatStream({
                           [{ci + 1}] {c.title}
                         </span>
                       )}
-                      <span className="text-iron-500"> · {c.source}</span>
+                      <span className="text-ink-500"> · {c.source}</span>
                     </div>
                   ))}
                 </div>
@@ -173,7 +173,7 @@ export function ChatStream({
 
       <form
         onSubmit={handleSubmit}
-        className="border-t border-iron-200 dark:border-iron-800 p-3 flex gap-2"
+        className="border-t border-ink-200 dark:border-ink-800 p-3 flex gap-2"
       >
         <input
           type="text"
@@ -181,7 +181,7 @@ export function ChatStream({
           onChange={(e) => setInput(e.target.value)}
           placeholder={placeholder}
           disabled={streaming}
-          className="flex-1 rounded-lg border border-iron-300 dark:border-iron-700 bg-white dark:bg-iron-900 px-3 py-2 text-sm focus:outline-none focus-visible:shadow-shield-focus disabled:opacity-60"
+          className="flex-1 rounded-lg border border-ink-300 dark:border-ink-700 bg-white dark:bg-ink-900 px-3 py-2 text-sm focus:outline-none focus-visible:shadow-shield-focus disabled:opacity-60"
         />
         <Button type="submit" variant="primary" disabled={streaming || !input.trim()}>
           {streaming ? "..." : "Wyślij"}

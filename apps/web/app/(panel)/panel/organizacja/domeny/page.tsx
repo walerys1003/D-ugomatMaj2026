@@ -42,13 +42,13 @@ export default async function DomenyPage() {
   return (
     <main className="container mx-auto px-4 py-8 max-w-5xl space-y-6">
       <div>
-        <Link href="/panel/organizacja" className="text-xs text-iron-500 hover:text-iron-700">
+        <Link href="/panel/organizacja" className="text-xs text-ink-500 hover:text-ink-700">
           ← Organizacja
         </Link>
-        <h1 className="font-display text-3xl font-semibold text-iron-900 dark:text-iron-50 mt-2">
+        <h1 className="font-display text-3xl font-semibold text-ink-900 dark:text-ink-50 mt-2">
           Domeny firmowe
         </h1>
-        <p className="text-sm text-iron-500 mt-1">
+        <p className="text-sm text-ink-500 mt-1">
           Zweryfikuj domeny, aby uzyskać automatyczne dołączanie e-maili firmowych do organizacji.
         </p>
       </div>
@@ -68,13 +68,13 @@ export default async function DomenyPage() {
               name="domain"
               required
               placeholder="firma.pl"
-              className="flex-1 rounded-lg border border-iron-300 dark:border-iron-700 bg-white dark:bg-iron-900 px-3 py-2 focus:outline-none focus-visible:shadow-shield-focus"
+              className="flex-1 rounded-lg border border-ink-300 dark:border-ink-700 bg-white dark:bg-ink-900 px-3 py-2 focus:outline-none focus-visible:shadow-shield-focus"
             />
             <Button type="submit" variant="primary">
               Dodaj
             </Button>
           </form>
-          <p className="text-xs text-iron-500 mt-2">
+          <p className="text-xs text-ink-500 mt-2">
             Po dodaniu zobaczysz rekord TXT, który należy umieścić w DNS.
           </p>
         </CardContent>
@@ -86,16 +86,16 @@ export default async function DomenyPage() {
         </CardHeader>
         <CardContent>
           {domains.length === 0 ? (
-            <p className="text-sm text-iron-500">Brak dodanych domen.</p>
+            <p className="text-sm text-ink-500">Brak dodanych domen.</p>
           ) : (
             <ul className="space-y-3">
               {domains.map((d) => (
                 <li
                   key={d.id}
-                  className="rounded-lg border border-iron-200 dark:border-iron-800 p-4"
+                  className="rounded-lg border border-ink-200 dark:border-ink-800 p-4"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                    <div className="font-mono text-sm font-medium text-iron-900 dark:text-iron-50">
+                    <div className="font-mono text-sm font-medium text-ink-900 dark:text-ink-50">
                       {d.domain}
                     </div>
                     <span
@@ -105,15 +105,15 @@ export default async function DomenyPage() {
                     </span>
                   </div>
                   {d.status !== "verified" && (
-                    <div className="text-xs text-iron-600 dark:text-iron-400">
+                    <div className="text-xs text-ink-600 dark:text-ink-400">
                       Rekord TXT:{" "}
-                      <code className="font-mono px-1.5 py-0.5 rounded bg-iron-100 dark:bg-iron-800">
+                      <code className="font-mono px-1.5 py-0.5 rounded bg-ink-100 dark:bg-ink-800">
                         {d.txt_record}
                       </code>
                     </div>
                   )}
                   {d.verified_at && (
-                    <div className="text-xs text-iron-500">
+                    <div className="text-xs text-ink-500">
                       Zweryfikowano: {new Date(d.verified_at).toLocaleDateString("pl-PL")}
                     </div>
                   )}

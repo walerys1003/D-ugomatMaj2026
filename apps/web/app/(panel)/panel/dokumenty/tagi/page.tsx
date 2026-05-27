@@ -68,13 +68,13 @@ export default function DokumentyTagiPage() {
     <div className="space-y-8">
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-2">
-          <p className="text-xs uppercase tracking-[0.18em] text-iron-500">
+          <p className="text-xs uppercase tracking-[0.18em] text-ink-500">
             Dokumenty · tagi
           </p>
           <h1 className="font-display text-fluid-h1 text-dlugomat-950">
             Twoje tagi
           </h1>
-          <p className="max-w-2xl text-iron-600">
+          <p className="max-w-2xl text-ink-600">
             Tagi pozwalają oznaczać dokumenty wielokrotnie i przeszukiwać je
             niezależnie od struktury folderów.
           </p>
@@ -85,16 +85,16 @@ export default function DokumentyTagiPage() {
         </Button>
       </header>
 
-      <nav aria-label="Widoki dokumentów" className="flex gap-1 rounded-md border border-iron-200 bg-iron-50 p-1 w-fit text-sm">
+      <nav aria-label="Widoki dokumentów" className="flex gap-1 rounded-md border border-ink-200 bg-ink-50 p-1 w-fit text-sm">
         <Link
           href="/panel/dokumenty"
-          className="rounded px-3 py-1.5 text-iron-700 hover:bg-white focus-visible:outline-none focus-visible:shadow-shield-focus"
+          className="rounded px-3 py-1.5 text-ink-700 hover:bg-white focus-visible:outline-none focus-visible:shadow-shield-focus"
         >
           Wszystkie
         </Link>
         <Link
           href="/panel/dokumenty/foldery"
-          className="rounded px-3 py-1.5 text-iron-700 hover:bg-white focus-visible:outline-none focus-visible:shadow-shield-focus"
+          className="rounded px-3 py-1.5 text-ink-700 hover:bg-white focus-visible:outline-none focus-visible:shadow-shield-focus"
         >
           Foldery
         </Link>
@@ -148,9 +148,9 @@ export default function DokumentyTagiPage() {
                     max,
                   )}`}
                 >
-                  <Hash className="h-3.5 w-3.5 text-iron-400" aria-hidden />
+                  <Hash className="h-3.5 w-3.5 text-ink-400" aria-hidden />
                   {t.name}
-                  <span className="text-xs text-iron-500">({t.count})</span>
+                  <span className="text-xs text-ink-500">({t.count})</span>
                 </Link>
               </li>
             ))}
@@ -169,10 +169,10 @@ export default function DokumentyTagiPage() {
               <li key={t.id}>
                 <Link
                   href={`/panel/dokumenty?tag=${t.name}`}
-                  className="flex items-center justify-between rounded-md border border-iron-200 bg-white px-3 py-2 text-sm transition hover:bg-iron-50 focus-visible:outline-none focus-visible:shadow-shield-focus"
+                  className="flex items-center justify-between rounded-md border border-ink-200 bg-white px-3 py-2 text-sm transition hover:bg-ink-50 focus-visible:outline-none focus-visible:shadow-shield-focus"
                 >
                   <span className="flex items-center gap-2">
-                    <Tag className="h-3.5 w-3.5 text-iron-400" aria-hidden />
+                    <Tag className="h-3.5 w-3.5 text-ink-400" aria-hidden />
                     <span className="text-dlugomat-900">{t.name}</span>
                   </span>
                   <Badge tone={COLOR_TONE[t.color]}>{t.count}</Badge>

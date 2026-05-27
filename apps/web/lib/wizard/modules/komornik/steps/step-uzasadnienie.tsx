@@ -38,7 +38,7 @@ export function StepKomornikUzasadnienie({
       className="space-y-5"
       noValidate
     >
-      <p className="text-fluid-sm text-iron-700">
+      <p className="text-fluid-sm text-ink-700">
         Zaznacz wszystkie okoliczności, które Cię dotyczą — to one stanowią
         merytoryczne uzasadnienie wniosku. Możesz dopisać własne szczegóły w
         polu poniżej (max 2000 znaków).
@@ -49,7 +49,7 @@ export function StepKomornikUzasadnienie({
         name="sytuacja"
         render={({ field }) => (
           <fieldset>
-            <legend className="text-fluid-sm font-medium text-iron-800">
+            <legend className="text-fluid-sm font-medium text-ink-800">
               Twoja sytuacja
             </legend>
             <div className="mt-3 grid gap-2 sm:grid-cols-2">
@@ -74,7 +74,7 @@ export function StepKomornikUzasadnienie({
                       "focus:outline-none focus-visible:ring-2 focus-visible:ring-shield-500 focus-visible:ring-offset-2",
                       active
                         ? "border-shield-500 bg-shield-50/70"
-                        : "border-iron-200 bg-white hover:border-shield-300",
+                        : "border-ink-200 bg-white hover:border-shield-300",
                     )}
                   >
                     {s.label}
@@ -96,7 +96,7 @@ export function StepKomornikUzasadnienie({
           id="okolicznosci"
           rows={5}
           {...register("okolicznosci")}
-          className="w-full rounded-md border border-iron-300 bg-white px-3 py-2 text-fluid-sm focus:border-shield-500 focus:outline-none focus:ring-2 focus:ring-shield-500/20 dark:border-iron-700 dark:bg-iron-950"
+          className="w-full rounded-md border border-ink-300 bg-white px-3 py-2 text-fluid-sm focus:border-shield-500 focus:outline-none focus:ring-2 focus:ring-shield-500/20 dark:border-ink-700 dark:bg-ink-950"
         />
       </FormField>
 

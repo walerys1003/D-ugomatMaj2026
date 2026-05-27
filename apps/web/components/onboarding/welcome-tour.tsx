@@ -105,7 +105,7 @@ export function WelcomeTour() {
         <button
           onClick={() => close(false)}
           aria-label="Zamknij i przypomnij później"
-          className="absolute right-3 top-3 rounded-full p-1.5 text-iron-400 hover:bg-iron-100 hover:text-iron-700 dark:hover:bg-dlugomat-800 dark:hover:text-iron-100"
+          className="absolute right-3 top-3 rounded-full p-1.5 text-ink-400 hover:bg-ink-100 hover:text-ink-700 dark:hover:bg-dlugomat-800 dark:hover:text-ink-100"
         >
           <X className="h-4 w-4" />
         </button>
@@ -126,17 +126,17 @@ export function WelcomeTour() {
                 <span
                   key={i}
                   className={`h-1.5 w-6 rounded-full ${
-                    i <= step ? "bg-dlugomat-600" : "bg-iron-200 dark:bg-dlugomat-800"
+                    i <= step ? "bg-dlugomat-600" : "bg-ink-200 dark:bg-dlugomat-800"
                   }`}
                 />
               ))}
             </div>
           </div>
 
-          <h2 id="tour-title" className="text-fluid-xl font-bold text-iron-900 dark:text-white">
+          <h2 id="tour-title" className="text-fluid-xl font-bold text-ink-900 dark:text-white">
             {current.title}
           </h2>
-          <p className="text-fluid-base text-iron-600 dark:text-iron-300">{current.description}</p>
+          <p className="text-fluid-base text-ink-600 dark:text-ink-300">{current.description}</p>
 
           <div className="flex flex-wrap items-center justify-between gap-2 pt-2">
             <Button variant="ghost" size="sm" onClick={() => close(false)}>

@@ -310,18 +310,18 @@ export function CookieConsentBanner() {
       aria-describedby="cookie-consent-desc"
       className="fixed inset-x-0 bottom-0 z-50 px-4 pb-4 sm:px-6 sm:pb-6"
     >
-      <div className="mx-auto max-w-3xl rounded-2xl border border-iron-200 bg-white/95 p-5 shadow-xl backdrop-blur dark:border-dlugomat-800 dark:bg-dlugomat-950/95 sm:p-6">
+      <div className="mx-auto max-w-3xl rounded-2xl border border-ink-200 bg-white/95 p-5 shadow-xl backdrop-blur dark:border-dlugomat-800 dark:bg-dlugomat-950/95 sm:p-6">
         <div className="flex flex-col gap-4">
           <div>
             <h2
               id="cookie-consent-title"
-              className="font-serif text-fluid-lg font-semibold text-iron-900 dark:text-white"
+              className="font-serif text-fluid-lg font-semibold text-ink-900 dark:text-white"
             >
               Twoja prywatność
             </h2>
             <p
               id="cookie-consent-desc"
-              className="mt-2 text-fluid-sm text-iron-600 dark:text-iron-300"
+              className="mt-2 text-fluid-sm text-ink-600 dark:text-ink-300"
             >
               Używamy plików cookies <strong>niezbędnych</strong> do działania
               serwisu (sesja, motyw). Cookies <strong>analityczne</strong>,{" "}
@@ -339,11 +339,11 @@ export function CookieConsentBanner() {
           </div>
 
           {showDetails ? (
-            <div className="rounded-lg border border-iron-200 bg-iron-50/60 p-4 text-fluid-xs text-iron-700 dark:border-dlugomat-800 dark:bg-dlugomat-900 dark:text-iron-200">
+            <div className="rounded-lg border border-ink-200 bg-ink-50/60 p-4 text-fluid-xs text-ink-700 dark:border-dlugomat-800 dark:bg-dlugomat-900 dark:text-ink-200">
               <ul className="space-y-3">
                 <li className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="font-semibold text-iron-900 dark:text-white">
+                    <p className="font-semibold text-ink-900 dark:text-white">
                       Niezbędne
                     </p>
                     <p>
@@ -354,14 +354,14 @@ export function CookieConsentBanner() {
                       <code>dlugomat:cookie-consent</code>.
                     </p>
                   </div>
-                  <span className="shrink-0 rounded-full bg-iron-200 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-iron-700 dark:bg-dlugomat-800 dark:text-iron-200">
+                  <span className="shrink-0 rounded-full bg-ink-200 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-ink-700 dark:bg-dlugomat-800 dark:text-ink-200">
                     Zawsze włączone
                   </span>
                 </li>
 
                 <li className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="font-semibold text-iron-900 dark:text-white">
+                    <p className="font-semibold text-ink-900 dark:text-white">
                       Analityczne
                     </p>
                     <p>
@@ -378,7 +378,7 @@ export function CookieConsentBanner() {
 
                 <li className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="font-semibold text-iron-900 dark:text-white">
+                    <p className="font-semibold text-ink-900 dark:text-white">
                       Marketingowe
                     </p>
                     <p>
@@ -395,7 +395,7 @@ export function CookieConsentBanner() {
 
                 <li className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="font-semibold text-iron-900 dark:text-white">
+                    <p className="font-semibold text-ink-900 dark:text-white">
                       Funkcjonalne
                     </p>
                     <p>
@@ -417,7 +417,7 @@ export function CookieConsentBanner() {
             <button
               type="button"
               onClick={() => setShowDetails((s) => !s)}
-              className="text-fluid-xs font-medium text-iron-500 underline-offset-2 hover:underline dark:text-iron-400"
+              className="text-fluid-xs font-medium text-ink-500 underline-offset-2 hover:underline dark:text-ink-400"
             >
               {showDetails ? "Ukryj szczegóły" : "Dostosuj ustawienia"}
             </button>
@@ -463,7 +463,7 @@ function ConsentToggle(props: {
           "relative inline-flex h-5 w-9 items-center rounded-full transition-colors",
           props.checked
             ? "bg-dlugomat-600"
-            : "bg-iron-300 dark:bg-dlugomat-800",
+            : "bg-ink-300 dark:bg-dlugomat-800",
         ].join(" ")}
         aria-hidden="true"
       >

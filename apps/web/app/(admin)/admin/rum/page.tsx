@@ -55,7 +55,7 @@ export default function RumPage() {
         <h1 className="text-fluid-3xl font-bold tracking-tight text-dlugomat-900 dark:text-white">
           RUM · Web Vitals
         </h1>
-        <p className="max-w-2xl text-fluid-base text-iron-600 dark:text-iron-300">
+        <p className="max-w-2xl text-fluid-base text-ink-600 dark:text-ink-300">
           Dane od prawdziwych użytkowników (Real User Monitoring) — wartości
           p75 dla głównych metryk Web Vitals w ciągu ostatnich 7 dni.
         </p>
@@ -72,7 +72,7 @@ export default function RumPage() {
             <Card key={v.metric} elevation="subtle">
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <span className="text-fluid-xs font-semibold uppercase tracking-wider text-iron-500">
+                  <span className="text-fluid-xs font-semibold uppercase tracking-wider text-ink-500">
                     {v.metric}
                   </span>
                   <Badge tone={r.tone} withDot>
@@ -105,8 +105,8 @@ export default function RumPage() {
         <Card elevation="subtle" className="overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-fluid-sm">
-              <thead className="border-b border-iron-200 bg-iron-50/60 dark:border-dlugomat-800 dark:bg-dlugomat-900/40">
-                <tr className="text-left text-iron-600 dark:text-iron-300">
+              <thead className="border-b border-ink-200 bg-ink-50/60 dark:border-dlugomat-800 dark:bg-dlugomat-900/40">
+                <tr className="text-left text-ink-600 dark:text-ink-300">
                   <th className="px-5 py-3 font-semibold">Ścieżka</th>
                   <th className="px-5 py-3 text-right font-semibold">LCP p75</th>
                   <th className="px-5 py-3 text-right font-semibold">INP p75</th>
@@ -114,7 +114,7 @@ export default function RumPage() {
                   <th className="px-5 py-3 font-semibold">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-iron-100 dark:divide-dlugomat-800">
+              <tbody className="divide-y divide-ink-100 dark:divide-dlugomat-800">
                 {ROUTES.map((r) => {
                   const tone: "success" | "warning" | "danger" =
                     r.lcp_p75 <= 2500 && r.inp_p75 <= 200
@@ -133,7 +133,7 @@ export default function RumPage() {
                       <td className="px-5 py-3 text-right tabular-nums">
                         {r.inp_p75} ms
                       </td>
-                      <td className="px-5 py-3 text-right tabular-nums text-iron-500">
+                      <td className="px-5 py-3 text-right tabular-nums text-ink-500">
                         {r.samples.toLocaleString("pl-PL")}
                       </td>
                       <td className="px-5 py-3">

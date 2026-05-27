@@ -99,7 +99,7 @@ body > nav, body > header.site-header, body > footer { display: none !important;
         <PrintTrigger />
       </div>
       <main
-        className="print-root mx-auto max-w-3xl bg-white px-10 py-12 text-[11pt] leading-relaxed text-iron-900"
+        className="print-root mx-auto max-w-3xl bg-white px-10 py-12 text-[11pt] leading-relaxed text-ink-900"
         dangerouslySetInnerHTML={{ __html: bodyHtml }}
       />
     </>

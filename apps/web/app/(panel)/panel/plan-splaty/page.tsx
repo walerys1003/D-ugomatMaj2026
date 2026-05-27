@@ -30,7 +30,7 @@ export default function PlanSplatyPage() {
         <h1 className="text-fluid-3xl font-bold tracking-tight text-dlugomat-900 dark:text-white">
           Plan spłaty
         </h1>
-        <p className="max-w-2xl text-fluid-base text-iron-600 dark:text-iron-300">
+        <p className="max-w-2xl text-fluid-base text-ink-600 dark:text-ink-300">
           Zaproponuj wierzycielowi rozłożenie należności na raty. Wyliczamy
           realną zdolność miesięczną, generujemy wniosek i monitorujemy
           terminy. Bez kar za zmianę harmonogramu w trakcie.
@@ -53,7 +53,7 @@ export default function PlanSplatyPage() {
                 Dlaczego ugoda się opłaca?
               </CardTitle>
             </CardHeader>
-            <CardContent className="flex flex-col gap-2 text-fluid-sm text-iron-600 dark:text-iron-300">
+            <CardContent className="flex flex-col gap-2 text-fluid-sm text-ink-600 dark:text-ink-300">
               <Bullet>Zatrzymujemy naliczanie kosztów egzekucji</Bullet>
               <Bullet>Najczęściej redukujemy odsetki o 30–60%</Bullet>
               <Bullet>Otrzymujesz harmonogram w PDF + e-mail do wierzyciela</Bullet>
@@ -73,7 +73,7 @@ export default function PlanSplatyPage() {
                 Co dostajesz?
               </CardTitle>
             </CardHeader>
-            <CardContent className="flex flex-col gap-3 text-fluid-sm text-iron-600 dark:text-iron-300">
+            <CardContent className="flex flex-col gap-3 text-fluid-sm text-ink-600 dark:text-ink-300">
               <FeatureRow
                 icon={<Banknote className="size-4" />}
                 label="Wniosek o rozłożenie na raty"
@@ -115,10 +115,10 @@ export default function PlanSplatyPage() {
         <h2 className="text-fluid-xl font-semibold text-dlugomat-900 dark:text-white">
           Twoje plany spłaty
         </h2>
-        <Card elevation="flat" className="border-dashed bg-iron-50/60 dark:bg-dlugomat-900/30">
+        <Card elevation="flat" className="border-dashed bg-ink-50/60 dark:bg-dlugomat-900/30">
           <CardContent className="flex flex-col items-center gap-3 p-8 text-center">
             <Badge tone="neutral">Brak zapisanych planów</Badge>
-            <p className="max-w-md text-fluid-sm text-iron-600 dark:text-iron-300">
+            <p className="max-w-md text-fluid-sm text-ink-600 dark:text-ink-300">
               Po zapisaniu pierwszego planu spłaty pojawi się tu lista z
               terminami rat, statusem akceptacji wierzyciela i bilansem
               pozostałym do spłaty.
@@ -147,7 +147,7 @@ function FeatureRow({ icon, label }: { icon: React.ReactNode; label: string }) {
     <span className="flex items-center gap-2">
       <span
         aria-hidden
-        className="grid size-7 place-items-center rounded-md bg-iron-100 text-iron-700 dark:bg-dlugomat-850 dark:text-iron-200"
+        className="grid size-7 place-items-center rounded-md bg-ink-100 text-ink-700 dark:bg-dlugomat-850 dark:text-ink-200"
       >
         {icon}
       </span>

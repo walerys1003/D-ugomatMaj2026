@@ -186,7 +186,7 @@ export default async function RegulaminSekcjaPage({ params }: { params: Params }
                     <li key={r.slug}>
                       <Link
                         href={`/regulamin/${r.slug}`}
-                        className="flex items-center justify-between p-3 rounded-md border border-iron-200 bg-white hover:bg-dlugomat-50 focus-visible:shadow-shield-focus"
+                        className="flex items-center justify-between p-3 rounded-md border border-ink-200 bg-white hover:bg-dlugomat-50 focus-visible:shadow-shield-focus"
                       >
                         <span className="text-sm text-dlugomat-900">{r.title}</span>
                         <ChevronRight className="h-4 w-4 text-dlugomat-500" aria-hidden />

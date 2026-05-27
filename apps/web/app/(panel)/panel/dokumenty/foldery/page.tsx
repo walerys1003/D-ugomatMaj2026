@@ -96,7 +96,7 @@ const COLOR_CLASS: Record<FolderItem["color"], string> = {
   amber: "text-warn",
   green: "text-accent-700",
   red: "text-danger",
-  gray: "text-iron-500",
+  gray: "text-ink-500",
 };
 
 export default function DokumentyFolderyPage() {
@@ -107,13 +107,13 @@ export default function DokumentyFolderyPage() {
     <div className="space-y-8">
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-2">
-          <p className="text-xs uppercase tracking-[0.18em] text-iron-500">
+          <p className="text-xs uppercase tracking-[0.18em] text-ink-500">
             Dokumenty · foldery
           </p>
           <h1 className="font-display text-fluid-h1 text-dlugomat-950">
             Twoje foldery
           </h1>
-          <p className="max-w-2xl text-iron-600">
+          <p className="max-w-2xl text-ink-600">
             Wszystkie dokumenty są szyfrowane (AES-256) i przechowywane w EU.
             Foldery oznaczone jako współdzielone udostępnione są partnerom prawnym.
           </p>
@@ -124,10 +124,10 @@ export default function DokumentyFolderyPage() {
         </Button>
       </header>
 
-      <nav aria-label="Widoki dokumentów" className="flex gap-1 rounded-md border border-iron-200 bg-iron-50 p-1 w-fit text-sm">
+      <nav aria-label="Widoki dokumentów" className="flex gap-1 rounded-md border border-ink-200 bg-ink-50 p-1 w-fit text-sm">
         <Link
           href="/panel/dokumenty"
-          className="rounded px-3 py-1.5 text-iron-700 hover:bg-white focus-visible:outline-none focus-visible:shadow-shield-focus"
+          className="rounded px-3 py-1.5 text-ink-700 hover:bg-white focus-visible:outline-none focus-visible:shadow-shield-focus"
         >
           Wszystkie
         </Link>
@@ -136,7 +136,7 @@ export default function DokumentyFolderyPage() {
         </span>
         <Link
           href="/panel/dokumenty/tagi"
-          className="rounded px-3 py-1.5 text-iron-700 hover:bg-white focus-visible:outline-none focus-visible:shadow-shield-focus"
+          className="rounded px-3 py-1.5 text-ink-700 hover:bg-white focus-visible:outline-none focus-visible:shadow-shield-focus"
         >
           Tagi
         </Link>
@@ -174,20 +174,20 @@ export default function DokumentyFolderyPage() {
           <li key={f.id}>
             <Link
               href={`/panel/dokumenty?folder=${f.id}`}
-              className="group block h-full rounded-lg border border-iron-200 bg-white p-5 shadow-card transition hover:shadow-pop focus-visible:outline-none focus-visible:shadow-shield-focus"
+              className="group block h-full rounded-lg border border-ink-200 bg-white p-5 shadow-card transition hover:shadow-pop focus-visible:outline-none focus-visible:shadow-shield-focus"
             >
               <div className="flex items-start justify-between">
                 <Folder className={`h-7 w-7 ${COLOR_CLASS[f.color]}`} aria-hidden />
                 <ArrowRight
-                  className="h-5 w-5 text-iron-400 group-hover:text-dlugomat-700"
+                  className="h-5 w-5 text-ink-400 group-hover:text-dlugomat-700"
                   aria-hidden
                 />
               </div>
               <h3 className="mt-4 font-semibold text-dlugomat-950 line-clamp-2">
                 {f.name}
               </h3>
-              <p className="mt-1 text-sm text-iron-600 line-clamp-2">{f.description}</p>
-              <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-iron-500">
+              <p className="mt-1 text-sm text-ink-600 line-clamp-2">{f.description}</p>
+              <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-ink-500">
                 <span>{f.documents_count} dokumentów</span>
                 <span aria-hidden>·</span>
                 <span>{f.size_mb} MB</span>

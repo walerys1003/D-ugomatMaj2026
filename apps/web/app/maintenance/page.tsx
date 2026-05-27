@@ -28,7 +28,7 @@ const tone: Record<string, "neutral" | "info" | "success" | "warning"> = {
 
 export default function MaintenancePage() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-iron-50/60 px-4 py-16">
+    <main className="flex min-h-screen items-center justify-center bg-ink-50/60 px-4 py-16">
       <div className="w-full max-w-3xl space-y-6">
         <Card elevation="pop" urgency="warning" className="p-10">
           <Badge tone="warning" withDot>

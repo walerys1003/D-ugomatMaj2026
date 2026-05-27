@@ -12,16 +12,16 @@ export const metadata: Metadata = {
 
 export default function RejestracjaPage() {
   return (
-    <main className="bg-iron-50 dark:bg-iron-950 min-h-screen pb-20">
-      <section className="border-b border-iron-200 dark:border-iron-800 bg-white dark:bg-iron-900">
+    <main className="bg-ink-50 dark:bg-ink-950 min-h-screen pb-20">
+      <section className="border-b border-ink-200 dark:border-ink-800 bg-white dark:bg-ink-900">
         <div className="container mx-auto px-4 py-10 max-w-3xl text-center">
-          <p className="text-xs uppercase tracking-wider text-iron-500 mb-2">
+          <p className="text-xs uppercase tracking-wider text-ink-500 mb-2">
             Krok do tarczy
           </p>
-          <h1 className="font-display text-3xl md:text-4xl font-semibold text-iron-900 dark:text-iron-50">
+          <h1 className="font-display text-3xl md:text-4xl font-semibold text-ink-900 dark:text-ink-50">
             Załóż konto
           </h1>
-          <p className="text-iron-600 dark:text-iron-300 mt-2 max-w-xl mx-auto">
+          <p className="text-ink-600 dark:text-ink-300 mt-2 max-w-xl mx-auto">
             14 dni darmowo · bez karty · pełen dostęp do modułów D1–D16
           </p>
         </div>
@@ -36,7 +36,7 @@ export default function RejestracjaPage() {
           <CardHeader>
             <CardTitle className="text-base">Bezpieczeństwo Twoich danych</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2 text-sm text-iron-600 dark:text-iron-400">
+          <CardContent className="space-y-2 text-sm text-ink-600 dark:text-ink-400">
             <p>
               Twoje dane są szyfrowane (AES-256), zgodne z RODO. Możesz w każdej
               chwili wyeksportować lub usunąć konto (art. 15, 17, 20 RODO).

@@ -53,11 +53,11 @@ export default async function BazaOrzecniczaPage({
   return (
     <main className="container mx-auto px-4 py-8 max-w-6xl space-y-6">
       <div>
-        <p className="text-xs uppercase tracking-wider text-iron-500 mb-2">Wiedza</p>
-        <h1 className="font-display text-3xl font-semibold text-iron-900 dark:text-iron-50">
+        <p className="text-xs uppercase tracking-wider text-ink-500 mb-2">Wiedza</p>
+        <h1 className="font-display text-3xl font-semibold text-ink-900 dark:text-ink-50">
           Baza orzecznicza
         </h1>
-        <p className="text-sm text-iron-500 mt-1">
+        <p className="text-sm text-ink-500 mt-1">
           Wyszukiwanie semantyczne (RAG) po tezach SN, TK, NSA, SA i TSUE.
         </p>
       </div>
@@ -70,13 +70,13 @@ export default async function BazaOrzecniczaPage({
               name="q"
               defaultValue={query}
               placeholder="np. odsetki ustawowe za opóźnienie w transakcjach handlowych..."
-              className="flex-1 rounded-lg border border-iron-300 dark:border-iron-700 bg-white dark:bg-iron-900 px-3 py-2.5 focus:outline-none focus-visible:shadow-shield-focus"
+              className="flex-1 rounded-lg border border-ink-300 dark:border-ink-700 bg-white dark:bg-ink-900 px-3 py-2.5 focus:outline-none focus-visible:shadow-shield-focus"
             />
             <Button type="submit" variant="primary">
               Szukaj
             </Button>
           </form>
-          <p className="text-xs text-iron-500 mt-2">
+          <p className="text-xs text-ink-500 mt-2">
             Wyszukujemy semantycznie — możesz pisać pełnymi pytaniami, np.
             "kiedy biegnie termin przedawnienia roszczeń przedsiębiorcy".
           </p>
@@ -92,7 +92,7 @@ export default async function BazaOrzecniczaPage({
           </CardHeader>
           <CardContent>
             {results.length === 0 ? (
-              <p className="text-sm text-iron-500">
+              <p className="text-sm text-ink-500">
                 Brak orzeczeń pasujących do zapytania.
               </p>
             ) : (
@@ -100,22 +100,22 @@ export default async function BazaOrzecniczaPage({
                 {results.map((j) => (
                   <li
                     key={j.id}
-                    className="rounded-lg border border-iron-200 dark:border-iron-800 p-4 hover:border-accent-400 transition"
+                    className="rounded-lg border border-ink-200 dark:border-ink-800 p-4 hover:border-accent-400 transition"
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-iron-100 dark:bg-iron-800 font-medium">
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-ink-100 dark:bg-ink-800 font-medium">
                           {COURT_LABELS[j.court]}
                         </span>
-                        <code className="font-mono text-sm text-iron-900 dark:text-iron-50">
+                        <code className="font-mono text-sm text-ink-900 dark:text-ink-50">
                           {j.signature}
                         </code>
-                        <span className="text-xs text-iron-500">
+                        <span className="text-xs text-ink-500">
                           {new Date(j.date).toLocaleDateString("pl-PL")}
                         </span>
                       </div>
-                      <div className="flex items-center gap-1.5 text-xs text-iron-500">
-                        <div className="w-16 h-1 rounded-full bg-iron-100 dark:bg-iron-800 overflow-hidden">
+                      <div className="flex items-center gap-1.5 text-xs text-ink-500">
+                        <div className="w-16 h-1 rounded-full bg-ink-100 dark:bg-ink-800 overflow-hidden">
                           <div
                             className="h-full bg-accent-600"
                             style={{ width: `${Math.round(j.relevance * 100)}%` }}
@@ -124,14 +124,14 @@ export default async function BazaOrzecniczaPage({
                         <span>{Math.round(j.relevance * 100)}%</span>
                       </div>
                     </div>
-                    <p className="text-sm text-iron-700 dark:text-iron-300 mb-2">
+                    <p className="text-sm text-ink-700 dark:text-ink-300 mb-2">
                       {j.thesis}
                     </p>
                     <div className="flex flex-wrap gap-1.5">
                       {j.legal_basis.map((b) => (
                         <span
                           key={b}
-                          className="text-xs px-2 py-0.5 rounded-full bg-iron-50 dark:bg-iron-900 border border-iron-200 dark:border-iron-800 text-iron-600 dark:text-iron-400"
+                          className="text-xs px-2 py-0.5 rounded-full bg-ink-50 dark:bg-ink-900 border border-ink-200 dark:border-ink-800 text-ink-600 dark:text-ink-400"
                         >
                           {b}
                         </span>
@@ -153,7 +153,7 @@ export default async function BazaOrzecniczaPage({
 
       {!query && (
         <Card elevation="subtle">
-          <CardContent className="pt-6 text-sm text-iron-500">
+          <CardContent className="pt-6 text-sm text-ink-500">
             Wpisz zapytanie powyżej. Możesz też zacząć rozmowę z{" "}
             <Link
               href="/panel/ai-asystent"

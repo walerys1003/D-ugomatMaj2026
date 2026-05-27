@@ -101,9 +101,9 @@ export function ModuleLanding({
               {title}
             </h1>
 
-            <p className="max-w-xl text-fluid-lg text-iron-200">{tagline}</p>
+            <p className="max-w-xl text-fluid-lg text-ink-200">{tagline}</p>
 
-            <p className="max-w-xl text-fluid-base text-iron-300">{description}</p>
+            <p className="max-w-xl text-fluid-base text-ink-300">{description}</p>
 
             <div className="flex flex-wrap items-center gap-3 pt-2">
               <Button asChild size="lg" variant="success">
@@ -123,7 +123,7 @@ export function ModuleLanding({
             </div>
 
             {legalNote ? (
-              <p className="max-w-xl text-fluid-xs text-iron-400">{legalNote}</p>
+              <p className="max-w-xl text-fluid-xs text-ink-400">{legalNote}</p>
             ) : null}
           </div>
 
@@ -170,13 +170,13 @@ export function ModuleLanding({
           {whenSignals.map((signal, i) => (
             <li
               key={i}
-              className="flex items-start gap-3 rounded-xl border border-iron-200 bg-card p-4 dark:border-dlugomat-800"
+              className="flex items-start gap-3 rounded-xl border border-ink-200 bg-card p-4 dark:border-dlugomat-800"
             >
               <CheckCircle2
                 className="mt-0.5 size-5 shrink-0 text-accent-600 dark:text-accent-400"
                 aria-hidden
               />
-              <span className="text-fluid-sm text-iron-700 dark:text-iron-200">
+              <span className="text-fluid-sm text-ink-700 dark:text-ink-200">
                 {signal}
               </span>
             </li>
@@ -185,7 +185,7 @@ export function ModuleLanding({
       </section>
 
       {/* STEPS */}
-      <section className="bg-iron-50/60 py-20 sm:py-24 dark:bg-dlugomat-950/40">
+      <section className="bg-ink-50/60 py-20 sm:py-24 dark:bg-dlugomat-950/40">
         <div className="container">
           <div className="mx-auto max-w-2xl text-center">
             <p className="text-fluid-sm font-semibold uppercase tracking-wider text-dlugomat-600">
@@ -201,10 +201,10 @@ export function ModuleLanding({
                 <span className="inline-flex size-9 items-center justify-center rounded-full bg-dlugomat-600 font-mono text-fluid-sm font-bold text-white">
                   {i + 1}
                 </span>
-                <h3 className="text-fluid-lg font-semibold text-dlugomat-900 dark:text-iron-50">
+                <h3 className="text-fluid-lg font-semibold text-dlugomat-900 dark:text-ink-50">
                   {step.title}
                 </h3>
-                <p className="text-fluid-sm text-iron-600 dark:text-iron-300">
+                <p className="text-fluid-sm text-ink-600 dark:text-ink-300">
                   {step.desc}
                 </p>
               </li>
@@ -230,7 +230,7 @@ export function ModuleLanding({
                 <CardTitle className="text-fluid-lg">{f.title}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-fluid-sm text-iron-600 dark:text-iron-300">
+                <p className="text-fluid-sm text-ink-600 dark:text-ink-300">
                   {f.desc}
                 </p>
               </CardContent>
@@ -242,7 +242,7 @@ export function ModuleLanding({
       {/* FAQ */}
       <section
         aria-labelledby={`faq-${code}`}
-        className="bg-iron-50/60 py-20 sm:py-24 dark:bg-dlugomat-950/40"
+        className="bg-ink-50/60 py-20 sm:py-24 dark:bg-dlugomat-950/40"
       >
         <div className="container max-w-3xl">
           <div className="text-center">
@@ -280,7 +280,7 @@ export function ModuleLanding({
             <h2 className="text-balance text-fluid-3xl font-bold tracking-tight text-white sm:text-fluid-4xl">
               Gotów rozpocząć? {title} czeka.
             </h2>
-            <p className="mt-3 text-fluid-base text-iron-200">{tagline}</p>
+            <p className="mt-3 text-fluid-base text-ink-200">{tagline}</p>
             <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
               <Button asChild size="lg" variant="success">
                 <Link href={ctaHref}>
@@ -297,7 +297,7 @@ export function ModuleLanding({
                 <Link href="/cennik">Cennik</Link>
               </Button>
             </div>
-            <p className="mt-4 text-fluid-xs text-iron-300">
+            <p className="mt-4 text-fluid-xs text-ink-300">
               Długomat nie jest kancelarią prawną. Każde pismo weryfikujesz
               przed wysyłką.
             </p>
@@ -325,7 +325,7 @@ function TrustTile({
         <div className="rounded-md bg-white/10 p-2">{icon}</div>
         <div className="flex flex-col gap-0.5">
           <p className="text-fluid-sm font-semibold text-white">{title}</p>
-          <p className="text-fluid-xs text-iron-300">{desc}</p>
+          <p className="text-fluid-xs text-ink-300">{desc}</p>
         </div>
       </div>
     </div>

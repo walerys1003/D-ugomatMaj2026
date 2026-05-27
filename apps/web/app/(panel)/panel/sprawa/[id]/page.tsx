@@ -73,8 +73,8 @@ export default async function SprawaPage({ params }: Props) {
         wizardState={caseRow.wizard_state}
       />
 
-      <aside className="rounded-xl border border-iron-200 bg-iron-50/60 p-4 text-fluid-xs text-iron-600 dark:border-iron-800 dark:bg-iron-900/40 dark:text-iron-400">
-        <p className="mb-1 font-medium text-iron-700 dark:text-iron-300">
+      <aside className="rounded-xl border border-ink-200 bg-ink-50/60 p-4 text-fluid-xs text-ink-600 dark:border-ink-800 dark:bg-ink-900/40 dark:text-ink-400">
+        <p className="mb-1 font-medium text-ink-700 dark:text-ink-300">
           Auto-zapis działa w tle
         </p>
         <p>
@@ -100,12 +100,12 @@ function BreadcrumbHeader({
     <header className="space-y-2">
       <Link
         href="/panel"
-        className="text-fluid-xs text-iron-500 hover:text-iron-700 dark:text-iron-400 dark:hover:text-iron-200"
+        className="text-fluid-xs text-ink-500 hover:text-ink-700 dark:text-ink-400 dark:hover:text-ink-200"
       >
         ← Panel
       </Link>
       <div className="flex flex-wrap items-baseline justify-between gap-3">
-        <h1 className="font-serif text-fluid-3xl text-iron-900 dark:text-iron-50">
+        <h1 className="font-serif text-fluid-3xl text-ink-900 dark:text-ink-50">
           {caseRow.title}
         </h1>
         <div className="flex items-center gap-2">
@@ -233,7 +233,7 @@ async function PostGenerationView({
               Tryb drukowania
             </Link>
           </Button>
-          <span className="text-fluid-xs text-iron-500">
+          <span className="text-fluid-xs text-ink-500">
             Wygenerowano: {formatDateTimePL(new Date(caseRow.updated_at))}
           </span>
         </CardContent>
@@ -241,11 +241,11 @@ async function PostGenerationView({
 
       {/* Tarcza guarantee — info o procesie */}
       {isAiGenerated && validationScore != null && validationScore >= 80 && (
-        <div className="rounded-xl border border-hope-200 bg-hope-50/60 p-4 text-fluid-sm text-iron-800">
+        <div className="rounded-xl border border-hope-200 bg-hope-50/60 p-4 text-fluid-sm text-ink-800">
           <p className="font-medium text-hope-800">
             Pismo przeszło walidację z wynikiem {validationScore}/100.
           </p>
-          <p className="mt-1 text-iron-700">
+          <p className="mt-1 text-ink-700">
             Sprawdziliśmy: kompletność danych, poprawność petitum, cytaty
             przepisów, zgodność z Twoim wprowadzeniem oraz brak halucynacji
             modeli. Możesz złożyć pismo bez dodatkowej korekty.
@@ -257,11 +257,11 @@ async function PostGenerationView({
         validationScore != null &&
         validationScore < 80 &&
         validationScore >= 60 && (
-          <div className="rounded-xl border border-temporal-amber-200 bg-temporal-amber-50/60 p-4 text-fluid-sm text-iron-800">
+          <div className="rounded-xl border border-temporal-amber-200 bg-temporal-amber-50/60 p-4 text-fluid-sm text-ink-800">
             <p className="font-medium text-temporal-amber-800">
               Pismo wymaga przejrzenia ({validationScore}/100).
             </p>
-            <p className="mt-1 text-iron-700">
+            <p className="mt-1 text-ink-700">
               Sprawdź dokładnie treść pisma — walidacja zgłosiła drobne uwagi.
               Możesz je poprawić bezpośrednio w trybie podglądu.
             </p>
@@ -269,11 +269,11 @@ async function PostGenerationView({
         )}
 
       {!isAiGenerated && (
-        <div className="rounded-xl border border-shield-100 bg-shield-50/40 p-4 text-fluid-sm text-iron-800">
+        <div className="rounded-xl border border-shield-100 bg-shield-50/40 p-4 text-fluid-sm text-ink-800">
           <p className="font-medium text-shield-900">
             Pismo wygenerowane na podstawie szablonu eksperckiego.
           </p>
-          <p className="mt-1 text-iron-700">
+          <p className="mt-1 text-ink-700">
             W tym momencie usługa AI była niedostępna — przygotowaliśmy pismo
             w oparciu o nasz statyczny szablon, sprawdzony przez radców prawnych.
             Możesz je złożyć bez obaw.

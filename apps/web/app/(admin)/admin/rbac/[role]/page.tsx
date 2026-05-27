@@ -111,7 +111,7 @@ export default async function RbacRoleEditorPage({ params }: PageProps) {
       <div>
         <Link
           href="/admin/rbac"
-          className="inline-flex items-center gap-2 text-sm text-iron-600 hover:text-dlugomat-900 focus-visible:outline-none focus-visible:shadow-shield-focus rounded"
+          className="inline-flex items-center gap-2 text-sm text-ink-600 hover:text-dlugomat-900 focus-visible:outline-none focus-visible:shadow-shield-focus rounded"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden />
           Wróć do listy ról
@@ -120,7 +120,7 @@ export default async function RbacRoleEditorPage({ params }: PageProps) {
 
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-2">
-          <p className="text-xs uppercase tracking-[0.18em] text-iron-500">
+          <p className="text-xs uppercase tracking-[0.18em] text-ink-500">
             RBAC · edytor roli · {r.id}
           </p>
           <div className="flex flex-wrap items-center gap-3">
@@ -131,7 +131,7 @@ export default async function RbacRoleEditorPage({ params }: PageProps) {
               <Badge tone="info">niestandardowa</Badge>
             )}
           </div>
-          <p className="max-w-2xl text-iron-600">{r.description}</p>
+          <p className="max-w-2xl text-ink-600">{r.description}</p>
         </div>
         <Button variant="success" disabled={r.is_system}>
           <Save className="mr-2 h-4 w-4" aria-hidden />
@@ -190,7 +190,7 @@ export default async function RbacRoleEditorPage({ params }: PageProps) {
                   {group.perms.map((p) => (
                     <li
                       key={p.id}
-                      className="flex items-start gap-3 rounded-md border border-iron-200 p-3 has-[:checked]:border-accent-200 has-[:checked]:bg-accent-50/40"
+                      className="flex items-start gap-3 rounded-md border border-ink-200 p-3 has-[:checked]:border-accent-200 has-[:checked]:bg-accent-50/40"
                     >
                       <input
                         type="checkbox"
@@ -202,9 +202,9 @@ export default async function RbacRoleEditorPage({ params }: PageProps) {
                       <label htmlFor={p.id} className="flex-1 cursor-pointer">
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="font-medium text-dlugomat-900">{p.label}</span>
-                          <code className="font-mono text-xs text-iron-500">{p.id}</code>
+                          <code className="font-mono text-xs text-ink-500">{p.id}</code>
                         </div>
-                        <p className="mt-0.5 text-xs text-iron-600">{p.description}</p>
+                        <p className="mt-0.5 text-xs text-ink-600">{p.description}</p>
                       </label>
                     </li>
                   ))}
@@ -221,7 +221,7 @@ export default async function RbacRoleEditorPage({ params }: PageProps) {
             <Lock className="mt-1 h-5 w-5 text-warn flex-shrink-0" aria-hidden />
             <div>
               <p className="font-semibold text-dlugomat-950">Rola systemowa</p>
-              <p className="text-sm text-iron-700">
+              <p className="text-sm text-ink-700">
                 Tej roli nie można modyfikować. Utwórz nową rolę niestandardową,
                 aby dostosować uprawnienia do swoich potrzeb.
               </p>

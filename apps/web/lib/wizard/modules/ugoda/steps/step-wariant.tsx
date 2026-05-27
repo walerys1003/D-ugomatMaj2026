@@ -45,7 +45,7 @@ export function StepWariant({
       className="space-y-6"
       noValidate
     >
-      <div className="rounded-lg border border-shield-100 bg-shield-50/40 p-3 text-sm text-iron-700">
+      <div className="rounded-lg border border-shield-100 bg-shield-50/40 p-3 text-sm text-ink-700">
         UgodoMat to ścieżka pozasądowa. Wybierz typ propozycji — pismo
         pozostawia kontrolę po Twojej stronie i nie stanowi uznania długu
         do czasu akceptacji warunków.
@@ -72,7 +72,7 @@ export function StepWariant({
                 "focus:outline-none focus-visible:ring-2 focus-visible:ring-shield-500 focus-visible:ring-offset-2",
                 active
                   ? "border-shield-500 bg-shield-50/70 shadow-card"
-                  : "border-iron-200 bg-white hover:border-shield-300 hover:bg-shield-50/30",
+                  : "border-ink-200 bg-white hover:border-shield-300 hover:bg-shield-50/30",
               )}
             >
               <span
@@ -87,14 +87,14 @@ export function StepWariant({
               </span>
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <h3 className="text-fluid-base font-semibold text-iron-900">
+                  <h3 className="text-fluid-base font-semibold text-ink-900">
                     {v.label}
                   </h3>
                   <span className="text-fluid-xs font-medium uppercase tracking-wide text-shield-700">
                     {v.art}
                   </span>
                 </div>
-                <p className="mt-1 text-fluid-sm text-iron-700">{v.helper}</p>
+                <p className="mt-1 text-fluid-sm text-ink-700">{v.helper}</p>
               </div>
             </button>
           );

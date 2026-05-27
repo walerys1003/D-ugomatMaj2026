@@ -128,7 +128,7 @@ export default function PartnerPipelinePage() {
         <h1 className="text-fluid-3xl font-bold tracking-tight text-dlugomat-900 dark:text-white">
           Pipeline
         </h1>
-        <p className="max-w-2xl text-fluid-base text-iron-600 dark:text-iron-300">
+        <p className="max-w-2xl text-fluid-base text-ink-600 dark:text-ink-300">
           Wszystkie aktywne deale od pierwszego kontaktu po wygraną. Wagi
           etapów wyliczają realistyczny weighted pipeline.
         </p>
@@ -163,34 +163,34 @@ export default function PartnerPipelinePage() {
             <section
               key={s.key}
               aria-label={`Etap ${s.label}`}
-              className="flex flex-col gap-2 rounded-xl border border-iron-200 bg-iron-50/40 p-3 dark:border-iron-800 dark:bg-dlugomat-900/30"
+              className="flex flex-col gap-2 rounded-xl border border-ink-200 bg-ink-50/40 p-3 dark:border-ink-800 dark:bg-dlugomat-900/30"
             >
               <header className="flex items-center justify-between">
                 <Badge tone={s.tone} withDot>
                   {s.label}
                 </Badge>
-                <span className="text-fluid-xs tabular-nums text-iron-500">
+                <span className="text-fluid-xs tabular-nums text-ink-500">
                   {items.length} · {pln(sum)}
                 </span>
               </header>
               <ul className="flex flex-col gap-2">
                 {items.length === 0 ? (
-                  <li className="rounded-md border border-dashed border-iron-200 p-3 text-center text-fluid-xs text-iron-500 dark:border-dlugomat-800">
+                  <li className="rounded-md border border-dashed border-ink-200 p-3 text-center text-fluid-xs text-ink-500 dark:border-dlugomat-800">
                     Brak deali
                   </li>
                 ) : (
                   items.map((d) => (
                     <li key={d.id}>
-                      <Card elevation="flat" className="bg-white dark:bg-iron-950">
+                      <Card elevation="flat" className="bg-white dark:bg-ink-950">
                         <CardContent className="flex flex-col gap-2 p-3">
-                          <span className="text-fluid-sm font-semibold text-iron-900 dark:text-iron-50">
+                          <span className="text-fluid-sm font-semibold text-ink-900 dark:text-ink-50">
                             {d.company}
                           </span>
-                          <span className="flex items-center gap-1 text-fluid-xs text-iron-500">
+                          <span className="flex items-center gap-1 text-fluid-xs text-ink-500">
                             <Briefcase className="size-3" aria-hidden />
                             {d.contact}
                           </span>
-                          <span className="flex items-center gap-1 text-fluid-xs text-iron-500">
+                          <span className="flex items-center gap-1 text-fluid-xs text-ink-500">
                             <Mail className="size-3" aria-hidden />
                             <a
                               href={`mailto:${d.email}`}
@@ -200,7 +200,7 @@ export default function PartnerPipelinePage() {
                             </a>
                           </span>
                           {d.phone ? (
-                            <span className="flex items-center gap-1 text-fluid-xs text-iron-500">
+                            <span className="flex items-center gap-1 text-fluid-xs text-ink-500">
                               <Phone className="size-3" aria-hidden />
                               <a
                                 href={`tel:${d.phone.replace(/\s/g, "")}`}
@@ -213,7 +213,7 @@ export default function PartnerPipelinePage() {
                           <span className="text-fluid-sm font-bold tabular-nums text-dlugomat-700 dark:text-dlugomat-300">
                             {pln(d.estimated_pln)}
                           </span>
-                          <span className="rounded-md bg-iron-50 px-2 py-1 text-fluid-xs dark:bg-dlugomat-900">
+                          <span className="rounded-md bg-ink-50 px-2 py-1 text-fluid-xs dark:bg-dlugomat-900">
                             <Calendar className="mr-1 inline size-3 align-text-bottom" aria-hidden />
                             {d.next_action_at} · {d.next_action}
                           </span>
@@ -285,13 +285,13 @@ function Stat({
   return (
     <Card elevation="subtle">
       <CardContent className="flex flex-col gap-1 p-5">
-        <span className="text-fluid-xs font-semibold uppercase tracking-wider text-iron-500">
+        <span className="text-fluid-xs font-semibold uppercase tracking-wider text-ink-500">
           {label}
         </span>
-        <span className="text-fluid-2xl font-bold tabular-nums text-iron-900 dark:text-iron-50">
+        <span className="text-fluid-2xl font-bold tabular-nums text-ink-900 dark:text-ink-50">
           {value}
         </span>
-        <span className="text-fluid-xs text-iron-500">{hint}</span>
+        <span className="text-fluid-xs text-ink-500">{hint}</span>
       </CardContent>
     </Card>
   );

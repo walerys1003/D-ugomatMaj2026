@@ -118,13 +118,13 @@ export function SignInForm({ next, initialError }: { next?: string; initialError
       </form>
 
       {/* Magic-link */}
-      <Card elevation="flat" className="bg-iron-50 dark:bg-dlugomat-900">
+      <Card elevation="flat" className="bg-ink-50 dark:bg-dlugomat-900">
         <CardContent className="flex flex-col gap-3 p-5">
           <div>
-            <h3 className="text-fluid-base font-semibold text-dlugomat-900 dark:text-iron-50">
+            <h3 className="text-fluid-base font-semibold text-dlugomat-900 dark:text-ink-50">
               Albo wyślij magic-link
             </h3>
-            <p className="text-fluid-xs text-iron-600 dark:text-iron-300">
+            <p className="text-fluid-xs text-ink-600 dark:text-ink-300">
               Bez hasła — kliknij link z e-maila i zaloguj się jednym tapnięciem.
             </p>
           </div>

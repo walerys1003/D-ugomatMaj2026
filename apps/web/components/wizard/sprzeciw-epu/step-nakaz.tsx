@@ -81,8 +81,8 @@ export function StepNakaz({
         </FormField>
       </div>
 
-      <fieldset className="rounded-xl border border-iron-200 dark:border-dlugomat-800 p-4">
-        <legend className="px-2 text-fluid-xs uppercase tracking-wide text-iron-500">
+      <fieldset className="rounded-xl border border-ink-200 dark:border-dlugomat-800 p-4">
+        <legend className="px-2 text-fluid-xs uppercase tracking-wide text-ink-500">
           Kwoty z nakazu
         </legend>
         <div className="grid gap-4 sm:grid-cols-3">

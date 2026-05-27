@@ -29,19 +29,19 @@ export function HelpCenter() {
         <div
           role="dialog"
           aria-label="Centrum pomocy"
-          className="fixed bottom-20 right-4 z-40 w-72 overflow-hidden rounded-2xl border border-iron-200 bg-white shadow-2xl dark:border-dlugomat-700 dark:bg-dlugomat-900"
+          className="fixed bottom-20 right-4 z-40 w-72 overflow-hidden rounded-2xl border border-ink-200 bg-white shadow-2xl dark:border-dlugomat-700 dark:bg-dlugomat-900"
         >
-          <div className="border-b border-iron-200 px-4 py-3 dark:border-dlugomat-700">
-            <h3 className="text-fluid-sm font-semibold text-iron-900 dark:text-white">
+          <div className="border-b border-ink-200 px-4 py-3 dark:border-dlugomat-700">
+            <h3 className="text-fluid-sm font-semibold text-ink-900 dark:text-white">
               Potrzebujesz pomocy?
             </h3>
-            <p className="text-fluid-xs text-iron-500">Wybierz, jak możemy pomóc.</p>
+            <p className="text-fluid-xs text-ink-500">Wybierz, jak możemy pomóc.</p>
           </div>
           <ul className="flex flex-col py-2">
             <li>
               <Link
                 href="/baza-wiedzy"
-                className="flex items-center gap-3 px-4 py-2 text-fluid-sm hover:bg-iron-50 dark:hover:bg-dlugomat-800"
+                className="flex items-center gap-3 px-4 py-2 text-fluid-sm hover:bg-ink-50 dark:hover:bg-dlugomat-800"
               >
                 <BookOpen className="h-4 w-4 text-dlugomat-600" />
                 Baza wiedzy
@@ -50,7 +50,7 @@ export function HelpCenter() {
             <li>
               <button
                 onClick={resetWelcomeTour}
-                className="flex w-full items-center gap-3 px-4 py-2 text-left text-fluid-sm hover:bg-iron-50 dark:hover:bg-dlugomat-800"
+                className="flex w-full items-center gap-3 px-4 py-2 text-left text-fluid-sm hover:bg-ink-50 dark:hover:bg-dlugomat-800"
               >
                 <Play className="h-4 w-4 text-dlugomat-600" />
                 Pokaż tour ponownie
@@ -59,14 +59,14 @@ export function HelpCenter() {
             <li>
               <Link
                 href="/kontakt"
-                className="flex items-center gap-3 px-4 py-2 text-fluid-sm hover:bg-iron-50 dark:hover:bg-dlugomat-800"
+                className="flex items-center gap-3 px-4 py-2 text-fluid-sm hover:bg-ink-50 dark:hover:bg-dlugomat-800"
               >
                 <MessageSquare className="h-4 w-4 text-dlugomat-600" />
                 Skontaktuj się z nami
               </Link>
             </li>
           </ul>
-          <div className="border-t border-iron-200 px-4 py-2 text-fluid-xs text-iron-400 dark:border-dlugomat-700">
+          <div className="border-t border-ink-200 px-4 py-2 text-fluid-xs text-ink-400 dark:border-dlugomat-700">
             Średni czas odpowiedzi: <strong>4h</strong> w dni robocze
           </div>
         </div>

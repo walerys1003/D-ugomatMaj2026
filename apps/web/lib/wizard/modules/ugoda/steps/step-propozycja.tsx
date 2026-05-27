@@ -74,14 +74,14 @@ export function StepPropozycja({
         <div className="text-fluid-sm font-semibold text-shield-700">
           {variantMeta.label}
         </div>
-        <p className="mt-1 text-fluid-xs text-iron-700">
+        <p className="mt-1 text-fluid-xs text-ink-700">
           {variantMeta.helper}
         </p>
       </div>
 
       {showRaty && (
-        <div className="space-y-4 rounded-xl border border-iron-200 bg-white p-4">
-          <h4 className="text-fluid-sm font-semibold text-iron-900">
+        <div className="space-y-4 rounded-xl border border-ink-200 bg-white p-4">
+          <h4 className="text-fluid-sm font-semibold text-ink-900">
             Propozycja rat
           </h4>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -141,7 +141,7 @@ export function StepPropozycja({
           </div>
 
           {suma > 0 && (
-            <p className="rounded-lg bg-shield-50 p-2 text-fluid-xs text-iron-700">
+            <p className="rounded-lg bg-shield-50 p-2 text-fluid-xs text-ink-700">
               Suma proponowanych rat: <strong>{formatPLN(suma)}</strong>
             </p>
           )}
@@ -149,8 +149,8 @@ export function StepPropozycja({
       )}
 
       {showUmorzenie && (
-        <div className="space-y-4 rounded-xl border border-iron-200 bg-white p-4">
-          <h4 className="text-fluid-sm font-semibold text-iron-900">
+        <div className="space-y-4 rounded-xl border border-ink-200 bg-white p-4">
+          <h4 className="text-fluid-sm font-semibold text-ink-900">
             Propozycja {variant === "propozycja_indywidualna" ? "częściowego umorzenia" : "umorzenia + zapłaty"}
           </h4>
           <div className="grid gap-4 sm:grid-cols-2">

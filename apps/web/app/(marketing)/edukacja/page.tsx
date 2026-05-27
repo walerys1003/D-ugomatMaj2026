@@ -64,7 +64,7 @@ const STATS = [
 export default function EdukacjaPage() {
   return (
     <div className="bg-background">
-      <section className="border-b border-iron-100 bg-white">
+      <section className="border-b border-ink-100 bg-white">
         <div className="mx-auto max-w-6xl px-6 py-16">
           <Badge tone="neutral" withDot className="mb-4">
             <GraduationCap className="mr-1 h-3 w-3" />
@@ -73,7 +73,7 @@ export default function EdukacjaPage() {
           <h1 className="font-display text-4xl tracking-tight text-dlugomat-950 sm:text-5xl">
             Wiedza prawnicza w przystepnej formie.
           </h1>
-          <p className="mt-4 max-w-2xl text-lg text-iron-600">
+          <p className="mt-4 max-w-2xl text-lg text-ink-600">
             Kursy online, webinary, podcasty i ebooki. Wiekszosc bezplatna, wszystko po polsku,
             prowadzone przez praktykow prawa.
           </p>
@@ -86,7 +86,7 @@ export default function EdukacjaPage() {
             <Card key={s.label} elevation="subtle">
               <CardContent className="p-6">
                 <p className="font-display text-3xl text-dlugomat-950">{s.value}</p>
-                <p className="mt-1 text-xs uppercase tracking-wide text-iron-500">{s.label}</p>
+                <p className="mt-1 text-xs uppercase tracking-wide text-ink-500">{s.label}</p>
               </CardContent>
             </Card>
           ))}
@@ -125,7 +125,7 @@ export default function EdukacjaPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center justify-between">
-                    <p className="text-xs text-iron-500">
+                    <p className="text-xs text-ink-500">
                       {c.topic} · {c.duration}
                     </p>
                     <Button asChild variant="ghost" size="sm">
@@ -160,7 +160,7 @@ export default function EdukacjaPage() {
                     type="email"
                     required
                     placeholder="twoj.email@example.pl"
-                    className="h-10 w-full rounded-md border border-iron-200 px-3 text-sm focus-visible:outline-none focus-visible:shadow-shield-focus"
+                    className="h-10 w-full rounded-md border border-ink-200 px-3 text-sm focus-visible:outline-none focus-visible:shadow-shield-focus"
                   />
                 </label>
                 <Button type="submit" variant="primary">Zapisz</Button>

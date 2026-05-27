@@ -76,7 +76,7 @@ export function StepWnioskodawca({
           aria-invalid={Boolean(errors.wnioskodawca_pesel)}
           {...register("wnioskodawca_pesel")}
         />
-        <p className="text-fluid-xs text-iron-600">
+        <p className="text-fluid-xs text-ink-600">
           PESEL pojawi się w piśmie zamaskowany (XXX*****1234).
         </p>
         {errors.wnioskodawca_pesel?.message && (

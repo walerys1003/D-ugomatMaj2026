@@ -55,7 +55,7 @@ export default async function SkanerPage() {
         <h1 className="text-3xl font-semibold tracking-tight text-shield-950 sm:text-4xl">
           Wrzuć skan — sprawdzimy, z czym masz do czynienia.
         </h1>
-        <p className="max-w-2xl text-base leading-relaxed text-iron-700">
+        <p className="max-w-2xl text-base leading-relaxed text-ink-700">
           Skaner rozpoznaje <strong>nakazy zapłaty (EPU)</strong>,{" "}
           <strong>pisma komorników</strong> i{" "}
           <strong>raporty BIK</strong>. Wyciągamy z nich kluczowe dane —
@@ -74,7 +74,7 @@ export default async function SkanerPage() {
       {history && history.length > 0 && (
         <section className="space-y-3 border-t border-shield-100 pt-6">
           <h2 className="flex items-center gap-2 text-base font-semibold text-shield-900">
-            <History className="h-4 w-4 text-iron-500" aria-hidden />
+            <History className="h-4 w-4 text-ink-500" aria-hidden />
             Ostatnie skany
           </h2>
           <ul className="divide-y divide-shield-100 rounded-xl border border-shield-100 bg-white">
@@ -119,7 +119,7 @@ function HistoryRow({
         <p className="truncate text-sm font-medium text-shield-900">
           {row.original_filename}
         </p>
-        <p className="text-xs text-iron-600">
+        <p className="text-xs text-ink-600">
           {humanIntent(intent)} &middot;{" "}
           <span className="font-mono tabular-nums">{conf}%</span> &middot;{" "}
           {formatDateTime(row.created_at)}
@@ -132,7 +132,7 @@ function HistoryRow({
               ? "bg-hope-50 text-hope-800"
               : row.status === "failed"
                 ? "bg-temporal-red-50 text-temporal-red-700"
-                : "bg-iron-100 text-iron-700"
+                : "bg-ink-100 text-ink-700"
           }`}
         >
           {row.status}
@@ -145,7 +145,7 @@ function HistoryRow({
             Otwórz sprawę →
           </Link>
         ) : (
-          <span className="text-iron-400">brak sprawy</span>
+          <span className="text-ink-400">brak sprawy</span>
         )}
       </div>
     </li>

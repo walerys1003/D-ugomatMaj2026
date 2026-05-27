@@ -170,11 +170,11 @@ export default function ModulyPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex flex-1 flex-col gap-4">
-                <p className="text-fluid-sm text-iron-600 dark:text-iron-300">
+                <p className="text-fluid-sm text-ink-600 dark:text-ink-300">
                   {m.longDesc}
                 </p>
-                <div className="mt-auto flex items-center justify-between border-t border-iron-100 pt-4 dark:border-dlugomat-800">
-                  <span className="text-fluid-lg font-bold text-dlugomat-800 dark:text-iron-100">
+                <div className="mt-auto flex items-center justify-between border-t border-ink-100 pt-4 dark:border-dlugomat-800">
+                  <span className="text-fluid-lg font-bold text-dlugomat-800 dark:text-ink-100">
                     {m.price}
                   </span>
                   <Button asChild size="sm">
@@ -191,7 +191,7 @@ export default function ModulyPage() {
       </section>
 
       {/* CATEGORIES MAP */}
-      <section className="bg-iron-50/60 py-20 sm:py-24 dark:bg-dlugomat-950/40">
+      <section className="bg-ink-50/60 py-20 sm:py-24 dark:bg-dlugomat-950/40">
         <div className="container max-w-4xl">
           <div className="text-center">
             <p className="text-fluid-sm font-semibold uppercase tracking-wider text-dlugomat-600">
@@ -207,9 +207,9 @@ export default function ModulyPage() {
               return (
                 <div
                   key={cat}
-                  className="rounded-xl border border-iron-200 bg-card p-5 dark:border-dlugomat-800"
+                  className="rounded-xl border border-ink-200 bg-card p-5 dark:border-dlugomat-800"
                 >
-                  <h3 className="text-fluid-base font-semibold text-dlugomat-900 dark:text-iron-50">
+                  <h3 className="text-fluid-base font-semibold text-dlugomat-900 dark:text-ink-50">
                     {cat}
                   </h3>
                   <ul className="mt-3 flex flex-col gap-2">
@@ -217,7 +217,7 @@ export default function ModulyPage() {
                       <li key={m.code}>
                         <Link
                           href={m.href}
-                          className="flex items-center justify-between gap-2 rounded-md px-2 py-1.5 text-fluid-sm text-iron-700 transition-colors hover:bg-iron-100 hover:text-dlugomat-700 dark:text-iron-200 dark:hover:bg-dlugomat-850"
+                          className="flex items-center justify-between gap-2 rounded-md px-2 py-1.5 text-fluid-sm text-ink-700 transition-colors hover:bg-ink-100 hover:text-dlugomat-700 dark:text-ink-200 dark:hover:bg-dlugomat-850"
                         >
                           <span>
                             <span className="font-mono text-fluid-xs font-bold text-dlugomat-600">

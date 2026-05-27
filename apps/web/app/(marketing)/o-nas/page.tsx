@@ -57,7 +57,7 @@ export default function ONasPage() {
 
       {/* MISSION */}
       <section className="container py-16 sm:py-20">
-        <div className="mx-auto max-w-3xl space-y-6 text-fluid-base leading-relaxed text-iron-700 dark:text-iron-200">
+        <div className="mx-auto max-w-3xl space-y-6 text-fluid-base leading-relaxed text-ink-700 dark:text-ink-200">
           <h2 className="text-balance text-fluid-4xl font-bold tracking-tight text-dlugomat-900 dark:text-white">
             Dlaczego to robimy
           </h2>
@@ -89,7 +89,7 @@ export default function ONasPage() {
       </section>
 
       {/* VALUES */}
-      <section className="bg-iron-50/60 py-20 sm:py-24 dark:bg-dlugomat-950/40">
+      <section className="bg-ink-50/60 py-20 sm:py-24 dark:bg-dlugomat-950/40">
         <div className="container">
           <div className="mx-auto max-w-2xl text-center">
             <p className="text-fluid-sm font-semibold uppercase tracking-wider text-dlugomat-600">
@@ -113,7 +113,7 @@ export default function ONasPage() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-fluid-sm text-iron-600 dark:text-iron-300">
+                    <p className="text-fluid-sm text-ink-600 dark:text-ink-300">
                       {v.desc}
                     </p>
                   </CardContent>
@@ -136,7 +136,7 @@ export default function ONasPage() {
             </h2>
           </div>
 
-          <div className="mt-10 space-y-5 text-fluid-base leading-relaxed text-iron-700 dark:text-iron-200">
+          <div className="mt-10 space-y-5 text-fluid-base leading-relaxed text-ink-700 dark:text-ink-200">
             <p>
               <strong>Modele AI:</strong> Claude Sonnet 4.5 (generowanie pism),
               Haiku 4.5 (walidacja), Opus 4.5 (analiza skomplikowanych

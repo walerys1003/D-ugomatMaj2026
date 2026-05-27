@@ -60,7 +60,7 @@ export function PrzedawnienieCalculator() {
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div>
-        <label htmlFor="dueDate" className="text-fluid-sm font-medium text-iron-800 dark:text-iron-100">
+        <label htmlFor="dueDate" className="text-fluid-sm font-medium text-ink-800 dark:text-ink-100">
           Data wymagalności roszczenia
         </label>
         <input
@@ -70,22 +70,22 @@ export function PrzedawnienieCalculator() {
           value={dueDate}
           onChange={(e) => setDueDate(e.target.value)}
           required
-          className="mt-1 w-full rounded-md border border-iron-300 bg-white px-3 py-2 text-fluid-sm focus:border-dlugomat-500 focus:outline-none focus:ring-2 focus:ring-dlugomat-500/30 dark:border-dlugomat-700 dark:bg-dlugomat-900"
+          className="mt-1 w-full rounded-md border border-ink-300 bg-white px-3 py-2 text-fluid-sm focus:border-dlugomat-500 focus:outline-none focus:ring-2 focus:ring-dlugomat-500/30 dark:border-dlugomat-700 dark:bg-dlugomat-900"
         />
-        <p className="mt-1 text-fluid-xs text-iron-500">
+        <p className="mt-1 text-fluid-xs text-ink-500">
           Najczęściej: data ostatniej raty / data wymagalności faktury / data zdarzenia.
         </p>
       </div>
 
       <div>
-        <label htmlFor="kind" className="text-fluid-sm font-medium text-iron-800 dark:text-iron-100">
+        <label htmlFor="kind" className="text-fluid-sm font-medium text-ink-800 dark:text-ink-100">
           Typ roszczenia
         </label>
         <select
           id="kind"
           value={kind}
           onChange={(e) => setKind(e.target.value as ClaimKind)}
-          className="mt-1 w-full rounded-md border border-iron-300 bg-white px-3 py-2 text-fluid-sm focus:border-dlugomat-500 focus:outline-none focus:ring-2 focus:ring-dlugomat-500/30 dark:border-dlugomat-700 dark:bg-dlugomat-900"
+          className="mt-1 w-full rounded-md border border-ink-300 bg-white px-3 py-2 text-fluid-sm focus:border-dlugomat-500 focus:outline-none focus:ring-2 focus:ring-dlugomat-500/30 dark:border-dlugomat-700 dark:bg-dlugomat-900"
         >
           {KIND_OPTIONS.map((o) => (
             <option key={o.value} value={o.value}>
@@ -95,7 +95,7 @@ export function PrzedawnienieCalculator() {
         </select>
       </div>
 
-      <div className="rounded-md border border-iron-200 bg-iron-50 p-4 dark:border-dlugomat-800 dark:bg-dlugomat-900">
+      <div className="rounded-md border border-ink-200 bg-ink-50 p-4 dark:border-dlugomat-800 dark:bg-dlugomat-900">
         <label className="flex items-start gap-2 text-fluid-sm">
           <input
             type="checkbox"
@@ -103,13 +103,13 @@ export function PrzedawnienieCalculator() {
             onChange={(e) => setInterrupted(e.target.checked)}
             className="mt-1"
           />
-          <span className="text-iron-700 dark:text-iron-200">
+          <span className="text-ink-700 dark:text-ink-200">
             Bieg przedawnienia został <strong>przerwany</strong> (uznanie długu, pozew, mediacja).
           </span>
         </label>
         {interrupted && (
           <div className="mt-3 pl-6">
-            <label htmlFor="interruption" className="text-fluid-xs font-medium text-iron-700 dark:text-iron-200">
+            <label htmlFor="interruption" className="text-fluid-xs font-medium text-ink-700 dark:text-ink-200">
               Data przerwania
             </label>
             <input
@@ -117,7 +117,7 @@ export function PrzedawnienieCalculator() {
               type="date"
               value={interruptionDate}
               onChange={(e) => setInterruptionDate(e.target.value)}
-              className="mt-1 w-full rounded-md border border-iron-300 bg-white px-3 py-2 text-fluid-sm focus:border-dlugomat-500 focus:outline-none focus:ring-2 focus:ring-dlugomat-500/30 dark:border-dlugomat-700 dark:bg-dlugomat-900"
+              className="mt-1 w-full rounded-md border border-ink-300 bg-white px-3 py-2 text-fluid-sm focus:border-dlugomat-500 focus:outline-none focus:ring-2 focus:ring-dlugomat-500/30 dark:border-dlugomat-700 dark:bg-dlugomat-900"
             />
           </div>
         )}
@@ -157,15 +157,15 @@ export function PrzedawnienieCalculator() {
             >
               {result.isLimited ? "Przedawnione" : "Nieprzedawnione"}
             </Badge>
-            <span className="text-fluid-xs text-iron-500">Okres: {result.yearsApplicable} lat</span>
+            <span className="text-fluid-xs text-ink-500">Okres: {result.yearsApplicable} lat</span>
           </div>
 
-          <p className="mt-3 font-display text-fluid-xl font-semibold text-dlugomat-900 dark:text-iron-50">
+          <p className="mt-3 font-display text-fluid-xl font-semibold text-dlugomat-900 dark:text-ink-50">
             {result.isLimited
               ? `Przedawnione od ${Math.abs(result.daysRemaining)} dni`
               : `Pozostało ${result.daysRemaining} dni`}
           </p>
-          <p className="mt-1 text-fluid-sm text-iron-700 dark:text-iron-200">
+          <p className="mt-1 text-fluid-sm text-ink-700 dark:text-ink-200">
             Data przedawnienia:{" "}
             <strong>
               {new Date(result.limitationEndDate).toLocaleDateString("pl-PL", {
@@ -177,18 +177,18 @@ export function PrzedawnienieCalculator() {
           </p>
 
           {result.warning && (
-            <p className="mt-3 text-fluid-sm font-medium text-iron-800 dark:text-iron-100">
+            <p className="mt-3 text-fluid-sm font-medium text-ink-800 dark:text-ink-100">
               {result.warning}
             </p>
           )}
 
-          <div className="mt-4 border-t border-iron-200 pt-3 dark:border-dlugomat-800">
-            <p className="text-fluid-xs uppercase tracking-wide text-iron-500">Podstawa prawna</p>
+          <div className="mt-4 border-t border-ink-200 pt-3 dark:border-dlugomat-800">
+            <p className="text-fluid-xs uppercase tracking-wide text-ink-500">Podstawa prawna</p>
             <ul className="mt-1 flex flex-wrap gap-1.5">
               {result.legalBasis.map((b) => (
                 <li
                   key={b}
-                  className="rounded bg-white px-2 py-0.5 font-mono text-fluid-xs text-iron-700 dark:bg-dlugomat-950 dark:text-iron-200"
+                  className="rounded bg-white px-2 py-0.5 font-mono text-fluid-xs text-ink-700 dark:bg-dlugomat-950 dark:text-ink-200"
                 >
                   {b}
                 </li>

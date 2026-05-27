@@ -128,28 +128,28 @@ export default function WsparcieBazaWiedzyPage() {
   return (
     <div className="space-y-8">
       <header className="space-y-2">
-        <p className="text-xs uppercase tracking-[0.18em] text-iron-500">
+        <p className="text-xs uppercase tracking-[0.18em] text-ink-500">
           Wsparcie · baza wiedzy
         </p>
         <h1 className="font-display text-fluid-h1 text-dlugomat-950">
           Jak możemy pomóc?
         </h1>
-        <p className="max-w-2xl text-iron-600">
+        <p className="max-w-2xl text-ink-600">
           {totalArticles} artykułów w {CATEGORIES.length} kategoriach. Jeśli nie
           znajdziesz odpowiedzi — założymy zgłoszenie.
         </p>
       </header>
 
-      <nav aria-label="Widoki wsparcia" className="flex gap-1 rounded-md border border-iron-200 bg-iron-50 p-1 w-fit text-sm">
+      <nav aria-label="Widoki wsparcia" className="flex gap-1 rounded-md border border-ink-200 bg-ink-50 p-1 w-fit text-sm">
         <Link
           href="/panel/wsparcie"
-          className="rounded px-3 py-1.5 text-iron-700 hover:bg-white focus-visible:outline-none focus-visible:shadow-shield-focus"
+          className="rounded px-3 py-1.5 text-ink-700 hover:bg-white focus-visible:outline-none focus-visible:shadow-shield-focus"
         >
           Strona główna
         </Link>
         <Link
           href="/panel/wsparcie/zgloszenia"
-          className="rounded px-3 py-1.5 text-iron-700 hover:bg-white focus-visible:outline-none focus-visible:shadow-shield-focus"
+          className="rounded px-3 py-1.5 text-ink-700 hover:bg-white focus-visible:outline-none focus-visible:shadow-shield-focus"
         >
           Zgłoszenia
         </Link>
@@ -162,16 +162,16 @@ export default function WsparcieBazaWiedzyPage() {
         <CardContent className="p-5">
           <form className="flex gap-2">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-iron-400" aria-hidden />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-400" aria-hidden />
               <input
                 type="search"
                 placeholder="Wpisz pytanie, np. jak zmienić hasło"
-                className="w-full rounded-md border border-iron-300 bg-white pl-9 pr-3 py-2.5 text-sm focus:border-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus"
+                className="w-full rounded-md border border-ink-300 bg-white pl-9 pr-3 py-2.5 text-sm focus:border-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus"
               />
             </div>
             <Button type="submit">Szukaj</Button>
           </form>
-          <p className="mt-2 text-xs text-iron-500">
+          <p className="mt-2 text-xs text-ink-500">
             Spróbuj: MFA, faktura, eksport RODO, wzór pisma
           </p>
         </CardContent>
@@ -186,20 +186,20 @@ export default function WsparcieBazaWiedzyPage() {
               <li key={c.id}>
                 <Link
                   href={`/panel/wsparcie/baza-wiedzy/${c.id}`}
-                  className="group block h-full rounded-lg border border-iron-200 bg-white p-5 shadow-card transition hover:shadow-pop focus-visible:outline-none focus-visible:shadow-shield-focus"
+                  className="group block h-full rounded-lg border border-ink-200 bg-white p-5 shadow-card transition hover:shadow-pop focus-visible:outline-none focus-visible:shadow-shield-focus"
                 >
                   <div className="flex items-start justify-between">
                     <span className="rounded-md bg-dlugomat-50 p-2">
                       <Icon className="h-5 w-5 text-dlugomat-700" aria-hidden />
                     </span>
                     <ChevronRight
-                      className="h-5 w-5 text-iron-400 group-hover:text-dlugomat-700"
+                      className="h-5 w-5 text-ink-400 group-hover:text-dlugomat-700"
                       aria-hidden
                     />
                   </div>
                   <h3 className="mt-3 font-semibold text-dlugomat-950">{c.name}</h3>
-                  <p className="mt-1 text-sm text-iron-600">{c.description}</p>
-                  <p className="mt-3 text-xs text-iron-500">
+                  <p className="mt-1 text-sm text-ink-600">{c.description}</p>
+                  <p className="mt-3 text-xs text-ink-500">
                     {c.articles_count} artykułów
                   </p>
                 </Link>
@@ -215,18 +215,18 @@ export default function WsparcieBazaWiedzyPage() {
         </h2>
         <Card>
           <CardContent className="p-0">
-            <ul className="divide-y divide-iron-100">
+            <ul className="divide-y divide-ink-100">
               {POPULAR.map((a) => (
                 <li key={a.id}>
                   <Link
                     href={`/panel/wsparcie/baza-wiedzy/artykul/${a.slug}`}
-                    className="group flex items-center justify-between gap-4 px-5 py-3.5 transition hover:bg-iron-50 focus-visible:outline-none focus-visible:shadow-shield-focus"
+                    className="group flex items-center justify-between gap-4 px-5 py-3.5 transition hover:bg-ink-50 focus-visible:outline-none focus-visible:shadow-shield-focus"
                   >
                     <div className="flex-1 min-w-0">
                       <h3 className="font-medium text-dlugomat-900 group-hover:text-dlugomat-700">
                         {a.title}
                       </h3>
-                      <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-iron-500">
+                      <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-ink-500">
                         <Badge tone="neutral">{a.category}</Badge>
                         <span>{a.views.toLocaleString("pl-PL")} wyświetleń</span>
                         <span aria-hidden>·</span>
@@ -234,7 +234,7 @@ export default function WsparcieBazaWiedzyPage() {
                       </div>
                     </div>
                     <ArrowRight
-                      className="h-4 w-4 text-iron-400 group-hover:text-dlugomat-700"
+                      className="h-4 w-4 text-ink-400 group-hover:text-dlugomat-700"
                       aria-hidden
                     />
                   </Link>
@@ -252,7 +252,7 @@ export default function WsparcieBazaWiedzyPage() {
             <p className="font-semibold text-dlugomat-950">
               Nie znalazłeś odpowiedzi?
             </p>
-            <p className="text-sm text-iron-600">
+            <p className="text-sm text-ink-600">
               Załóż zgłoszenie — odpowiemy w ciągu 2 godzin w dni robocze.
             </p>
           </div>

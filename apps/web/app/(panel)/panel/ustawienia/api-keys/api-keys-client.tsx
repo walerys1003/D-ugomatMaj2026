@@ -120,7 +120,7 @@ export function ApiKeysClient() {
       )}
 
       {showForm && (
-        <div className="flex flex-col gap-3 rounded-lg border border-iron-200 p-4 dark:border-dlugomat-700">
+        <div className="flex flex-col gap-3 rounded-lg border border-ink-200 p-4 dark:border-dlugomat-700">
           <div className="grid gap-2">
             <Label htmlFor="key-name">Nazwa (do identyfikacji)</Label>
             <Input
@@ -164,15 +164,15 @@ export function ApiKeysClient() {
       )}
 
       {loading ? (
-        <p className="text-fluid-sm text-iron-500">Wczytuję klucze...</p>
+        <p className="text-fluid-sm text-ink-500">Wczytuję klucze...</p>
       ) : keys.length === 0 ? (
-        <p className="text-fluid-sm text-iron-500">Nie masz jeszcze żadnych kluczy.</p>
+        <p className="text-fluid-sm text-ink-500">Nie masz jeszcze żadnych kluczy.</p>
       ) : (
         <ul className="flex flex-col gap-2">
           {keys.map((k) => (
             <li
               key={k.id}
-              className="flex items-start justify-between gap-3 rounded-lg border border-iron-200 p-3 dark:border-dlugomat-700"
+              className="flex items-start justify-between gap-3 rounded-lg border border-ink-200 p-3 dark:border-dlugomat-700"
             >
               <div className="flex flex-col">
                 <div className="flex items-center gap-2">
@@ -184,18 +184,18 @@ export function ApiKeysClient() {
                     </Badge>
                   )}
                 </div>
-                <code className="mt-1 font-mono text-fluid-xs text-iron-500">{k.prefix}…</code>
+                <code className="mt-1 font-mono text-fluid-xs text-ink-500">{k.prefix}…</code>
                 <div className="mt-1 flex flex-wrap gap-1">
                   {k.scopes.map((s) => (
                     <span
                       key={s}
-                      className="rounded bg-iron-100 px-1.5 py-0.5 text-fluid-xs text-iron-700 dark:bg-dlugomat-800 dark:text-iron-200"
+                      className="rounded bg-ink-100 px-1.5 py-0.5 text-fluid-xs text-ink-700 dark:bg-dlugomat-800 dark:text-ink-200"
                     >
                       {s}
                     </span>
                   ))}
                 </div>
-                <span className="mt-1 text-fluid-xs text-iron-400">
+                <span className="mt-1 text-fluid-xs text-ink-400">
                   Utworzony {new Date(k.created_at).toLocaleDateString("pl-PL")} ·{" "}
                   {k.last_used_at
                     ? `użyty ${new Date(k.last_used_at).toLocaleDateString("pl-PL")}`

@@ -44,7 +44,7 @@ export function ResetPasswordForm() {
           Jeśli konto z adresem <strong>{sentTo}</strong> istnieje, otrzymasz link do
           zmiany hasła w ciągu kilku minut.
         </p>
-        <p className="mt-2 text-iron-700">Nie ma wiadomości? Sprawdź folder spam.</p>
+        <p className="mt-2 text-ink-700">Nie ma wiadomości? Sprawdź folder spam.</p>
       </div>
     );
   }

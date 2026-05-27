@@ -58,10 +58,10 @@ export default async function PrecedentsPage({
             <span className="h-px w-8 bg-dlugomat-600" />
             Baza orzecznictwa
           </p>
-          <h1 className="font-display text-fluid-5xl font-bold leading-tight text-dlugomat-900 dark:text-iron-50">
+          <h1 className="font-display text-fluid-5xl font-bold leading-tight text-dlugomat-900 dark:text-ink-50">
             Znajdź precedens pod swoją sprawę
           </h1>
-          <p className="mt-4 max-w-2xl text-fluid-lg leading-relaxed text-iron-700 dark:text-iron-200">
+          <p className="mt-4 max-w-2xl text-fluid-lg leading-relaxed text-ink-700 dark:text-ink-200">
             Aktualizowana co tydzień baza orzeczeń Sądu Najwyższego, sądów apelacyjnych,
             okręgowych i TSUE. Tezy, podstawy prawne, mapowanie na moduły Długomata.
           </p>
@@ -72,7 +72,7 @@ export default async function PrecedentsPage({
               name="q"
               defaultValue={params.q ?? ""}
               placeholder='np. "przedawnienie roszczenia konsumenckiego"'
-              className="flex-1 rounded-lg border border-iron-300 bg-white px-4 py-3 text-fluid-base shadow-subtle focus:border-dlugomat-500 focus:outline-none focus:ring-2 focus:ring-dlugomat-500/30 dark:border-dlugomat-700 dark:bg-dlugomat-900"
+              className="flex-1 rounded-lg border border-ink-300 bg-white px-4 py-3 text-fluid-base shadow-subtle focus:border-dlugomat-500 focus:outline-none focus:ring-2 focus:ring-dlugomat-500/30 dark:border-dlugomat-700 dark:bg-dlugomat-900"
               aria-label="Wyszukaj precedens"
             />
             <Button type="submit" size="lg" variant="primary">
@@ -82,13 +82,13 @@ export default async function PrecedentsPage({
 
           {/* Quick filters */}
           <div className="mt-4 flex flex-wrap gap-2">
-            <span className="self-center text-fluid-xs text-iron-500">Popularne:</span>
+            <span className="self-center text-fluid-xs text-ink-500">Popularne:</span>
             {["Przedawnienie 3 lata", "Klauzule abuzywne kredyt", "Komornik kwota wolna", "Upadłość konsumencka plan spłaty"].map(
               (q) => (
                 <Link
                   key={q}
                   href={`/precedensy?q=${encodeURIComponent(q)}`}
-                  className="rounded-full border border-iron-200 bg-white px-3 py-1 text-fluid-xs text-iron-700 hover:border-dlugomat-300 hover:text-dlugomat-700 dark:border-dlugomat-800 dark:bg-dlugomat-900 dark:text-iron-200"
+                  className="rounded-full border border-ink-200 bg-white px-3 py-1 text-fluid-xs text-ink-700 hover:border-dlugomat-300 hover:text-dlugomat-700 dark:border-dlugomat-800 dark:bg-dlugomat-900 dark:text-ink-200"
                 >
                   {q}
                 </Link>
@@ -103,7 +103,7 @@ export default async function PrecedentsPage({
           {/* Sidebar filtry */}
           <aside aria-label="Filtry" className="space-y-6">
             <div>
-              <h2 className="mb-3 font-display text-fluid-sm font-semibold uppercase tracking-wider text-iron-500">
+              <h2 className="mb-3 font-display text-fluid-sm font-semibold uppercase tracking-wider text-ink-500">
                 Sąd
               </h2>
               <ul className="space-y-1.5 text-fluid-sm">
@@ -113,7 +113,7 @@ export default async function PrecedentsPage({
                     className={
                       !params.court
                         ? "font-semibold text-dlugomat-700"
-                        : "text-iron-700 hover:text-dlugomat-700 dark:text-iron-200"
+                        : "text-ink-700 hover:text-dlugomat-700 dark:text-ink-200"
                     }
                   >
                     Wszystkie
@@ -126,11 +126,11 @@ export default async function PrecedentsPage({
                       className={
                         params.court === c.value
                           ? "font-semibold text-dlugomat-700"
-                          : "text-iron-700 hover:text-dlugomat-700 dark:text-iron-200"
+                          : "text-ink-700 hover:text-dlugomat-700 dark:text-ink-200"
                       }
                     >
                       {COURT_LABELS[c.value]}{" "}
-                      <span className="text-iron-400">({c.count})</span>
+                      <span className="text-ink-400">({c.count})</span>
                     </Link>
                   </li>
                 ))}
@@ -138,7 +138,7 @@ export default async function PrecedentsPage({
             </div>
 
             <div>
-              <h2 className="mb-3 font-display text-fluid-sm font-semibold uppercase tracking-wider text-iron-500">
+              <h2 className="mb-3 font-display text-fluid-sm font-semibold uppercase tracking-wider text-ink-500">
                 Kategoria
               </h2>
               <ul className="space-y-1.5 text-fluid-sm">
@@ -148,7 +148,7 @@ export default async function PrecedentsPage({
                     className={
                       !params.category
                         ? "font-semibold text-dlugomat-700"
-                        : "text-iron-700 hover:text-dlugomat-700 dark:text-iron-200"
+                        : "text-ink-700 hover:text-dlugomat-700 dark:text-ink-200"
                     }
                   >
                     Wszystkie
@@ -161,7 +161,7 @@ export default async function PrecedentsPage({
                       className={
                         params.category === c.key
                           ? "font-semibold text-dlugomat-700"
-                          : "text-iron-700 hover:text-dlugomat-700 dark:text-iron-200"
+                          : "text-ink-700 hover:text-dlugomat-700 dark:text-ink-200"
                       }
                     >
                       {c.label}
@@ -173,7 +173,7 @@ export default async function PrecedentsPage({
 
             {result.facets.years.length > 0 && (
               <div>
-                <h2 className="mb-3 font-display text-fluid-sm font-semibold uppercase tracking-wider text-iron-500">
+                <h2 className="mb-3 font-display text-fluid-sm font-semibold uppercase tracking-wider text-ink-500">
                   Rok
                 </h2>
                 <div className="flex flex-wrap gap-1.5">
@@ -184,7 +184,7 @@ export default async function PrecedentsPage({
                       className={`rounded border px-2 py-1 text-fluid-xs ${
                         params.year === y.value
                           ? "border-dlugomat-700 bg-dlugomat-700 text-white"
-                          : "border-iron-200 text-iron-700 hover:border-dlugomat-300 dark:border-dlugomat-800 dark:text-iron-200"
+                          : "border-ink-200 text-ink-700 hover:border-dlugomat-300 dark:border-dlugomat-800 dark:text-ink-200"
                       }`}
                     >
                       {y.value}
@@ -198,10 +198,10 @@ export default async function PrecedentsPage({
           {/* Wyniki */}
           <div>
             <div className="mb-5 flex items-center justify-between">
-              <p className="text-fluid-sm text-iron-600 dark:text-iron-300">
+              <p className="text-fluid-sm text-ink-600 dark:text-ink-300">
                 {result.total > 0 ? (
                   <>
-                    <span className="font-semibold text-dlugomat-900 dark:text-iron-50">
+                    <span className="font-semibold text-dlugomat-900 dark:text-ink-50">
                       {result.total.toLocaleString("pl-PL")}
                     </span>{" "}
                     orzeczeń{params.q ? ` dla "${params.q}"` : ""}
@@ -215,10 +215,10 @@ export default async function PrecedentsPage({
             {result.items.length === 0 ? (
               <Card elevation="subtle" className="py-12 text-center">
                 <CardContent>
-                  <p className="font-display text-fluid-xl text-iron-700">
+                  <p className="font-display text-fluid-xl text-ink-700">
                     Nic nie znaleziono
                   </p>
-                  <p className="mt-2 text-fluid-sm text-iron-500">
+                  <p className="mt-2 text-fluid-sm text-ink-500">
                     Spróbuj innych słów kluczowych albo zmień filtry.
                   </p>
                 </CardContent>
@@ -239,7 +239,7 @@ export default async function PrecedentsPage({
                           <Badge variant="outline" className="bg-dlugomat-50 text-dlugomat-700 dark:bg-dlugomat-900">
                             {COURT_LABELS[p.court]}
                           </Badge>
-                          <span className="text-fluid-xs text-iron-500">
+                          <span className="text-fluid-xs text-ink-500">
                             {new Date(p.date).toLocaleDateString("pl-PL")}
                           </span>
                           {p.related_modules.length > 0 && (
@@ -253,18 +253,18 @@ export default async function PrecedentsPage({
                           )}
                         </div>
 
-                        <h3 className="font-display text-fluid-lg font-semibold leading-snug text-dlugomat-900 dark:text-iron-50">
+                        <h3 className="font-display text-fluid-lg font-semibold leading-snug text-dlugomat-900 dark:text-ink-50">
                           {p.thesis}
                         </h3>
 
-                        <p className="mt-2 text-fluid-xs text-iron-500">{p.court_name}</p>
+                        <p className="mt-2 text-fluid-xs text-ink-500">{p.court_name}</p>
 
                         {p.legal_basis.length > 0 && (
                           <div className="mt-3 flex flex-wrap gap-1">
                             {p.legal_basis.slice(0, 4).map((b) => (
                               <span
                                 key={b}
-                                className="rounded bg-iron-50 px-2 py-0.5 font-mono text-fluid-xs text-iron-700 dark:bg-dlugomat-900 dark:text-iron-200"
+                                className="rounded bg-ink-50 px-2 py-0.5 font-mono text-fluid-xs text-ink-700 dark:bg-dlugomat-900 dark:text-ink-200"
                               >
                                 {b}
                               </span>
@@ -283,13 +283,13 @@ export default async function PrecedentsPage({
 
       {/* CTA */}
       <section className="container mt-12">
-        <Card elevation="pop" className="border-dlugomat-700/30 bg-gradient-to-br from-dlugomat-900 to-dlugomat-700 text-iron-50">
+        <Card elevation="pop" className="border-dlugomat-700/30 bg-gradient-to-br from-dlugomat-900 to-dlugomat-700 text-ink-50">
           <CardContent className="grid gap-6 p-10 lg:grid-cols-[2fr_1fr] lg:items-center">
             <div>
               <h2 className="font-display text-fluid-2xl font-bold leading-tight">
                 Chcesz, żeby AI dobierało precedensy automatycznie?
               </h2>
-              <p className="mt-3 text-fluid-base leading-relaxed text-iron-100/90">
+              <p className="mt-3 text-fluid-base leading-relaxed text-ink-100/90">
                 W panelu Długomata generator pism procesowych <strong>sam</strong> dobiera
                 najtrafniejsze precedensy z naszej bazy do Twojej sprawy. Bez przeszukiwania,
                 bez czytania 200 wyroków, bez błędów.

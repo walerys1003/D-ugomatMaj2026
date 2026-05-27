@@ -64,19 +64,19 @@ export default function FinansePage() {
 
   return (
     <div className="space-y-6">
-      <Link href="/panel" className="inline-flex items-center gap-2 text-sm text-iron-600 hover:text-dlugomat-900">
+      <Link href="/panel" className="inline-flex items-center gap-2 text-sm text-ink-600 hover:text-dlugomat-900">
         <ArrowLeft className="h-4 w-4" aria-hidden />
         Powrot do panelu
       </Link>
 
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.18em] text-iron-500">Finanse</p>
+          <p className="text-xs uppercase tracking-[0.18em] text-ink-500">Finanse</p>
           <h1 className="font-display text-fluid-h1 text-dlugomat-950 flex items-center gap-3">
             <Wallet className="h-7 w-7 text-dlugomat-700" aria-hidden />
             Twoje finanse
           </h1>
-          <p className="mt-1 text-sm text-iron-600">Wszystkie transakcje, faktury i splaty w jednym miejscu.</p>
+          <p className="mt-1 text-sm text-ink-600">Wszystkie transakcje, faktury i splaty w jednym miejscu.</p>
         </div>
         <Button variant="secondary">
           <Download className="mr-2 h-4 w-4" aria-hidden />
@@ -91,7 +91,7 @@ export default function FinansePage() {
             <CardTitle className="font-display text-fluid-h3 text-dlugomat-950">{fmtPLN.format(totalSpent)}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-iron-500 flex items-center gap-1">
+            <p className="text-xs text-ink-500 flex items-center gap-1">
               <ArrowDownRight className="h-3 w-3" aria-hidden />
               Ostatnie 30 dni
             </p>
@@ -103,7 +103,7 @@ export default function FinansePage() {
             <CardTitle className="font-display text-fluid-h3 text-accent-700">{fmtPLN.format(totalReturned)}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-iron-500 flex items-center gap-1">
+            <p className="text-xs text-ink-500 flex items-center gap-1">
               <ArrowUpRight className="h-3 w-3" aria-hidden />
               Zwroty oplat sadowych
             </p>
@@ -115,7 +115,7 @@ export default function FinansePage() {
             <CardTitle className="font-display text-fluid-h3 text-warn">{fmtPLN.format(pendingTotal)}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-iron-500">{TX.filter((t) => t.status === "oczekuje").length} pozycja</p>
+            <p className="text-xs text-ink-500">{TX.filter((t) => t.status === "oczekuje").length} pozycja</p>
           </CardContent>
         </Card>
         <Card>
@@ -124,7 +124,7 @@ export default function FinansePage() {
             <CardTitle className="font-display text-fluid-h3 text-dlugomat-950">{pismaCount}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-iron-500">Z fakturami VAT</p>
+            <p className="text-xs text-ink-500">Z fakturami VAT</p>
           </CardContent>
         </Card>
       </section>
@@ -138,7 +138,7 @@ export default function FinansePage() {
         </CardHeader>
         <CardContent className="p-0">
           <table className="w-full text-sm">
-            <thead className="border-b border-iron-100 bg-iron-50/50 text-xs uppercase tracking-wide text-iron-600">
+            <thead className="border-b border-ink-100 bg-ink-50/50 text-xs uppercase tracking-wide text-ink-600">
               <tr>
                 <th className="px-5 py-2 text-left font-medium">Data</th>
                 <th className="px-5 py-2 text-left font-medium">Opis</th>
@@ -148,10 +148,10 @@ export default function FinansePage() {
                 <th className="px-5 py-2 text-left font-medium">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-iron-100">
+            <tbody className="divide-y divide-ink-100">
               {TX.map((t) => (
                 <tr key={t.id}>
-                  <td className="px-5 py-3 font-mono text-xs text-iron-600">{t.date}</td>
+                  <td className="px-5 py-3 font-mono text-xs text-ink-600">{t.date}</td>
                   <td className="px-5 py-3 text-dlugomat-900">{t.desc}</td>
                   <td className="px-5 py-3">
                     <Badge tone={CATEGORY_TONE[t.category]}>{CATEGORY_LABEL[t.category]}</Badge>
@@ -159,7 +159,7 @@ export default function FinansePage() {
                   <td className={`px-5 py-3 text-right font-mono ${t.amount > 0 ? "text-accent-700" : "text-dlugomat-900"}`}>
                     {t.amount > 0 ? "+" : ""}{fmtPLN.format(t.amount)}
                   </td>
-                  <td className="px-5 py-3 font-mono text-xs text-iron-600">{t.invoice_no ?? "—"}</td>
+                  <td className="px-5 py-3 font-mono text-xs text-ink-600">{t.invoice_no ?? "—"}</td>
                   <td className="px-5 py-3">
                     <Badge tone={STATUS_TONE[t.status]} withDot>{t.status}</Badge>
                   </td>

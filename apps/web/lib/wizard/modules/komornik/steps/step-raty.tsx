@@ -50,7 +50,7 @@ export function StepRaty({
       className="space-y-5"
       noValidate
     >
-      <div className="flex items-start gap-3 rounded-lg border border-shield-100 bg-shield-50/30 p-3 text-fluid-sm text-iron-700">
+      <div className="flex items-start gap-3 rounded-lg border border-shield-100 bg-shield-50/30 p-3 text-fluid-sm text-ink-700">
         <HandCoins className="mt-0.5 size-4 text-shield-700" aria-hidden />
         <p>
           Zaproponuj kwotę raty, którą rzeczywiście będziesz w stanie regularnie
@@ -105,16 +105,16 @@ export function StepRaty({
       </FormField>
 
       {suma > 0 && (
-        <div className="rounded-lg border border-iron-200 bg-iron-50/60 p-3 text-fluid-sm dark:border-iron-800 dark:bg-iron-900/40">
+        <div className="rounded-lg border border-ink-200 bg-ink-50/60 p-3 text-fluid-sm dark:border-ink-800 dark:bg-ink-900/40">
           <div className="flex items-center justify-between">
-            <span className="text-iron-600 dark:text-iron-400">
+            <span className="text-ink-600 dark:text-ink-400">
               Łączna suma propozycji
             </span>
-            <strong className="font-serif text-fluid-base text-iron-900 dark:text-iron-50">
+            <strong className="font-serif text-fluid-base text-ink-900 dark:text-ink-50">
               {formatPLN(suma)}
             </strong>
           </div>
-          <p className="mt-1 text-fluid-xs text-iron-500">
+          <p className="mt-1 text-fluid-xs text-ink-500">
             ({liczba} × {formatPLN(rata)}) — wartość bez odsetek i kosztów.
           </p>
         </div>

@@ -93,8 +93,8 @@ export default async function IntegrationsSettingsPage() {
       <header className="flex items-center gap-3">
         <Link2 className="h-7 w-7 text-dlugomat-600" />
         <div>
-          <h1 className="text-fluid-2xl font-bold text-iron-900 dark:text-white">Integracje</h1>
-          <p className="text-fluid-base text-iron-600 dark:text-iron-300">
+          <h1 className="text-fluid-2xl font-bold text-ink-900 dark:text-white">Integracje</h1>
+          <p className="text-fluid-base text-ink-600 dark:text-ink-300">
             Połącz konto Długomat z zewnętrznymi narzędziami przez OAuth.
           </p>
         </div>

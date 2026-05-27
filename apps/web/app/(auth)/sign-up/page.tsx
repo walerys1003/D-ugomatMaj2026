@@ -19,14 +19,14 @@ export default function SignUpPage({ searchParams }: PageProps) {
         <h1 className="text-fluid-3xl font-bold tracking-tight text-dlugomat-900 dark:text-white">
           Załóż konto
         </h1>
-        <p className="mt-1 text-fluid-sm text-iron-600 dark:text-iron-300">
+        <p className="mt-1 text-fluid-sm text-ink-600 dark:text-ink-300">
           30 sekund. Bez karty. Bez ukrytych kosztów.
         </p>
       </div>
 
       <SignUpForm next={searchParams.next} />
 
-      <p className="text-fluid-sm text-iron-600 dark:text-iron-300">
+      <p className="text-fluid-sm text-ink-600 dark:text-ink-300">
         Masz już konto?{" "}
         <Link
           href={`/auth/sign-in${searchParams.next ? `?next=${encodeURIComponent(searchParams.next)}` : ""}`}

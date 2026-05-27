@@ -49,7 +49,7 @@ export function IntegrationsClient({ providers, initialConnected }: Props) {
         return (
           <li
             key={p.id}
-            className="flex flex-col gap-2 rounded-xl border border-iron-200 bg-white p-4 dark:border-dlugomat-700 dark:bg-dlugomat-900"
+            className="flex flex-col gap-2 rounded-xl border border-ink-200 bg-white p-4 dark:border-dlugomat-700 dark:bg-dlugomat-900"
           >
             <div className="flex items-start justify-between gap-2">
               <div className="flex items-center gap-2">
@@ -65,13 +65,13 @@ export function IntegrationsClient({ providers, initialConnected }: Props) {
                 <Badge tone="neutral">Dostępne</Badge>
               )}
             </div>
-            <p className="text-fluid-sm text-iron-600 dark:text-iron-300">{p.description}</p>
-            <code className="rounded bg-iron-100 px-2 py-1 font-mono text-fluid-xs text-iron-700 dark:bg-dlugomat-800 dark:text-iron-200">
+            <p className="text-fluid-sm text-ink-600 dark:text-ink-300">{p.description}</p>
+            <code className="rounded bg-ink-100 px-2 py-1 font-mono text-fluid-xs text-ink-700 dark:bg-dlugomat-800 dark:text-ink-200">
               {p.scopes_label}
             </code>
             {isConnected ? (
               <div className="mt-1 flex items-center justify-between gap-2">
-                <span className="text-fluid-xs text-iron-500">
+                <span className="text-fluid-xs text-ink-500">
                   Podłączono {new Date(conn.created_at).toLocaleDateString("pl-PL")}
                 </span>
                 <Button

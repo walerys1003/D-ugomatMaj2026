@@ -85,7 +85,7 @@ export function ProfileForm({
         <Label htmlFor="locale">Język interfejsu</Label>
         <select
           id="locale"
-          className="h-10 rounded-md border border-iron-200 bg-white px-3 text-fluid-sm dark:border-dlugomat-700 dark:bg-dlugomat-900"
+          className="h-10 rounded-md border border-ink-200 bg-white px-3 text-fluid-sm dark:border-dlugomat-700 dark:bg-dlugomat-900"
           value={locale}
           onChange={(e) => setLocale(e.target.value)}
         >
@@ -101,9 +101,9 @@ export function ProfileForm({
           type="checkbox"
           checked={marketing}
           onChange={(e) => setMarketing(e.target.checked)}
-          className="mt-1 h-4 w-4 rounded border-iron-300 accent-dlugomat-600"
+          className="mt-1 h-4 w-4 rounded border-ink-300 accent-dlugomat-600"
         />
-        <span className="text-iron-700 dark:text-iron-200">
+        <span className="text-ink-700 dark:text-ink-200">
           Zgadzam się na otrzymywanie informacji marketingowych (możesz wycofać zgodę w każdej chwili).
         </span>
       </label>

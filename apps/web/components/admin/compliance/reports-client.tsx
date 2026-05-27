@@ -66,9 +66,9 @@ export function ComplianceReportsClient({
         </Button>
       </section>
 
-      <section className="rounded-lg border border-iron-200 dark:border-dlugomat-800 overflow-hidden">
+      <section className="rounded-lg border border-ink-200 dark:border-dlugomat-800 overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-iron-50 dark:bg-dlugomat-850">
+          <thead className="bg-ink-50 dark:bg-dlugomat-850">
             <tr>
               <th className="text-left p-3">Typ</th>
               <th className="text-left p-3">Wygenerowano</th>
@@ -79,16 +79,16 @@ export function ComplianceReportsClient({
           <tbody>
             {reports.length === 0 && (
               <tr>
-                <td colSpan={4} className="p-6 text-center text-iron-500">
+                <td colSpan={4} className="p-6 text-center text-ink-500">
                   Brak zapisanych raportów. Wygeneruj pierwszy powyżej.
                 </td>
               </tr>
             )}
             {reports.map((r) => (
-              <tr key={r.id} className="border-t border-iron-200 dark:border-dlugomat-800">
+              <tr key={r.id} className="border-t border-ink-200 dark:border-dlugomat-800">
                 <td className="p-3 font-mono">{r.kind}</td>
                 <td className="p-3">{new Date(r.generated_at).toLocaleString("pl-PL")}</td>
-                <td className="p-3 text-iron-600 dark:text-iron-300 max-w-md truncate">
+                <td className="p-3 text-ink-600 dark:text-ink-300 max-w-md truncate">
                   {summarize(r.summary)}
                 </td>
                 <td className="p-3 text-right">
@@ -116,11 +116,11 @@ export function ComplianceReportsClient({
           >
             <header className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold uppercase">{open.kind}</h2>
-              <button onClick={() => setOpen(null)} className="text-iron-500">
+              <button onClick={() => setOpen(null)} className="text-ink-500">
                 ✕
               </button>
             </header>
-            <pre className="text-xs overflow-auto bg-iron-50 dark:bg-dlugomat-850 p-3 rounded">
+            <pre className="text-xs overflow-auto bg-ink-50 dark:bg-dlugomat-850 p-3 rounded">
               {JSON.stringify(open.payload ?? open.summary ?? {}, null, 2)}
             </pre>
           </div>

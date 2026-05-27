@@ -57,7 +57,7 @@ export function RatySadoweCalculator() {
         </CardHeader>
         <CardContent>
           {!result && (
-            <p className="text-sm text-iron-500">
+            <p className="text-sm text-ink-500">
               Wypełnij dane finansowe, by zobaczyć rekomendację.
             </p>
           )}
@@ -73,13 +73,13 @@ export function RatySadoweCalculator() {
               </div>
 
               <div>
-                <div className="flex items-center justify-between text-xs text-iron-500 mb-1.5">
+                <div className="flex items-center justify-between text-xs text-ink-500 mb-1.5">
                   <span>Wskaźnik kwalifikowalności</span>
-                  <span className="font-medium text-iron-900 dark:text-iron-50">
+                  <span className="font-medium text-ink-900 dark:text-ink-50">
                     {result.eligibilityScore} / 100
                   </span>
                 </div>
-                <div className="h-2 rounded-full bg-iron-100 dark:bg-iron-800 overflow-hidden">
+                <div className="h-2 rounded-full bg-ink-100 dark:bg-ink-800 overflow-hidden">
                   <div
                     className="h-full bg-accent-600 transition-all"
                     style={{ width: `${result.eligibilityScore}%` }}
@@ -88,23 +88,23 @@ export function RatySadoweCalculator() {
               </div>
 
               {result.installmentMonthsRecommended > 0 && (
-                <div className="rounded-md bg-iron-50 dark:bg-iron-900 p-3 text-sm">
-                  <div className="text-xs text-iron-500">Sugerowana liczba rat</div>
-                  <div className="font-medium text-iron-900 dark:text-iron-50">
+                <div className="rounded-md bg-ink-50 dark:bg-ink-900 p-3 text-sm">
+                  <div className="text-xs text-ink-500">Sugerowana liczba rat</div>
+                  <div className="font-medium text-ink-900 dark:text-ink-50">
                     {result.installmentMonthsRecommended} miesięcy
                   </div>
                 </div>
               )}
 
-              <div className="border-t border-iron-200 dark:border-iron-800 pt-3">
-                <div className="text-xs uppercase tracking-wider text-iron-500 mb-1.5">
+              <div className="border-t border-ink-200 dark:border-ink-800 pt-3">
+                <div className="text-xs uppercase tracking-wider text-ink-500 mb-1.5">
                   Podstawa prawna
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {result.legalBasis.map((b) => (
                     <span
                       key={b}
-                      className="text-xs px-2 py-0.5 rounded-full bg-iron-100 dark:bg-iron-800 text-iron-700 dark:text-iron-300"
+                      className="text-xs px-2 py-0.5 rounded-full bg-ink-100 dark:bg-ink-800 text-ink-700 dark:text-ink-300"
                     >
                       {b}
                     </span>
@@ -112,7 +112,7 @@ export function RatySadoweCalculator() {
                 </div>
               </div>
 
-              <ul className="space-y-1 text-xs text-iron-600 dark:text-iron-400 list-disc list-inside">
+              <ul className="space-y-1 text-xs text-ink-600 dark:text-ink-400 list-disc list-inside">
                 {result.notes.map((n, i) => (
                   <li key={i}>{n}</li>
                 ))}
@@ -140,7 +140,7 @@ function NumField({
 }) {
   return (
     <label className="block">
-      <span className="text-sm font-medium text-iron-700 dark:text-iron-300 mb-1.5 block">
+      <span className="text-sm font-medium text-ink-700 dark:text-ink-300 mb-1.5 block">
         {label}
       </span>
       <input
@@ -149,7 +149,7 @@ function NumField({
         step={step}
         value={value}
         onChange={(e) => onChange(Number(e.target.value) || 0)}
-        className="w-full rounded-lg border border-iron-300 dark:border-iron-700 bg-white dark:bg-iron-900 px-3 py-2 text-iron-900 dark:text-iron-50 focus:outline-none focus-visible:shadow-shield-focus"
+        className="w-full rounded-lg border border-ink-300 dark:border-ink-700 bg-white dark:bg-ink-900 px-3 py-2 text-ink-900 dark:text-ink-50 focus:outline-none focus-visible:shadow-shield-focus"
       />
     </label>
   );

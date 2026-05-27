@@ -35,7 +35,7 @@ export function StepDluznik({
       className="space-y-5"
       noValidate
     >
-      <div className="rounded-lg border border-shield-100 bg-shield-50/40 p-3 text-sm text-iron-700">
+      <div className="rounded-lg border border-shield-100 bg-shield-50/40 p-3 text-sm text-ink-700">
         Dane wnioskodawcy pojawią się w nagłówku odpowiedzi do funduszu —
         muszą być zgodne z danymi w wezwaniu.
       </div>
@@ -81,7 +81,7 @@ export function StepDluznik({
           aria-invalid={Boolean(errors.dluznik_pesel)}
           {...register("dluznik_pesel")}
         />
-        <p className="text-fluid-xs text-iron-600">
+        <p className="text-fluid-xs text-ink-600">
           PESEL pojawi się w piśmie zamaskowany (XXX*****1234).
         </p>
         {errors.dluznik_pesel?.message && (

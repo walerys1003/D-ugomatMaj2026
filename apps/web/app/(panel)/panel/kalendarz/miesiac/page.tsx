@@ -66,7 +66,7 @@ export default function KalendarzMiesiacPage() {
     <div className="space-y-6">
       <Link
         href="/panel/kalendarz"
-        className="inline-flex items-center gap-2 text-sm text-iron-600 hover:text-dlugomat-900"
+        className="inline-flex items-center gap-2 text-sm text-ink-600 hover:text-dlugomat-900"
       >
         <ArrowLeft className="h-4 w-4" aria-hidden />
         Powrot do kalendarza
@@ -74,9 +74,9 @@ export default function KalendarzMiesiacPage() {
 
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.18em] text-iron-500">Widok miesieczny</p>
+          <p className="text-xs uppercase tracking-[0.18em] text-ink-500">Widok miesieczny</p>
           <h1 className="font-display text-fluid-h1 text-dlugomat-950">{MONTH_LABEL}</h1>
-          <p className="mt-1 text-sm text-iron-600">
+          <p className="mt-1 text-sm text-ink-600">
             {EVENTS.length} zdarzen, w tym {EVENTS.filter((e) => e.urgent).length} pilnych.
           </p>
         </div>
@@ -99,9 +99,9 @@ export default function KalendarzMiesiacPage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <div className="grid grid-cols-7 border-t border-iron-100 bg-iron-50/50 text-xs font-medium uppercase tracking-wide text-iron-600">
+          <div className="grid grid-cols-7 border-t border-ink-100 bg-ink-50/50 text-xs font-medium uppercase tracking-wide text-ink-600">
             {WEEKDAYS.map((w) => (
-              <div key={w} className="border-r border-iron-100 px-3 py-2 last:border-r-0">
+              <div key={w} className="border-r border-ink-100 px-3 py-2 last:border-r-0">
                 {w}
               </div>
             ))}
@@ -113,8 +113,8 @@ export default function KalendarzMiesiacPage() {
               return (
                 <div
                   key={idx}
-                  className={`min-h-[110px] border-b border-r border-iron-100 p-2 last:border-r-0 ${
-                    c.day === null ? "bg-iron-50/30" : ""
+                  className={`min-h-[110px] border-b border-r border-ink-100 p-2 last:border-r-0 ${
+                    c.day === null ? "bg-ink-50/30" : ""
                   } ${hasUrgent ? "bg-danger/5" : ""}`}
                 >
                   {c.day !== null && (
@@ -127,7 +127,7 @@ export default function KalendarzMiesiacPage() {
                               className={`block truncate rounded px-1.5 py-0.5 text-[10px] ${
                                 e.urgent
                                   ? "bg-danger/10 text-danger"
-                                  : "bg-iron-100 text-dlugomat-800"
+                                  : "bg-ink-100 text-dlugomat-800"
                               }`}
                               title={`${e.time} ${e.title}`}
                             >
@@ -150,11 +150,11 @@ export default function KalendarzMiesiacPage() {
           <CardTitle>Wszystkie zdarzenia w maju</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <ul className="divide-y divide-iron-100">
+          <ul className="divide-y divide-ink-100">
             {EVENTS.map((e) => (
               <li key={e.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-3">
                 <div className="flex items-center gap-3">
-                  <span className="font-mono text-xs text-iron-500">{e.date} · {e.time}</span>
+                  <span className="font-mono text-xs text-ink-500">{e.date} · {e.time}</span>
                   <span className="text-sm text-dlugomat-900">{e.title}</span>
                 </div>
                 <div className="flex items-center gap-2">

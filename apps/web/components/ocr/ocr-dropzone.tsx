@@ -116,7 +116,7 @@ export function OcrDropzone({
             <FileUp className="h-10 w-10 text-shield-500" aria-hidden />
             <div className="space-y-1">
               <p className="text-base font-medium text-shield-900">{ctaText}</p>
-              <p className="text-sm text-iron-600">
+              <p className="text-sm text-ink-600">
                 PDF, JPG, PNG, WEBP &middot; do 20 MB &middot; OCR uruchamia się
                 lokalnie (PII chronione)
               </p>
@@ -152,7 +152,7 @@ export function OcrDropzone({
                 transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
               />
             </div>
-            <p className="font-mono text-xs tabular-nums text-iron-500">
+            <p className="font-mono text-xs tabular-nums text-ink-500">
               {Math.round(progress * 100)}%
             </p>
           </motion.div>
@@ -169,7 +169,7 @@ export function OcrDropzone({
             <p className="text-base font-medium text-shield-900">
               Skan przeanalizowany
             </p>
-            <p className="text-sm text-iron-600">
+            <p className="text-sm text-ink-600">
               Sprawdź wyniki poniżej i przejdź do kreatora.
             </p>
             <button
@@ -199,7 +199,7 @@ export function OcrDropzone({
             <p className="text-base font-medium text-shield-900">
               Nie udało się przetworzyć pliku
             </p>
-            <p className="text-sm text-iron-700">{error}</p>
+            <p className="text-sm text-ink-700">{error}</p>
             <button
               type="button"
               onClick={(e) => {

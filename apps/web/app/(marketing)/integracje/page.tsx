@@ -63,7 +63,7 @@ const STATUS_LABEL = {
 const STATUS_BADGE = {
   available: "bg-accent-50 text-accent-700 border-accent-200",
   beta: "bg-warn-50 text-warn-700 border-warn-200",
-  soon: "bg-iron-100 text-iron-600 border-iron-200",
+  soon: "bg-ink-100 text-ink-600 border-ink-200",
 };
 
 export default function IntegracjePage() {
@@ -74,14 +74,14 @@ export default function IntegracjePage() {
   }
 
   return (
-    <main className="bg-iron-50 dark:bg-iron-950 pb-20">
-      <section className="bg-white dark:bg-iron-900 border-b border-iron-200 dark:border-iron-800">
+    <main className="bg-ink-50 dark:bg-ink-950 pb-20">
+      <section className="bg-white dark:bg-ink-900 border-b border-ink-200 dark:border-ink-800">
         <div className="container mx-auto px-4 py-12 max-w-4xl text-center">
-          <p className="text-xs uppercase tracking-wider text-iron-500 mb-2">Integracje</p>
-          <h1 className="font-display text-4xl md:text-5xl font-semibold text-iron-900 dark:text-iron-50">
+          <p className="text-xs uppercase tracking-wider text-ink-500 mb-2">Integracje</p>
+          <h1 className="font-display text-4xl md:text-5xl font-semibold text-ink-900 dark:text-ink-50">
             Połącz z narzędziami, których już używasz
           </h1>
-          <p className="text-lg text-iron-600 dark:text-iron-300 mt-3">
+          <p className="text-lg text-ink-600 dark:text-ink-300 mt-3">
             {INTEGRATIONS.filter((i) => i.status === "available").length} natywnych integracji,
             REST API i webhooki. Brakuje czegoś? Napisz —{" "}
             <Link href="/kontakt?temat=integracja" className="text-accent-700 hover:underline">
@@ -95,7 +95,7 @@ export default function IntegracjePage() {
       <section className="container mx-auto px-4 py-10 space-y-10">
         {Array.from(grouped.entries()).map(([cat, items]) => (
           <div key={cat}>
-            <h2 className="font-display text-xl font-semibold text-iron-900 dark:text-iron-50 mb-4">
+            <h2 className="font-display text-xl font-semibold text-ink-900 dark:text-ink-50 mb-4">
               {CATEGORY_LABELS[cat]}
             </h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -107,7 +107,7 @@ export default function IntegracjePage() {
                   >
                     <CardHeader>
                       <div className="flex items-center justify-between mb-2">
-                        <div className="w-10 h-10 rounded-md bg-iron-100 dark:bg-iron-800 flex items-center justify-center font-display font-semibold text-iron-700 dark:text-iron-300">
+                        <div className="w-10 h-10 rounded-md bg-ink-100 dark:bg-ink-800 flex items-center justify-center font-display font-semibold text-ink-700 dark:text-ink-300">
                           {i.logo_letter}
                         </div>
                         <span
@@ -119,7 +119,7 @@ export default function IntegracjePage() {
                       <CardTitle className="text-base">{i.name}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-sm text-iron-600 dark:text-iron-400 line-clamp-2">
+                      <p className="text-sm text-ink-600 dark:text-ink-400 line-clamp-2">
                         {i.description}
                       </p>
                     </CardContent>

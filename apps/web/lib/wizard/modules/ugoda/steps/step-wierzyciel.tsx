@@ -34,7 +34,7 @@ export function StepWierzyciel({
       className="space-y-5"
       noValidate
     >
-      <div className="rounded-lg border border-shield-100 bg-shield-50/40 p-3 text-sm text-iron-700">
+      <div className="rounded-lg border border-shield-100 bg-shield-50/40 p-3 text-sm text-ink-700">
         Wskaż adresata propozycji ugody — bank, fundusz sekurytyzacyjny lub
         firmę windykacyjną. Pismo powinno trafić bezpośrednio do działu
         windykacji / negocjacji.

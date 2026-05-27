@@ -147,13 +147,13 @@ export function StepWpis({
                       "focus:outline-none focus-visible:ring-2 focus-visible:ring-shield-500 focus-visible:ring-offset-2",
                       active
                         ? "border-shield-500 bg-shield-50/70"
-                        : "border-iron-200 bg-white hover:border-shield-300",
+                        : "border-ink-200 bg-white hover:border-shield-300",
                     )}
                   >
-                    <span className="block text-fluid-sm font-medium text-iron-900">
+                    <span className="block text-fluid-sm font-medium text-ink-900">
                       {opt.label}
                     </span>
-                    <span className="mt-0.5 block text-fluid-xs text-iron-600">
+                    <span className="mt-0.5 block text-fluid-xs text-ink-600">
                       {opt.helper}
                     </span>
                   </button>

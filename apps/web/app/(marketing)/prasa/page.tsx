@@ -152,7 +152,7 @@ export default function PrasaPage() {
 
   return (
     <div className="min-h-screen bg-dlugomat-50">
-      <section className="bg-white border-b border-iron-200">
+      <section className="bg-white border-b border-ink-200">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <Badge tone="info" className="mb-4">Centrum prasowe</Badge>
@@ -211,7 +211,7 @@ export default function PrasaPage() {
         </div>
       </section>
 
-      <section className="py-12 bg-white border-y border-iron-200">
+      <section className="py-12 bg-white border-y border-ink-200">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <h2 className="font-display text-2xl text-dlugomat-950 mb-6">Dlugomat w mediach</h2>
           <Card>
@@ -219,7 +219,7 @@ export default function PrasaPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="text-left text-xs uppercase tracking-wide text-dlugomat-600 border-b border-iron-200">
+                    <tr className="text-left text-xs uppercase tracking-wide text-dlugomat-600 border-b border-ink-200">
                       <th className="py-3 pr-3">Data</th>
                       <th className="py-3 pr-3">Medium</th>
                       <th className="py-3 pr-3">Tytul</th>
@@ -229,7 +229,7 @@ export default function PrasaPage() {
                   </thead>
                   <tbody>
                     {COVERAGE.map((m) => (
-                      <tr key={m.id} className="border-b border-iron-100 last:border-0 hover:bg-dlugomat-50">
+                      <tr key={m.id} className="border-b border-ink-100 last:border-0 hover:bg-dlugomat-50">
                         <td className="py-3 pr-3 text-dlugomat-700 text-xs">{dateFmt.format(new Date(m.date))}</td>
                         <td className="py-3 pr-3 font-medium text-dlugomat-950">{m.outlet}</td>
                         <td className="py-3 pr-3 text-dlugomat-800">{m.title}</td>

@@ -133,10 +133,10 @@ export default async function AdminGroupLayout({
                     <Link
                       key={item.href}
                       href={item.href}
-                      className="group flex h-8 items-center gap-2.5 rounded-sm px-2.5 text-[13px] font-medium text-ink-700 transition-colors duration-base ease-shield-out hover:bg-ink-50 hover:text-ink-900 focus-visible:shadow-shield-focus focus-visible:outline-none dark:text-iron-200 dark:hover:bg-dlugomat-850/70 dark:hover:text-white"
+                      className="group flex h-8 items-center gap-2.5 rounded-sm px-2.5 text-[13px] font-medium text-ink-700 transition-colors duration-base ease-shield-out hover:bg-ink-50 hover:text-ink-900 focus-visible:shadow-shield-focus focus-visible:outline-none dark:text-ink-200 dark:hover:bg-dlugomat-850/70 dark:hover:text-white"
                     >
                       <Icon
-                        className="size-3.5 shrink-0 text-ink-400 group-hover:text-ink-700 dark:text-iron-500 dark:group-hover:text-white"
+                        className="size-3.5 shrink-0 text-ink-400 group-hover:text-ink-700 dark:text-ink-500 dark:group-hover:text-white"
                         aria-hidden
                       />
                       <span className="truncate">{item.label}</span>
@@ -152,7 +152,7 @@ export default async function AdminGroupLayout({
         <div className="border-t border-ink-200 p-4 dark:border-dlugomat-800/60">
           <div className="mb-3 flex items-center justify-between gap-2">
             <span
-              className="truncate text-xs text-ink-600 dark:text-iron-400"
+              className="truncate text-xs text-ink-600 dark:text-ink-400"
               title={admin.email}
             >
               {admin.email}
@@ -197,7 +197,7 @@ export default async function AdminGroupLayout({
               <Link
                 key={item.href}
                 href={item.href}
-                className="rounded-sm border border-ink-200 px-2 py-1 text-[11px] font-medium text-ink-600 transition-colors hover:border-ink-300 hover:bg-ink-50 hover:text-ink-900 dark:border-dlugomat-700 dark:text-iron-300 dark:hover:text-white"
+                className="rounded-sm border border-ink-200 px-2 py-1 text-[11px] font-medium text-ink-600 transition-colors hover:border-ink-300 hover:bg-ink-50 hover:text-ink-900 dark:border-dlugomat-700 dark:text-ink-300 dark:hover:text-white"
               >
                 {item.label}
               </Link>

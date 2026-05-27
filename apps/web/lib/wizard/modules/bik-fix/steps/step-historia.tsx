@@ -64,7 +64,7 @@ export function StepHistoria({
       className="space-y-5"
       noValidate
     >
-      <div className="rounded-lg border border-shield-100 bg-shield-50/30 p-3 text-fluid-sm text-iron-700">
+      <div className="rounded-lg border border-shield-100 bg-shield-50/30 p-3 text-fluid-sm text-ink-700">
         {effectiveVariant === "reklamacja_bik" ? (
           <>
             BIK będzie potrzebować dowodu, że wcześniej próbowałeś u banku.
@@ -81,7 +81,7 @@ export function StepHistoria({
       </div>
 
       <section className="space-y-4">
-        <h3 className="text-fluid-base font-semibold text-iron-900 dark:text-iron-50">
+        <h3 className="text-fluid-base font-semibold text-ink-900 dark:text-ink-50">
           Reklamacja w banku (krok 1)
         </h3>
         <FormField
@@ -112,7 +112,7 @@ export function StepHistoria({
 
       {showBikReklamacja && (
         <section className="space-y-4">
-          <h3 className="text-fluid-base font-semibold text-iron-900 dark:text-iron-50">
+          <h3 className="text-fluid-base font-semibold text-ink-900 dark:text-ink-50">
             Reklamacja w BIK (krok 2)
           </h3>
           <FormField

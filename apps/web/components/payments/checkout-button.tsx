@@ -75,11 +75,11 @@ export function CheckoutButton({
   if (mode === "idle") {
     return (
       <div className="space-y-3">
-        <div className="flex items-baseline justify-between rounded-lg border border-iron-200 bg-iron-50/60 px-4 py-3 dark:border-iron-800 dark:bg-iron-900/40">
-          <span className="text-fluid-sm text-iron-700 dark:text-iron-300">
+        <div className="flex items-baseline justify-between rounded-lg border border-ink-200 bg-ink-50/60 px-4 py-3 dark:border-ink-800 dark:bg-ink-900/40">
+          <span className="text-fluid-sm text-ink-700 dark:text-ink-300">
             {productName}
           </span>
-          <strong className="font-serif text-fluid-xl text-iron-900 dark:text-iron-50">
+          <strong className="font-serif text-fluid-xl text-ink-900 dark:text-ink-50">
             {formatPriceGrosze(grossGrosze)}
           </strong>
         </div>
@@ -101,7 +101,7 @@ export function CheckoutButton({
             Faktura na firmę (B2B)
           </Button>
         </div>
-        <p className="flex items-center gap-2 text-fluid-xs text-iron-500">
+        <p className="flex items-center gap-2 text-fluid-xs text-ink-500">
           <ShieldCheck className="size-3.5 text-shield-600" aria-hidden />
           Płatność obsługuje Stripe — karta, BLIK, Przelewy24. Faktura VAT
           generowana automatycznie.
@@ -117,12 +117,12 @@ export function CheckoutButton({
 
   // B2B form
   return (
-    <div className="space-y-4 rounded-xl border border-iron-200 bg-white p-5 dark:border-iron-800 dark:bg-iron-950">
+    <div className="space-y-4 rounded-xl border border-ink-200 bg-white p-5 dark:border-ink-800 dark:bg-ink-950">
       <div className="space-y-1">
-        <h4 className="text-fluid-base font-semibold text-iron-900 dark:text-iron-50">
+        <h4 className="text-fluid-base font-semibold text-ink-900 dark:text-ink-50">
           Dane do faktury VAT
         </h4>
-        <p className="text-fluid-xs text-iron-500">
+        <p className="text-fluid-xs text-ink-500">
           Faktura w cenie. Wyślemy ją na Twój email natychmiast po opłaceniu.
         </p>
       </div>

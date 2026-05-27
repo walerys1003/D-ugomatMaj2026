@@ -43,7 +43,7 @@ export function StepReview({
 
   return (
     <form onSubmit={onValid} className="space-y-6" noValidate>
-      <div className="rounded-xl border border-iron-200 dark:border-dlugomat-800 bg-iron-50/40 dark:bg-dlugomat-900/40 p-5 space-y-4">
+      <div className="rounded-xl border border-ink-200 dark:border-dlugomat-800 bg-ink-50/40 dark:bg-dlugomat-900/40 p-5 space-y-4">
         <h3 className="text-fluid-base font-semibold text-foreground">
           Podsumowanie sprawy
         </h3>
@@ -78,7 +78,7 @@ export function StepReview({
             <h4 className="text-fluid-sm font-semibold text-foreground mb-1">
               Zarzuty
             </h4>
-            <ul className="list-disc pl-5 text-fluid-sm text-iron-700 dark:text-iron-300">
+            <ul className="list-disc pl-5 text-fluid-sm text-ink-700 dark:text-ink-300">
               {zarzutyLabels.map((l) => (
                 <li key={l}>{l}</li>
               ))}
@@ -93,7 +93,7 @@ export function StepReview({
             <input
               type="checkbox"
               {...form.register("zgoda_dane")}
-              className="mt-1 size-4 rounded border-iron-300 text-dlugomat-500 focus:ring-dlugomat-500"
+              className="mt-1 size-4 rounded border-ink-300 text-dlugomat-500 focus:ring-dlugomat-500"
             />
             <span className="text-fluid-sm text-foreground">
               Wyrażam zgodę na przetwarzanie moich danych osobowych w celu
@@ -107,7 +107,7 @@ export function StepReview({
             <input
               type="checkbox"
               {...form.register("zgoda_oswiadczenie")}
-              className="mt-1 size-4 rounded border-iron-300 text-dlugomat-500 focus:ring-dlugomat-500"
+              className="mt-1 size-4 rounded border-ink-300 text-dlugomat-500 focus:ring-dlugomat-500"
             />
             <span className="text-fluid-sm text-foreground">
               Oświadczam, że podane dane są zgodne z prawdą i posiadam
@@ -135,7 +135,7 @@ function SummaryGrid({ rows }: { rows: Array<[string, string]> }) {
     <dl className="grid gap-x-6 gap-y-2 sm:grid-cols-2">
       {rows.map(([k, v]) => (
         <div key={k} className="flex items-baseline justify-between sm:block">
-          <dt className="text-fluid-xs uppercase tracking-wide text-iron-500">
+          <dt className="text-fluid-xs uppercase tracking-wide text-ink-500">
             {k}
           </dt>
           <dd className="text-fluid-sm text-foreground sm:mt-0.5">{v}</dd>

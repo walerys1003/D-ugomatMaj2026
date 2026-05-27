@@ -24,8 +24,8 @@ export default function ChangelogPage() {
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-10 px-4 py-12">
       <header>
-        <h1 className="text-fluid-3xl font-bold text-iron-900 dark:text-white">Changelog</h1>
-        <p className="mt-2 text-fluid-base text-iron-600 dark:text-iron-300">
+        <h1 className="text-fluid-3xl font-bold text-ink-900 dark:text-white">Changelog</h1>
+        <p className="mt-2 text-fluid-base text-ink-600 dark:text-ink-300">
           Wszystkie zmiany w Długomacie — funkcje, poprawki, bezpieczeństwo.
         </p>
       </header>
@@ -34,10 +34,10 @@ export default function ChangelogPage() {
         {RELEASE_HISTORY.map((release) => (
           <article key={release.version} className="border-l-2 border-dlugomat-200 pl-6 dark:border-dlugomat-700">
             <header className="mb-4 flex items-baseline gap-3">
-              <h2 className="text-fluid-2xl font-bold text-iron-900 dark:text-white">
+              <h2 className="text-fluid-2xl font-bold text-ink-900 dark:text-white">
                 {release.version}
               </h2>
-              <time className="text-fluid-sm text-iron-500">
+              <time className="text-fluid-sm text-ink-500">
                 {new Date(release.date).toLocaleDateString("pl-PL", {
                   year: "numeric",
                   month: "long",
@@ -49,7 +49,7 @@ export default function ChangelogPage() {
             {release.highlights.length > 0 && (
               <ul className="mb-4 flex flex-col gap-1 rounded-lg bg-dlugomat-50 p-4 dark:bg-dlugomat-950">
                 {release.highlights.map((h, i) => (
-                  <li key={i} className="flex items-start gap-2 text-fluid-sm text-iron-800 dark:text-iron-200">
+                  <li key={i} className="flex items-start gap-2 text-fluid-sm text-ink-800 dark:text-ink-200">
                     <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-dlugomat-600" />
                     <span>{h}</span>
                   </li>
@@ -67,7 +67,7 @@ export default function ChangelogPage() {
                       <Icon className="h-3 w-3" />
                       {meta.label}
                     </Badge>
-                    <span className="flex-1 text-iron-700 dark:text-iron-300">{c.description}</span>
+                    <span className="flex-1 text-ink-700 dark:text-ink-300">{c.description}</span>
                   </li>
                 );
               })}

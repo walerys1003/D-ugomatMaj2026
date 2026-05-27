@@ -79,7 +79,7 @@ export default function PartnerUmowyPage() {
         <h1 className="text-fluid-3xl font-bold tracking-tight text-dlugomat-900 dark:text-white">
           Umowy
         </h1>
-        <p className="max-w-2xl text-fluid-base text-iron-600 dark:text-iron-300">
+        <p className="max-w-2xl text-fluid-base text-ink-600 dark:text-ink-300">
           Aktualna wersja każdego dokumentu programu partnerskiego.
           Po zmianie warunków otrzymasz powiadomienie e-mail i okno 14 dni
           na akceptację nowej wersji.
@@ -111,8 +111,8 @@ export default function PartnerUmowyPage() {
       <Card elevation="subtle" className="overflow-hidden">
         <CardContent className="p-0">
           <table className="w-full text-fluid-sm">
-            <thead className="border-b border-iron-200 bg-iron-50/60 dark:border-dlugomat-800 dark:bg-dlugomat-900/40">
-              <tr className="text-left text-iron-600 dark:text-iron-300">
+            <thead className="border-b border-ink-200 bg-ink-50/60 dark:border-dlugomat-800 dark:bg-dlugomat-900/40">
+              <tr className="text-left text-ink-600 dark:text-ink-300">
                 <th className="px-5 py-3 font-semibold">Dokument</th>
                 <th className="px-5 py-3 font-semibold">Wersja</th>
                 <th className="px-5 py-3 font-semibold">Podpisana</th>
@@ -121,7 +121,7 @@ export default function PartnerUmowyPage() {
                 <th className="px-5 py-3 font-semibold">PDF</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-iron-100 dark:divide-dlugomat-800">
+            <tbody className="divide-y divide-ink-100 dark:divide-dlugomat-800">
               {DOCS.map((d) => (
                 <tr key={d.id}>
                   <td className="px-5 py-3">
@@ -130,18 +130,18 @@ export default function PartnerUmowyPage() {
                         aria-hidden
                         className="size-4 text-dlugomat-600"
                       />
-                      <span className="font-semibold text-iron-900 dark:text-iron-50">
+                      <span className="font-semibold text-ink-900 dark:text-ink-50">
                         {d.name}
                       </span>
                     </span>
                   </td>
-                  <td className="px-5 py-3 font-mono text-fluid-xs text-iron-500">
+                  <td className="px-5 py-3 font-mono text-fluid-xs text-ink-500">
                     {d.version}
                   </td>
-                  <td className="px-5 py-3 text-fluid-xs text-iron-500">
+                  <td className="px-5 py-3 text-fluid-xs text-ink-500">
                     {d.signed_at ?? "—"}
                   </td>
-                  <td className="px-5 py-3 text-fluid-xs text-iron-500">
+                  <td className="px-5 py-3 text-fluid-xs text-ink-500">
                     {d.expires_at ?? "bezterminowo"}
                   </td>
                   <td className="px-5 py-3">

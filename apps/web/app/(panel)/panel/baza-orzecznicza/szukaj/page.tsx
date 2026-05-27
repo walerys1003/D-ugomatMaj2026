@@ -114,13 +114,13 @@ export default async function BazaOrzeczniczaSzukajPage({ searchParams }: PagePr
   return (
     <div className="space-y-8">
       <header className="space-y-2">
-        <p className="text-xs uppercase tracking-[0.18em] text-iron-500">
+        <p className="text-xs uppercase tracking-[0.18em] text-ink-500">
           Baza orzecznicza · zaawansowane wyszukiwanie
         </p>
         <h1 className="font-display text-fluid-h1 text-dlugomat-950">
           Znajdź orzeczenie
         </h1>
-        <p className="max-w-2xl text-iron-600">
+        <p className="max-w-2xl text-ink-600">
           Pełnotekstowe wyszukiwanie po tezach, sygnaturach i uzasadnieniach.
           Wyniki sortowane według trafności semantycznej.
         </p>
@@ -136,7 +136,7 @@ export default async function BazaOrzeczniczaSzukajPage({ searchParams }: PagePr
         <CardContent>
           <form method="get" className="grid gap-4 md:grid-cols-6">
             <label className="block md:col-span-3">
-              <span className="block text-xs uppercase tracking-wide text-iron-500">
+              <span className="block text-xs uppercase tracking-wide text-ink-500">
                 Zapytanie
               </span>
               <input
@@ -144,15 +144,15 @@ export default async function BazaOrzeczniczaSzukajPage({ searchParams }: PagePr
                 name="q"
                 defaultValue={sp.q ?? ""}
                 placeholder="np. kwota wolna od egzekucji"
-                className="mt-1 w-full rounded-md border border-iron-300 bg-white px-3 py-2 text-sm focus:border-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus"
+                className="mt-1 w-full rounded-md border border-ink-300 bg-white px-3 py-2 text-sm focus:border-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus"
               />
             </label>
             <label className="block md:col-span-3">
-              <span className="block text-xs uppercase tracking-wide text-iron-500">Sąd</span>
+              <span className="block text-xs uppercase tracking-wide text-ink-500">Sąd</span>
               <select
                 name="court"
                 defaultValue={sp.court ?? ""}
-                className="mt-1 w-full rounded-md border border-iron-300 bg-white px-3 py-2 text-sm focus:border-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus"
+                className="mt-1 w-full rounded-md border border-ink-300 bg-white px-3 py-2 text-sm focus:border-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus"
               >
                 <option value="">Wszystkie sądy</option>
                 {COURTS.map((c) => (
@@ -163,13 +163,13 @@ export default async function BazaOrzeczniczaSzukajPage({ searchParams }: PagePr
               </select>
             </label>
             <label className="block md:col-span-2">
-              <span className="block text-xs uppercase tracking-wide text-iron-500">
+              <span className="block text-xs uppercase tracking-wide text-ink-500">
                 Tematyka
               </span>
               <select
                 name="topic"
                 defaultValue={sp.topic ?? ""}
-                className="mt-1 w-full rounded-md border border-iron-300 bg-white px-3 py-2 text-sm focus:border-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus"
+                className="mt-1 w-full rounded-md border border-ink-300 bg-white px-3 py-2 text-sm focus:border-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus"
               >
                 <option value="">Wszystkie tematy</option>
                 {TOPICS.map((t) => (
@@ -180,7 +180,7 @@ export default async function BazaOrzeczniczaSzukajPage({ searchParams }: PagePr
               </select>
             </label>
             <label className="block md:col-span-2">
-              <span className="block text-xs uppercase tracking-wide text-iron-500">Rok od</span>
+              <span className="block text-xs uppercase tracking-wide text-ink-500">Rok od</span>
               <input
                 type="number"
                 name="year_from"
@@ -188,11 +188,11 @@ export default async function BazaOrzeczniczaSzukajPage({ searchParams }: PagePr
                 min={1990}
                 max={2026}
                 placeholder="2018"
-                className="mt-1 w-full rounded-md border border-iron-300 bg-white px-3 py-2 text-sm focus:border-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus"
+                className="mt-1 w-full rounded-md border border-ink-300 bg-white px-3 py-2 text-sm focus:border-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus"
               />
             </label>
             <label className="block md:col-span-2">
-              <span className="block text-xs uppercase tracking-wide text-iron-500">Rok do</span>
+              <span className="block text-xs uppercase tracking-wide text-ink-500">Rok do</span>
               <input
                 type="number"
                 name="year_to"
@@ -200,7 +200,7 @@ export default async function BazaOrzeczniczaSzukajPage({ searchParams }: PagePr
                 min={1990}
                 max={2026}
                 placeholder="2026"
-                className="mt-1 w-full rounded-md border border-iron-300 bg-white px-3 py-2 text-sm focus:border-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus"
+                className="mt-1 w-full rounded-md border border-ink-300 bg-white px-3 py-2 text-sm focus:border-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus"
               />
             </label>
             <div className="md:col-span-6 flex justify-end gap-2">
@@ -220,7 +220,7 @@ export default async function BazaOrzeczniczaSzukajPage({ searchParams }: PagePr
             Wyniki ({RULINGS.length})
           </h2>
           <select
-            className="rounded-md border border-iron-300 bg-white px-3 py-1.5 text-sm focus:border-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus"
+            className="rounded-md border border-ink-300 bg-white px-3 py-1.5 text-sm focus:border-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus"
             defaultValue="relevance"
             aria-label="Sortowanie"
           >
@@ -236,7 +236,7 @@ export default async function BazaOrzeczniczaSzukajPage({ searchParams }: PagePr
             <li key={r.id}>
               <Link
                 href={`/panel/baza-orzecznicza/${r.id}`}
-                className="group block rounded-lg border border-iron-200 bg-white p-5 shadow-card transition hover:shadow-pop focus-visible:outline-none focus-visible:shadow-shield-focus"
+                className="group block rounded-lg border border-ink-200 bg-white p-5 shadow-card transition hover:shadow-pop focus-visible:outline-none focus-visible:shadow-shield-focus"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
@@ -250,10 +250,10 @@ export default async function BazaOrzeczniczaSzukajPage({ searchParams }: PagePr
                         {r.relevance}% trafność
                       </Badge>
                     </div>
-                    <p className="mt-2 text-sm text-iron-700 leading-relaxed line-clamp-3">
+                    <p className="mt-2 text-sm text-ink-700 leading-relaxed line-clamp-3">
                       {r.thesis}
                     </p>
-                    <p className="mt-2 text-xs text-iron-500">
+                    <p className="mt-2 text-xs text-ink-500">
                       Data wydania:{" "}
                       {new Intl.DateTimeFormat("pl-PL", { dateStyle: "long" }).format(
                         new Date(r.date),
@@ -261,7 +261,7 @@ export default async function BazaOrzeczniczaSzukajPage({ searchParams }: PagePr
                     </p>
                   </div>
                   <ArrowRight
-                    className="h-5 w-5 flex-shrink-0 text-iron-400 group-hover:text-dlugomat-700"
+                    className="h-5 w-5 flex-shrink-0 text-ink-400 group-hover:text-dlugomat-700"
                     aria-hidden
                   />
                 </div>

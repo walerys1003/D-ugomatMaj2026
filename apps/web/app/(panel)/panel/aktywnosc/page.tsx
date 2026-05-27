@@ -156,13 +156,13 @@ export default function AktywnoscPage() {
   return (
     <div className="space-y-8">
       <header className="space-y-2">
-        <p className="text-xs uppercase tracking-[0.18em] text-iron-500">
+        <p className="text-xs uppercase tracking-[0.18em] text-ink-500">
           Konto · aktywność
         </p>
         <h1 className="font-display text-fluid-h1 text-dlugomat-950">
           Historia aktywności
         </h1>
-        <p className="max-w-2xl text-iron-600">
+        <p className="max-w-2xl text-ink-600">
           Wszystkie zdarzenia w Twoim koncie z ostatnich 90 dni. Jeśli widzisz
           aktywność, której nie rozpoznajesz — natychmiast zmień hasło.
         </p>
@@ -201,13 +201,13 @@ export default function AktywnoscPage() {
           <CardDescription>Sortowanie: czas malejąco</CardDescription>
         </CardHeader>
         <CardContent>
-          <ol className="relative border-l border-iron-200 pl-6 space-y-5">
+          <ol className="relative border-l border-ink-200 pl-6 space-y-5">
             {EVENTS.map((ev) => {
               const Icon = TYPE_ICON[ev.type];
               return (
                 <li key={ev.id} className="relative">
                   <span
-                    className="absolute -left-[31px] mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full border border-iron-200 bg-white"
+                    className="absolute -left-[31px] mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full border border-ink-200 bg-white"
                     aria-hidden
                   >
                     <Icon className="h-3.5 w-3.5 text-dlugomat-700" />
@@ -221,7 +221,7 @@ export default function AktywnoscPage() {
                         </Badge>
                       </div>
                       <p className="mt-1 text-sm text-dlugomat-900">{ev.description}</p>
-                      <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-iron-500">
+                      <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-ink-500">
                         <span>{fmtDate(ev.ts)}</span>
                         {ev.ip ? (
                           <>

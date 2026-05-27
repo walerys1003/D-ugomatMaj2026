@@ -40,7 +40,7 @@ export function StepKomornikZajecie({
       className="space-y-5"
       noValidate
     >
-      <p className="text-fluid-sm text-iron-700">
+      <p className="text-fluid-sm text-ink-700">
         Co konkretnie zajął komornik? Od tego zależy podstawa prawna i argumenty
         w piśmie. Jeśli nie jesteś pewien — wybierz „Inne / nie jestem
         pewien(-a)".
@@ -51,7 +51,7 @@ export function StepKomornikZajecie({
         name="zajecie_typ"
         render={({ field }) => (
           <fieldset>
-            <legend className="text-fluid-sm font-medium text-iron-800">
+            <legend className="text-fluid-sm font-medium text-ink-800">
               Typ zajęcia
             </legend>
             <div role="radiogroup" className="mt-3 grid gap-2 sm:grid-cols-2">
@@ -69,7 +69,7 @@ export function StepKomornikZajecie({
                       "focus:outline-none focus-visible:ring-2 focus-visible:ring-shield-500 focus-visible:ring-offset-2",
                       active
                         ? "border-shield-500 bg-shield-50/70"
-                        : "border-iron-200 bg-white hover:border-shield-300",
+                        : "border-ink-200 bg-white hover:border-shield-300",
                     )}
                   >
                     {t.label}

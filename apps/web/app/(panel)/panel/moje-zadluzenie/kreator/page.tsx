@@ -30,7 +30,7 @@ interface PageProps {
 }
 
 const inputCls =
-  "w-full rounded-md border border-iron-300 bg-white px-3 py-2 text-sm text-dlugomat-900 focus:border-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus";
+  "w-full rounded-md border border-ink-300 bg-white px-3 py-2 text-sm text-dlugomat-900 focus:border-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus";
 
 export default async function ZadluzenieKreatorPage({ searchParams }: PageProps) {
   const sp = (await searchParams) ?? {};
@@ -41,7 +41,7 @@ export default async function ZadluzenieKreatorPage({ searchParams }: PageProps)
       <div>
         <Link
           href="/panel/moje-zadluzenie"
-          className="inline-flex items-center gap-2 text-sm text-iron-600 hover:text-dlugomat-900 focus-visible:outline-none focus-visible:shadow-shield-focus rounded"
+          className="inline-flex items-center gap-2 text-sm text-ink-600 hover:text-dlugomat-900 focus-visible:outline-none focus-visible:shadow-shield-focus rounded"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden />
           Wróć do listy zadłużeń
@@ -49,13 +49,13 @@ export default async function ZadluzenieKreatorPage({ searchParams }: PageProps)
       </div>
 
       <header className="space-y-2">
-        <p className="text-xs uppercase tracking-[0.18em] text-iron-500">
+        <p className="text-xs uppercase tracking-[0.18em] text-ink-500">
           Krok {current} z {STEPS.length}
         </p>
         <h1 className="font-display text-fluid-h1 text-dlugomat-950">
           Dodaj zadłużenie
         </h1>
-        <p className="max-w-2xl text-iron-600">
+        <p className="max-w-2xl text-ink-600">
           Wypełnij formularz krok po kroku. Dane są szyfrowane i widoczne tylko
           dla Ciebie i przypisanego prawnika.
         </p>
@@ -74,7 +74,7 @@ export default async function ZadluzenieKreatorPage({ searchParams }: PageProps)
                     ? "border-dlugomat-700 bg-dlugomat-50"
                     : isDone
                     ? "border-accent-200 bg-accent-50/50"
-                    : "border-iron-200 bg-white"
+                    : "border-ink-200 bg-white"
                 }`}
               >
                 <div className="flex items-center gap-2">
@@ -84,7 +84,7 @@ export default async function ZadluzenieKreatorPage({ searchParams }: PageProps)
                         ? "bg-accent-600 text-white"
                         : isActive
                         ? "bg-dlugomat-900 text-white"
-                        : "bg-iron-200 text-iron-700"
+                        : "bg-ink-200 text-ink-700"
                     }`}
                     aria-hidden
                   >
@@ -94,7 +94,7 @@ export default async function ZadluzenieKreatorPage({ searchParams }: PageProps)
                     {step.title}
                   </span>
                 </div>
-                <p className="mt-1 text-xs text-iron-500">{step.description}</p>
+                <p className="mt-1 text-xs text-ink-500">{step.description}</p>
               </Link>
             </li>
           );
@@ -146,7 +146,7 @@ function Field({
     <label className="block">
       <span className="text-sm font-medium text-dlugomat-900">{label}</span>
       <div className="mt-1">{children}</div>
-      {hint ? <span className="mt-1 block text-xs text-iron-500">{hint}</span> : null}
+      {hint ? <span className="mt-1 block text-xs text-ink-500">{hint}</span> : null}
     </label>
   );
 }
@@ -167,12 +167,12 @@ function Step1() {
       {TYPES.map((t) => (
         <label
           key={t.id}
-          className="flex items-start gap-3 rounded-md border border-iron-200 p-4 cursor-pointer hover:bg-iron-50 has-[:checked]:border-dlugomat-700 has-[:checked]:bg-dlugomat-50"
+          className="flex items-start gap-3 rounded-md border border-ink-200 p-4 cursor-pointer hover:bg-ink-50 has-[:checked]:border-dlugomat-700 has-[:checked]:bg-dlugomat-50"
         >
           <input type="radio" name="debt_type" value={t.id} className="mt-1" />
           <div>
             <p className="font-medium text-dlugomat-900">{t.label}</p>
-            <p className="text-xs text-iron-500">{t.desc}</p>
+            <p className="text-xs text-ink-500">{t.desc}</p>
           </div>
         </label>
       ))}
@@ -244,7 +244,7 @@ function Step4() {
           <Info className="mt-1 h-4 w-4 text-dlugomat-700" aria-hidden />
           <div>
             <p className="text-sm font-semibold text-dlugomat-900">Bezpieczeństwo dokumentów</p>
-            <p className="text-sm text-iron-600">
+            <p className="text-sm text-ink-600">
               Wszystkie pliki są szyfrowane (AES-256) i przechowywane w EU.
               Dostęp ma tylko Ty i przypisany prawnik.
             </p>
@@ -252,9 +252,9 @@ function Step4() {
         </CardContent>
       </Card>
 
-      <div className="rounded-lg border-2 border-dashed border-iron-300 bg-iron-50/50 p-8 text-center">
+      <div className="rounded-lg border-2 border-dashed border-ink-300 bg-ink-50/50 p-8 text-center">
         <p className="font-semibold text-dlugomat-900">Przeciągnij pliki tutaj</p>
-        <p className="mt-1 text-sm text-iron-600">
+        <p className="mt-1 text-sm text-ink-600">
           lub kliknij, aby wybrać z dysku · PDF, JPG, PNG · max 25 MB
         </p>
         <input type="file" multiple className="sr-only" id="file-upload" />
@@ -268,7 +268,7 @@ function Step4() {
 
       <div>
         <h3 className="text-sm font-semibold text-dlugomat-900">Sugerowane dokumenty</h3>
-        <ul className="mt-2 space-y-1 text-sm text-iron-700">
+        <ul className="mt-2 space-y-1 text-sm text-ink-700">
           <li>· Umowa kredytowa lub umowa o świadczenie usług</li>
           <li>· Wezwania do zapłaty</li>
           <li>· Pisma od windykatora/komornika</li>
@@ -290,7 +290,7 @@ function Step5() {
             <p className="text-sm font-semibold text-dlugomat-900">
               Wszystkie wymagane pola wypełnione
             </p>
-            <p className="text-sm text-iron-700">
+            <p className="text-sm text-ink-700">
               Możesz dodać zadłużenie. Po zapisaniu zostanie ono dodane do listy
               w „Moje zadłużenie".
             </p>
@@ -320,8 +320,8 @@ function Step5() {
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-md border border-iron-200 bg-white px-3 py-2">
-      <dt className="text-xs uppercase tracking-wide text-iron-500">{label}</dt>
+    <div className="rounded-md border border-ink-200 bg-white px-3 py-2">
+      <dt className="text-xs uppercase tracking-wide text-ink-500">{label}</dt>
       <dd className="mt-0.5 text-dlugomat-900">{value}</dd>
     </div>
   );

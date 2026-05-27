@@ -113,19 +113,19 @@ export default function WiadomosciPage() {
 
   return (
     <div className="space-y-6">
-      <Link href="/panel" className="inline-flex items-center gap-2 text-sm text-iron-600 hover:text-dlugomat-900">
+      <Link href="/panel" className="inline-flex items-center gap-2 text-sm text-ink-600 hover:text-dlugomat-900">
         <ArrowLeft className="h-4 w-4" aria-hidden />
         Powrot do panelu
       </Link>
 
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.18em] text-iron-500">Wiadomosci</p>
+          <p className="text-xs uppercase tracking-[0.18em] text-ink-500">Wiadomosci</p>
           <h1 className="font-display text-fluid-h1 text-dlugomat-950 flex items-center gap-3">
             <MessageSquare className="h-7 w-7 text-dlugomat-700" aria-hidden />
             Skrzynka odbiorcza
           </h1>
-          <p className="mt-1 text-sm text-iron-600">
+          <p className="mt-1 text-sm text-ink-600">
             {THREADS.length} watkow, {totalUnread} nieprzeczytanych.
           </p>
         </div>
@@ -136,22 +136,22 @@ export default function WiadomosciPage() {
           <CardHeader>
             <label className="relative">
               <span className="sr-only">Szukaj watku</span>
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-iron-400" aria-hidden />
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400" aria-hidden />
               <input
                 type="search"
                 placeholder="Szukaj..."
-                className="h-9 w-full rounded-md border border-iron-200 pl-9 pr-3 text-sm focus-visible:outline-none focus-visible:shadow-shield-focus"
+                className="h-9 w-full rounded-md border border-ink-200 pl-9 pr-3 text-sm focus-visible:outline-none focus-visible:shadow-shield-focus"
               />
             </label>
           </CardHeader>
           <CardContent className="p-0">
-            <ul className="divide-y divide-iron-100">
+            <ul className="divide-y divide-ink-100">
               {THREADS.map((th, idx) => (
                 <li key={th.id}>
                   <button
                     type="button"
-                    className={`w-full px-5 py-3 text-left transition-colors hover:bg-iron-50 focus-visible:outline-none focus-visible:shadow-shield-focus ${
-                      idx === 0 ? "bg-iron-50" : ""
+                    className={`w-full px-5 py-3 text-left transition-colors hover:bg-ink-50 focus-visible:outline-none focus-visible:shadow-shield-focus ${
+                      idx === 0 ? "bg-ink-50" : ""
                     }`}
                   >
                     <div className="flex items-center justify-between gap-2">
@@ -160,10 +160,10 @@ export default function WiadomosciPage() {
                     </div>
                     <div className="mt-1 flex items-center gap-2">
                       <Badge tone={ROLE_TONE[th.role]}>{th.role}</Badge>
-                      {th.case_id && <span className="font-mono text-[10px] text-iron-500">{th.case_id}</span>}
+                      {th.case_id && <span className="font-mono text-[10px] text-ink-500">{th.case_id}</span>}
                     </div>
-                    <p className="mt-1 line-clamp-1 text-xs text-iron-600">{th.preview}</p>
-                    <p className="mt-1 text-[10px] text-iron-400">{th.last_at}</p>
+                    <p className="mt-1 line-clamp-1 text-xs text-ink-600">{th.preview}</p>
+                    <p className="mt-1 text-[10px] text-ink-400">{th.last_at}</p>
                   </button>
                 </li>
               ))}
@@ -191,7 +191,7 @@ export default function WiadomosciPage() {
                 className={`max-w-[80%] rounded-lg border p-3 ${
                   m.from === "me"
                     ? "ml-auto border-dlugomat-200 bg-dlugomat-50/50"
-                    : "border-iron-200 bg-white"
+                    : "border-ink-200 bg-white"
                 }`}
               >
                 <p className="text-xs font-medium text-dlugomat-900">{m.author}</p>
@@ -206,16 +206,16 @@ export default function WiadomosciPage() {
                     ))}
                   </ul>
                 )}
-                <p className="mt-2 text-[10px] text-iron-500">{m.at}</p>
+                <p className="mt-2 text-[10px] text-ink-500">{m.at}</p>
               </div>
             ))}
           </CardContent>
-          <div className="border-t border-iron-100 p-4">
+          <div className="border-t border-ink-100 p-4">
             <div className="flex items-end gap-2">
               <textarea
                 rows={2}
                 placeholder="Napisz odpowiedz..."
-                className="flex-1 resize-none rounded-md border border-iron-200 p-2 text-sm focus-visible:outline-none focus-visible:shadow-shield-focus"
+                className="flex-1 resize-none rounded-md border border-ink-200 p-2 text-sm focus-visible:outline-none focus-visible:shadow-shield-focus"
               />
               <Button variant="secondary" size="sm" aria-label="Dodaj zalacznik">
                 <Paperclip className="h-4 w-4" aria-hidden />

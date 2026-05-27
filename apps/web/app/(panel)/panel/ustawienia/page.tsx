@@ -109,13 +109,13 @@ export default async function SettingsHomePage() {
         <p className="text-fluid-sm font-semibold uppercase tracking-wider text-dlugomat-600">
           Ustawienia
         </p>
-        <h1 className="text-fluid-3xl font-bold tracking-tight text-iron-900 dark:text-white">
+        <h1 className="text-fluid-3xl font-bold tracking-tight text-ink-900 dark:text-white">
           Twoje konto
         </h1>
-        <p className="text-fluid-base text-iron-600 dark:text-iron-300">
+        <p className="text-fluid-base text-ink-600 dark:text-ink-300">
           Zarządzaj profilem, bezpieczeństwem i integracjami.
         </p>
-        <p className="mt-1 text-fluid-sm text-iron-500">
+        <p className="mt-1 text-fluid-sm text-ink-500">
           Zalogowany jako <span className="font-medium">{user.email}</span>
         </p>
       </header>
@@ -137,7 +137,7 @@ export default async function SettingsHomePage() {
             <Link
               key={tile.href}
               href={tile.href}
-              className="group rounded-2xl border border-iron-200 bg-white p-5 transition-colors hover:border-dlugomat-300 hover:shadow-sm dark:border-dlugomat-800 dark:bg-dlugomat-900 dark:hover:border-dlugomat-600"
+              className="group rounded-2xl border border-ink-200 bg-white p-5 transition-colors hover:border-dlugomat-300 hover:shadow-sm dark:border-dlugomat-800 dark:bg-dlugomat-900 dark:hover:border-dlugomat-600"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="rounded-lg bg-dlugomat-50 p-2 text-dlugomat-700 dark:bg-dlugomat-800 dark:text-dlugomat-300">
@@ -149,8 +149,8 @@ export default async function SettingsHomePage() {
                   </Badge>
                 )}
               </div>
-              <h2 className="mt-3 text-fluid-lg font-semibold text-iron-900 dark:text-white">{tile.title}</h2>
-              <p className="mt-1 text-fluid-sm text-iron-600 dark:text-iron-300">{tile.description}</p>
+              <h2 className="mt-3 text-fluid-lg font-semibold text-ink-900 dark:text-white">{tile.title}</h2>
+              <p className="mt-1 text-fluid-sm text-ink-600 dark:text-ink-300">{tile.description}</p>
             </Link>
           );
         })}
