@@ -98,7 +98,9 @@ export async function verifyIncomingWebhook(
 
   // 3) Nonce replay check — atomicznie INSERT z UNIQUE constraint
   try {
-    const sb = await createServerSupabase();
+    // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
     const { error } = await sb.from("webhook_nonces").insert({
       nonce: headers.nonce,
       timestamp_unix: ts,
@@ -124,7 +126,9 @@ export async function verifyIncomingWebhook(
  * Wywoływany co 10 minut przez Vercel Cron.
  */
 export async function cleanupExpiredNonces(): Promise<{ deleted: number }> {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   const cutoff = new Date(Date.now() - NONCE_TTL_SECONDS * 1000).toISOString();
   const { count, error } = await sb
     .from("webhook_nonces")

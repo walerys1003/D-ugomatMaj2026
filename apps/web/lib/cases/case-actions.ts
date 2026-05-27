@@ -112,7 +112,10 @@ export async function startCaseAction(formData: FormData): Promise<void> {
 
   // Tier 5.3 — tag-based invalidation poza zwykłym revalidatePath.
   const supabase = createSupabaseServerClient();
-  const { data: userData } = await supabase.auth.getUser();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data: userData } = await sb.auth.getUser();
   if (userData?.user?.id) {
     revalidateCase(created.id, userData.user.id);
     if (meta.deadline) revalidateDeadlines(userData.user.id);
@@ -163,7 +166,10 @@ export async function advanceCaseStatusAction(
     to: parsed.data.status,
   });
   const supabase = createSupabaseServerClient();
-  const { data: userData } = await supabase.auth.getUser();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data: userData } = await sb.auth.getUser();
   if (userData?.user?.id) {
     revalidateCase(parsed.data.caseId, userData.user.id);
   } else {
@@ -181,7 +187,10 @@ export async function deleteDraftCaseAction(
 
   await softDeleteCase(caseId);
   const supabase = createSupabaseServerClient();
-  const { data: userData } = await supabase.auth.getUser();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data: userData } = await sb.auth.getUser();
   if (userData?.user?.id) {
     revalidateCase(caseId, userData.user.id);
   } else {
@@ -202,7 +211,10 @@ export async function patchCaseMetadataAction(
     keys: Object.keys(metadata),
   });
   const supabase = createSupabaseServerClient();
-  const { data: userData } = await supabase.auth.getUser();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data: userData } = await sb.auth.getUser();
   if (userData?.user?.id) {
     revalidateCase(caseId, userData.user.id);
   } else {

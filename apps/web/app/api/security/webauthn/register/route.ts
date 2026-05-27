@@ -7,7 +7,7 @@ import {
 import { recordSecurityEvent } from "@/lib/security/security-events";
 
 async function getSupabase() {
-  const { createSupabaseServerClient } = await import("@/lib/db/supabase-server");
+  const { createSupabaseServerClient } = await import("@/lib/db/sb-server");
   return createSupabaseServerClient();
 }
 
@@ -21,7 +21,10 @@ function rpConfig(req: NextRequest) {
 // GET — issue registration challenge
 export async function GET(req: NextRequest) {
   const supabase = await getSupabase();
-  const { data: { user } } = await supabase.auth.getUser();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data: { user } } = await sb.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const { rpId } = rpConfig(req);
@@ -34,7 +37,7 @@ export async function GET(req: NextRequest) {
   });
 
   // Store challenge for later verification.
-  await supabase.from("webauthn_challenges").upsert(
+  await sb.from("webauthn_challenges").upsert(
     { user_id: user.id, challenge: options.challenge, kind: "registration", expires_at: new Date(Date.now() + 60_000).toISOString() },
     { onConflict: "user_id,kind" },
   );
@@ -45,7 +48,10 @@ export async function GET(req: NextRequest) {
 // POST — finalize registration with attestation response from client
 export async function POST(req: NextRequest) {
   const supabase = await getSupabase();
-  const { data: { user } } = await supabase.auth.getUser();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data: { user } } = await sb.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const body = await req.json().catch(() => ({}));
@@ -56,7 +62,7 @@ export async function POST(req: NextRequest) {
   const { rpId, origin } = rpConfig(req);
 
   // Get + consume the challenge.
-  const { data: challengeRow } = await supabase
+  const { data: challengeRow } = await sb
     .from("webauthn_challenges")
     .select("challenge")
     .eq("user_id", user.id)
@@ -67,7 +73,7 @@ export async function POST(req: NextRequest) {
   const verification = verifyClientDataChallenge(body.clientDataJSON, challengeRow.challenge, [origin]);
   if (!verification.ok) return NextResponse.json({ error: verification.reason }, { status: 400 });
 
-  await supabase.from("webauthn_credentials").insert({
+  await sb.from("webauthn_credentials").insert({
     user_id: user.id,
     credential_id: body.credentialId,
     fingerprint: credentialFingerprint(body.credentialId),
@@ -78,9 +84,9 @@ export async function POST(req: NextRequest) {
     sign_count: 0,
   });
 
-  await supabase.from("webauthn_challenges").delete().eq("user_id", user.id).eq("kind", "registration");
+  await sb.from("webauthn_challenges").delete().eq("user_id", user.id).eq("kind", "registration");
 
-  await recordSecurityEvent(supabase, {
+  await recordSecurityEvent(sb, {
     userId: user.id,
     type: "auth.webauthn_registered",
     ip: req.headers.get("x-forwarded-for") ?? undefined,

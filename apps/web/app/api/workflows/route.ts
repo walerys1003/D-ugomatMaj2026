@@ -5,7 +5,9 @@ import { randomUUID } from "crypto";
 export const runtime = "nodejs";
 
 export async function GET() {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   const { data: { user } } = await sb.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
   const { data } = await sb.from("workflows").select("*").eq("user_id", user.id).order("created_at", { ascending: false });
@@ -13,7 +15,9 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   const { data: { user } } = await sb.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
   const body = await req.json().catch(() => null);

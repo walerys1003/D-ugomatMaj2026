@@ -79,13 +79,16 @@ export async function appendAuditEntry(args: {
   payload?: Record<string, unknown>;
 }): Promise<AuditChainEntry> {
   const supabase = await createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
 
   // Try RPC variant which holds advisory lock; if not available, fall back
   // to optimistic concurrency: read last → insert with computed hash, retry on conflict.
   const payload = args.payload ?? {};
 
   for (let attempt = 0; attempt < 5; attempt++) {
-    const { data: lastRow } = await supabase
+    const { data: lastRow } = await sb
       .from("audit_chain")
       .select("seq, curr_hash")
       .order("seq", { ascending: false })
@@ -104,7 +107,7 @@ export async function appendAuditEntry(args: {
     const hmac = computeHmac(prevHash, canonical, createdAt);
     const currHash = computeCurrHash(prevHash, canonical, hmac);
 
-    const { data, error } = await supabase
+    const { data, error } = await sb
       .from("audit_chain")
       .insert({
         seq: prevSeq + 1,
@@ -137,7 +140,10 @@ export async function verifyAuditChain(args?: {
   toSeq?: number;
 }): Promise<{ valid: boolean; brokenAt: AuditChainEntry | null; checked: number }> {
   const supabase = await createSupabaseServerClient();
-  let q = supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  let q = sb
     .from("audit_chain")
     .select("*")
     .order("seq", { ascending: true });
@@ -172,13 +178,19 @@ export async function verifyAuditChain(args?: {
 
 async function getEntryBySeq(seq: number): Promise<AuditChainEntry | null> {
   const supabase = await createSupabaseServerClient();
-  const { data } = await supabase.from("audit_chain").select("*").eq("seq", seq).maybeSingle();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data } = await sb.from("audit_chain").select("*").eq("seq", seq).maybeSingle();
   return (data ?? null) as AuditChainEntry | null;
 }
 
 export async function getLatestAuditEntries(limit = 100): Promise<AuditChainEntry[]> {
   const supabase = await createSupabaseServerClient();
-  const { data } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data } = await sb
     .from("audit_chain")
     .select("*")
     .order("seq", { ascending: false })

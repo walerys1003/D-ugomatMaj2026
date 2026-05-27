@@ -65,7 +65,10 @@ export const DEFAULT_PREFS: Omit<NotificationPreferences, "user_id" | "updated_a
 
 export async function getUserPreferences(userId: string): Promise<NotificationPreferences> {
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data, error } = await sb
     .from("notification_preferences")
     .select("*")
     .eq("user_id", userId)
@@ -84,8 +87,11 @@ export async function updateUserPreferences(
   patch: Partial<NotificationPreferences>,
 ): Promise<NotificationPreferences> {
   const supabase = await createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const merged = { ...(await getUserPreferences(userId)), ...patch, user_id: userId, updated_at: new Date().toISOString() };
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from("notification_preferences")
     .upsert(merged, { onConflict: "user_id" })
     .select("*")

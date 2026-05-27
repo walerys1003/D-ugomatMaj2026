@@ -155,8 +155,11 @@ async function execAction(
     }
     case "create_deadline": {
       const supabase = await createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
       const cfg = action.config as { ruleId?: string; due_at?: string; case_id?: string; note?: string };
-      const { error } = await supabase.from("deadlines").insert({
+      const { error } = await sb.from("deadlines").insert({
         user_id: userId,
         case_id: cfg.case_id ?? null,
         rule_id: cfg.ruleId ?? "custom",
@@ -168,9 +171,12 @@ async function execAction(
     }
     case "tag_case": {
       const supabase = await createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
       const cfg = action.config as { case_id?: string; tags?: string[] };
       if (!cfg.case_id) return { success: false, detail: "missing case_id" };
-      const { error } = await supabase
+      const { error } = await sb
         .from("cases")
         .update({ tags: cfg.tags ?? [] })
         .eq("id", cfg.case_id)
@@ -236,7 +242,10 @@ export async function createWorkflow(args: {
   enabled?: boolean;
 }): Promise<WorkflowDefinition> {
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data, error } = await sb
     .from("automation_workflows")
     .insert({
       user_id: args.userId,
@@ -255,7 +264,10 @@ export async function createWorkflow(args: {
 
 export async function listWorkflows(userId: string): Promise<WorkflowDefinition[]> {
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data, error } = await sb
     .from("automation_workflows")
     .select("*")
     .eq("user_id", userId)
@@ -266,7 +278,10 @@ export async function listWorkflows(userId: string): Promise<WorkflowDefinition[
 
 export async function getWorkflow(id: string, userId: string): Promise<WorkflowDefinition | null> {
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data, error } = await sb
     .from("automation_workflows")
     .select("*")
     .eq("id", id)
@@ -278,7 +293,10 @@ export async function getWorkflow(id: string, userId: string): Promise<WorkflowD
 
 export async function setWorkflowEnabled(id: string, userId: string, enabled: boolean): Promise<void> {
   const supabase = await createSupabaseServerClient();
-  await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  await sb
     .from("automation_workflows")
     .update({ enabled })
     .eq("id", id)
@@ -287,7 +305,10 @@ export async function setWorkflowEnabled(id: string, userId: string, enabled: bo
 
 export async function deleteWorkflow(id: string, userId: string): Promise<void> {
   const supabase = await createSupabaseServerClient();
-  await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  await sb
     .from("automation_workflows")
     .delete()
     .eq("id", id)
@@ -303,7 +324,10 @@ export async function executeWorkflow(args: {
   triggerPayload: Record<string, unknown>;
 }): Promise<WorkflowRun> {
   const supabase = await createSupabaseServerClient();
-  const { data: wf, error: wfErr } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data: wf, error: wfErr } = await sb
     .from("automation_workflows")
     .select("*")
     .eq("id", args.workflowId)
@@ -338,7 +362,7 @@ export async function executeWorkflow(args: {
     duration_ms: Date.now() - condStart,
   });
   if (!condsOk) {
-    await supabase.from("automation_runs").insert({
+    await sb.from("automation_runs").insert({
       id: runId,
       workflow_id: workflow.id,
       user_id: workflow.user_id,
@@ -381,7 +405,7 @@ export async function executeWorkflow(args: {
   const status: WorkflowRun["status"] = failed ? "failed" : "completed";
 
   // Persist run
-  await supabase.from("automation_runs").insert({
+  await sb.from("automation_runs").insert({
     id: runId,
     workflow_id: workflow.id,
     user_id: workflow.user_id,
@@ -393,7 +417,7 @@ export async function executeWorkflow(args: {
   }).then(() => null).catch(() => null);
 
   // Update workflow stats
-  await supabase
+  await sb
     .from("automation_workflows")
     .update({
       last_run_at: finishedAt,

@@ -46,7 +46,9 @@ export async function refreshAccessToken(creds: MsCalCredentials): Promise<MsCal
     refresh_token: j.refresh_token ?? creds.refresh_token,
     expires_at: new Date(Date.now() + (j.expires_in ?? 3600) * 1000).toISOString(),
   };
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   await sb
     .from("oauth_credentials")
     .update({
@@ -201,7 +203,9 @@ export async function sendMail(
 }
 
 export async function getCredentialsForUser(userId: string): Promise<MsCalCredentials | null> {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   const { data } = await sb
     .from("oauth_credentials")
     .select("*")

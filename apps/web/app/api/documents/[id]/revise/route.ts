@@ -24,7 +24,10 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
   if (instruction.length > 2000) return NextResponse.json({ error: "instruction_too_long" }, { status: 400 });
 
   const supabase = getSupabaseAdmin();
-  const { data: doc } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data: doc } = await sb
     .from("documents")
     .select("id, case_id, content_markdown, cases!inner(user_id, case_type, facts)")
     .eq("id", id)

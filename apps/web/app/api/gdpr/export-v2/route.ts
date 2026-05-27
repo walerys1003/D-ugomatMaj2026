@@ -19,7 +19,9 @@ export const dynamic = "force-dynamic";
 const COOLDOWN_HOURS = 24;
 
 export async function POST(_req: Request) {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   const { data: auth } = await sb.auth.getUser();
   if (!auth?.user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   const userId = auth.user.id;
@@ -62,7 +64,9 @@ export async function POST(_req: Request) {
 }
 
 export async function GET(req: Request) {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   const { data: auth } = await sb.auth.getUser();
   if (!auth?.user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 

@@ -91,11 +91,17 @@ export async function buildCaseTimeline(opts: BuildTimelineOptions): Promise<Tim
   } = opts;
 
   const supabase = getSupabaseAdmin();
+  // W10-3: loose-cast wrapper — generated Database type is stale for
+  // columns added after migration tier 25 (case_type, title on
+  // evidence_uploads, etc.). Cast through a permissive `any`-shape so
+  // chained queries type-check.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const events: TimelineEvent[] = [];
 
   // 1. case row → case_created
   try {
-    const { data: caseRow } = await supabase
+    const { data: caseRow } = await sb
       .from("cases")
       .select("id, user_id, case_type, created_at, updated_at, status, title")
       .eq("id", case_id)
@@ -133,7 +139,7 @@ export async function buildCaseTimeline(opts: BuildTimelineOptions): Promise<Tim
 
   // 2. documents → received / generated / sent
   try {
-    const { data: docs } = await supabase
+    const { data: docs } = await sb
       .from("documents")
       .select("id, case_id, kind, source, created_at, sent_at, title")
       .eq("case_id", case_id)
@@ -175,7 +181,7 @@ export async function buildCaseTimeline(opts: BuildTimelineOptions): Promise<Tim
   // 3. deadlines
   if (include_deadlines) {
     try {
-      const { data: deadlines } = await supabase
+      const { data: deadlines } = await sb
         .from("deadlines")
         .select("id, case_id, kind, due_at, completed_at, missed, created_at, title")
         .eq("case_id", case_id);
@@ -225,7 +231,7 @@ export async function buildCaseTimeline(opts: BuildTimelineOptions): Promise<Tim
   // 4. notifications
   if (include_notifications) {
     try {
-      const { data: notifs } = await supabase
+      const { data: notifs } = await sb
         .from("notifications")
         .select("id, case_id, channel, kind, sent_at, status, title")
         .eq("case_id", case_id);
@@ -250,7 +256,7 @@ export async function buildCaseTimeline(opts: BuildTimelineOptions): Promise<Tim
   // 5. ai_runs (optional)
   if (include_ai_runs) {
     try {
-      const { data: runs } = await supabase
+      const { data: runs } = await sb
         .from("ai_runs")
         .select("id, case_id, kind, created_at, status, total_cost_pln")
         .eq("case_id", case_id)
@@ -277,7 +283,7 @@ export async function buildCaseTimeline(opts: BuildTimelineOptions): Promise<Tim
 
   // 6. case_events (free-form, may include hearing/ruling/appeal)
   try {
-    const { data: caseEvents } = await supabase
+    const { data: caseEvents } = await sb
       .from("case_events")
       .select("id, case_id, kind, occurred_at, title, description, metadata")
       .eq("case_id", case_id)

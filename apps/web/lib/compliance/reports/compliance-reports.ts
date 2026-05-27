@@ -136,11 +136,14 @@ export async function generateDpia(args: {
   periodEnd?: string;
 }): Promise<DpiaReport> {
   const supabase = await createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const periodStart = args.periodStart ?? new Date(Date.now() - 90 * 86400000).toISOString();
   const periodEnd = args.periodEnd ?? new Date().toISOString();
 
   // Consent summary
-  const { data: consents } = await supabase
+  const { data: consents } = await sb
     .from("consent_ledger")
     .select("purpose, revoked_at")
     .gte("granted_at", periodStart)
@@ -154,7 +157,7 @@ export async function generateDpia(args: {
   }
 
   // Erasure summary
-  const { data: erasures } = await supabase
+  const { data: erasures } = await sb
     .from("erasure_requests")
     .select("status, deadline_at, completed_at");
   const erasureSummary = { pending: 0, completed: 0, overdue: 0 };
@@ -229,20 +232,23 @@ export async function generateSoc2Evidence(args: {
   periodEnd?: string;
 }): Promise<Record<string, unknown>> {
   const supabase = await createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const periodStart = args.periodStart ?? new Date(Date.now() - 90 * 86400000).toISOString();
   const periodEnd = args.periodEnd ?? new Date().toISOString();
 
   // Security: MFA enrolment rate
-  const { count: totalUsers } = await supabase
+  const { count: totalUsers } = await sb
     .from("auth.users" as never)
     .select("id", { count: "exact", head: true })
     .eq("aud", "authenticated");
-  const { count: mfaUsers } = await supabase
+  const { count: mfaUsers } = await sb
     .from("mfa_secrets")
     .select("user_id", { count: "exact", head: true });
 
   // Availability: uptime z SLO metrics (jeśli istnieje)
-  const { data: sloRows } = await supabase
+  const { data: sloRows } = await sb
     .from("slo_metrics")
     .select("name, value, recorded_at")
     .gte("recorded_at", periodStart)
@@ -298,7 +304,10 @@ export async function saveComplianceReport(args: {
   format?: ComplianceReport["format"];
 }): Promise<ComplianceReport> {
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data, error } = await sb
     .from("compliance_evidence")
     .insert({
       kind: args.kind,
@@ -321,7 +330,10 @@ export async function listComplianceReports(args: {
   limit?: number;
 }): Promise<ComplianceReport[]> {
   const supabase = await createSupabaseServerClient();
-  let q = supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  let q = sb
     .from("compliance_evidence")
     .select("*")
     .order("generated_at", { ascending: false })

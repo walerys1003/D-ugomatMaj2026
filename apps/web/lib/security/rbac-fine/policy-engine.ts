@@ -269,7 +269,10 @@ export function clearDecisionCache(): void {
 // ---------------------------------------------------------------------
 export async function loadPoliciesForResource(resourceType: string): Promise<PolicyRule[]> {
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data, error } = await sb
     .from("rbac_policies")
     .select("*")
     .eq("enabled", true)
@@ -281,7 +284,10 @@ export async function loadPoliciesForResource(resourceType: string): Promise<Pol
 
 export async function listAllPolicies(): Promise<PolicyRule[]> {
   const supabase = await createSupabaseServerClient();
-  const { data } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data } = await sb
     .from("rbac_policies")
     .select("*")
     .order("priority", { ascending: false });
@@ -290,11 +296,14 @@ export async function listAllPolicies(): Promise<PolicyRule[]> {
 
 export async function upsertPolicy(rule: Omit<PolicyRule, "id"> & { id?: string }): Promise<PolicyRule> {
   const supabase = await createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const payload = {
     ...rule,
     id: rule.id ?? undefined,
   };
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from("rbac_policies")
     .upsert(payload, { onConflict: "id" })
     .select("*")
@@ -306,7 +315,10 @@ export async function upsertPolicy(rule: Omit<PolicyRule, "id"> & { id?: string 
 
 export async function deletePolicy(id: string): Promise<void> {
   const supabase = await createSupabaseServerClient();
-  const { error } = await supabase.from("rbac_policies").delete().eq("id", id);
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { error } = await sb.from("rbac_policies").delete().eq("id", id);
   if (error) throw error;
   clearDecisionCache();
 }

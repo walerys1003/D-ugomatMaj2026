@@ -126,8 +126,11 @@ export async function validatePromoCode(
   }
 
   const supabase = createSupabaseAdminClient();
+  // W10-3: loose cast — typed Database missing recent promo_codes columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
 
-  const { data: promo, error } = await supabase
+  const { data: promo, error } = await sb
     .from("promo_codes")
     .select(
       "id,code,discount_pct,discount_grosze,max_uses,per_user_limit," +
@@ -212,7 +215,7 @@ export async function validatePromoCode(
   }
 
   // Per-user limit — count successful redemptions
-  const { count, error: countErr } = await supabase
+  const { count, error: countErr } = await sb
     .from("promo_redemptions")
     .select("id", { count: "exact", head: true })
     .eq("promo_code_id", promo.id)
@@ -271,9 +274,12 @@ export async function recordPromoRedemption(args: {
   finalAmountGrosze: number;
 }): Promise<boolean> {
   const supabase = createSupabaseAdminClient();
+  // W10-3: loose cast — typed Database missing recent promo_codes columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
 
   // Idempotentne INSERT — jeśli payment już ma redemption, on_conflict skip.
-  const { error: insertErr } = await supabase
+  const { error: insertErr } = await sb
     .from("promo_redemptions")
     .insert({
       promo_code_id: args.promoCodeId,
@@ -304,7 +310,7 @@ export async function recordPromoRedemption(args: {
   }
 
   // Atomic increment current_uses (RPC zapewnia że nie przekroczymy max_uses).
-  const { data: incremented, error: rpcErr } = await supabase.rpc(
+  const { data: incremented, error: rpcErr } = await sb.rpc(
     "fn_promo_increment_use" as never,
     { p_code: args.code } as never,
   );

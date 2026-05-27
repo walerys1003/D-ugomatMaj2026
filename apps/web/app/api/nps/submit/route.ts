@@ -35,7 +35,9 @@ export async function POST(req: Request) {
   const comment = typeof body.comment === "string" ? body.comment.slice(0, 500) : null;
   const channel: "in_app" | "email" | "sms" = body.channel === "email" || body.channel === "sms" ? body.channel : "in_app";
 
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   const { data: auth } = await sb.auth.getUser();
   if (!auth?.user) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });

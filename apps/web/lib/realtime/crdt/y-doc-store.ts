@@ -51,7 +51,10 @@ export async function appendUpdate(input: AppendUpdateInput): Promise<CrdtUpdate
     throw new Error(`crdt_update_too_large:${sizeBytes}`);
   }
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data, error } = await sb
     .from("crdt_updates")
     .insert({
       doc_id: input.docId,
@@ -68,7 +71,7 @@ export async function appendUpdate(input: AppendUpdateInput): Promise<CrdtUpdate
 
   // Jeśli to snapshot kompaktujący — usuwamy zastąpione updates.
   if (input.isSnapshot && input.replacesIds && input.replacesIds.length > 0) {
-    await supabase
+    await sb
       .from("crdt_updates")
       .delete()
       .in("id", input.replacesIds)
@@ -87,7 +90,10 @@ export async function getUpdates(args: {
   limit?: number;
 }): Promise<CrdtUpdate[]> {
   const supabase = await createSupabaseServerClient();
-  let q = supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  let q = sb
     .from("crdt_updates")
     .select("*")
     .eq("doc_id", args.docId)
@@ -116,7 +122,10 @@ const COMPACT_THRESHOLD_BYTES = 256 * 1024;
 
 export async function getDocStats(docId: string): Promise<DocStats> {
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data, error } = await sb
     .from("crdt_updates")
     .select("id,size_bytes,is_snapshot,created_at")
     .eq("doc_id", docId);
@@ -162,8 +171,11 @@ export async function updateAwareness(args: {
   state: Record<string, unknown>;
 }): Promise<void> {
   const supabase = await createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const now = new Date();
-  await supabase
+  await sb
     .from("crdt_awareness")
     .upsert(
       {
@@ -180,8 +192,11 @@ export async function updateAwareness(args: {
 
 export async function listAwareness(docId: string): Promise<AwarenessState[]> {
   const supabase = await createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const now = new Date().toISOString();
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from("crdt_awareness")
     .select("*")
     .eq("doc_id", docId)
@@ -192,7 +207,10 @@ export async function listAwareness(docId: string): Promise<AwarenessState[]> {
 
 export async function sweepExpiredAwareness(): Promise<number> {
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data, error } = await sb
     .from("crdt_awareness")
     .delete()
     .lt("expires_at", new Date().toISOString())
@@ -207,7 +225,10 @@ export async function sweepExpiredAwareness(): Promise<number> {
  */
 export async function canEditDocument(docId: string, userId: string): Promise<boolean> {
   const supabase = await createSupabaseServerClient();
-  const { data } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data } = await sb
     .from("documents")
     .select("id")
     .eq("id", docId)

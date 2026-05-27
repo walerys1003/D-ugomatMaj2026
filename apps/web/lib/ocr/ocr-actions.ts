@@ -77,7 +77,10 @@ export async function submitOcrResultAction(
   const parsed = submitSchema.parse(input);
 
   const supabase = createSupabaseServerClient();
-  const { data: userResult, error: userErr } = await supabase.auth.getUser();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data: userResult, error: userErr } = await sb.auth.getUser();
   if (userErr || !userResult.user) {
     throw new Error("Sesja wygasła — zaloguj się ponownie.");
   }
@@ -106,7 +109,7 @@ export async function submitOcrResultAction(
   const parsedDoc = dispatchParser(parsed.rawText, intent);
 
   // Persist
-  const insertResult = await supabase
+  const insertResult = await sb
     .from("ocr_results")
     .insert({
       case_id: parsed.caseId ?? null,
@@ -200,7 +203,10 @@ export async function runServerOcrAction(
   }
 
   const supabase = createSupabaseServerClient();
-  const { data: userResult, error: userErr } = await supabase.auth.getUser();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data: userResult, error: userErr } = await sb.auth.getUser();
   if (userErr || !userResult.user) {
     throw new Error("Sesja wygasła — zaloguj się ponownie.");
   }
@@ -238,7 +244,7 @@ export async function runServerOcrAction(
   const parsedDoc = dispatchParser(raw.text, intent);
 
   // Persist
-  const insertResult = await supabase
+  const insertResult = await sb
     .from("ocr_results")
     .insert({
       case_id: parsed.caseId ?? null,
@@ -304,7 +310,10 @@ export async function createOcrUploadUrlAction(input: {
   const parsed = uploadUrlSchema.parse(input);
 
   const supabase = createSupabaseServerClient();
-  const { data: userResult, error: userErr } = await supabase.auth.getUser();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data: userResult, error: userErr } = await sb.auth.getUser();
   if (userErr || !userResult.user) {
     throw new Error("Sesja wygasła — zaloguj się ponownie.");
   }
@@ -313,7 +322,7 @@ export async function createOcrUploadUrlAction(input: {
   const safeName = parsed.fileName.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 100);
   const path = `${userResult.user.id}/${today}/${Date.now()}_${safeName}`;
 
-  const { data, error } = await supabase.storage
+  const { data, error } = await sb.storage
     .from("ocr-uploads")
     .createSignedUploadUrl(path);
 
@@ -356,14 +365,17 @@ export async function createCaseFromOcrAction(input: {
   const parsed = createCaseFromOcrSchema.parse(input);
 
   const supabase = createSupabaseServerClient();
-  const { data: userResult, error: userErr } = await supabase.auth.getUser();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data: userResult, error: userErr } = await sb.auth.getUser();
   if (userErr || !userResult.user) {
     throw new Error("Sesja wygasła — zaloguj się ponownie.");
   }
   const userId = userResult.user.id;
 
   // 1) Pobierz OCR result
-  const { data: ocr, error: ocrErr } = await supabase
+  const { data: ocr, error: ocrErr } = await sb
     .from("ocr_results")
     .select("*")
     .eq("id", parsed.ocrResultId)
@@ -389,7 +401,7 @@ export async function createCaseFromOcrAction(input: {
   const answers = mapParsedToWizardAnswers(parsedDoc, caseType);
 
   // 4) Wstaw case
-  const insertResult = await supabase
+  const insertResult = await sb
     .from("cases")
     .insert({
       user_id: userId,
@@ -428,7 +440,7 @@ export async function createCaseFromOcrAction(input: {
   const caseId = insertResult.data.id;
 
   // 5) Połącz ocr_result.case_id
-  await supabase
+  await sb
     .from("ocr_results")
     .update({ case_id: caseId })
     .eq("id", parsed.ocrResultId);

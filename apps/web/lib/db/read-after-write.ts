@@ -9,8 +9,8 @@ import "server-only";
  * (eventual consistency w sub-second window).
  *
  * Strategia:
- *   1. Session pinning — używaj tego samego supabase clienta dla write+read
- *      w obrębie request (już domyślne w supabase-server.ts).
+ *   1. Session pinning — używaj tego samego sb clienta dla write+read
+ *      w obrębie request (już domyślne w sb-server.ts).
  *   2. RYW guard — po krytycznym write, poczekaj na readback z tym samym
  *      ID lub powtórz z exponential backoff (max 3 próby, 50/100/200 ms).
  *   3. ETag/version column — kolumna `updated_at` lub `version` z monotonic
@@ -119,7 +119,7 @@ function sleep(ms: number): Promise<void> {
  * Helper: write + immediate readback z RYW guard.
  *
  * Przykład:
- *   const caseRow = await writeWithReadback(supabase, {
+ *   const caseRow = await writeWithReadback(sb, {
  *     table: "cases",
  *     insert: { user_id, title, type },
  *     select: "*",

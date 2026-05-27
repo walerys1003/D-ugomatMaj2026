@@ -33,12 +33,15 @@ export async function checkFrequencyCap(args: {
   }
 
   const supabase = await createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
 
   const hourAgo = new Date(now.getTime() - 60 * 60 * 1000);
   const dayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
   const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-  const baseQuery = supabase
+  const baseQuery = sb
     .from("notification_log")
     .select("sent_at", { count: "exact", head: true })
     .eq("user_id", args.userId)
@@ -78,7 +81,10 @@ export async function logNotification(args: {
   externalId?: string;
 }): Promise<void> {
   const supabase = await createSupabaseServerClient();
-  await supabase.from("notification_log").insert({
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  await sb.from("notification_log").insert({
     user_id: args.userId,
     channel: args.channel,
     category: args.category,

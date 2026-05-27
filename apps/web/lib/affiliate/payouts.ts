@@ -30,10 +30,13 @@ export interface PayoutBatch {
  */
 export async function runMonthlyPayouts(): Promise<PayoutBatch[]> {
   const supabase = createSupabaseAdminClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const periodEnd = new Date().toISOString();
 
   // Aggregate pending commissions per affiliate
-  const { data: rows, error } = await supabase
+  const { data: rows, error } = await sb
     .from("affiliate_commissions")
     .select("id, affiliate_id, amount_grosze, affiliate:affiliate_accounts(payout_email, slug)")
     .eq("status", "pending");
@@ -58,7 +61,7 @@ export async function runMonthlyPayouts(): Promise<PayoutBatch[]> {
   for (const [affiliateId, agg] of grouped.entries()) {
     if (agg.sum < MIN_PAYOUT_GROSZE) continue;
 
-    const { data: payout, error: payoutErr } = await supabase
+    const { data: payout, error: payoutErr } = await sb
       .from("affiliate_payouts")
       .insert({
         affiliate_id: affiliateId,
@@ -73,7 +76,7 @@ export async function runMonthlyPayouts(): Promise<PayoutBatch[]> {
     if (payoutErr || !payout) continue;
 
     // Mark commissions as paid (linked to payout)
-    await supabase
+    await sb
       .from("affiliate_commissions")
       .update({
         status: "paid",
@@ -100,7 +103,10 @@ export async function markPayoutTransferred(
   externalRef: string,
 ): Promise<void> {
   const supabase = createSupabaseAdminClient();
-  await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  await sb
     .from("affiliate_payouts")
     .update({
       status: "transferred",

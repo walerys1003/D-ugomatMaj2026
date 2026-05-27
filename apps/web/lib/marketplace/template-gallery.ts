@@ -22,9 +22,9 @@ export interface GalleryView {
   totalCount: number;
 }
 
-export async function getGalleryView(supabase: any): Promise<GalleryView> {
+export async function getGalleryView(sb: any): Promise<GalleryView> {
   // Only show approved templates in the public gallery.
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from("marketplace_listings")
     .select("*")
     .eq("type", "template")

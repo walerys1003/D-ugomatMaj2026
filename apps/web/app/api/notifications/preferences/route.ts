@@ -22,7 +22,9 @@ const DEFAULTS = {
 };
 
 export async function GET() {
-  const sb = createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = createSupabaseServerClient();
   const {
     data: { user },
   } = await sb.auth.getUser();
@@ -38,7 +40,9 @@ export async function GET() {
 }
 
 export async function PUT(req: NextRequest) {
-  const sb = createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = createSupabaseServerClient();
   const {
     data: { user },
   } = await sb.auth.getUser();

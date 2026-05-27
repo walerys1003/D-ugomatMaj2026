@@ -85,7 +85,10 @@ export async function startImpersonation(args: {
 
   // Verify admin role
   const supabase = await createSupabaseServerClient();
-  const { data: { user: actor } } = await supabase.auth.getUser();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data: { user: actor } } = await sb.auth.getUser();
   const actorRole = (actor?.app_metadata as Record<string, unknown> | undefined)?.role;
   if (actor?.id !== args.adminId || actorRole !== "admin") {
     throw new Error("forbidden_only_admin_can_impersonate");
@@ -98,7 +101,7 @@ export async function startImpersonation(args: {
   const now = new Date();
   const expiresAt = new Date(now.getTime() + ttl * 60_000);
 
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from("impersonation_sessions")
     .insert({
       admin_id: args.adminId,
@@ -116,7 +119,7 @@ export async function startImpersonation(args: {
   if (error) throw error;
 
   // Audit: dispatch + log
-  await supabase.from("admin_audit_log").insert({
+  await sb.from("admin_audit_log").insert({
     actor_id: args.adminId,
     action: "impersonation.start",
     target_type: "user",
@@ -142,7 +145,10 @@ export async function verifyImpersonationToken(token: string): Promise<Impersona
   const tokenHash = createHash("sha256").update(tokenSigned).digest("hex");
 
   const supabase = await createSupabaseServerClient();
-  const { data } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data } = await sb
     .from("impersonation_sessions")
     .select("*")
     .eq("token_hash", tokenHash)
@@ -159,7 +165,7 @@ export async function verifyImpersonationToken(token: string): Promise<Impersona
   }
 
   // Bump use_count
-  await supabase
+  await sb
     .from("impersonation_sessions")
     .update({ use_count: ((data as ImpersonationSession).use_count ?? 0) + 1 })
     .eq("id", (data as ImpersonationSession).id)
@@ -192,15 +198,18 @@ export async function revokeImpersonation(args: {
   revokedByUserId: string;
 }): Promise<void> {
   const supabase = await createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const now = new Date().toISOString();
-  const { error } = await supabase
+  const { error } = await sb
     .from("impersonation_sessions")
     .update({ revoked_at: now })
     .eq("id", args.sessionId)
     .is("revoked_at", null);
   if (error) throw error;
 
-  await supabase.from("admin_audit_log").insert({
+  await sb.from("admin_audit_log").insert({
     actor_id: args.revokedByUserId,
     action: "impersonation.revoke",
     target_type: "impersonation_session",
@@ -212,7 +221,10 @@ export async function revokeImpersonation(args: {
 
 export async function listActiveImpersonations(adminId?: string): Promise<ImpersonationSession[]> {
   const supabase = await createSupabaseServerClient();
-  let q = supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  let q = sb
     .from("impersonation_sessions")
     .select("*")
     .is("revoked_at", null)
@@ -228,7 +240,10 @@ export async function listActiveImpersonations(adminId?: string): Promise<Impers
  */
 export async function sweepExpiredImpersonations(): Promise<number> {
   const supabase = await createSupabaseServerClient();
-  const { data } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data } = await sb
     .from("impersonation_sessions")
     .update({ revoked_at: new Date().toISOString() })
     .lt("expires_at", new Date().toISOString())

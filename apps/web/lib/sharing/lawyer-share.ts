@@ -65,9 +65,12 @@ export async function createLawyerShare(
   const expires = new Date(Date.now() + ttlDays * 86_400_000);
 
   const supabase = getSupabaseAdmin();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
 
   // Verify the case belongs to the user
-  const { data: caseRow, error: caseErr } = await supabase
+  const { data: caseRow, error: caseErr } = await sb
     .from("cases")
     .select("id, user_id")
     .eq("id", input.case_id)
@@ -78,7 +81,7 @@ export async function createLawyerShare(
   const raw = generateToken();
   const hash = hashToken(raw);
 
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from("lawyer_share_tokens")
     .insert({
       token_hash: hash,
@@ -110,8 +113,11 @@ export async function verifyLawyerShare(
   | { ok: false; reason: "not_found" | "expired" | "revoked" }
 > {
   const supabase = getSupabaseAdmin();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const hash = hashToken(rawToken);
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from("lawyer_share_tokens")
     .select("*")
     .eq("token_hash", hash)
@@ -121,7 +127,7 @@ export async function verifyLawyerShare(
   if (new Date(data.expires_at).getTime() < Date.now()) return { ok: false, reason: "expired" };
 
   // Bump usage counter (fire and forget)
-  supabase
+  sb
     .from("lawyer_share_tokens")
     .update({ last_used_at: new Date().toISOString(), used_count: (data.used_count ?? 0) + 1 })
     .eq("id", data.id)
@@ -132,7 +138,10 @@ export async function verifyLawyerShare(
 
 export async function revokeLawyerShare(userId: string, shareId: string): Promise<{ ok: boolean }> {
   const supabase = getSupabaseAdmin();
-  const { error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { error } = await sb
     .from("lawyer_share_tokens")
     .update({ revoked_at: new Date().toISOString() })
     .eq("id", shareId)
@@ -142,7 +151,10 @@ export async function revokeLawyerShare(userId: string, shareId: string): Promis
 
 export async function listUserShares(userId: string, caseId?: string): Promise<ShareTokenRecord[]> {
   const supabase = getSupabaseAdmin();
-  let q = supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  let q = sb
     .from("lawyer_share_tokens")
     .select("id, user_id, case_id, scopes, lawyer_email, lawyer_name, allow_download, expires_at, revoked_at, created_at, last_used_at, used_count")
     .eq("user_id", userId)

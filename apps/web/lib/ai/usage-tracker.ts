@@ -15,7 +15,9 @@ export interface UsageRecord {
 }
 
 export async function recordAiUsage(rec: UsageRecord): Promise<void> {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   await sb.from("ai_usage_log").insert({
     user_id: rec.user_id,
     model_id: rec.model_id,
@@ -41,7 +43,9 @@ export interface UsageSummary {
 
 export async function getUserUsageSummary(userId: string, days = 30): Promise<UsageSummary> {
   const since = new Date(Date.now() - days * 24 * 3600 * 1000).toISOString();
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   const { data } = await sb.from("ai_usage_log").select("*").eq("user_id", userId).gte("created_at", since);
   const rows = data ?? [];
   const per: Record<string, { calls: number; cost_grosze: number }> = {};

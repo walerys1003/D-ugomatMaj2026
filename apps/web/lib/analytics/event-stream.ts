@@ -17,7 +17,9 @@ export interface AnalyticsEvent {
 }
 
 export async function trackEvent(e: AnalyticsEvent): Promise<{ id: string }> {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   const occurred = e.occurred_at ?? new Date().toISOString();
   const id = createHash("sha256")
     .update(`${e.user_id ?? ""}|${e.event}|${occurred}|${JSON.stringify(e.properties ?? {})}`)
@@ -40,7 +42,9 @@ export async function trackEvent(e: AnalyticsEvent): Promise<{ id: string }> {
 
 export async function trackBatch(events: AnalyticsEvent[]): Promise<{ inserted: number }> {
   if (events.length === 0) return { inserted: 0 };
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   const rows = events.map((e) => {
     const occurred = e.occurred_at ?? new Date().toISOString();
     const id = createHash("sha256")

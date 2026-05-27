@@ -12,7 +12,9 @@ export interface NpsResponse {
 
 export async function recordNpsResponse(r: NpsResponse): Promise<void> {
   if (r.score < 0 || r.score > 10) throw new Error("score_out_of_range");
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   await sb.from("nps_responses").insert({
     user_id: r.user_id,
     score: r.score,
@@ -32,7 +34,9 @@ export interface NpsSummary {
 }
 
 export async function computeNps(periodDays = 90): Promise<NpsSummary> {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   const since = new Date(Date.now() - periodDays * 86400_000).toISOString();
   const { data } = await sb.from("nps_responses").select("score").gte("created_at", since);
   const rows = (data ?? []) as { score: number }[];

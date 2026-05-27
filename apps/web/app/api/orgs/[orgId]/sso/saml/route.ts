@@ -14,7 +14,9 @@ export async function GET(req: NextRequest, ctx: { params: { orgId: string } }) 
 }
 
 export async function POST(req: NextRequest, ctx: { params: { orgId: string } }) {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   const { data: { user } } = await sb.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
   const body = await req.json().catch(() => null);

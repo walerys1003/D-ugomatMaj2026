@@ -41,6 +41,9 @@ export interface CreateDeadlineInput {
 
 export async function createDeadline(input: CreateDeadlineInput): Promise<DeadlineRecord> {
   const supabase = await createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const computed = computeDeadline({
     kind: input.kind,
     startDate: input.startDate,
@@ -62,7 +65,7 @@ export async function createDeadline(input: CreateDeadlineInput): Promise<Deadli
     reminders_sent: [] as string[],
   };
 
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from("deadlines")
     .insert(row)
     .select("*")
@@ -73,7 +76,10 @@ export async function createDeadline(input: CreateDeadlineInput): Promise<Deadli
 
 export async function listUserDeadlines(userId: string): Promise<DeadlineRecord[]> {
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data, error } = await sb
     .from("deadlines")
     .select("*")
     .eq("user_id", userId)
@@ -89,7 +95,10 @@ export async function snoozeDeadline(
   until: Date,
 ): Promise<void> {
   const supabase = await createSupabaseServerClient();
-  const { error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { error } = await sb
     .from("deadlines")
     .update({ snoozed_until: until.toISOString() })
     .eq("id", id)
@@ -99,7 +108,10 @@ export async function snoozeDeadline(
 
 export async function completeDeadline(id: string, userId: string): Promise<void> {
   const supabase = await createSupabaseServerClient();
-  const { error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { error } = await sb
     .from("deadlines")
     .update({ completed_at: new Date().toISOString() })
     .eq("id", id)
@@ -121,9 +133,12 @@ export interface DueReminder {
 
 export async function findDueReminders(now: Date = new Date()): Promise<DueReminder[]> {
   const supabase = await createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const horizon = new Date(now);
   horizon.setUTCDate(horizon.getUTCDate() + 8);
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from("deadlines")
     .select("*")
     .is("completed_at", null)
@@ -160,8 +175,11 @@ export async function markReminderSent(
   window: DueReminder["window"],
 ): Promise<void> {
   const supabase = await createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   // Pobieramy aktualną listę i dopisujemy okno.
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from("deadlines")
     .select("reminders_sent")
     .eq("id", deadlineId)
@@ -169,7 +187,7 @@ export async function markReminderSent(
   if (error) throw error;
   const sent = new Set<string>((data?.reminders_sent as string[]) ?? []);
   sent.add(window);
-  const { error: updErr } = await supabase
+  const { error: updErr } = await sb
     .from("deadlines")
     .update({ reminders_sent: Array.from(sent) })
     .eq("id", deadlineId);

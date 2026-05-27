@@ -114,8 +114,11 @@ const RATE_LIMIT_PER_CASE_PER_HOUR = 3;
  */
 async function isWithinRateLimit(caseId: string): Promise<boolean> {
   const supabase = createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const oneHourAgo = new Date(Date.now() - 3600_000).toISOString();
-  const { count, error } = await supabase
+  const { count, error } = await sb
     .from("ai_suggestions")
     .select("id", { count: "exact", head: true })
     .eq("case_id", caseId)
@@ -228,7 +231,10 @@ Pisz po polsku, prawniczo, ale bez formalizmu.`.trim();
   // Persist
   if (suggestions.length > 0) {
     const supabase = createSupabaseServerClient();
-    const { error: insErr } = await supabase.from("ai_suggestions").insert(suggestions);
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+    const { error: insErr } = await sb.from("ai_suggestions").insert(suggestions);
     if (insErr) {
       logger.warn("ai_suggestions.insert_failed", {
         caseId: params.caseId,
@@ -242,7 +248,10 @@ Pisz po polsku, prawniczo, ale bez formalizmu.`.trim();
 
 export async function dismissSuggestion(suggestionId: string): Promise<boolean> {
   const supabase = createSupabaseServerClient();
-  const { error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { error } = await sb
     .from("ai_suggestions")
     .update({ dismissed: true })
     .eq("id", suggestionId);
@@ -251,7 +260,10 @@ export async function dismissSuggestion(suggestionId: string): Promise<boolean> 
 
 export async function applySuggestion(suggestionId: string): Promise<boolean> {
   const supabase = createSupabaseServerClient();
-  const { error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { error } = await sb
     .from("ai_suggestions")
     .update({ applied: true, applied_at: new Date().toISOString() })
     .eq("id", suggestionId);

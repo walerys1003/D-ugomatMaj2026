@@ -71,8 +71,11 @@ export async function createApiKey(
   scopes: ApiKeyScope[],
 ): Promise<{ ok: true; key: string; prefix: string; id: string } | { ok: false; error: string }> {
   const supabase = getSupabaseAdmin();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const { raw, prefix, hash } = generateApiKey();
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from("api_keys")
     .insert({
       organization_id: organizationId,
@@ -91,8 +94,11 @@ export async function createApiKey(
 export async function verifyApiKey(rawKey: string): Promise<{ ok: true; key: ApiKey } | { ok: false; reason: string }> {
   if (!rawKey?.startsWith("dlk_")) return { ok: false, reason: "invalid_format" };
   const supabase = getSupabaseAdmin();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const hash = createHash("sha256").update(rawKey).digest("hex");
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from("api_keys")
     .select("*")
     .eq("key_hash", hash)
@@ -100,7 +106,7 @@ export async function verifyApiKey(rawKey: string): Promise<{ ok: true; key: Api
   if (error || !data) return { ok: false, reason: "not_found" };
   if (data.revoked_at) return { ok: false, reason: "revoked" };
   // Fire-and-forget last_used_at update
-  supabase.from("api_keys").update({ last_used_at: new Date().toISOString() }).eq("id", data.id).then(
+  sb.from("api_keys").update({ last_used_at: new Date().toISOString() }).eq("id", data.id).then(
     () => {},
     () => {},
   );
@@ -142,7 +148,10 @@ export function verifyWebhookSignature(payload: string, header: string, secret: 
 
 export async function dispatchWebhook(event: WebhookEvent, organizationId: string, payload: Record<string, unknown>): Promise<void> {
   const supabase = getSupabaseAdmin();
-  const { data: subs } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data: subs } = await sb
     .from("webhook_subscriptions")
     .select("*")
     .eq("organization_id", organizationId)
@@ -153,11 +162,11 @@ export async function dispatchWebhook(event: WebhookEvent, organizationId: strin
 
   await Promise.allSettled(
     subs
-      .filter((s) => s.events?.includes(event))
+      .filter((s: any) => s.events?.includes(event))
       .map(async (s: any) => {
         try {
           // Get the raw secret for signing - in production, would store the raw secret encrypted
-          const { data: secretRow } = await supabase
+          const { data: secretRow } = await sb
             .from("webhook_secrets")
             .select("raw_secret")
             .eq("subscription_id", s.id)
@@ -175,7 +184,7 @@ export async function dispatchWebhook(event: WebhookEvent, organizationId: strin
           try {
             const resp = await fetch(s.url, { method: "POST", headers, body, signal: ac.signal });
             const ok = resp.ok;
-            await supabase
+            await sb
               .from("webhook_subscriptions")
               .update({
                 last_delivery_at: new Date().toISOString(),
@@ -188,7 +197,7 @@ export async function dispatchWebhook(event: WebhookEvent, organizationId: strin
           }
         } catch (err) {
           logger.warn("webhook.dispatch_failed", { sub_id: s.id, error: (err as Error).message });
-          await supabase
+          await sb
             .from("webhook_subscriptions")
             .update({ failure_count: (s.failure_count ?? 0) + 1, active: (s.failure_count ?? 0) < 10 })
             .eq("id", s.id);

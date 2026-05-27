@@ -115,7 +115,10 @@ class ChannelBroker {
     if (args.persist !== false) {
       try {
         const supabase = await createSupabaseServerClient();
-        await supabase.from("realtime_events").insert({
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+        await sb.from("realtime_events").insert({
           id: event.id,
           topic: event.topic,
           kind: event.kind,
@@ -245,7 +248,10 @@ export async function fetchEventReplay(args: {
   limit?: number;
 }): Promise<RealtimeEvent[]> {
   const supabase = await createSupabaseServerClient();
-  let q = supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  let q = sb
     .from("realtime_events")
     .select("*")
     .eq("topic", args.topic)

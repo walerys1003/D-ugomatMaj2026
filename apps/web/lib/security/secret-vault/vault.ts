@@ -108,12 +108,15 @@ export async function setSecret(args: {
 
   const ciphertext = encryptSecret(args.value);
   const supabase = await createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const rotationDueAt = args.rotationDays
     ? new Date(Date.now() + args.rotationDays * 86_400_000).toISOString()
     : null;
 
   // Upsert by (org, key) — increments version
-  const { data: existing } = await supabase
+  const { data: existing } = await sb
     .from("secret_vault")
     .select("version")
     .eq("organization_id", args.organizationId ?? null)
@@ -121,7 +124,7 @@ export async function setSecret(args: {
     .maybeSingle();
   const nextVersion = ((existing as { version?: number } | null)?.version ?? 0) + 1;
 
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from("secret_vault")
     .upsert(
       {
@@ -159,7 +162,10 @@ export async function getSecret(args: {
   actorId: string;
 }): Promise<string | null> {
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data, error } = await sb
     .from("secret_vault")
     .select("*")
     .eq("organization_id", args.organizationId ?? null)
@@ -187,7 +193,7 @@ export async function getSecret(args: {
   }
 
   // Touch access stats
-  await supabase
+  await sb
     .from("secret_vault")
     .update({
       last_accessed_at: new Date().toISOString(),
@@ -216,7 +222,10 @@ export async function deleteSecret(args: {
   actorId: string;
 }): Promise<void> {
   const supabase = await createSupabaseServerClient();
-  const { error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { error } = await sb
     .from("secret_vault")
     .delete()
     .eq("organization_id", args.organizationId ?? null)
@@ -235,7 +244,10 @@ export async function listSecrets(args: {
   organizationId?: string | null;
 }): Promise<Omit<VaultSecret, "ciphertext">[]> {
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data, error } = await sb
     .from("secret_vault")
     .select("id, organization_id, key, description, version, created_by, created_at, last_accessed_at, access_count, rotation_due_at")
     .eq("organization_id", args.organizationId ?? null)
@@ -249,7 +261,10 @@ export async function listSecrets(args: {
  */
 export async function listSecretsDueForRotation(): Promise<Omit<VaultSecret, "ciphertext">[]> {
   const supabase = await createSupabaseServerClient();
-  const { data } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data } = await sb
     .from("secret_vault")
     .select("id, organization_id, key, description, version, created_by, created_at, last_accessed_at, access_count, rotation_due_at")
     .lt("rotation_due_at", new Date().toISOString())
@@ -264,14 +279,17 @@ export async function listSecretsDueForRotation(): Promise<Omit<VaultSecret, "ci
  */
 export async function rotateAllSecrets(actorId: string): Promise<{ rotated: number; failed: number }> {
   const supabase = await createSupabaseServerClient();
-  const { data } = await supabase.from("secret_vault").select("*");
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data } = await sb.from("secret_vault").select("*");
   let rotated = 0;
   let failed = 0;
   for (const s of (data ?? []) as VaultSecret[]) {
     try {
       const plaintext = decryptSecret(s.ciphertext);
       const newCt = encryptSecret(plaintext);
-      await supabase
+      await sb
         .from("secret_vault")
         .update({ ciphertext: newCt, version: s.version + 1 })
         .eq("id", s.id);

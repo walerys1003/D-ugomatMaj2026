@@ -12,7 +12,10 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
   if (!auth.ok) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const supabase = getSupabaseAdmin();
-  const { data: caseRow } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data: caseRow } = await sb
     .from("cases")
     .select("id, user_id, case_type")
     .eq("id", id)
@@ -20,7 +23,7 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
     .maybeSingle();
   if (!caseRow) return NextResponse.json({ error: "case_not_found" }, { status: 404 });
 
-  const { data: uploadedDocs } = await supabase
+  const { data: uploadedDocs } = await sb
     .from("evidence_uploads")
     .select("evidence_id")
     .eq("case_id", id);

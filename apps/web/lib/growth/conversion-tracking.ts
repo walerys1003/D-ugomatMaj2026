@@ -55,7 +55,10 @@ export interface RecordEventInput {
 
 export async function recordConversionEvent(input: RecordEventInput): Promise<void> {
   const supabase = createSupabaseAdminClient();
-  await supabase.from("conversion_events").insert({
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  await sb.from("conversion_events").insert({
     event: input.event,
     user_id: input.userId ?? null,
     anon_id: input.anonId ?? null,
@@ -79,11 +82,14 @@ export async function computeFunnel(
   windowDays: number = 30,
 ): Promise<FunnelStep[]> {
   const supabase = createSupabaseAdminClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const since = new Date(Date.now() - windowDays * 86_400_000).toISOString();
 
   const counts: number[] = [];
   for (const step of steps) {
-    const { count } = await supabase
+    const { count } = await sb
       .from("conversion_events")
       .select("id", { count: "exact", head: true })
       .eq("event", step)

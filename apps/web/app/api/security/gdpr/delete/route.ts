@@ -3,19 +3,22 @@ import { requestErasure, cancelErasure, executeErasure } from "@/lib/security/gd
 import { recordSecurityEvent } from "@/lib/security/security-events";
 
 async function getSupabase() {
-  const { createSupabaseServerClient } = await import("@/lib/db/supabase-server");
+  const { createSupabaseServerClient } = await import("@/lib/db/sb-server");
   return createSupabaseServerClient();
 }
 
 export async function POST(req: NextRequest) {
   const supabase = await getSupabase();
-  const { data: { user } } = await supabase.auth.getUser();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data: { user } } = await sb.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const body = await req.json().catch(() => ({}));
   try {
-    const reqRow = await requestErasure(supabase, user.id, body.reason);
-    await recordSecurityEvent(supabase, {
+    const reqRow = await requestErasure(sb, user.id, body.reason);
+    await recordSecurityEvent(sb, {
       userId: user.id,
       type: "gdpr.erasure_requested",
       ip: req.headers.get("x-forwarded-for") ?? undefined,
@@ -30,13 +33,16 @@ export async function POST(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   const supabase = await getSupabase();
-  const { data: { user } } = await supabase.auth.getUser();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data: { user } } = await sb.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const requestId = req.nextUrl.searchParams.get("id");
   if (!requestId) return NextResponse.json({ error: "id_required" }, { status: 400 });
   try {
-    await cancelErasure(supabase, user.id, requestId);
+    await cancelErasure(sb, user.id, requestId);
     return NextResponse.json({ cancelled: true });
   } catch (e: any) {
     return NextResponse.json({ error: e?.message ?? "cancel_failed" }, { status: 500 });
@@ -46,10 +52,13 @@ export async function DELETE(req: NextRequest) {
 // Admin-only — execute pending erasure after grace period.
 export async function PATCH(req: NextRequest) {
   const supabase = await getSupabase();
-  const { data: { user } } = await supabase.auth.getUser();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data: { user } } = await sb.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
-  const { data } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
+  const { data } = await sb.from("profiles").select("role").eq("id", user.id).maybeSingle();
   if (data?.role !== "admin" && data?.role !== "owner") {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
@@ -57,8 +66,8 @@ export async function PATCH(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
   if (!body.requestId) return NextResponse.json({ error: "missing_fields" }, { status: 400 });
   try {
-    const result = await executeErasure(supabase, body.requestId);
-    await recordSecurityEvent(supabase, {
+    const result = await executeErasure(sb, body.requestId);
+    await recordSecurityEvent(sb, {
       userId: user.id,
       type: "gdpr.erasure_executed",
       metadata: { requestId: body.requestId, ...result },

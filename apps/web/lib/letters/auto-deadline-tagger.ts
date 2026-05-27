@@ -127,7 +127,10 @@ export async function autoTagDeadlineFromLetter(input: AutoTagInput): Promise<Au
   const days_remaining = Math.ceil((dueAt.getTime() - Date.now()) / 86_400_000);
 
   const supabase = getSupabaseAdmin();
-  const { data, error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data, error } = await sb
     .from("deadlines")
     .insert({
       user_id: input.user_id,
@@ -160,7 +163,7 @@ export async function autoTagDeadlineFromLetter(input: AutoTagInput): Promise<Au
     for (const daysBefore of rule.reminders_days_before) {
       const remindAt = new Date(dueAt.getTime() - daysBefore * 86_400_000);
       if (remindAt.getTime() <= Date.now()) continue;
-      await supabase.from("scheduled_reminders").insert({
+      await sb.from("scheduled_reminders").insert({
         user_id: input.user_id,
         case_id: input.case_id,
         deadline_id: data.id,

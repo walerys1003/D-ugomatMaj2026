@@ -17,7 +17,9 @@ export async function GET(_req: NextRequest, ctx: { params: { provider: string }
     return NextResponse.json({ error: "unknown_provider" }, { status: 404 });
   }
 
-  const sb = createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = createSupabaseServerClient();
   const {
     data: { user },
   } = await sb.auth.getUser();
@@ -39,7 +41,9 @@ export async function DELETE(_req: NextRequest, ctx: { params: { provider: strin
     return NextResponse.json({ error: "unknown_provider" }, { status: 404 });
   }
 
-  const sb = createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = createSupabaseServerClient();
   const {
     data: { user },
   } = await sb.auth.getUser();

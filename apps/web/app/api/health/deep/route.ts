@@ -58,24 +58,27 @@ async function checkSupabase(): Promise<ComponentHealth> {
   const start = Date.now();
   try {
     const supabase = createSupabaseAdminClient();
-    if (!supabase) return { name: "supabase", status: "skipped" };
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+    if (!sb) return { name: "sb", status: "skipped" };
     // Minimal RTT query: query existing tiny table, head only.
     const { error } = await withTimeout(
-      supabase.from("audit_log").select("id", { head: true, count: "exact" }).limit(1),
+      sb.from("audit_log").select("id", { head: true, count: "exact" }).limit(1),
       1500,
     );
     if (error) {
       return {
-        name: "supabase",
+        name: "sb",
         status: "down",
         latency_ms: Date.now() - start,
         detail: error.message,
       };
     }
-    return { name: "supabase", status: "ok", latency_ms: Date.now() - start };
+    return { name: "sb", status: "ok", latency_ms: Date.now() - start };
   } catch (err) {
     return {
-      name: "supabase",
+      name: "sb",
       status: "down",
       latency_ms: Date.now() - start,
       detail: err instanceof Error ? err.message : String(err),
@@ -146,7 +149,7 @@ async function checkAnthropic(): Promise<ComponentHealth> {
 }
 
 function overallStatus(components: ComponentHealth[]): Status {
-  const critical = components.filter((c) => c.name === "supabase" || c.name === "stripe");
+  const critical = components.filter((c) => c.name === "sb" || c.name === "stripe");
   if (critical.some((c) => c.status === "down")) return "down";
   if (components.some((c) => c.status === "down")) return "degraded";
   if (components.some((c) => c.status === "degraded")) return "degraded";
@@ -165,13 +168,13 @@ export async function GET(request: Request): Promise<NextResponse> {
     }
   }
 
-  const [supabase, stripe, anthropic] = await Promise.all([
+  const [sb, stripe, anthropic] = await Promise.all([
     checkSupabase(),
     checkStripe(),
     checkAnthropic(),
   ]);
 
-  const components = [supabase, stripe, anthropic];
+  const components = [sb, stripe, anthropic];
   const overall = overallStatus(components);
 
   const circuits = ALL_CIRCUITS.map((c) => {

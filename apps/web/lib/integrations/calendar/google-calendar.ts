@@ -32,7 +32,9 @@ export async function refreshAccessToken(creds: GoogleCalCredentials): Promise<G
     access_token: j.access_token,
     expires_at: new Date(Date.now() + (j.expires_in ?? 3600) * 1000).toISOString(),
   };
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   await sb.from("oauth_credentials").update({ access_token: next.access_token, expires_at: next.expires_at }).eq("user_id", creds.user_id).eq("provider", "google");
   return next;
 }

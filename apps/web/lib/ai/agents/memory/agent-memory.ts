@@ -45,8 +45,11 @@ export async function rememberFact(args: {
   metadata?: Record<string, unknown>;
 }): Promise<string> {
   const supabase = await createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const embRes = await embed(args.content);
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from("agent_memory")
     .insert({
       user_id: args.userId,
@@ -74,10 +77,13 @@ export async function recallMemory(args: {
   kindFilter?: MemoryKind[];
 }): Promise<AgentMemoryEntry[]> {
   const supabase = await createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const k = args.k ?? 8;
   const embRes = await embed(args.query);
   // Używamy RPC search_agent_memory zdefiniowanego w migracji.
-  const { data, error } = await supabase.rpc("search_agent_memory", {
+  const { data, error } = await sb.rpc("search_agent_memory", {
     p_user_id: args.userId,
     p_query_embedding: embRes.vector,
     p_k: k,
@@ -85,7 +91,7 @@ export async function recallMemory(args: {
   });
   if (error) {
     // Fallback: bez RPC — pobieramy najnowsze wg ważności
-    const { data: fallback } = await supabase
+    const { data: fallback } = await sb
       .from("agent_memory")
       .select("*")
       .eq("user_id", args.userId)
@@ -98,7 +104,7 @@ export async function recallMemory(args: {
   // Touch — bump access_count + last_accessed_at
   const ids = ((data ?? []) as Array<{ id: string }>).map((r) => r.id);
   if (ids.length > 0) {
-    await supabase
+    await sb
       .from("agent_memory")
       .update({ last_accessed_at: new Date().toISOString() })
       .in("id", ids)
@@ -158,9 +164,12 @@ export async function pruneMemory(args: {
   dryRun?: boolean;
 }): Promise<number> {
   const supabase = await createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const cutoff = new Date(Date.now() - 90 * 86_400_000).toISOString();
   if (args.dryRun) {
-    const { count } = await supabase
+    const { count } = await sb
       .from("agent_memory")
       .select("id", { count: "exact", head: true })
       .eq("user_id", args.userId)
@@ -168,7 +177,7 @@ export async function pruneMemory(args: {
       .lt("last_accessed_at", cutoff);
     return count ?? 0;
   }
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from("agent_memory")
     .delete()
     .eq("user_id", args.userId)

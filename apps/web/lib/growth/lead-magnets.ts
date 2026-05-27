@@ -71,7 +71,10 @@ export async function captureLead(input: CaptureLeadInput): Promise<{ ok: boolea
   if (!input.consentMarketing) return { ok: false, magnet };
 
   const supabase = createSupabaseAdminClient();
-  const { data: lead } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data: lead } = await sb
     .from("leads")
     .upsert(
       {

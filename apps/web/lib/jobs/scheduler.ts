@@ -1,6 +1,6 @@
 /**
  * Tier 12 — Cron-style scheduled job runner.
- * Jobs are registered statically; the /api/jobs/run endpoint is hit by Vercel Cron or supabase pg_cron.
+ * Jobs are registered statically; the /api/jobs/run endpoint is hit by Vercel Cron or sb pg_cron.
  */
 import { processDueDeliveries } from "@/lib/integrations/webhooks-v2";
 import { pruneOldCache } from "@/lib/ai/cache";

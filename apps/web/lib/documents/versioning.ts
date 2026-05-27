@@ -52,9 +52,12 @@ export async function saveDocumentVersion(params: {
   createdBy?: string | null;
 }): Promise<DocumentVersion | null> {
   const supabase = createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
 
   // Get latest version_no for case
-  const { data: latest } = await supabase
+  const { data: latest } = await sb
     .from("document_versions")
     .select("version_no")
     .eq("case_id", params.caseId)
@@ -64,7 +67,7 @@ export async function saveDocumentVersion(params: {
 
   const nextVersion = (latest?.version_no ?? 0) + 1;
 
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from("document_versions")
     .insert({
       case_id: params.caseId,
@@ -93,7 +96,10 @@ export async function saveDocumentVersion(params: {
 
 export async function listDocumentVersions(caseId: string): Promise<DocumentVersion[]> {
   const supabase = createSupabaseServerClient();
-  const { data, error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data, error } = await sb
     .from("document_versions")
     .select("*")
     .eq("case_id", caseId)
@@ -114,7 +120,10 @@ export async function getDocumentVersion(
   versionId: string,
 ): Promise<DocumentVersion | null> {
   const supabase = createSupabaseServerClient();
-  const { data, error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data, error } = await sb
     .from("document_versions")
     .select("*")
     .eq("id", versionId)

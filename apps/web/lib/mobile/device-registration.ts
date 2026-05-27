@@ -43,7 +43,10 @@ export async function registerOrUpdateDevice(
   input: RegisterDeviceInput,
 ): Promise<MobileDevice> {
   const supabase = createSupabaseAdminClient();
-  const { data, error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data, error } = await sb
     .from("mobile_devices")
     .upsert(
       {
@@ -69,7 +72,10 @@ export async function updatePushToken(
   pushToken: string | null,
 ): Promise<void> {
   const supabase = createSupabaseAdminClient();
-  await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  await sb
     .from("mobile_devices")
     .update({ push_token: pushToken, last_seen_at: new Date().toISOString() })
     .eq("device_id", deviceId);
@@ -77,7 +83,10 @@ export async function updatePushToken(
 
 export async function listUserDevices(userId: string): Promise<MobileDevice[]> {
   const supabase = createSupabaseAdminClient();
-  const { data } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data } = await sb
     .from("mobile_devices")
     .select("*")
     .eq("user_id", userId)
@@ -87,7 +96,10 @@ export async function listUserDevices(userId: string): Promise<MobileDevice[]> {
 
 export async function unregisterDevice(deviceId: string): Promise<void> {
   const supabase = createSupabaseAdminClient();
-  await supabase.from("mobile_devices").delete().eq("device_id", deviceId);
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  await sb.from("mobile_devices").delete().eq("device_id", deviceId);
 }
 
 /**
@@ -95,8 +107,11 @@ export async function unregisterDevice(deviceId: string): Promise<void> {
  */
 export async function pruneInactiveDevices(): Promise<number> {
   const supabase = createSupabaseAdminClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const cutoff = new Date(Date.now() - 90 * 86_400_000).toISOString();
-  const { count } = await supabase
+  const { count } = await sb
     .from("mobile_devices")
     .delete({ count: "exact" })
     .lt("last_seen_at", cutoff);

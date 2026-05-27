@@ -19,7 +19,9 @@ export function cacheKey(modelId: string, system: string, user: string): string 
 }
 
 export async function getCached(key: string): Promise<CachedResponse | null> {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   const { data } = await sb.from("ai_response_cache").select("*").eq("key", key).maybeSingle();
   if (!data) return null;
   // Bump hit count async
@@ -35,7 +37,9 @@ export async function getCached(key: string): Promise<CachedResponse | null> {
 }
 
 export async function setCached(opts: { key: string; modelId: string; text: string; expectedCostGrosze: number }): Promise<void> {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   await sb.from("ai_response_cache").upsert(
     {
       key: opts.key,
@@ -51,7 +55,9 @@ export async function setCached(opts: { key: string; modelId: string; text: stri
 
 export async function pruneOldCache(olderThanDays = 30): Promise<number> {
   const cutoff = new Date(Date.now() - olderThanDays * 24 * 3600 * 1000).toISOString();
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   const { count } = await sb
     .from("ai_response_cache")
     .delete({ count: "exact" })

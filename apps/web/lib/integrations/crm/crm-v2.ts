@@ -41,7 +41,9 @@ export async function syncContact(opts: {
   contact: CrmContact;
   entity_ref?: string;
 }): Promise<SyncLogEntry> {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   const id = randomUUID();
   const baseRow = {
     id,
@@ -106,7 +108,9 @@ export async function listSyncLog(
   userId: string,
   opts: { provider?: CrmProvider; status?: SyncStatus; limit?: number } = {},
 ): Promise<SyncLogEntry[]> {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   let q = sb
     .from("crm_sync_log")
     .select("*")

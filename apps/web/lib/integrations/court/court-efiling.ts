@@ -99,7 +99,9 @@ function hashDocs(docs: CourtAttachment[]): CourtAttachment[] {
  *   3. submitFiling(id, signedEnvelope)
  */
 export async function createDraft(input: CourtFilingInput): Promise<CourtFilingRecord> {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   const id = randomUUID();
   const docs = hashDocs(input.documents);
   const row = {
@@ -132,7 +134,9 @@ export async function submitFiling(
   filingId: string,
   input: CourtFilingInput,
 ): Promise<CourtFilingRecord> {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   const now = new Date().toISOString();
   await sb.from("court_filings").update({ status: "queued", attempts: 0 }).eq("id", filingId);
 
@@ -193,7 +197,9 @@ export async function submitFiling(
 }
 
 export async function getFiling(filingId: string): Promise<CourtFilingRecord | null> {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   const { data } = await sb.from("court_filings").select("*").eq("id", filingId).maybeSingle();
   return (data as any) ?? null;
 }
@@ -204,7 +210,9 @@ export async function listFilings(opts: {
   status?: CourtFilingStatus;
   limit?: number;
 }): Promise<CourtFilingRecord[]> {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   let q = sb.from("court_filings").select("*").order("created_at", { ascending: false });
   if (opts.user_id) q = q.eq("user_id", opts.user_id);
   if (opts.case_id) q = q.eq("case_id", opts.case_id);
@@ -218,7 +226,9 @@ export async function listFilings(opts: {
  * Poll the court gateway for updated status (called by cron / job runner).
  */
 export async function refreshStatus(filingId: string): Promise<CourtFilingRecord | null> {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   const filing = await getFiling(filingId);
   if (!filing || !filing.external_ref) return filing;
   const r = await fetch(
@@ -255,7 +265,9 @@ function mapStatus(s: string): CourtFilingStatus {
  * fingerprinting the document set.
  */
 export async function submitOneShot(input: CourtFilingInput): Promise<CourtFilingRecord> {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   const fp = createHash("sha256")
     .update(JSON.stringify({ u: input.user_id, c: input.case_id, p: input.pleading_type, d: hashDocs(input.documents).map((d) => d.sha256) }))
     .digest("hex")

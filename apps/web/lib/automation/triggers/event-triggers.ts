@@ -44,7 +44,10 @@ export interface EventPayload {
  */
 export async function dispatchEvent(payload: EventPayload): Promise<{ triggered: number }> {
   const supabase = await createSupabaseServerClient();
-  const { data: workflows, error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data: workflows, error } = await sb
     .from("automation_workflows")
     .select("id, user_id, trigger")
     .eq("user_id", payload.userId)
@@ -98,7 +101,10 @@ export async function dispatchEvent(payload: EventPayload): Promise<{ triggered:
  */
 export async function evaluateCronTriggers(): Promise<{ triggered: number }> {
   const supabase = await createSupabaseServerClient();
-  const { data: workflows, error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data: workflows, error } = await sb
     .from("automation_workflows")
     .select("id, user_id, trigger")
     .eq("enabled", true);
@@ -165,9 +171,12 @@ function matchCronField(expr: string, value: number): boolean {
  */
 export async function scanUpcomingDeadlines(): Promise<{ found: number }> {
   const supabase = await createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const now = new Date();
   const cutoff = new Date(now.getTime() + 24 * 3_600_000);
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from("deadlines")
     .select("id, user_id, due_at, rule_id, case_id, notified_24h")
     .gte("due_at", now.toISOString())
@@ -199,7 +208,7 @@ export async function scanUpcomingDeadlines(): Promise<{ found: number }> {
     }).catch(() => null);
 
     // Mark as notified
-    await supabase
+    await sb
       .from("deadlines")
       .update({ notified_24h: true })
       .eq("id", dl.id)

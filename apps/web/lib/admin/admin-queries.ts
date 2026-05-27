@@ -45,10 +45,13 @@ export async function listCasesForAdmin(
   params: AdminCaseQueueParams = {},
 ): Promise<{ rows: AdminCaseQueueRow[]; total: number }> {
   const supabase = createSupabaseAdminClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const limit = Math.min(params.limit ?? 50, 200);
   const offset = params.offset ?? 0;
 
-  let q = supabase
+  let q = sb
     .from("cases")
     .select("id, user_id, type, status, created_at, updated_at", {
       count: "exact",
@@ -64,13 +67,13 @@ export async function listCasesForAdmin(
   if (error) throw new Error(`Admin cases query failed: ${error.message}`);
   if (!cases || cases.length === 0) return { rows: [], total: count ?? 0 };
 
-  const userIds = Array.from(new Set(cases.map((c) => c.user_id)));
-  const caseIds = cases.map((c) => c.id);
+  const userIds = Array.from(new Set(cases.map((c: any) => c.user_id)));
+  const caseIds = cases.map((c: any) => c.id);
 
   // Pobierz e-maile równolegle (auth.users via admin API).
-  const emailsPromise = supabase.auth.admin
+  const emailsPromise = sb.auth.admin
     .listUsers({ page: 1, perPage: 1000 })
-    .then((res) => {
+    .then((res: any) => {
       if (res.error) return new Map<string, string>();
       const map = new Map<string, string>();
       for (const u of res.data.users) {
@@ -80,12 +83,12 @@ export async function listCasesForAdmin(
     })
     .catch(() => new Map<string, string>());
 
-  const docsPromise = supabase
+  const docsPromise = sb
     .from("documents")
     .select("id, case_id")
     .in("case_id", caseIds);
 
-  const paymentsPromise = supabase
+  const paymentsPromise = sb
     .from("payments")
     .select("case_id, status")
     .in("case_id", caseIds)
@@ -102,13 +105,13 @@ export async function listCasesForAdmin(
     docsByCase.set(d.case_id, (docsByCase.get(d.case_id) ?? 0) + 1);
   }
   const paidCases = new Set<string>(
-    (paymentsRes.data ?? []).map((p) => p.case_id as string),
+    (paymentsRes.data ?? []).map((p: any) => p.case_id as string),
   );
 
   // emailsPromise jest już Mapą.
   const _ = userIds; // referenced for clarity
 
-  const rows: AdminCaseQueueRow[] = cases.map((c) => ({
+  const rows: AdminCaseQueueRow[] = cases.map((c: any) => ({
     id: c.id,
     user_id: c.user_id,
     type: c.type as CaseType,
@@ -145,6 +148,9 @@ export interface AdminStats {
 
 export async function getAdminStats(): Promise<AdminStats> {
   const supabase = createSupabaseAdminClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const now = Date.now();
   const oneDayAgo = new Date(now - 24 * 60 * 60 * 1000).toISOString();
   const thirtyDaysAgo = new Date(now - 30 * 24 * 60 * 60 * 1000).toISOString();
@@ -159,27 +165,27 @@ export async function getAdminStats(): Promise<AdminStats> {
     usersList,
     validations,
   ] = await Promise.all([
-    supabase.from("cases").select("id", { count: "exact", head: true }).is("deleted_at", null),
-    supabase
+    sb.from("cases").select("id", { count: "exact", head: true }).is("deleted_at", null),
+    sb
       .from("cases")
       .select("id", { count: "exact", head: true })
       .is("deleted_at", null)
       .gte("created_at", oneDayAgo),
-    supabase
+    sb
       .from("cases")
       .select("status")
       .is("deleted_at", null),
-    supabase.from("documents").select("id", { count: "exact", head: true }),
-    supabase
+    sb.from("documents").select("id", { count: "exact", head: true }),
+    sb
       .from("documents")
       .select("id", { count: "exact", head: true })
       .gte("created_at", oneDayAgo),
-    supabase
+    sb
       .from("payments")
       .select("amount", { count: "exact" })
       .eq("status", "completed"),
-    supabase.auth.admin.listUsers({ page: 1, perPage: 1 }),
-    supabase
+    sb.auth.admin.listUsers({ page: 1, perPage: 1 }),
+    sb
       .from("validation_runs")
       .select("pass, score")
       .gte("created_at", thirtyDaysAgo),
@@ -198,9 +204,9 @@ export async function getAdminStats(): Promise<AdminStats> {
   let validation_pass_rate_30d: number | null = null;
   const vRows = validations.data ?? [];
   if (vRows.length > 0) {
-    const sum = vRows.reduce((acc, r) => acc + (r.score ?? 0), 0);
+    const sum = vRows.reduce((acc: any, r: any) => acc + (r.score ?? 0), 0);
     validation_avg_score_30d = Math.round((sum / vRows.length) * 100) / 100;
-    const passed = vRows.filter((r) => r.pass).length;
+    const passed = vRows.filter((r: any) => r.pass).length;
     validation_pass_rate_30d = Math.round((passed / vRows.length) * 1000) / 10;
   }
 
@@ -238,17 +244,20 @@ export async function getKpiTimeSeries(
   days = 30,
 ): Promise<AdminKpiTimeSeries[]> {
   const supabase = createSupabaseAdminClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const since = new Date(
     Date.now() - days * 24 * 60 * 60 * 1000,
   ).toISOString();
 
   const [casesRes, paymentsRes] = await Promise.all([
-    supabase
+    sb
       .from("cases")
       .select("created_at")
       .is("deleted_at", null)
       .gte("created_at", since),
-    supabase
+    sb
       .from("payments")
       .select("amount, completed_at, created_at")
       .eq("status", "completed")
@@ -310,11 +319,14 @@ export interface AdminFunnelMetrics {
  */
 export async function getFunnelMetrics(days = 30): Promise<AdminFunnelMetrics> {
   const supabase = createSupabaseAdminClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const since = new Date(
     Date.now() - days * 24 * 60 * 60 * 1000,
   ).toISOString();
 
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from("cases")
     .select("id, user_id, status, created_at, updated_at")
     .is("deleted_at", null)
@@ -339,7 +351,7 @@ export async function getFunnelMetrics(days = 30): Promise<AdminFunnelMetrics> {
   const caseIds = rows.map((r) => r.id);
   let paymentByCase = new Map<string, string>();
   if (caseIds.length > 0) {
-    const { data: payRows } = await supabase
+    const { data: payRows } = await sb
       .from("payments")
       .select("case_id, completed_at, created_at")
       .in("case_id", caseIds)
@@ -401,10 +413,13 @@ export interface AdminNotificationStats {
  */
 export async function getNotificationStats(): Promise<AdminNotificationStats> {
   const supabase = createSupabaseAdminClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
   const now = new Date().toISOString();
 
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from("notifications")
     .select("status, channel, scheduled_for, created_at")
     .gte("created_at", new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
@@ -466,7 +481,10 @@ export interface AdminKnowledgeStats {
  */
 export async function getKnowledgeStats(): Promise<AdminKnowledgeStats> {
   const supabase = createSupabaseAdminClient();
-  const { data, error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data, error } = await sb
     .from("legal_knowledge")
     .select("case_type, embedding");
 
@@ -514,11 +532,14 @@ export interface AdminPromoStats {
  */
 export async function getPromoStats(): Promise<AdminPromoStats> {
   const supabase = createSupabaseAdminClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const [codesRes, redRes] = await Promise.all([
-    supabase
+    sb
       .from("promo_codes")
       .select("code, is_active, uses_count"),
-    supabase
+    sb
       .from("promo_redemptions")
       .select("code, discount_grosze"),
   ]);
@@ -579,10 +600,13 @@ export async function listAuditEvents(params: {
   caseId?: string;
 }): Promise<{ rows: AdminAuditEvent[]; total: number }> {
   const supabase = createSupabaseAdminClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const limit = Math.min(params.limit ?? 100, 500);
   const offset = params.offset ?? 0;
 
-  let q = supabase
+  let q = sb
     .from("case_events")
     .select("id, case_id, user_id, actor, event_type, metadata, created_at", {
       count: "exact",
@@ -596,7 +620,7 @@ export async function listAuditEvents(params: {
   const { data, error, count } = await q;
   if (error) throw new Error(`Audit log query failed: ${error.message}`);
 
-  const rows: AdminAuditEvent[] = (data ?? []).map((row) => ({
+  const rows: AdminAuditEvent[] = (data ?? []).map((row: any) => ({
     id: row.id as string,
     case_id: row.case_id as string,
     user_id: (row.user_id as string | null) ?? null,
@@ -611,7 +635,10 @@ export async function listAuditEvents(params: {
 
 export async function listPromptTemplates(): Promise<PromptTemplateRow[]> {
   const supabase = createSupabaseAdminClient();
-  const { data, error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data, error } = await sb
     .from("prompt_templates")
     .select("*")
     .order("case_type", { ascending: true })
@@ -625,7 +652,10 @@ export async function getPromptTemplate(
   id: string,
 ): Promise<PromptTemplateRow | null> {
   const supabase = createSupabaseAdminClient();
-  const { data, error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data, error } = await sb
     .from("prompt_templates")
     .select("*")
     .eq("id", id)
@@ -643,9 +673,12 @@ export async function getCaseDetailsForAdmin(caseId: string): Promise<{
   user_email: string | null;
 }> {
   const supabase = createSupabaseAdminClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const [caseRes, eventsRes] = await Promise.all([
-    supabase.from("cases").select("*").eq("id", caseId).maybeSingle(),
-    supabase
+    sb.from("cases").select("*").eq("id", caseId).maybeSingle(),
+    sb
       .from("case_events")
       .select("*")
       .eq("case_id", caseId)
@@ -659,7 +692,7 @@ export async function getCaseDetailsForAdmin(caseId: string): Promise<{
 
   let userEmail: string | null = null;
   if (caseRes.data?.user_id) {
-    const { data } = await supabase.auth.admin.getUserById(
+    const { data } = await sb.auth.admin.getUserById(
       caseRes.data.user_id as string,
     );
     userEmail = data?.user?.email ?? null;

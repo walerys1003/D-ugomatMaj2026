@@ -111,6 +111,9 @@ export async function generateDocumentFromWizardAction(
   await patchCase({ id: caseId, status: "analysis" });
 
   const supabase = createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
 
   // -------------------------------------------------------------------------
   // 1) Spróbuj AI pipeline; jeśli niedostępny → static fallback
@@ -177,7 +180,7 @@ export async function generateDocumentFromWizardAction(
   // -------------------------------------------------------------------------
   // 3) Persist documents
   // -------------------------------------------------------------------------
-  const insertResult = await supabase
+  const insertResult = await sb
     .from("documents")
     .insert({
       case_id: caseId,
@@ -208,7 +211,7 @@ export async function generateDocumentFromWizardAction(
   const documentId = insertResult.data.id;
 
   // 4) Snapshot do document_versions (audyt)
-  await supabase.from("document_versions").insert({
+  await sb.from("document_versions").insert({
     document_id: documentId,
     version_number: 1,
     content_markdown: markdown,
@@ -219,7 +222,7 @@ export async function generateDocumentFromWizardAction(
   // 5) Insert validation_runs (jeżeli AI walidacja zdarzyła się)
   if (aiResult?.validation) {
     const v = aiResult.validation;
-    const { error: vErr } = await supabase.from("validation_runs").insert({
+    const { error: vErr } = await sb.from("validation_runs").insert({
       document_id: documentId,
       case_id: caseId,
       user_id: userId,
@@ -303,9 +306,12 @@ export async function markDocumentDownloadedAction(
   }
 
   const supabase = createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   // RLS i tak ogranicza widok do własnych dokumentów, ale dla pewności
   // używamy `.eq("user_id", userId)` — defense in depth.
-  const { error } = await supabase
+  const { error } = await sb
     .from("documents")
     .update({
       downloaded_at: new Date().toISOString(),

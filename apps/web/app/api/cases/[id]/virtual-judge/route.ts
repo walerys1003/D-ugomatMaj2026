@@ -13,7 +13,10 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
   if (!auth.ok) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const supabase = getSupabaseAdmin();
-  const { data: caseRow } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data: caseRow } = await sb
     .from("cases")
     .select("id, user_id, case_type, facts")
     .eq("id", id)

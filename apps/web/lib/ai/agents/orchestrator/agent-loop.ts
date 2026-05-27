@@ -147,7 +147,10 @@ export async function runAgent(args: {
 
   // Persist run kickoff (best-effort)
   const supabase = await createSupabaseServerClient();
-  await supabase.from("agent_runs").insert({
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  await sb.from("agent_runs").insert({
     id: runId,
     user_id: args.userId,
     goal: args.goal,
@@ -316,7 +319,7 @@ export async function runAgent(args: {
   };
 
   // Persist steps + final
-  await supabase.from("agent_runs").update({
+  await sb.from("agent_runs").update({
     status,
     final_answer: finalAnswer,
     total_cost_grosze: state.totalCost,
@@ -324,7 +327,7 @@ export async function runAgent(args: {
   }).eq("id", runId).then(() => null).catch(() => null);
 
   if (state.steps.length > 0) {
-    await supabase.from("agent_steps").insert(
+    await sb.from("agent_steps").insert(
       state.steps.map((s) => ({
         run_id: runId,
         index: s.index,
@@ -345,7 +348,10 @@ export async function runAgent(args: {
 
 export async function cancelAgentRun(runId: string, userId: string): Promise<void> {
   const supabase = await createSupabaseServerClient();
-  await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  await sb
     .from("agent_runs")
     .update({ status: "canceled", finished_at: new Date().toISOString() })
     .eq("id", runId)

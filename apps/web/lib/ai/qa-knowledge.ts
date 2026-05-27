@@ -79,8 +79,11 @@ function scoreArticle(article: KnowledgeArticle, queryTokens: string[]): number 
 
 export async function loadKnowledgeArticles(): Promise<KnowledgeArticle[]> {
   const supabase = getSupabaseAdmin();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   try {
-    const { data, error } = await supabase
+    const { data, error } = await sb
       .from("knowledge_articles")
       .select("slug, title, category, excerpt, content, updated_at")
       .eq("published", true);

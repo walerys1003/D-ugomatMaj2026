@@ -70,7 +70,9 @@ export async function runDripScheduler(): Promise<DripRunSummary> {
     },
   };
 
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
 
   // 1) D+3 tips — userzy zarejestrowani 3..4 dni temu, którzy nie mają żadnej `case`
   const d3From = new Date(Date.now() - 4 * 86400_000).toISOString();

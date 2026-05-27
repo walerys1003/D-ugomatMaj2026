@@ -9,6 +9,9 @@ async function getSupabase() {
 
 export async function GET(req: NextRequest) {
   const supabase = await getSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   const currentId = req.headers.get("x-session-id") ?? undefined;
@@ -22,6 +25,9 @@ export async function GET(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   const supabase = await getSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 

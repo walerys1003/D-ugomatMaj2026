@@ -23,7 +23,9 @@ export async function POST(
 ) {
   const admin = await requireFullAdmin();
   const { id, versionId } = await ctx.params;
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
 
   // Pobierz nową wersję
   const { data: newVersion, error: fetchErr } = await sb

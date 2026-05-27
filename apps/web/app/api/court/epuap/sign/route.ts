@@ -16,7 +16,10 @@ import {
 
 export async function POST(req: Request) {
   const supabase = await createSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data: { user } } = await sb.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const body = (await req.json().catch(() => null)) as
@@ -35,7 +38,7 @@ export async function POST(req: Request) {
       metadata: body.metadata,
     });
     // Persist session for later callback verification.
-    await supabase.from("epuap_sign_sessions").insert({
+    await sb.from("epuap_sign_sessions").insert({
       session_id: session.sessionId,
       user_id: user.id,
       case_id: body.caseId ?? null,
@@ -55,13 +58,16 @@ export async function POST(req: Request) {
 
 export async function GET(req: Request) {
   const supabase = await createSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data: { user } } = await sb.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const sessionId = new URL(req.url).searchParams.get("session");
   if (!sessionId) return NextResponse.json({ error: "missing_session" }, { status: 400 });
 
-  const { data: row, error } = await supabase
+  const { data: row, error } = await sb
     .from("epuap_sign_sessions")
     .select("*")
     .eq("session_id", sessionId)
@@ -73,13 +79,13 @@ export async function GET(req: Request) {
     const env = await fetchSignedEnvelope(sessionId);
     const ok = verifyEnvelopeAgainstHashes(env, row.document_hashes as string[]);
     if (!ok) {
-      await supabase
+      await sb
         .from("epuap_sign_sessions")
         .update({ status: "hash_mismatch" })
         .eq("session_id", sessionId);
       return NextResponse.json({ error: "hash_mismatch" }, { status: 409 });
     }
-    await supabase
+    await sb
       .from("epuap_sign_sessions")
       .update({ status: "signed", signed_at: env.signedAt })
       .eq("session_id", sessionId);

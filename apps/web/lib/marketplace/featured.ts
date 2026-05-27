@@ -10,9 +10,9 @@ export interface FeaturedSlot {
   endsAt: string;
 }
 
-export async function listFeatured(supabase: any): Promise<FeaturedSlot[]> {
+export async function listFeatured(sb: any): Promise<FeaturedSlot[]> {
   const now = new Date().toISOString();
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from("marketplace_featured")
     .select("*")
     .lte("starts_at", now)

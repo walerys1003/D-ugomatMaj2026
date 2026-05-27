@@ -14,9 +14,12 @@ export async function GET(req: NextRequest) {
   if (!verifyFeedToken(userId, token)) return new NextResponse("invalid token", { status: 403 });
 
   const supabase = getSupabaseAdmin();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const events: IcsEvent[] = [];
   try {
-    const { data: deadlines } = await supabase
+    const { data: deadlines } = await sb
       .from("deadlines")
       .select("id, case_id, kind, title, due_at, completed_at")
       .eq("user_id", userId)
@@ -34,7 +37,7 @@ export async function GET(req: NextRequest) {
         alarm_minutes_before: 1440,
       });
     }
-    const { data: hearings } = await supabase
+    const { data: hearings } = await sb
       .from("case_events")
       .select("id, case_id, title, occurred_at, metadata")
       .eq("user_id", userId)

@@ -17,7 +17,9 @@ export interface OrgAuditEntry {
 }
 
 export async function recordOrgAuditEntry(entry: OrgAuditEntry): Promise<void> {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   // Compute hash chain: sha256(prev_hash + JSON(entry))
   const { data: last } = await sb
     .from("org_audit_log")
@@ -47,7 +49,9 @@ export async function recordOrgAuditEntry(entry: OrgAuditEntry): Promise<void> {
 }
 
 export async function verifyAuditChain(orgId: string): Promise<{ ok: boolean; broken_at?: string }> {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   const { data } = await sb
     .from("org_audit_log")
     .select("*")

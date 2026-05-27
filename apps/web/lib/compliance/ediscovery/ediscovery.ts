@@ -82,7 +82,10 @@ export async function imposeLegalHold(args: {
     throw new Error("must_specify_targets");
   }
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data, error } = await sb
     .from("legal_holds")
     .insert({
       case_reference: args.caseReference,
@@ -120,7 +123,10 @@ export async function releaseLegalHold(args: {
   releasedBy: string;
 }): Promise<void> {
   const supabase = await createSupabaseServerClient();
-  const { error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { error } = await sb
     .from("legal_holds")
     .update({
       active: false,
@@ -146,7 +152,10 @@ export async function isOnLegalHold(args: {
   resourceType: string;
 }): Promise<boolean> {
   const supabase = await createSupabaseServerClient();
-  let q = supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  let q = sb
     .from("legal_holds")
     .select("id")
     .eq("active", true)
@@ -161,7 +170,10 @@ export async function isOnLegalHold(args: {
 
 export async function listActiveLegalHolds(): Promise<LegalHold[]> {
   const supabase = await createSupabaseServerClient();
-  const { data } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data } = await sb
     .from("legal_holds")
     .select("*")
     .eq("active", true)
@@ -194,8 +206,11 @@ export async function runEDiscoveryQuery(args: {
   requestedBy: string;
 }): Promise<EDiscoveryResult> {
   const supabase = await createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   // Create query record
-  const { data: queryRow, error: qErr } = await supabase
+  const { data: queryRow, error: qErr } = await sb
     .from("ediscovery_queries")
     .insert({
       user_id: args.filters.target_user_id ?? null,
@@ -213,7 +228,7 @@ export async function runEDiscoveryQuery(args: {
 
   // Cases
   if (!args.filters.document_id) {
-    let cq = supabase
+    let cq = sb
       .from("cases")
       .select("id, signature, title, description, created_at")
       .order("created_at", { ascending: false })
@@ -241,7 +256,7 @@ export async function runEDiscoveryQuery(args: {
   }
 
   // Documents
-  let dq = supabase
+  let dq = sb
     .from("documents")
     .select("id, case_id, name, mime_type, created_at")
     .order("created_at", { ascending: false })
@@ -266,7 +281,7 @@ export async function runEDiscoveryQuery(args: {
   }
 
   // Audit chain entries
-  let aq = supabase
+  let aq = sb
     .from("audit_chain")
     .select("id, seq, action, target_type, target_id, payload, created_at")
     .order("seq", { ascending: true })
@@ -293,7 +308,7 @@ export async function runEDiscoveryQuery(args: {
   const custodyChainHash = createHash("sha256").update(sortedHashes).digest("hex");
 
   // Update query record
-  await supabase
+  await sb
     .from("ediscovery_queries")
     .update({
       status: "completed",
@@ -325,7 +340,10 @@ export async function runEDiscoveryQuery(args: {
 
 export async function listEDiscoveryQueries(args?: { limit?: number }): Promise<EDiscoveryQuery[]> {
   const supabase = await createSupabaseServerClient();
-  const { data } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data } = await sb
     .from("ediscovery_queries")
     .select("*")
     .order("requested_at", { ascending: false })

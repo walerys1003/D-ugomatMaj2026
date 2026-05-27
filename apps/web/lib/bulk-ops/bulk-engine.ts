@@ -71,7 +71,10 @@ export async function createBulkOperation(args: {
     throw new Error("bulk_operation_too_many_targets");
   }
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data, error } = await sb
     .from("bulk_operations")
     .insert({
       user_id: args.userId,
@@ -95,28 +98,40 @@ export type PerItemHandler = (id: string, params: Record<string, unknown>) => Pr
 const HANDLERS: Record<BulkOpKind, PerItemHandler> = {
   "cases.update": async (id, params) => {
     const supabase = await createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
     const patch: Record<string, unknown> = {};
     if (typeof params.status === "string") patch.status = params.status;
     if (typeof params.case_type === "string") patch.case_type = params.case_type;
     if (Array.isArray(params.tags)) patch.tags = params.tags;
     if (Object.keys(patch).length === 0) return;
-    const { error } = await supabase.from("cases").update(patch).eq("id", id);
+    const { error } = await sb.from("cases").update(patch).eq("id", id);
     if (error) throw error;
   },
   "cases.archive": async (id) => {
     const supabase = await createSupabaseServerClient();
-    const { error } = await supabase.from("cases").update({ archived_at: new Date().toISOString() }).eq("id", id);
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+    const { error } = await sb.from("cases").update({ archived_at: new Date().toISOString() }).eq("id", id);
     if (error) throw error;
   },
   "cases.unarchive": async (id) => {
     const supabase = await createSupabaseServerClient();
-    const { error } = await supabase.from("cases").update({ archived_at: null }).eq("id", id);
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+    const { error } = await sb.from("cases").update({ archived_at: null }).eq("id", id);
     if (error) throw error;
   },
   "cases.delete": async (id) => {
     const supabase = await createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
     const purgeAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-    const { error } = await supabase
+    const { error } = await sb
       .from("cases")
       .update({ deleted_at: new Date().toISOString(), purge_at: purgeAt })
       .eq("id", id);
@@ -127,14 +142,20 @@ const HANDLERS: Record<BulkOpKind, PerItemHandler> = {
   },
   "deadlines.reassign": async (id, params) => {
     const supabase = await createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
     const newOwner = typeof params.assignee_id === "string" ? params.assignee_id : null;
     if (!newOwner) throw new Error("missing_assignee_id");
-    const { error } = await supabase.from("deadlines").update({ assignee_id: newOwner }).eq("id", id);
+    const { error } = await sb.from("deadlines").update({ assignee_id: newOwner }).eq("id", id);
     if (error) throw error;
   },
   "deadlines.complete": async (id) => {
     const supabase = await createSupabaseServerClient();
-    const { error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+    const { error } = await sb
       .from("deadlines")
       .update({ completed_at: new Date().toISOString() })
       .eq("id", id);
@@ -145,15 +166,21 @@ const HANDLERS: Record<BulkOpKind, PerItemHandler> = {
   },
   "documents.tag": async (id, params) => {
     const supabase = await createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
     const tags = Array.isArray(params.tags) ? params.tags : [];
-    const { error } = await supabase.from("documents").update({ tags }).eq("id", id);
+    const { error } = await sb.from("documents").update({ tags }).eq("id", id);
     if (error) throw error;
   },
   "documents.move": async (id, params) => {
     const supabase = await createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
     const targetCaseId = typeof params.case_id === "string" ? params.case_id : null;
     if (!targetCaseId) throw new Error("missing_case_id");
-    const { error } = await supabase.from("documents").update({ case_id: targetCaseId }).eq("id", id);
+    const { error } = await sb.from("documents").update({ case_id: targetCaseId }).eq("id", id);
     if (error) throw error;
   },
 };
@@ -165,7 +192,10 @@ const HANDLERS: Record<BulkOpKind, PerItemHandler> = {
  */
 export async function executeBulkOperation(opId: string): Promise<BulkOperation> {
   const supabase = await createSupabaseServerClient();
-  const { data: op, error: loadErr } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data: op, error: loadErr } = await sb
     .from("bulk_operations")
     .select("*")
     .eq("id", opId)
@@ -174,7 +204,7 @@ export async function executeBulkOperation(opId: string): Promise<BulkOperation>
   const operation = op as BulkOperation;
   if (operation.status === "canceled") return operation;
 
-  await supabase
+  await sb
     .from("bulk_operations")
     .update({ status: "running" as BulkOpStatus, started_at: new Date().toISOString() })
     .eq("id", opId);
@@ -188,13 +218,13 @@ export async function executeBulkOperation(opId: string): Promise<BulkOperation>
 
   for (let i = 0; i < operation.target_ids.length; i += CHUNK_SIZE) {
     // Cancellation check
-    const { data: latest } = await supabase
+    const { data: latest } = await sb
       .from("bulk_operations")
       .select("status")
       .eq("id", opId)
       .single();
     if (latest?.status === "canceled") {
-      await supabase
+      await sb
         .from("bulk_operations")
         .update({ finished_at: new Date().toISOString() })
         .eq("id", opId);
@@ -216,7 +246,7 @@ export async function executeBulkOperation(opId: string): Promise<BulkOperation>
       }
     }
 
-    await supabase
+    await sb
       .from("bulk_operations")
       .update({ processed, failed, errors })
       .eq("id", opId);
@@ -237,7 +267,7 @@ export async function executeBulkOperation(opId: string): Promise<BulkOperation>
   }
 
   const finalStatus: BulkOpStatus = failed === 0 ? "completed" : "completed_with_errors";
-  const { data: finalRow } = await supabase
+  const { data: finalRow } = await sb
     .from("bulk_operations")
     .update({
       status: finalStatus,
@@ -255,7 +285,10 @@ export async function executeBulkOperation(opId: string): Promise<BulkOperation>
 
 export async function cancelBulkOperation(opId: string, userId: string): Promise<void> {
   const supabase = await createSupabaseServerClient();
-  const { error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { error } = await sb
     .from("bulk_operations")
     .update({ status: "canceled" as BulkOpStatus })
     .eq("id", opId)
@@ -266,7 +299,10 @@ export async function cancelBulkOperation(opId: string, userId: string): Promise
 
 export async function getBulkOperation(opId: string, userId: string): Promise<BulkOperation | null> {
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data, error } = await sb
     .from("bulk_operations")
     .select("*")
     .eq("id", opId)

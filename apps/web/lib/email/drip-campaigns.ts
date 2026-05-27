@@ -207,8 +207,11 @@ export interface EnrollmentInput {
 
 export async function enrollInCampaign(input: EnrollmentInput): Promise<string> {
   const supabase = createSupabaseAdminClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const startAt = input.startAt ?? new Date().toISOString();
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from("email_campaign_enrollments")
     .upsert(
       {
@@ -228,7 +231,10 @@ export async function enrollInCampaign(input: EnrollmentInput): Promise<string> 
 
 export async function cancelEnrollment(userId: string, campaignKey: CampaignKey): Promise<void> {
   const supabase = createSupabaseAdminClient();
-  await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  await sb
     .from("email_campaign_enrollments")
     .update({ status: "cancelled", cancelled_at: new Date().toISOString() })
     .eq("user_id", userId)
@@ -252,7 +258,10 @@ export interface DueEmail {
 
 export async function getDueEmails(now: Date = new Date(), limit: number = 100): Promise<DueEmail[]> {
   const supabase = createSupabaseAdminClient();
-  const { data: enrollments } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data: enrollments } = await sb
     .from("email_campaign_enrollments")
     .select("id, user_id, campaign_key, start_at, context")
     .eq("status", "active")
@@ -266,7 +275,7 @@ export async function getDueEmails(now: Date = new Date(), limit: number = 100):
       const fireAt = startMs + step.offset_minutes * 60_000;
       if (fireAt > now.getTime()) continue;
       // Check not already sent
-      const { data: already } = await supabase
+      const { data: already } = await sb
         .from("email_send_log")
         .select("id")
         .eq("enrollment_id", e.id)
@@ -296,7 +305,10 @@ export async function logEmailSent(
   detail?: string,
 ): Promise<void> {
   const supabase = createSupabaseAdminClient();
-  await supabase.from("email_send_log").insert({
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  await sb.from("email_send_log").insert({
     enrollment_id: enrollmentId,
     step_id: stepId,
     status,

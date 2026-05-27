@@ -80,6 +80,9 @@ export async function exportUserDataAction(input: {
   }
 
   const supabase = createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
 
   // RLS sam ogranicza do user_id, ale dla pewności każde zapytanie
   // używa explicit `.eq('user_id', userId)` (defense in depth).
@@ -94,22 +97,22 @@ export async function exportUserDataAction(input: {
     caseEventsRes,
     validationRunsRes,
   ] = await Promise.all([
-    supabase.from("profiles").select("*").eq("id", userId).maybeSingle(),
-    supabase.from("cases").select("*").eq("user_id", userId),
-    supabase.from("documents").select("*").eq("user_id", userId),
-    supabase.from("deadlines").select("*").eq("user_id", userId),
-    supabase.from("ocr_results").select("*").eq("user_id", userId),
-    supabase.from("payments").select("*").eq("user_id", userId),
-    supabase.from("notifications").select("*").eq("user_id", userId),
-    supabase.from("case_events").select("*").eq("user_id", userId),
-    supabase.from("validation_runs").select("*").eq("user_id", userId),
+    sb.from("profiles").select("*").eq("id", userId).maybeSingle(),
+    sb.from("cases").select("*").eq("user_id", userId),
+    sb.from("documents").select("*").eq("user_id", userId),
+    sb.from("deadlines").select("*").eq("user_id", userId),
+    sb.from("ocr_results").select("*").eq("user_id", userId),
+    sb.from("payments").select("*").eq("user_id", userId),
+    sb.from("notifications").select("*").eq("user_id", userId),
+    sb.from("case_events").select("*").eq("user_id", userId),
+    sb.from("validation_runs").select("*").eq("user_id", userId),
   ]);
 
   // document_versions wymaga JOIN przez documents
   const documentIds = (documentsRes.data ?? []).map((d) => (d as { id: string }).id);
   const { data: documentVersions } =
     documentIds.length > 0
-      ? await supabase
+      ? await sb
           .from("document_versions")
           .select("*")
           .in("document_id", documentIds)
@@ -180,7 +183,7 @@ export async function exportUserDataAction(input: {
   try {
     if (cases[0]) {
       const firstCaseId = (cases[0] as { id: string }).id;
-      await supabase.from("case_events").insert({
+      await sb.from("case_events").insert({
         case_id: firstCaseId,
         user_id: userId,
         actor: "user",

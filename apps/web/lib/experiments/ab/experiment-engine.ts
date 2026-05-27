@@ -61,7 +61,10 @@ export interface Assignment {
 
 export async function getExperiment(key: string): Promise<Experiment | null> {
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data, error } = await sb
     .from("experiments")
     .select("*")
     .eq("key", key)
@@ -79,13 +82,16 @@ export async function assignVariant(
   ctx: AssignmentContext,
 ): Promise<Assignment> {
   const supabase = await createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const exp = await getExperiment(experimentKey);
   if (!exp || exp.status !== "running") {
     return { experimentKey, variant: "control", reason: "paused" };
   }
 
   // 1) Sticky bucketing — sprawdź istniejący zapis.
-  const { data: existing } = await supabase
+  const { data: existing } = await sb
     .from("experiment_assignments")
     .select("variant")
     .eq("experiment_key", experimentKey)
@@ -102,7 +108,7 @@ export async function assignVariant(
 
   // 2) Layer exclusion — jeśli user już jest w innym eksperymencie z tej samej warstwy.
   if (exp.layer) {
-    const { data: layerAssign } = await supabase
+    const { data: layerAssign } = await sb
       .from("experiment_assignments")
       .select("experiment_key,layer")
       .eq("user_id", ctx.userId)
@@ -124,7 +130,7 @@ export async function assignVariant(
   // 4) Variant bucketing — deterministic hash → wagi.
   const variant = pickVariant(exp, ctx.userId);
 
-  await supabase
+  await sb
     .from("experiment_assignments")
     .insert({
       experiment_key: experimentKey,
@@ -178,8 +184,11 @@ export async function trackExposure(args: {
   context?: Record<string, unknown>;
 }): Promise<void> {
   const supabase = await createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const today = new Date().toISOString().slice(0, 10);
-  await supabase
+  await sb
     .from("experiment_exposures")
     .upsert(
       {
@@ -202,7 +211,10 @@ export async function trackGoal(args: {
   metadata?: Record<string, unknown>;
 }): Promise<void> {
   const supabase = await createSupabaseServerClient();
-  await supabase.from("experiment_goals").insert({
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  await sb.from("experiment_goals").insert({
     experiment_key: args.experimentKey,
     user_id: args.userId,
     goal_event: args.goalEvent,

@@ -83,7 +83,10 @@ export async function createSubscriptionCoupon(
   });
 
   const supabase = createSupabaseAdminClient();
-  const { data, error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data, error } = await sb
     .from("subscription_coupons")
     .insert({
       code: input.code.toUpperCase(),
@@ -108,7 +111,10 @@ export async function createSubscriptionCoupon(
 
 export async function getCouponByCode(code: string): Promise<SubscriptionCoupon | null> {
   const supabase = createSupabaseAdminClient();
-  const { data } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data } = await sb
     .from("subscription_coupons")
     .select("*")
     .eq("code", code.toUpperCase())
@@ -123,17 +129,23 @@ export async function recordCouponRedemption(
   subscriptionId: string,
 ): Promise<void> {
   const supabase = createSupabaseAdminClient();
-  await supabase.from("subscription_coupon_redemptions").insert({
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  await sb.from("subscription_coupon_redemptions").insert({
     coupon_id: couponId,
     user_id: userId,
     subscription_id: subscriptionId,
   });
-  await supabase.rpc("fn_increment_coupon_redemption", { p_coupon_id: couponId });
+  await sb.rpc("fn_increment_coupon_redemption", { p_coupon_id: couponId });
 }
 
 export async function listActiveCampaigns(): Promise<SubscriptionCoupon[]> {
   const supabase = createSupabaseAdminClient();
-  const { data } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data } = await sb
     .from("subscription_coupons")
     .select("*")
     .eq("is_active", true)

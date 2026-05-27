@@ -29,7 +29,9 @@ export interface OrgMembership {
 }
 
 export async function createOrganization(input: { ownerUserId: string; name: string; plan?: OrgPlan; seats?: number }): Promise<Organization> {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   const slug = baseSlug(input.name);
   const finalSlug = await ensureUniqueSlug(slug);
   const org: Organization = {
@@ -52,7 +54,9 @@ export async function createOrganization(input: { ownerUserId: string; name: str
 }
 
 export async function listUserOrganizations(userId: string): Promise<{ org: Organization; role: OrgRole }[]> {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   const { data } = await sb
     .from("org_memberships")
     .select("role, org:organizations(*)")
@@ -61,7 +65,9 @@ export async function listUserOrganizations(userId: string): Promise<{ org: Orga
 }
 
 export async function inviteMember(orgId: string, email: string, role: OrgRole, invitedBy: string): Promise<{ token: string }> {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   const token = randomUUID().replace(/-/g, "");
   await sb.from("org_invitations").insert({
     org_id: orgId,
@@ -76,7 +82,9 @@ export async function inviteMember(orgId: string, email: string, role: OrgRole, 
 }
 
 export async function acceptInvitation(token: string, userId: string): Promise<{ org_id: string; role: OrgRole }> {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   const { data: inv } = await sb.from("org_invitations").select("*").eq("token", token).maybeSingle();
   if (!inv) throw new Error("invalid_token");
   if (new Date(inv.expires_at).getTime() < Date.now()) throw new Error("expired");
@@ -94,12 +102,16 @@ export async function acceptInvitation(token: string, userId: string): Promise<{
 }
 
 export async function setMemberRole(orgId: string, userId: string, role: OrgRole): Promise<void> {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   await sb.from("org_memberships").update({ role }).eq("org_id", orgId).eq("user_id", userId);
 }
 
 export async function removeMember(orgId: string, userId: string): Promise<void> {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   await sb.from("org_memberships").delete().eq("org_id", orgId).eq("user_id", userId);
 }
 
@@ -113,7 +125,9 @@ function baseSlug(name: string): string {
 }
 
 async function ensureUniqueSlug(base: string): Promise<string> {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   let candidate = base || "org";
   let n = 0;
   for (let i = 0; i < 20; i++) {

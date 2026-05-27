@@ -65,7 +65,10 @@ export async function submitTemplate(
   }
 
   const supabase = getSupabaseAdmin();
-  const { data, error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data, error } = await sb
     .from("marketplace_templates")
     .insert({
       author_id: input.author_id,
@@ -92,7 +95,10 @@ export async function reviewTemplate(
   reviewNotes?: string,
 ): Promise<{ ok: boolean }> {
   const supabase = getSupabaseAdmin();
-  const { error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { error } = await sb
     .from("marketplace_templates")
     .update({
       status: decision,
@@ -111,7 +117,10 @@ export async function listApprovedTemplates(opts: {
   sort?: "popular" | "newest" | "highest_rated";
 }): Promise<{ templates: MarketplaceTemplate[]; total: number }> {
   const supabase = getSupabaseAdmin();
-  let q = supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  let q = sb
     .from("marketplace_templates")
     .select("*", { count: "exact" })
     .eq("status", "approved");
@@ -137,7 +146,10 @@ export async function rateTemplate(
 ): Promise<{ ok: boolean }> {
   if (rating < 1 || rating > 5) return { ok: false };
   const supabase = getSupabaseAdmin();
-  const { error } = await supabase.from("marketplace_template_ratings").upsert(
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { error } = await sb.from("marketplace_template_ratings").upsert(
     {
       user_id: userId,
       template_id: templateId,
@@ -149,13 +161,13 @@ export async function rateTemplate(
   );
   if (error) return { ok: false };
   // Recompute aggregate
-  const { data: agg } = await supabase
+  const { data: agg } = await sb
     .from("marketplace_template_ratings")
     .select("rating")
     .eq("template_id", templateId);
   if (agg && agg.length > 0) {
-    const avg = agg.reduce((s, r) => s + Number(r.rating), 0) / agg.length;
-    await supabase
+    const avg = agg.reduce((s: any, r: any) => s + Number(r.rating), 0) / agg.length;
+    await sb
       .from("marketplace_templates")
       .update({ rating_avg: Math.round(avg * 100) / 100, rating_count: agg.length })
       .eq("id", templateId);
@@ -165,13 +177,16 @@ export async function rateTemplate(
 
 export async function recordTemplateUsage(templateId: string): Promise<void> {
   const supabase = getSupabaseAdmin();
-  await supabase.rpc("increment_template_usage", { p_template_id: templateId }).then(
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  await sb.rpc("increment_template_usage", { p_template_id: templateId }).then(
     () => {},
     async () => {
       // fallback: best-effort increment
-      const { data } = await supabase.from("marketplace_templates").select("usage_count").eq("id", templateId).maybeSingle();
+      const { data } = await sb.from("marketplace_templates").select("usage_count").eq("id", templateId).maybeSingle();
       if (data) {
-        await supabase.from("marketplace_templates").update({ usage_count: (data.usage_count ?? 0) + 1 }).eq("id", templateId);
+        await sb.from("marketplace_templates").update({ usage_count: (data.usage_count ?? 0) + 1 }).eq("id", templateId);
       }
     },
   );

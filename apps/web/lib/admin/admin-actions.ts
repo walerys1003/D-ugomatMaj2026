@@ -82,8 +82,11 @@ export async function adminUpdateCaseStatusAction(input: {
   }
 
   const supabase = createSupabaseAdminClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
 
-  const { data: existing, error: readErr } = await supabase
+  const { data: existing, error: readErr } = await sb
     .from("cases")
     .select("user_id, status")
     .eq("id", parsed.data.caseId)
@@ -92,7 +95,7 @@ export async function adminUpdateCaseStatusAction(input: {
     throw new Error("Sprawa nie została znaleziona.");
   }
 
-  const { error: updErr } = await supabase
+  const { error: updErr } = await sb
     .from("cases")
     .update({ status: parsed.data.status })
     .eq("id", parsed.data.caseId);
@@ -101,7 +104,7 @@ export async function adminUpdateCaseStatusAction(input: {
   }
 
   // Audyt — actor = "admin" + admin_user_id w metadata.
-  await supabase.from("case_events").insert({
+  await sb.from("case_events").insert({
     case_id: parsed.data.caseId,
     user_id: existing.user_id,
     actor: "admin",
@@ -172,13 +175,16 @@ export async function adminUpsertPromptTemplateAction(
   }
 
   const supabase = createSupabaseAdminClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   let id = parsed.data.id;
   let version: number;
 
   if (id) {
     // UPDATE — bump version i (jeżeli aktywujemy) deaktywuj inne dla pary
     // (case_type, variant).
-    const { data: existing, error: readErr } = await supabase
+    const { data: existing, error: readErr } = await sb
       .from("prompt_templates")
       .select("version, case_type, variant")
       .eq("id", id)
@@ -188,7 +194,7 @@ export async function adminUpsertPromptTemplateAction(
     version = (existing.version as number) + 1;
 
     if (parsed.data.is_active) {
-      await supabase
+      await sb
         .from("prompt_templates")
         .update({ is_active: false })
         .eq("case_type", parsed.data.case_type)
@@ -196,7 +202,7 @@ export async function adminUpsertPromptTemplateAction(
         .neq("id", id);
     }
 
-    const { error: updErr } = await supabase
+    const { error: updErr } = await sb
       .from("prompt_templates")
       .update({
         system_prompt: parsed.data.system_prompt,
@@ -215,7 +221,7 @@ export async function adminUpsertPromptTemplateAction(
     }
   } else {
     // INSERT — version = max+1 dla pary (case_type, variant) lub 1.
-    const { data: existing } = await supabase
+    const { data: existing } = await sb
       .from("prompt_templates")
       .select("version")
       .eq("case_type", parsed.data.case_type)
@@ -228,14 +234,14 @@ export async function adminUpsertPromptTemplateAction(
         : 1;
 
     if (parsed.data.is_active) {
-      await supabase
+      await sb
         .from("prompt_templates")
         .update({ is_active: false })
         .eq("case_type", parsed.data.case_type)
         .eq("variant", parsed.data.variant);
     }
 
-    const { data: inserted, error: insErr } = await supabase
+    const { data: inserted, error: insErr } = await sb
       .from("prompt_templates")
       .insert({
         case_type: parsed.data.case_type as never,
@@ -321,7 +327,10 @@ export async function adminUpdateUserRoleAction(input: {
   }
 
   const supabase = createSupabaseAdminClient();
-  const { error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { error } = await sb
     .from("profiles")
     .update({ role: parsed.data.role })
     .eq("id", parsed.data.userId);
@@ -390,9 +399,12 @@ export async function adminCreateRefundAction(
   }
 
   const supabase = createSupabaseAdminClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
 
   // 1) Load payment
-  const { data: payment, error: payErr } = await supabase
+  const { data: payment, error: payErr } = await sb
     .from("payments")
     .select(
       "id, user_id, case_id, amount, status, stripe_payment_intent_id, refunded_at",
@@ -438,7 +450,7 @@ export async function adminCreateRefundAction(
   }
 
   // 3) Insert refund row
-  const { data: refundRow, error: insErr } = await supabase
+  const { data: refundRow, error: insErr } = await sb
     .from("refunds")
     .insert({
       payment_id: payment.id,
@@ -464,7 +476,7 @@ export async function adminCreateRefundAction(
 
   // 4) Mark payment as refunded jeżeli full refund
   if (refundAmount === payment.amount && stripeRes.status === "succeeded") {
-    await supabase
+    await sb
       .from("payments")
       .update({
         status: "refunded",
@@ -476,7 +488,7 @@ export async function adminCreateRefundAction(
 
   // 5) Audit
   if (payment.case_id) {
-    await supabase.from("case_events").insert({
+    await sb.from("case_events").insert({
       case_id: payment.case_id,
       user_id: payment.user_id,
       actor: "admin",

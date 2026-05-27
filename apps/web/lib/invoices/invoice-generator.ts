@@ -77,7 +77,10 @@ export interface InvoiceRecord {
  */
 async function nextInvoiceNumber(year: number, isCorrection: boolean): Promise<string> {
   const supabase = createSupabaseAdminClient();
-  const { data, error } = await supabase.rpc("fn_next_invoice_number", {
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data, error } = await sb.rpc("fn_next_invoice_number", {
     p_year: year,
     p_is_correction: isCorrection,
   });
@@ -91,6 +94,9 @@ async function nextInvoiceNumber(year: number, isCorrection: boolean): Promise<s
 
 export async function createInvoice(input: InvoiceInput): Promise<InvoiceRecord> {
   const supabase = createSupabaseAdminClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const issueDate = input.issueDate ?? new Date();
   const sellDate = input.sellDate ?? issueDate;
   const isCorrection = !!input.originalInvoiceNumber;
@@ -122,7 +128,7 @@ export async function createInvoice(input: InvoiceInput): Promise<InvoiceRecord>
     vat: b.vat,
   }));
 
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from("invoices")
     .insert({
       invoice_number: invoiceNumber,
@@ -260,7 +266,10 @@ export async function syncInvoiceToFakturownia(
     if (!json.id) return null;
 
     const supabase = createSupabaseAdminClient();
-    await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+    await sb
       .from("invoices")
       .update({ fakturownia_id: String(json.id) })
       .eq("id", invoice.id);

@@ -24,12 +24,21 @@ interface PlanFeature {
   }>;
 }
 
-const PLANS = [
+// W10-2: explicit type so `highlight?` is uniformly part of the union
+// (was: `as const` produced a discriminated union where only `pro` had highlight)
+interface PlanCard {
+  id: "free" | "solo" | "pro" | "enterprise";
+  name: string;
+  price: string;
+  period: string;
+  highlight?: boolean;
+}
+const PLANS: readonly PlanCard[] = [
   { id: "free", name: "Free", price: "0 zł", period: "" },
   { id: "solo", name: "Solo", price: "49 zł", period: "/mc" },
   { id: "pro", name: "Pro", price: "149 zł", period: "/mc", highlight: true },
   { id: "enterprise", name: "Enterprise", price: "od 999 zł", period: "/mc" },
-] as const;
+];
 
 const FEATURES: PlanFeature[] = [
   {

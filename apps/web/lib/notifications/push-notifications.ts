@@ -59,8 +59,11 @@ export function getVapidPublicKey(): string | null {
  */
 export async function saveSubscription(rec: PushSubscriptionRecord): Promise<{ ok: true } | { ok: false; error: string }> {
   const supabase = getSupabaseAdmin();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   try {
-    const { error } = await supabase.from("push_subscriptions").upsert(
+    const { error } = await sb.from("push_subscriptions").upsert(
       {
         user_id: rec.user_id,
         endpoint: rec.endpoint,
@@ -80,7 +83,10 @@ export async function saveSubscription(rec: PushSubscriptionRecord): Promise<{ o
 
 export async function removeSubscription(endpoint: string): Promise<void> {
   const supabase = getSupabaseAdmin();
-  await supabase.from("push_subscriptions").delete().eq("endpoint", endpoint);
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  await sb.from("push_subscriptions").delete().eq("endpoint", endpoint);
 }
 
 /**
@@ -109,7 +115,10 @@ export async function sendPushToUser(userId: string, payload: PushPayload): Prom
   webpush.setVapidDetails(cfg.subject, cfg.publicKey, cfg.privateKey);
 
   const supabase = getSupabaseAdmin();
-  const { data: subs, error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data: subs, error } = await sb
     .from("push_subscriptions")
     .select("id, endpoint, keys, failed_count")
     .eq("user_id", userId);
@@ -127,7 +136,7 @@ export async function sendPushToUser(userId: string, payload: PushPayload): Prom
         { TTL: 86400, urgency: "normal" },
       );
       success++;
-      await supabase
+      await sb
         .from("push_subscriptions")
         .update({ last_seen_at: new Date().toISOString(), failed_count: 0 })
         .eq("id", sub.id);
@@ -143,7 +152,7 @@ export async function sendPushToUser(userId: string, payload: PushPayload): Prom
         if (failed >= 5) {
           await removeSubscription(sub.endpoint);
         } else {
-          await supabase.from("push_subscriptions").update({ failed_count: failed }).eq("id", sub.id);
+          await sb.from("push_subscriptions").update({ failed_count: failed }).eq("id", sub.id);
         }
       }
     }

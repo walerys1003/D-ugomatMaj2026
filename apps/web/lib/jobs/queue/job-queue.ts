@@ -74,10 +74,13 @@ const VISIBILITY_TIMEOUT_MS = 5 * 60 * 1000;
 
 export async function enqueueJob(opts: EnqueueOptions): Promise<JobRecord> {
   const supabase = await createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
 
   // Idempotency: jeśli pending lub running job z tym kluczem istnieje, zwróć go.
   if (opts.idempotencyKey) {
-    const { data: existing } = await supabase
+    const { data: existing } = await sb
       .from("job_queue")
       .select("*")
       .eq("idempotency_key", opts.idempotencyKey)
@@ -86,7 +89,7 @@ export async function enqueueJob(opts: EnqueueOptions): Promise<JobRecord> {
     if (existing) return existing as JobRecord;
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from("job_queue")
     .insert({
       kind: opts.kind,
@@ -114,7 +117,10 @@ export async function claimNextJob(args: {
   kinds?: JobKind[];
 }): Promise<JobRecord | null> {
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase.rpc("claim_next_job", {
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data, error } = await sb.rpc("claim_next_job", {
     worker_id: args.workerId,
     kinds: args.kinds ?? null,
     visibility_timeout_ms: VISIBILITY_TIMEOUT_MS,
@@ -126,7 +132,10 @@ export async function claimNextJob(args: {
 
 export async function heartbeatJob(id: string, workerId: string): Promise<void> {
   const supabase = await createSupabaseServerClient();
-  const { error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { error } = await sb
     .from("job_queue")
     .update({ heartbeat_at: new Date().toISOString() })
     .eq("id", id)
@@ -137,7 +146,10 @@ export async function heartbeatJob(id: string, workerId: string): Promise<void> 
 
 export async function completeJob(id: string, workerId: string): Promise<void> {
   const supabase = await createSupabaseServerClient();
-  const { error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { error } = await sb
     .from("job_queue")
     .update({
       status: "completed",
@@ -155,7 +167,10 @@ export async function failJob(args: {
   retry?: boolean;
 }): Promise<void> {
   const supabase = await createSupabaseServerClient();
-  const { data: row, error: rowErr } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data: row, error: rowErr } = await sb
     .from("job_queue")
     .select("attempts,max_attempts")
     .eq("id", args.id)
@@ -166,7 +181,7 @@ export async function failJob(args: {
   const shouldDeadLetter = !args.retry || attempts >= (row.max_attempts ?? DEFAULT_MAX_ATTEMPTS);
 
   if (shouldDeadLetter) {
-    const { error } = await supabase
+    const { error } = await sb
       .from("job_queue")
       .update({
         status: "dead_letter",
@@ -182,7 +197,7 @@ export async function failJob(args: {
 
   const backoffMs = exponentialBackoff(attempts);
   const runAfter = new Date(Date.now() + backoffMs).toISOString();
-  const { error } = await supabase
+  const { error } = await sb
     .from("job_queue")
     .update({
       status: "pending",
@@ -201,8 +216,11 @@ export async function failJob(args: {
 /** Sweep stale jobs (brak heartbeat > 60s) — uwalnia je do ponownego claim. */
 export async function sweepStaleJobs(): Promise<number> {
   const supabase = await createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const cutoff = new Date(Date.now() - HEARTBEAT_STALE_MS).toISOString();
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from("job_queue")
     .update({
       status: "pending",
@@ -220,7 +238,10 @@ export async function sweepStaleJobs(): Promise<number> {
 
 export async function queueDepth(kind?: JobKind): Promise<{ pending: number; running: number; dead: number }> {
   const supabase = await createSupabaseServerClient();
-  const base = supabase.from("job_queue").select("status", { count: "exact", head: true });
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const base = sb.from("job_queue").select("status", { count: "exact", head: true });
   const filter = (b: typeof base) => (kind ? b.eq("kind", kind) : b);
   const [pending, running, dead] = await Promise.all([
     filter(base).eq("status", "pending"),

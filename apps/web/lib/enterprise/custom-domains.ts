@@ -16,7 +16,9 @@ export interface CustomDomain {
 }
 
 export async function registerDomain(orgId: string, domain: string): Promise<CustomDomain> {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   const d: CustomDomain = {
     id: randomUUID(),
     org_id: orgId,
@@ -31,7 +33,9 @@ export async function registerDomain(orgId: string, domain: string): Promise<Cus
 }
 
 export async function verifyDomain(domainId: string): Promise<{ verified: boolean; method?: "txt" | "cname" }> {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   const { data: d } = await sb.from("custom_domains").select("*").eq("id", domainId).maybeSingle();
   if (!d) throw new Error("not_found");
   // DNS verification via DoH (Cloudflare 1.1.1.1)

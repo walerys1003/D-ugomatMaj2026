@@ -49,6 +49,9 @@ export async function enqueueGenerationJob(
   input: EnqueueInput,
 ): Promise<{ ok: true; job_id: string } | { ok: false; error: string }> {
   const supabase = getSupabaseAdmin();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const priority = input.priority ?? "normal";
   const scheduled_at = input.delay_seconds
     ? new Date(Date.now() + input.delay_seconds * 1000).toISOString()
@@ -56,7 +59,7 @@ export async function enqueueGenerationJob(
 
   // Idempotency: skip duplicate queued jobs for same case+kind+priority
   if (input.kind === "generation") {
-    const { data: existing } = await supabase
+    const { data: existing } = await sb
       .from("generation_jobs")
       .select("id")
       .eq("case_id", input.case_id)
@@ -68,7 +71,7 @@ export async function enqueueGenerationJob(
     }
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from("generation_jobs")
     .insert({
       user_id: input.user_id,
@@ -92,16 +95,19 @@ export interface ClaimedJob extends GenerationJob {}
 
 export async function claimNextJob(workerId: string): Promise<ClaimedJob | null> {
   const supabase = getSupabaseAdmin();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   // Use RPC if available, else fallback to a 2-step claim
   try {
-    const { data } = await supabase.rpc("claim_next_generation_job", { p_worker_id: workerId });
+    const { data } = await sb.rpc("claim_next_generation_job", { p_worker_id: workerId });
     if (data && Array.isArray(data) && data[0]) return data[0] as ClaimedJob;
     if (data && !Array.isArray(data) && (data as any).id) return data as ClaimedJob;
   } catch (err) {
     logger.debug("queue.rpc_unavailable_fallback", { error: (err as Error).message });
   }
   // Fallback (race-prone, ok for low concurrency)
-  const { data: candidate } = await supabase
+  const { data: candidate } = await sb
     .from("generation_jobs")
     .select("*")
     .eq("status", "queued")
@@ -111,7 +117,7 @@ export async function claimNextJob(workerId: string): Promise<ClaimedJob | null>
     .limit(1)
     .maybeSingle();
   if (!candidate) return null;
-  const { data: updated, error } = await supabase
+  const { data: updated, error } = await sb
     .from("generation_jobs")
     .update({
       status: "running",
@@ -129,7 +135,10 @@ export async function claimNextJob(workerId: string): Promise<ClaimedJob | null>
 
 export async function completeJob(jobId: string, result: Record<string, unknown>): Promise<void> {
   const supabase = getSupabaseAdmin();
-  await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  await sb
     .from("generation_jobs")
     .update({ status: "completed", completed_at: new Date().toISOString(), result })
     .eq("id", jobId);
@@ -137,7 +146,10 @@ export async function completeJob(jobId: string, result: Record<string, unknown>
 
 export async function failJob(jobId: string, error: string, retry = true): Promise<void> {
   const supabase = getSupabaseAdmin();
-  const { data } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data } = await sb
     .from("generation_jobs")
     .select("attempts, max_attempts")
     .eq("id", jobId)
@@ -145,14 +157,14 @@ export async function failJob(jobId: string, error: string, retry = true): Promi
   if (!data) return;
   const exhausted = !retry || (data.attempts ?? 0) >= (data.max_attempts ?? 3);
   if (exhausted) {
-    await supabase
+    await sb
       .from("generation_jobs")
       .update({ status: "failed", completed_at: new Date().toISOString(), error })
       .eq("id", jobId);
   } else {
     // re-queue with exponential backoff
     const backoffSec = Math.min(60 * Math.pow(2, data.attempts ?? 0), 3600);
-    await supabase
+    await sb
       .from("generation_jobs")
       .update({
         status: "queued",
@@ -166,7 +178,10 @@ export async function failJob(jobId: string, error: string, retry = true): Promi
 
 export async function cancelJob(userId: string, jobId: string): Promise<{ ok: boolean }> {
   const supabase = getSupabaseAdmin();
-  const { error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { error } = await sb
     .from("generation_jobs")
     .update({ status: "cancelled", completed_at: new Date().toISOString() })
     .eq("id", jobId)
@@ -177,7 +192,10 @@ export async function cancelJob(userId: string, jobId: string): Promise<{ ok: bo
 
 export async function getJob(jobId: string, userId: string): Promise<GenerationJob | null> {
   const supabase = getSupabaseAdmin();
-  const { data } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data } = await sb
     .from("generation_jobs")
     .select("*")
     .eq("id", jobId)
@@ -188,7 +206,10 @@ export async function getJob(jobId: string, userId: string): Promise<GenerationJ
 
 export async function listUserJobs(userId: string, opts?: { status?: JobStatus; limit?: number }): Promise<GenerationJob[]> {
   const supabase = getSupabaseAdmin();
-  let q = supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  let q = sb
     .from("generation_jobs")
     .select("*")
     .eq("user_id", userId)

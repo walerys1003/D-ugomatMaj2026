@@ -78,7 +78,9 @@ export async function registerEndpoint(input: {
   url: string;
   events: WebhookEvent[];
 }): Promise<WebhookEndpoint> {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   const endpoint: Omit<WebhookEndpoint, never> = {
     id: randomUUID(),
     user_id: input.user_id,
@@ -96,7 +98,9 @@ export async function registerEndpoint(input: {
 }
 
 export async function emitEvent(event: WebhookEvent, userId: string, payload: Record<string, unknown>): Promise<number> {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   const { data: endpoints } = await sb
     .from("webhook_endpoints")
     .select("*")
@@ -120,7 +124,9 @@ export async function emitEvent(event: WebhookEvent, userId: string, payload: Re
 }
 
 export async function processDueDeliveries(batchSize = 25): Promise<{ delivered: number; failed: number; dead: number }> {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   const now = new Date().toISOString();
   const { data: due } = await sb
     .from("webhook_deliveries")

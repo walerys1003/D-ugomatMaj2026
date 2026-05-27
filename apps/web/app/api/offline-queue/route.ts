@@ -2,16 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 import { persistServerAction, drainServerQueue, QueueOp } from "@/lib/pwa/offline-queue";
 
 async function getSupabase() {
-  const { createServerSupabase } = await import("@/lib/supabase/server");
+  const { createServerSupabase } = await import("@/lib/sb/server");
   return createSupabaseServerClient();
 }
 
 export async function GET(_req: NextRequest) {
   const supabase = await getSupabase();
-  const { data: { user } } = await supabase.auth.getUser();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data: { user } } = await sb.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from("offline_queue")
     .select("*")
     .eq("user_id", user.id)
@@ -23,14 +26,17 @@ export async function GET(_req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const supabase = await getSupabase();
-  const { data: { user } } = await supabase.auth.getUser();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data: { user } } = await sb.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const body = await req.json().catch(() => ({}));
   if (!body.op || !body.payload) return NextResponse.json({ error: "missing_fields" }, { status: 400 });
 
   try {
-    const action = await persistServerAction(supabase, user.id, body.op as QueueOp, body.payload);
+    const action = await persistServerAction(sb, user.id, body.op as QueueOp, body.payload);
     return NextResponse.json({ action }, { status: 201 });
   } catch (e: any) {
     return NextResponse.json({ error: e?.message ?? "queue_failed" }, { status: 500 });

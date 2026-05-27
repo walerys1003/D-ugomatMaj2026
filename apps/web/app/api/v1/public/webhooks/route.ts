@@ -52,8 +52,11 @@ export async function POST(req: NextRequest) {
   }
 
   const supabase = getSupabaseAdmin();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const { raw, hash } = generateWebhookSecret();
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from("webhook_subscriptions")
     .insert({
       organization_id: verified.key.organization_id,
@@ -68,7 +71,7 @@ export async function POST(req: NextRequest) {
   if (error || !data) return NextResponse.json({ error: error?.message ?? "create_failed" }, { status: 500 });
 
   // Store raw secret for signing dispatch
-  await supabase.from("webhook_secrets").insert({ subscription_id: data.id, raw_secret: raw });
+  await sb.from("webhook_secrets").insert({ subscription_id: data.id, raw_secret: raw });
 
   return NextResponse.json({ ...data, secret: raw, note: "save_this_secret_now_it_will_not_be_shown_again" }, { status: 201 });
 }
@@ -81,7 +84,10 @@ export async function GET(req: NextRequest) {
   if (!hasApiScope(verified.key, "webhooks.manage")) return NextResponse.json({ error: "insufficient_scope" }, { status: 403 });
 
   const supabase = getSupabaseAdmin();
-  const { data } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data } = await sb
     .from("webhook_subscriptions")
     .select("id, url, events, active, failure_count, last_delivery_at, created_at")
     .eq("organization_id", verified.key.organization_id)

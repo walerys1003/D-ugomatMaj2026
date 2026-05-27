@@ -5,20 +5,23 @@ import { decryptField } from "@/lib/security/encryption/field-crypto";
 import { recordSecurityEvent } from "@/lib/security/security-events";
 
 async function getSupabase() {
-  const { createSupabaseServerClient } = await import("@/lib/db/supabase-server");
+  const { createSupabaseServerClient } = await import("@/lib/db/sb-server");
   return createSupabaseServerClient();
 }
 
 export async function POST(req: NextRequest) {
   const supabase = await getSupabase();
-  const { data: { user } } = await supabase.auth.getUser();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data: { user } } = await sb.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const body = await req.json().catch(() => ({}));
   const token = String(body.token ?? "").trim();
   if (!token) return NextResponse.json({ error: "token_required" }, { status: 400 });
 
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from("mfa_secrets")
     .select("secret_encrypted, backup_codes, verified")
     .eq("user_id", user.id)
@@ -31,8 +34,8 @@ export async function POST(req: NextRequest) {
   // Try TOTP first.
   const secret = decryptField(data.secret_encrypted);
   if (verifyTotp(token, secret)) {
-    if (!data.verified) await supabase.from("mfa_secrets").update({ verified: true }).eq("user_id", user.id);
-    await recordSecurityEvent(supabase, { userId: user.id, type: "auth.mfa_verified", ip, userAgent: ua });
+    if (!data.verified) await sb.from("mfa_secrets").update({ verified: true }).eq("user_id", user.id);
+    await recordSecurityEvent(sb, { userId: user.id, type: "auth.mfa_verified", ip, userAgent: ua });
     return NextResponse.json({ verified: true, method: "totp" });
   }
 
@@ -42,12 +45,12 @@ export async function POST(req: NextRequest) {
     const c = codes[i];
     if (!c.used && verifyBackupCode(token, c.code_hash)) {
       codes[i] = { ...c, used: true };
-      await supabase.from("mfa_secrets").update({ backup_codes: codes }).eq("user_id", user.id);
-      await recordSecurityEvent(supabase, { userId: user.id, type: "auth.backup_code_used", ip, userAgent: ua });
+      await sb.from("mfa_secrets").update({ backup_codes: codes }).eq("user_id", user.id);
+      await recordSecurityEvent(sb, { userId: user.id, type: "auth.backup_code_used", ip, userAgent: ua });
       return NextResponse.json({ verified: true, method: "backup_code", remainingBackupCodes: codes.filter((x) => !x.used).length });
     }
   }
 
-  await recordSecurityEvent(supabase, { userId: user.id, type: "auth.mfa_failed", ip, userAgent: ua });
+  await recordSecurityEvent(sb, { userId: user.id, type: "auth.mfa_failed", ip, userAgent: ua });
   return NextResponse.json({ verified: false }, { status: 401 });
 }

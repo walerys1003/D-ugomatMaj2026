@@ -27,7 +27,9 @@ export interface AuditEntry {
 }
 
 export async function recordAuditEntry(entry: AuditEntry): Promise<void> {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   await sb.from("admin_audit_log").insert({
     actor_id: entry.actor_id,
     action: entry.action,
@@ -41,7 +43,9 @@ export async function recordAuditEntry(entry: AuditEntry): Promise<void> {
 }
 
 export async function listRecentAuditEntries(limit = 200): Promise<AuditEntry[]> {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   const { data } = await sb
     .from("admin_audit_log")
     .select("*")

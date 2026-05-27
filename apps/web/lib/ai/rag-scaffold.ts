@@ -52,13 +52,16 @@ class InHouseProvider implements RagProviderImpl {
 
   async search(q: RagQuery): Promise<RagResult[]> {
     const supabase = getSupabaseAdmin();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
     const limit = q.limit ?? 5;
     const tokens = tokenize(q.query);
     if (tokens.length === 0) return [];
 
     const ftsExpr = tokens.map((t) => `${t}:*`).join(" | ");
 
-    let query = supabase
+    let query = sb
       .from("legal_references")
       .select("citation, body, abbreviation, article_number, ref_type, url, publication_date")
       .eq("verified", true)

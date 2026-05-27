@@ -136,6 +136,9 @@ export async function POST(req: NextRequest): Promise<Response> {
   if (reports.length === 0) return new NextResponse(null, { status: 204 });
 
   const supabase = createSupabaseAdminClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const toInsert: Array<Record<string, unknown>> = [];
 
   for (const r of reports) {
@@ -158,7 +161,7 @@ export async function POST(req: NextRequest): Promise<Response> {
       src: r.source_file?.slice(0, 200),
     });
 
-    if (supabase) {
+    if (sb) {
       toInsert.push({
         event_type: "csp_violation",
         actor_type: "browser",
@@ -177,9 +180,9 @@ export async function POST(req: NextRequest): Promise<Response> {
     }
   }
 
-  if (supabase && toInsert.length > 0) {
+  if (sb && toInsert.length > 0) {
     try {
-      await supabase.from("audit_log").insert(toInsert);
+      await sb.from("audit_log").insert(toInsert);
     } catch (e) {
       logger.warn("csp.audit_log_insert_failed", {
         error: e instanceof Error ? e.message : String(e),

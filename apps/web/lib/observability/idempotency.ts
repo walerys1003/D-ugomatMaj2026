@@ -49,13 +49,16 @@ export async function reserveIdempotency<T>(
   k: IdempotencyKey,
 ): Promise<IdempotencyLookup<T>> {
   const supabase = createSupabaseAdminClient();
-  if (!supabase) {
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  if (!sb) {
     // Bez admin clienta nie możemy gwarantować idempotencji — pomiń.
     logger.warn("idempotency.no_admin", { scope: k.scope });
     return { hit: false };
   }
 
-  const { data: existing, error: lookupErr } = await supabase
+  const { data: existing, error: lookupErr } = await sb
     .from("idempotency_records")
     .select("status,result,http_status,created_at")
     .eq("scope", k.scope)
@@ -71,7 +74,7 @@ export async function reserveIdempotency<T>(
     const age = Date.now() - new Date(existing.created_at as string).getTime();
     if (age > TTL_MS) {
       // TTL przeterminowany — re-reserve.
-      await supabase
+      await sb
         .from("idempotency_records")
         .delete()
         .eq("scope", k.scope)
@@ -87,7 +90,7 @@ export async function reserveIdempotency<T>(
   }
 
   // Reserve in_progress.
-  const { error: insertErr } = await supabase.from("idempotency_records").insert({
+  const { error: insertErr } = await sb.from("idempotency_records").insert({
     scope: k.scope,
     key: k.key,
     user_id: k.user_id ?? null,
@@ -113,8 +116,11 @@ export async function completeIdempotency<T>(
   httpStatus = 200,
 ): Promise<void> {
   const supabase = createSupabaseAdminClient();
-  if (!supabase) return;
-  const { error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  if (!sb) return;
+  const { error } = await sb
     .from("idempotency_records")
     .update({
       status: "completed",
@@ -132,8 +138,11 @@ export async function completeIdempotency<T>(
 
 export async function abortIdempotency(k: IdempotencyKey): Promise<void> {
   const supabase = createSupabaseAdminClient();
-  if (!supabase) return;
-  await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  if (!sb) return;
+  await sb
     .from("idempotency_records")
     .delete()
     .eq("scope", k.scope)

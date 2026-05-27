@@ -20,7 +20,9 @@ export interface RetrievedDoc extends VectorDoc {
 }
 
 export async function upsertVectorDoc(doc: VectorDoc & { vector: number[] }): Promise<void> {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   await sb.from("rag_documents").upsert(
     {
       id: doc.id,
@@ -40,7 +42,9 @@ export async function upsertVectorDoc(doc: VectorDoc & { vector: number[] }): Pr
 export async function searchSimilar(query: string, opts?: { corpus?: string; topK?: number }): Promise<RetrievedDoc[]> {
   const topK = opts?.topK ?? 5;
   const qVec = (await embed(query)).vector;
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   // Try pgvector RPC first
   try {
     const { data, error } = await sb.rpc("rag_search", {

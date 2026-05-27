@@ -52,7 +52,10 @@ export async function captureError(
   // 2. DB fallback (always — for analytics + offline replay if Sentry down)
   try {
     const supabase = createSupabaseAdminClient();
-    await supabase.from("error_reports").insert({
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+    await sb.from("error_reports").insert({
       message: message.slice(0, 1000),
       stack: stack?.slice(0, 8000) ?? null,
       severity,
@@ -104,8 +107,11 @@ export async function recentErrorSummary(): Promise<
   Array<{ fingerprint: string; count: number; sample_message: string; last_seen: string }>
 > {
   const supabase = createSupabaseAdminClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const since = new Date(Date.now() - 86_400_000).toISOString();
-  const { data } = await supabase
+  const { data } = await sb
     .from("error_reports")
     .select("fingerprint, message, created_at")
     .gte("created_at", since)

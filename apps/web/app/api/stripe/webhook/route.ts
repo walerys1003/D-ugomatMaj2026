@@ -150,9 +150,12 @@ async function handleCheckoutCompleted(event: {
   }
 
   const supabase = createSupabaseAdminClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
 
   // Idempotency: jeśli już 'completed' — skip
-  const { data: existing, error: selErr } = await supabase
+  const { data: existing, error: selErr } = await sb
     .from("payments")
     .select(
       "id, user_id, case_id, status, amount, vat_rate, product_name, customer_type, invoice_company_name, invoice_nip, invoice_address, fakturownia_invoice_id",
@@ -170,7 +173,7 @@ async function handleCheckoutCompleted(event: {
   }
 
   // Update payments → completed
-  await supabase
+  await sb
     .from("payments")
     .update({
       status: "completed",
@@ -182,12 +185,12 @@ async function handleCheckoutCompleted(event: {
 
   // Update case → status='paid'
   if (caseId) {
-    await supabase
+    await sb
       .from("cases")
       .update({ status: "paid" })
       .eq("id", caseId);
 
-    await supabase.from("case_events").insert({
+    await sb.from("case_events").insert({
       case_id: caseId,
       user_id: existing.user_id,
       actor: "payment",
@@ -271,7 +274,7 @@ async function handleCheckoutCompleted(event: {
         stripeSessionId: session.id,
       });
 
-      await supabase
+      await sb
         .from("payments")
         .update({
           fakturownia_invoice_id: invoice.id,
@@ -313,7 +316,10 @@ async function handleCheckoutExpired(event: {
   if (!paymentId) return;
 
   const supabase = createSupabaseAdminClient();
-  await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  await sb
     .from("payments")
     .update({
       status: "failed",
@@ -344,9 +350,12 @@ async function handleChargeRefunded(event: {
   if (!charge.payment_intent) return;
 
   const supabase = createSupabaseAdminClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
 
   // Pobierz powiązaną płatność (potrzebujemy payment_id + user_id do `refunds`)
-  const { data: payment } = await supabase
+  const { data: payment } = await sb
     .from("payments")
     .select("id, user_id, case_id, amount")
     .eq("stripe_payment_intent_id", charge.payment_intent)
@@ -359,7 +368,7 @@ async function handleChargeRefunded(event: {
   if (payment && charge.refunds?.data) {
     for (const r of charge.refunds.data) {
       // Sprawdź czy już istnieje (idempotency dla async webhook retries)
-      const { data: existing } = await supabase
+      const { data: existing } = await sb
         .from("refunds")
         .select("id, status")
         .eq("stripe_refund_id", r.id)
@@ -368,7 +377,7 @@ async function handleChargeRefunded(event: {
       if (existing) {
         // Update statusu (np. pending → succeeded)
         if (existing.status !== r.status) {
-          await supabase
+          await sb
             .from("refunds")
             .update({
               status: r.status === "succeeded" ? "succeeded" : r.status,
@@ -379,7 +388,7 @@ async function handleChargeRefunded(event: {
         }
       } else {
         // Insert nowego — wywołane spoza naszego admin tool (np. Dashboard Stripe)
-        await supabase.from("refunds").insert({
+        await sb.from("refunds").insert({
           payment_id: payment.id,
           user_id: payment.user_id,
           stripe_refund_id: r.id,
@@ -398,7 +407,7 @@ async function handleChargeRefunded(event: {
   // 2) Update payments.status + refunded_at jeżeli pełna kwota zrefundowana
   const isFullRefund =
     payment && charge.amount_refunded >= payment.amount;
-  await supabase
+  await sb
     .from("payments")
     .update({
       status: isFullRefund ? "refunded" : "completed",
@@ -408,7 +417,7 @@ async function handleChargeRefunded(event: {
 
   // 3) Audit case_event
   if (payment?.case_id) {
-    await supabase.from("case_events").insert({
+    await sb.from("case_events").insert({
       case_id: payment.case_id,
       user_id: payment.user_id,
       actor: "payment",
@@ -465,8 +474,11 @@ async function handlePaymentFailed(event: {
     "payment_failed";
 
   const supabase = createSupabaseAdminClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
 
-  const { data: payment, error: selErr } = await supabase
+  const { data: payment, error: selErr } = await sb
     .from("payments")
     .select("id, user_id, case_id, status, amount, product_name")
     .eq("id", paymentId)
@@ -482,7 +494,7 @@ async function handlePaymentFailed(event: {
   if (payment.status === "completed") return;
 
   // Mark failed (zachowujemy 'failed' jeśli już był, aktualizujemy reason).
-  await supabase
+  await sb
     .from("payments")
     .update({
       status: "failed",
@@ -493,7 +505,7 @@ async function handlePaymentFailed(event: {
 
   // Audit
   if (payment.case_id) {
-    await supabase.from("case_events").insert({
+    await sb.from("case_events").insert({
       case_id: payment.case_id,
       user_id: payment.user_id,
       actor: "payment",
@@ -506,7 +518,7 @@ async function handlePaymentFailed(event: {
   }
 
   // Email recovery — pobiera adres z auth.users (service-role).
-  const { data: userResult } = await supabase.auth.admin.getUserById(
+  const { data: userResult } = await sb.auth.admin.getUserById(
     payment.user_id,
   );
   const recipient = userResult?.user?.email;

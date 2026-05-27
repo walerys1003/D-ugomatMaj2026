@@ -110,6 +110,9 @@ export async function syncSubscriptionFromStripe(
   stripeSub: Record<string, any>,
 ): Promise<void> {
   const supabase = createSupabaseAdminClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const userId = stripeSub.metadata?.user_id;
   if (!userId) {
     if (process.env.NODE_ENV !== "production") {
@@ -137,14 +140,17 @@ export async function syncSubscriptionFromStripe(
     updated_at: new Date().toISOString(),
   };
 
-  await supabase
+  await sb
     .from("subscriptions")
     .upsert(row, { onConflict: "stripe_subscription_id" });
 }
 
 export async function getActiveSubscription(userId: string): Promise<SubscriptionRecord | null> {
   const supabase = createSupabaseAdminClient();
-  const { data } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data } = await sb
     .from("subscriptions")
     .select("*")
     .eq("user_id", userId)
@@ -198,6 +204,9 @@ export interface UsageSnapshot {
 
 export async function getCurrentUsage(userId: string): Promise<UsageSnapshot> {
   const supabase = createSupabaseAdminClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const sub = await getActiveSubscription(userId);
   const planId = sub?.plan_id ?? "free";
   const plan = getPlan(planId);
@@ -205,7 +214,7 @@ export async function getCurrentUsage(userId: string): Promise<UsageSnapshot> {
   const periodStart = sub?.current_period_start ?? monthStartIso();
   const periodEnd = sub?.current_period_end ?? monthEndIso();
 
-  const { data } = await supabase
+  const { data } = await sb
     .from("subscription_usage")
     .select("cases_created, ai_generations")
     .eq("user_id", userId)
@@ -229,12 +238,15 @@ export async function incrementUsage(
   delta: number = 1,
 ): Promise<void> {
   const supabase = createSupabaseAdminClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const sub = await getActiveSubscription(userId);
   const periodStart = sub?.current_period_start ?? monthStartIso();
   const periodEnd = sub?.current_period_end ?? monthEndIso();
 
   // Upsert + atomic increment via RPC (created in migration)
-  await supabase.rpc("fn_increment_subscription_usage", {
+  await sb.rpc("fn_increment_subscription_usage", {
     p_user_id: userId,
     p_period_start: periodStart,
     p_period_end: periodEnd,

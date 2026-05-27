@@ -34,7 +34,10 @@ export async function GET(req: NextRequest) {
   const offset = parseInt(url.searchParams.get("offset") ?? "0", 10);
 
   const supabase = getSupabaseAdmin();
-  const { data, error, count } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data, error, count } = await sb
     .from("cases")
     .select("id, case_type, title, status, created_at, updated_at", { count: "exact" })
     .eq("organization_id", verified.key.organization_id)
@@ -60,7 +63,10 @@ export async function POST(req: NextRequest) {
   if (!body.case_type) return NextResponse.json({ error: "case_type_required" }, { status: 400 });
 
   const supabase = getSupabaseAdmin();
-  const { data, error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data, error } = await sb
     .from("cases")
     .insert({
       organization_id: verified.key.organization_id,

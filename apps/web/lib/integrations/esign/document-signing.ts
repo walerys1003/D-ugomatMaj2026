@@ -111,7 +111,9 @@ export async function createSignatureRequest(input: {
       ? new Date(Date.now() + input.expires_in_days * 86400_000).toISOString()
       : undefined,
   };
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   await sb.from("signature_requests").insert({
     ...req,
     signing_url: sent.signing_url ?? null,
@@ -121,7 +123,9 @@ export async function createSignatureRequest(input: {
 }
 
 export async function refreshSignatureStatus(requestId: string): Promise<ESignStatus> {
-  const sb = await createServerSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createServerSupabase();
   const { data } = await sb.from("signature_requests").select("*").eq("id", requestId).maybeSingle();
   if (!data) throw new Error("not_found");
   const adapter = getAdapter(data.provider as ESignProvider);

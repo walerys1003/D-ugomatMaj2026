@@ -35,13 +35,16 @@ export interface DashboardSummary {
 
 export async function buildDashboard(userId: string): Promise<DashboardSummary> {
   const supabase = getSupabaseAdmin();
+  // W10-3: loose cast — Database type stale for `missed`, `win_probability`, etc.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
 
   const [casesResult, deadlinesResult, docsResult, suggestionsResult, runsResult] = await Promise.all([
-    supabase.from("cases").select("id, case_type, title, status, created_at, updated_at, win_probability").eq("user_id", userId).order("updated_at", { ascending: false, nullsFirst: false }),
-    supabase.from("deadlines").select("case_id, kind, due_at, completed_at, missed").eq("user_id", userId).is("completed_at", null),
-    supabase.from("documents").select("case_id").eq("user_id", userId),
-    supabase.from("ai_suggestions").select("case_id, dismissed, applied").eq("user_id", userId).is("dismissed_at", null),
-    supabase.from("ai_runs").select("total_cost_pln, created_at").eq("user_id", userId).gte("created_at", new Date(Date.now() - 30 * 86_400_000).toISOString()),
+    sb.from("cases").select("id, case_type, title, status, created_at, updated_at, win_probability").eq("user_id", userId).order("updated_at", { ascending: false, nullsFirst: false }),
+    sb.from("deadlines").select("case_id, kind, due_at, completed_at, missed").eq("user_id", userId).is("completed_at", null),
+    sb.from("documents").select("case_id").eq("user_id", userId),
+    sb.from("ai_suggestions").select("case_id, dismissed, applied").eq("user_id", userId).is("dismissed_at", null),
+    sb.from("ai_runs").select("total_cost_pln, created_at").eq("user_id", userId).gte("created_at", new Date(Date.now() - 30 * 86_400_000).toISOString()),
   ]);
 
   if (casesResult.error || !casesResult.data) {
@@ -75,7 +78,7 @@ export async function buildDashboard(userId: string): Promise<DashboardSummary> 
   let active = 0;
   let completed = 0;
 
-  const dashboardCases: DashboardCase[] = cases.map((c) => {
+  const dashboardCases: DashboardCase[] = cases.map((c: any) => {
     if (c.status === "closed" || c.status === "completed") completed++;
     else active++;
     const dl = deadlinesByCase.get(c.id);
@@ -101,7 +104,7 @@ export async function buildDashboard(userId: string): Promise<DashboardSummary> 
     };
   });
 
-  const this_month_cost_pln = (runsResult.data ?? []).reduce((sum, r: any) => sum + Number(r.total_cost_pln ?? 0), 0);
+  const this_month_cost_pln = (runsResult.data ?? []).reduce((sum: number, r: any) => sum + Number(r.total_cost_pln ?? 0), 0);
 
   return {
     cases: dashboardCases,

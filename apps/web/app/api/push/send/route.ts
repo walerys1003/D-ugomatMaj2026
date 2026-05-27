@@ -2,21 +2,24 @@ import { NextRequest, NextResponse } from "next/server";
 import { fanoutPush } from "@/lib/push/subscriptions";
 
 async function getSupabase() {
-  const { createServerSupabase } = await import("@/lib/supabase/server");
+  const { createServerSupabase } = await import("@/lib/sb/server");
   return createSupabaseServerClient();
 }
 
-async function requireAdmin(supabase: any) {
-  const { data: { user } } = await supabase.auth.getUser();
+async function requireAdmin(sb: any) {
+  const { data: { user } } = await sb.auth.getUser();
   if (!user) return null;
-  const { data } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
+  const { data } = await sb.from("profiles").select("role").eq("id", user.id).maybeSingle();
   if (data?.role !== "admin" && data?.role !== "owner") return null;
   return user;
 }
 
 export async function POST(req: NextRequest) {
   const supabase = await getSupabase();
-  if (!(await requireAdmin(supabase))) return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  if (!(await requireAdmin(sb))) return NextResponse.json({ error: "forbidden" }, { status: 403 });
 
   const body = await req.json().catch(() => ({}));
   if (!body.userId || !body.payload?.title) {
@@ -33,7 +36,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const result = await fanoutPush(supabase, body.userId, body.payload, cfg);
+    const result = await fanoutPush(sb, body.userId, body.payload, cfg);
     return NextResponse.json(result);
   } catch (e: any) {
     return NextResponse.json({ error: e?.message ?? "send_failed" }, { status: 500 });

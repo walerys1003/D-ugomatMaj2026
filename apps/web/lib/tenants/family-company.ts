@@ -60,9 +60,12 @@ export async function createTenant(input: {
   regon?: string;
 }): Promise<{ ok: true; tenant: Tenant } | { ok: false; error: string }> {
   const supabase = getSupabaseAdmin();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const memberLimit = input.kind === "personal" ? 1 : input.kind === "family" ? 6 : 50;
 
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from("tenants")
     .insert({
       kind: input.kind,
@@ -77,7 +80,7 @@ export async function createTenant(input: {
   if (error || !data) return { ok: false, error: error?.message ?? "create_failed" };
 
   // Add owner as member
-  await supabase.from("tenant_members").insert({
+  await sb.from("tenant_members").insert({
     tenant_id: data.id,
     user_id: input.owner_user_id,
     role: "owner",
@@ -92,8 +95,11 @@ export async function inviteToTenant(
   role: TenantRole = "member",
 ): Promise<{ ok: true; invitation_id: string; token: string } | { ok: false; error: string }> {
   const supabase = getSupabaseAdmin();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   // Verify inviter has admin or owner role
-  const { data: membership } = await supabase
+  const { data: membership } = await sb
     .from("tenant_members")
     .select("role")
     .eq("tenant_id", tenantId)
@@ -104,15 +110,15 @@ export async function inviteToTenant(
   }
 
   // Check member limit
-  const { data: tenant } = await supabase.from("tenants").select("member_limit").eq("id", tenantId).maybeSingle();
-  const { count } = await supabase.from("tenant_members").select("*", { count: "exact", head: true }).eq("tenant_id", tenantId);
+  const { data: tenant } = await sb.from("tenants").select("member_limit").eq("id", tenantId).maybeSingle();
+  const { count } = await sb.from("tenant_members").select("*", { count: "exact", head: true }).eq("tenant_id", tenantId);
   if (tenant && count !== null && count >= tenant.member_limit) {
     return { ok: false, error: "member_limit_reached" };
   }
 
   const token = await import("node:crypto").then((c) => c.randomBytes(24).toString("base64url"));
   const expires = new Date(Date.now() + 7 * 86_400_000).toISOString();
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from("tenant_invitations")
     .insert({
       tenant_id: tenantId,
@@ -133,7 +139,10 @@ export async function acceptInvitation(
   userId: string,
 ): Promise<{ ok: true; tenant_id: string; role: TenantRole } | { ok: false; error: string }> {
   const supabase = getSupabaseAdmin();
-  const { data: invitation } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data: invitation } = await sb
     .from("tenant_invitations")
     .select("*")
     .eq("token", token)
@@ -143,7 +152,7 @@ export async function acceptInvitation(
   if (new Date(invitation.expires_at).getTime() < Date.now()) return { ok: false, error: "expired" };
 
   // Add as member
-  const { error } = await supabase.from("tenant_members").insert({
+  const { error } = await sb.from("tenant_members").insert({
     tenant_id: invitation.tenant_id,
     user_id: userId,
     role: invitation.role,
@@ -153,13 +162,16 @@ export async function acceptInvitation(
     logger.warn("tenant.accept_invite_failed", { error: error.message });
     return { ok: false, error: error.message };
   }
-  await supabase.from("tenant_invitations").update({ accepted_at: new Date().toISOString() }).eq("id", invitation.id);
+  await sb.from("tenant_invitations").update({ accepted_at: new Date().toISOString() }).eq("id", invitation.id);
   return { ok: true, tenant_id: invitation.tenant_id, role: invitation.role };
 }
 
 export async function listUserTenants(userId: string): Promise<Array<Tenant & { role: TenantRole }>> {
   const supabase = getSupabaseAdmin();
-  const { data, error } = await supabase
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  const { data, error } = await sb
     .from("tenant_members")
     .select("role, tenants!inner(id, kind, name, owner_user_id, nip, regon, member_limit, created_at)")
     .eq("user_id", userId);
@@ -173,8 +185,11 @@ export async function removeMember(
   removeUserId: string,
 ): Promise<{ ok: boolean; error?: string }> {
   const supabase = getSupabaseAdmin();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   // Acting user must be owner or admin
-  const { data: actingMembership } = await supabase
+  const { data: actingMembership } = await sb
     .from("tenant_members")
     .select("role")
     .eq("tenant_id", tenantId)
@@ -184,7 +199,7 @@ export async function removeMember(
     return { ok: false, error: "insufficient_role" };
   }
   // Can't remove owner
-  const { data: targetMembership } = await supabase
+  const { data: targetMembership } = await sb
     .from("tenant_members")
     .select("role")
     .eq("tenant_id", tenantId)
@@ -192,6 +207,6 @@ export async function removeMember(
     .maybeSingle();
   if (targetMembership?.role === "owner") return { ok: false, error: "cannot_remove_owner" };
 
-  const { error } = await supabase.from("tenant_members").delete().eq("tenant_id", tenantId).eq("user_id", removeUserId);
+  const { error } = await sb.from("tenant_members").delete().eq("tenant_id", tenantId).eq("user_id", removeUserId);
   return { ok: !error, error: error?.message };
 }

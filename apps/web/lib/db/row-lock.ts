@@ -48,7 +48,10 @@ export interface ClaimedWork<T> {
  */
 export async function tryAdvisoryLock(scope: string): Promise<boolean> {
   const supabase = createSupabaseAdminClient();
-  if (!supabase) {
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  if (!sb) {
     logger.warn("rowlock.no_admin", { scope });
     return false;
   }
@@ -57,7 +60,7 @@ export async function tryAdvisoryLock(scope: string): Promise<boolean> {
   for (let i = 0; i < scope.length; i++) {
     h = (h * 31 + scope.charCodeAt(i)) | 0;
   }
-  const { data, error } = await supabase.rpc("try_advisory_lock", {
+  const { data, error } = await sb.rpc("try_advisory_lock", {
     lock_key: h,
   });
   if (error) {
@@ -69,12 +72,15 @@ export async function tryAdvisoryLock(scope: string): Promise<boolean> {
 
 export async function releaseAdvisoryLock(scope: string): Promise<void> {
   const supabase = createSupabaseAdminClient();
-  if (!supabase) return;
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  if (!sb) return;
   let h = 0;
   for (let i = 0; i < scope.length; i++) {
     h = (h * 31 + scope.charCodeAt(i)) | 0;
   }
-  await supabase.rpc("release_advisory_lock", { lock_key: h });
+  await sb.rpc("release_advisory_lock", { lock_key: h });
 }
 
 /**
@@ -106,11 +112,14 @@ export async function claimWork<T>(
   params: ClaimWorkParams,
 ): Promise<ClaimedWork<T>> {
   const supabase = createSupabaseAdminClient();
-  if (!supabase) {
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
+  if (!sb) {
     return { rows: [], release: async () => {} };
   }
 
-  const { data, error } = await supabase.rpc("claim_work_batch", {
+  const { data, error } = await sb.rpc("claim_work_batch", {
     p_table: params.table,
     p_status_filter: (params.where?.status as string) ?? "queued",
     p_limit: params.limit ?? 50,
@@ -137,7 +146,7 @@ export async function claimWork<T>(
           .map((r) => r.id)
           .filter(Boolean);
         if (ids.length === 0) return;
-        await supabase.rpc("release_work_batch", {
+        await sb.rpc("release_work_batch", {
           p_table: params.table,
           p_ids: ids,
           p_worker_id: params.workerId,

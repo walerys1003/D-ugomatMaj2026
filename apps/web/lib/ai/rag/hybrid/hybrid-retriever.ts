@@ -44,6 +44,9 @@ const DEFAULT_PER_RETRIEVER_LIMIT = 30;
 
 export async function hybridRetrieve(opts: HybridRetrievalOptions): Promise<RetrievedChunk[]> {
   const supabase = await createSupabaseServerClient();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   const topK = opts.topK ?? DEFAULT_TOP_K;
   const bm25Limit = opts.bm25Limit ?? DEFAULT_PER_RETRIEVER_LIMIT;
   const vectorLimit = opts.vectorLimit ?? DEFAULT_PER_RETRIEVER_LIMIT;
@@ -51,14 +54,14 @@ export async function hybridRetrieve(opts: HybridRetrievalOptions): Promise<Retr
 
   // Wywołujemy dwa RPC równolegle, by minimalizować latencję.
   const [bm25Res, vectorRes] = await Promise.all([
-    supabase.rpc("rag_bm25_search", {
+    sb.rpc("rag_bm25_search", {
       query_text: opts.query,
       max_results: bm25Limit,
       filter_document_ids: opts.filter?.documentIds ?? null,
       filter_tenant_id: opts.filter?.tenantId ?? null,
       filter_case_type: opts.filter?.caseType ?? null,
     }),
-    supabase.rpc("rag_vector_search", {
+    sb.rpc("rag_vector_search", {
       query_embedding: opts.queryEmbedding,
       max_results: vectorLimit,
       filter_document_ids: opts.filter?.documentIds ?? null,

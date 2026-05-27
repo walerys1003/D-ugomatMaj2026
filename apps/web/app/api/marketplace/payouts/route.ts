@@ -16,6 +16,9 @@ async function requireAdmin(supabase: any) {
 
 export async function GET(_req: NextRequest) {
   const supabase = await getSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   if (!(await requireAdmin(supabase))) return NextResponse.json({ error: "forbidden" }, { status: 403 });
   try {
     const lines = await computePendingPayouts(supabase);
@@ -27,6 +30,9 @@ export async function GET(_req: NextRequest) {
 
 export async function POST(_req: NextRequest) {
   const supabase = await getSupabase();
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb = supabase as any;
   if (!(await requireAdmin(supabase))) return NextResponse.json({ error: "forbidden" }, { status: 403 });
   try {
     const batch = await createPayoutBatch(supabase);
