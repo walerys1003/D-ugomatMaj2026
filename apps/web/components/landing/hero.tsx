@@ -142,27 +142,32 @@ export function Hero() {
  * mockup terminala. Z premium depth: floating card + ground card behind.
  */
 function HeroArtifact() {
-  // V4-ι.1 — fix kompozycji po root font-size 1.2× (zoom-120-parity).
-  // Karty zwężone (w-[80%] / w-[86%] zamiast 88%/92%), rotacje stonowane
-  // (1.8°/-1° zamiast 2.5°/-1.5°). Wrapper z max-w na mobile + min-w-0 na
-  // gridzie chronią przed wypchnięciem prawej kolumny przez wewnętrzną
-  // szerokość kart (Tailwind grid items defaultują do min-width: auto).
+  // V4-ι.3 — TOTAL clipping elimination.
+  // Poniżej xl (1280px): karty w PLAIN BLOCK FLOW (flex-col), bez absolute,
+  // bez rotacji, bez stacked depth — zwyczajnie jedna pod drugą.
+  // Na xl+: 2-panel composition z absolute positioning + lekki tilt.
+  // Wrapper ma h:auto na mobile (treść decyduje), h-[560px] tylko na xl.
   return (
-    <div className="relative mx-auto h-[480px] w-full max-w-[480px] sm:h-[520px] xl:h-[560px] xl:max-w-none">
-      {/* Background card — Sprzeciw draft (subtle tilt, behind) */}
+    <div className="relative mx-auto flex w-full max-w-[480px] flex-col gap-4 xl:block xl:h-[560px] xl:max-w-none xl:gap-0">
+      {/* Background card — Sprzeciw draft.
+       *  - mobile: static block, no rotation, full column width
+       *  - xl+: absolute top-right z lekkim tiltem (depth) */}
       <Surface
         elevation="raised"
         padded="none"
-        className="absolute right-0 top-6 w-[80%] rotate-[1.8deg] overflow-hidden xl:right-2 xl:top-10"
+        className="overflow-hidden xl:absolute xl:right-2 xl:top-10 xl:w-[80%] xl:rotate-[1.8deg]"
       >
         <SprzeciwCard />
       </Surface>
 
-      {/* Foreground card — Scanner result (in front) */}
+      {/* Foreground card — Scanner result.
+       *  - mobile: static block (zostaje na -order-1 żeby Scanner był na górze
+       *    jako primary artifact)
+       *  - xl+: absolute bottom-left z odwrotnym tiltem */}
       <Surface
         elevation="floating"
         padded="none"
-        className="absolute -bottom-2 left-0 w-[86%] -rotate-[1deg] overflow-hidden"
+        className="-order-1 overflow-hidden xl:order-none xl:absolute xl:-bottom-2 xl:left-0 xl:w-[86%] xl:-rotate-[1deg]"
       >
         <ScannerCard />
       </Surface>
