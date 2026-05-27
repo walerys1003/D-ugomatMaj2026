@@ -27,6 +27,7 @@ import {
   Text,
   Mono,
 } from "@/components/ui/typography";
+import { PricingTiers } from "@/components/marketing/pricing-tiers";
 
 export const metadata: Metadata = {
   title: "Cennik Długomatu — od 0 zł, bez abonamentu, bez ukrytych kosztów",
@@ -248,8 +249,24 @@ export default function CennikPage() {
         subtitle="Skaner pism — DARMOWE. Pojedyncze pismo procesowe — od 79 zł. Pakiet komorniczy (4 pisma) — 199 zł. Bez subskrypcji, bez abonamentu, bez kart przy rejestracji."
       />
 
-      {/* PRICING GRID — Tarcza v4 */}
-      <section className="container py-16 sm:py-20">
+      {/* TIER MATRIX — V4-γ orientation */}
+      <PricingTiers />
+
+      {/* PRICING GRID — Tarcza v4 (full module list) */}
+      <section className="container border-t border-ink-150 py-16 sm:py-20">
+        <div className="mx-auto mb-12 max-w-2xl text-center">
+          <div className="flex justify-center">
+            <Eyebrow tone="neutral" tracking="wide">
+              Pełny cennik
+            </Eyebrow>
+          </div>
+          <Display level={2} className="mt-4">
+            Wszystkie moduły — od 79 zł.
+          </Display>
+          <Text size="lg" tone="default" className="mt-4">
+            8 modułów rozwiązujących konkretne problemy. Bez pakietów na siłę.
+          </Text>
+        </div>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {ITEMS.map((item) => {
             const isFree = item.price === "free";
