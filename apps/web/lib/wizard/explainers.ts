@@ -31,7 +31,7 @@ const REGISTRY: Record<string, Explainer> = {
     variant: "warning",
   },
   "*:sygnatura_akt": {
-    short: "Sygnatura sprawy — np. „Nc-e 12345/24" (e-Sąd) lub „I C 567/24".",
+    short: "Sygnatura sprawy — np. „Nc-e 12345/24” (e-Sąd) lub „I C 567/24”.",
     article_slug: "sygnatura-akt-jak-czytac",
   },
   "*:wartosc_przedmiotu_sporu": {
@@ -43,7 +43,7 @@ const REGISTRY: Record<string, Explainer> = {
     short: "Czy masz radcę prawnego/adwokata, który Cię reprezentuje w tej sprawie?",
   },
   "*:dochody_miesieczne_netto": {
-    short: "Dochody netto „na rękę" za ostatnie 3-12 miesięcy, łącznie z 500+, alimentami, dodatkami.",
+    short: "Dochody netto „na rękę” za ostatnie 3-12 miesięcy, łącznie z 500+, alimentami, dodatkami.",
     article_slug: "dochody-do-wniosku-o-zwolnienie-z-kosztow",
     variant: "tip",
   },
@@ -77,12 +77,12 @@ const REGISTRY: Record<string, Explainer> = {
   // wniosek_zwolnienie_kosztow_sadowych
   "wniosek_zwolnienie_kosztow_sadowych:has_dependents": {
     short: "Czy masz osoby na utrzymaniu (dzieci, niepracujący małżonek, rodzice)?",
-    long: "Liczba osób na utrzymaniu zwiększa szanse na zwolnienie z kosztów. Sąd liczy „dochód na członka rodziny" i porównuje z kosztami utrzymania.",
+    long: "Liczba osób na utrzymaniu zwiększa szanse na zwolnienie z kosztów. Sąd liczy „dochód na członka rodziny” i porównuje z kosztami utrzymania.",
   },
 
   // upadlosc_pelny_wniosek
   "upadlosc_pelny_wniosek:przyczyna_niewyplacalnosci": {
-    short: "Krótki opis: utrata pracy, choroba, rozwód, pandemia, etc. Sąd ocenia „brak rażącej winy".",
+    short: "Krótki opis: utrata pracy, choroba, rozwód, pandemia, etc. Sąd ocenia „brak rażącej winy”.",
     article_slug: "upadlosc-konsumencka-przeslanki",
     variant: "warning",
   },

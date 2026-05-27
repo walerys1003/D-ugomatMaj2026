@@ -42,7 +42,7 @@ export default function Page() {
           },
           {
             id: "termin-30-dni",
-            title: "Termin 30 dni — uznanie reklamacji „milcząco"",
+            title: "Termin 30 dni — uznanie reklamacji „milcząco”",
             content: (
               <p>
                 Bank ma 30 dni kalendarzowych na rzeczową odpowiedź. W przypadkach szczególnie skomplikowanych — 60 dni, ale musi pisemnie poinformować o przedłużeniu. Brak odpowiedzi = <strong>reklamacja uznana w całości</strong> (art. 8 ustawy z 5 sierpnia 2015 r.).
@@ -57,7 +57,7 @@ export default function Page() {
                 <p>Jeśli bank odmówi uwzględnienia reklamacji, możesz złożyć wniosek do Rzecznika Finansowego (RF):</p>
                 <ul className="list-disc pl-6 space-y-1">
                   <li>Mediacja — bezpłatna, nieformalna procedura ugodowa.</li>
-                  <li>„Istotny pogląd" przed sądem — RF może wystąpić z opinią prawną w toczącym się postępowaniu (art. 36 ustawy o Rzeczniku Finansowym).</li>
+                  <li>„Istotny pogląd” przed sądem — RF może wystąpić z opinią prawną w toczącym się postępowaniu (art. 36 ustawy o Rzeczniku Finansowym).</li>
                   <li>Pozasądowe rozstrzyganie sporów (PRS) — wiążące dla podmiotu rynku finansowego.</li>
                 </ul>
               </>

@@ -351,12 +351,3 @@ export default function Page() {
     </>
   );
 }
-ierpnia 2015 r. o reklamacjach (Dz.U. 2024 ze zm.)",
-          "Ustawa z 9 kwietnia 2010 r. o udostępnianiu informacji gospodarczych",
-          "art. 24, 448 Kodeks cywilny — ochrona dóbr osobistych",
-          "Wyrok WSA w Warszawie z 23 listopada 2018 r., II SA/Wa 552/18 — przesłanki usunięcia danych z BIK",
-        ]}
-      />
-    </>
-  );
-}

@@ -24,7 +24,7 @@ export default function Page() {
         category="Egzekucja"
         readingMinutes={14}
         updatedAt={UPDATED}
-        lead="Art. 840 KPC pozwala pozbawić tytuł wykonawczy w całości lub części wykonalności. To „ostatnia linia obrony" gdy komornik prowadzi egzekucję z tytułu, który jest formalnie prawidłowy, ale nie powinien być wykonywany. Najczęstsze podstawy: przedawnienie roszczenia, spłata długu, zwolnienie z długu, brak wymagalności."
+        lead="Art. 840 KPC pozwala pozbawić tytuł wykonawczy w całości lub części wykonalności. To „ostatnia linia obrony” gdy komornik prowadzi egzekucję z tytułu, który jest formalnie prawidłowy, ale nie powinien być wykonywany. Najczęstsze podstawy: przedawnienie roszczenia, spłata długu, zwolnienie z długu, brak wymagalności."
         sections={[
           {
             id: "podstawy",

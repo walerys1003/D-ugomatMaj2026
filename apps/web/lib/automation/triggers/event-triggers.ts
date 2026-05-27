@@ -125,7 +125,7 @@ export async function evaluateCronTriggers(): Promise<{ triggered: number }> {
 
 /**
  * Uproszczony cron matcher — wspiera "minute hour dom month dow"
- * z wartościami: * | liczba | a,b,c | */n
+ * z wartościami: * | liczba | a,b,c | *\/n
  */
 export function matchesCronExpression(cron: string, date: Date): boolean {
   const parts = cron.trim().split(/\s+/);

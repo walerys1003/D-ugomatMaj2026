@@ -35,7 +35,7 @@ export default function Page() {
                 <ul className="list-disc pl-6 space-y-1">
                   <li>Dane wnioskodawcy + osób pozostających we wspólnym gospodarstwie.</li>
                   <li>Wszystkie źródła dochodów (umowa, działalność, renta, alimenty, zasiłki, 500+, darowizny).</li>
-                  <li>Majątek: nieruchomości, samochody, oszczędności, papiery wartościowe, biżuteria > 5 tys. zł.</li>
+                  <li>Majątek: nieruchomości, samochody, oszczędności, papiery wartościowe, biżuteria powyżej 5 tys. zł.</li>
                   <li>Stałe wydatki (czynsz, media, leki, raty, alimenty wypłacane).</li>
                   <li>Zobowiązania (kredyty, pożyczki, zaległości).</li>
                 </ul>

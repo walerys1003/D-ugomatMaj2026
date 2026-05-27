@@ -24,14 +24,14 @@ export default function Page() {
         category="Procedura sądowa"
         readingMinutes={12}
         updatedAt={UPDATED}
-        lead="Art. 320 KPC pozwala sądowi rozłożyć zasądzoną kwotę na raty „w szczególnie uzasadnionych wypadkach" — w praktyce to dochody netto poniżej 2× minimum socjalnego, osoby na utrzymaniu, choroby. Art. 102 UKSC umożliwia zwolnienie z kosztów sądowych w całości lub części, jeśli dochód na członka rodziny jest zbyt niski."
+        lead="Art. 320 KPC pozwala sądowi rozłożyć zasądzoną kwotę na raty „w szczególnie uzasadnionych wypadkach” — w praktyce to dochody netto poniżej 2× minimum socjalnego, osoby na utrzymaniu, choroby. Art. 102 UKSC umożliwia zwolnienie z kosztów sądowych w całości lub części, jeśli dochód na członka rodziny jest zbyt niski."
         sections={[
           {
             id: "rozlozenie-na-raty",
             title: "Rozłożenie na raty — kiedy sąd je przyzna",
             content: (
               <>
-                <p>Art. 320 KPC: sąd „w szczególnie uzasadnionych wypadkach może w wyroku rozłożyć na raty zasądzone świadczenie". Sąd patrzy na:</p>
+                <p>Art. 320 KPC: sąd „w szczególnie uzasadnionych wypadkach może w wyroku rozłożyć na raty zasądzone świadczenie”. Sąd patrzy na:</p>
                 <ul className="list-disc pl-6 space-y-1">
                   <li>Stałe i nieregularne dochody dłużnika.</li>
                   <li>Liczbę osób na utrzymaniu.</li>
@@ -48,7 +48,7 @@ export default function Page() {
             title: "Zwolnienie z kosztów sądowych",
             content: (
               <>
-                <p>Art. 102 ust. 1 UKSC: zwolnienie przysługuje, jeśli „nie jest w stanie ich ponieść bez uszczerbku dla utrzymania siebie i rodziny". Standardowy próg w orzecznictwie SN: dochód na członka rodziny &lt; 2× minimum egzystencji (ok. 1 200 zł).</p>
+                <p>Art. 102 ust. 1 UKSC: zwolnienie przysługuje, jeśli „nie jest w stanie ich ponieść bez uszczerbku dla utrzymania siebie i rodziny”. Standardowy próg w orzecznictwie SN: dochód na członka rodziny &lt; 2× minimum egzystencji (ok. 1 200 zł).</p>
                 <p>Konieczne załączniki:</p>
                 <ul className="list-disc pl-6 space-y-1">
                   <li>Oświadczenie o stanie rodzinnym, majątku i dochodach (formularz urzędowy).</li>
