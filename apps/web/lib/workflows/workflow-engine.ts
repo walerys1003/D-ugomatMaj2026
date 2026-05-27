@@ -90,12 +90,14 @@ export async function executeWorkflows(trigger: WorkflowTrigger, payload: Record
       }
     }
     executed++;
+    // workflow_runs is not yet present in the generated Supabase types — cast
+    // the insert payload via `as never` until the schema is regenerated.
     await sb.from("workflow_runs").insert({
       workflow_id: w.id,
       trigger,
       payload,
       executed_at: new Date().toISOString(),
-    });
+    } as never);
   }
   return { executed };
 }

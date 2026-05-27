@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, IBM_Plex_Serif, JetBrains_Mono } from "next/font/google";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { AppProviders } from "@/lib/providers";
 import { themeBootstrapScript } from "@/lib/providers/theme-provider";
 import {
@@ -91,9 +91,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   // Wymagane, żeby strict-dynamic CSP zezwolił na inline theme bootstrap.
   const nonce = headers().get("x-nonce") ?? undefined;
 
+  // V5-INFRA toggle: enabled when cookie `v5=on` is set OR pathname starts with /v5
+  // The cookie is set by the user-facing /v5 entry routes (server components)
+  // and read here for global root-level activation of V5 design tokens.
+  const v5Cookie = cookies().get("v5")?.value;
+  const path = headers().get("x-pathname") ?? headers().get("referer") ?? "";
+  const v5Active = v5Cookie === "on" || /\/v5(\/|$|\?)/.test(path);
+
   return (
     <html
       lang="pl"
+      data-v5={v5Active ? "on" : undefined}
       className={`${inter.variable} ${ibmPlexSerif.variable} ${jetbrainsMono.variable}`}
       suppressHydrationWarning
     >

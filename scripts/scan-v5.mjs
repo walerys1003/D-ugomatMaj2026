@@ -1,6 +1,6 @@
 import { chromium } from "playwright";
 const browser = await chromium.launch();
-const routes = ["/v5/showcase"];
+const routes = ["/v5", "/v5/showcase", "/v5/panel", "/v5/admin", "/v5/gallery"];
 const viewports = [
   { w: 375, h: 800, n: "375" },
   { w: 768, h: 900, n: "768" },

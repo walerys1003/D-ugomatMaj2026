@@ -13,7 +13,7 @@
  * smoke-test.sh (Tier 5 zad. 249). Tutaj weryfikujemy primitive'y, na których
  * webhook handler się opiera.
  */
-import { describe, it, expect } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createHmac } from "node:crypto";
 
 import {

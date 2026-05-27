@@ -72,10 +72,24 @@ export async function middleware(request: NextRequest) {
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-nonce", nonce);
   requestHeaders.set("x-request-id", requestId);
+  // V5-INFRA — expose pathname to root layout so it can toggle data-v5
+  requestHeaders.set("x-pathname", request.nextUrl.pathname);
 
   let response = NextResponse.next({
     request: { headers: requestHeaders },
   });
+
+  // V5-INFRA — opt-in toggle via ?v5=on|off query
+  const v5Query = request.nextUrl.searchParams.get("v5");
+  if (v5Query === "on") {
+    response.cookies.set("v5", "on", {
+      path: "/",
+      maxAge: 60 * 60 * 24 * 30,
+      sameSite: "lax",
+    });
+  } else if (v5Query === "off") {
+    response.cookies.delete("v5");
+  }
 
   // -------------------------------------------------------------------
   // 3) Supabase session refresh
