@@ -218,6 +218,20 @@
   }
 
   html {
+    /* V4-ι (iota) — root font-size 1.2× (19.2px zamiast browser-default 16px).
+     * Skutek: wszystkie rem-based wymiary Tailwindu (typografia, paddingi,
+     * gaps, radii, heights nie pinowane przez `text-[Xpx]`) rosną o 20%
+     * proporcjonalnie. Efekt ≡ trzymanie przeglądarki na zoomie 120% z tą
+     * różnicą, że NIE skalujemy fizycznych touch-targetów wyrażonych w px
+     * (h-9=36px input zostaje 36px — zgodnie z WCAG 2.5.5 target size).
+     *
+     * Px-based klasy NIE rosną (text-[17px], h-9, w-px) — to celowe.
+     * rem-based klasy rosną (text-base=1rem=19.2px, p-4=1rem=19.2px,
+     * gap-6=1.5rem=28.8px, rounded-2xl=1rem=19.2px, max-w-7xl=80rem=1536px).
+     *
+     * Atomowy revert: usuń linię `font-size: 1.2rem` poniżej. To wszystko.
+     */
+    font-size: 1.2rem;
     @apply scroll-smooth antialiased;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
