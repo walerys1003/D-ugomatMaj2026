@@ -1,105 +1,113 @@
 import { ShieldCheck, Lock, FileCheck2, Building2 } from "lucide-react";
+
 import { Section } from "@/components/ui/section";
-import { Surface } from "@/components/ui/surface";
-import { Divider } from "@/components/ui/divider";
-import { Eyebrow, Heading, Text, Stat } from "@/components/ui/typography";
+import { Eyebrow, Heading, Text } from "@/components/ui/typography";
 
 /**
- * TrustBar v3 — Tarcza Stoic.
+ * TrustBar v4 — Tarcza Stoic / first-section under hero.
  *
- * Vs v2:
- *  - Surface primitive zamiast raw <li className="rounded-lg border…">.
- *  - Stat primitive dla KPI strip — eliminuje duplikację z Hero/Panel
- *    dashboard, jeden styl liczb w produkcie.
- *  - Eyebrow primitive zamiast 8 wariantów uppercase tracking.
- *  - Compliance row: ikony w mocnym ink-900 chip (squared), nie pill.
- *  - Section default tone (białe) zamiast specjalnego — KPI strip jest
- *    samonośny wizualnie przez border + tinted shadow.
+ * Zmiany vs v3 (audit V4 §3.1, §5.2 vs Stripe):
+ *  - Usunięte KPI staty (4×) — duplikowały hero TrustStat (3×) i mieszały
+ *    hierarchię. Tu trust = compliance + media, nie liczby.
+ *  - Usunięty Surface elevation=raised wokół KPI — czyste in-flow layout
+ *  - Section density=compact zachowane (py-16/20/24 8pt rytm)
+ *  - 4 compliance items w grid bez border-card (jak Stripe trust strip)
+ *  - Press row z divider — bez animacji (pasek instytucji typografią
+ *    a nie raw logo)
+ *  - Continuation tła z hero: bg-background (eliminacja "rwanej" hierarchii
+ *    bg-iron/ink/white o której pisał audit V4)
+ *
+ * Cel: pierwsza sekcja pod hero = **lekka, niedużo informacji**, bo użytkownik
+ * dopiero "wszedł" i nie chce dostać kolejnego flow. To strefa "ok, można im
+ * zaufać" a nie "spójrz na 13 elementów".
  */
 
-const COMPLIANCE: ReadonlyArray<{ icon: typeof ShieldCheck; label: string; sub: string }> = [
-  { icon: ShieldCheck, label: "RODO + ISO 27001", sub: "Audyt zewnętrzny 2026" },
-  { icon: Lock, label: "Szyfrowanie end-to-end", sub: "AES-256-GCM · klucze w pgcrypto" },
-  { icon: Building2, label: "Hosting w UE", sub: "Supabase EU-West · Frankfurt" },
-  { icon: FileCheck2, label: "Nadzór kancelarii", sub: "Templates podpisane przez r. pr." },
-];
-
-const STATS: ReadonlyArray<{ value: string; label: string; context: string; tone: "default" | "brand" | "success" }> = [
-  { value: "12 min", label: "średni czas pisma", context: "Od skanu do gotowego PDF/DOCX", tone: "default" },
-  { value: "94%", label: "skuteczność walidacji", context: "Pism przyjętych bez braków formalnych", tone: "success" },
-  { value: "5–10×", label: "taniej niż prawnik", context: "Wobec 1 500–3 000 PLN za sprzeciw", tone: "brand" },
-  { value: "0 PLN", label: "skaner nakazu", context: "Sprawdzasz sytuację bez konta", tone: "default" },
+const COMPLIANCE: ReadonlyArray<{
+  icon: typeof ShieldCheck;
+  label: string;
+  sub: string;
+}> = [
+  {
+    icon: ShieldCheck,
+    label: "RODO + ISO 27001",
+    sub: "Audyt zewnętrzny 2026",
+  },
+  {
+    icon: Lock,
+    label: "Szyfrowanie at-rest",
+    sub: "AES-256-GCM · klucze w pgcrypto",
+  },
+  {
+    icon: Building2,
+    label: "Hosting w UE",
+    sub: "Supabase EU-West · Frankfurt",
+  },
+  {
+    icon: FileCheck2,
+    label: "Nadzór radcy prawnego",
+    sub: "Szablony weryfikowane co kwartał",
+  },
 ];
 
 const PRESS: ReadonlyArray<string> = [
-  "Gazeta Prawna",
   "Rzeczpospolita",
   "Puls Biznesu",
   "Money.pl",
   "Forbes Polska",
+  "Gazeta Prawna",
 ];
 
 export function TrustBar() {
   return (
-    <Section tone="default" density="compact" aria-labelledby="trust-title">
+    <Section
+      tone="default"
+      density="compact"
+      width="lg"
+      aria-labelledby="trust-title"
+    >
       <header className="mx-auto max-w-2xl text-center">
-        <Eyebrow tone="brand">Dlaczego można nam zaufać</Eyebrow>
-        <Heading level={1} id="trust-title" as="h2" className="mt-3">
-          Bezpieczeństwo prawne i&nbsp;techniczne na&nbsp;poziomie kancelarii enterprise
+        <Eyebrow tone="brand">Bezpieczeństwo i nadzór</Eyebrow>
+        <Heading level={2} as="h2" id="trust-title" className="mt-3 text-balance">
+          Każde pismo trafia przed sąd. Każdy bajt jest zaszyfrowany.
         </Heading>
+        <Text size="base" tone="muted" className="mx-auto mt-3 max-w-xl text-balance">
+          Długomat operuje pod nadzorem polskiego radcy prawnego.
+          Infrastruktura zgodna z&nbsp;RODO, hostowana wyłącznie w&nbsp;Unii Europejskiej.
+        </Text>
       </header>
 
-      {/* Compliance row */}
-      <ul className="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Compliance grid — flat, no card */}
+      <ul className="mt-14 grid gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
         {COMPLIANCE.map((c) => (
-          <li key={c.label}>
-            <Surface elevation="flat" padded="sm" className="flex items-start gap-3">
-              <span
-                aria-hidden
-                className="grid size-9 shrink-0 place-items-center rounded bg-ink-900 text-white dark:bg-white dark:text-ink-900"
-              >
-                <c.icon className="size-4" />
-              </span>
-              <div className="min-w-0 pt-0.5">
-                <Text size="sm" tone="strong" weight="semibold" as="div">
-                  {c.label}
-                </Text>
-                <Text size="xs" tone="muted" as="div" className="mt-0.5">
-                  {c.sub}
-                </Text>
-              </div>
-            </Surface>
+          <li key={c.label} className="flex items-start gap-3">
+            <span
+              aria-hidden
+              className="grid size-9 shrink-0 place-items-center rounded-sm border border-ink-200 bg-white text-ink-700"
+            >
+              <c.icon className="size-4" />
+            </span>
+            <div className="min-w-0 pt-0.5">
+              <Text size="sm" tone="strong" weight="semibold" as="div">
+                {c.label}
+              </Text>
+              <Text size="xs" tone="muted" as="div" className="mt-0.5">
+                {c.sub}
+              </Text>
+            </div>
           </li>
         ))}
       </ul>
 
-      {/* KPI strip — Stat primitives */}
-      <Surface
-        elevation="raised"
-        padded="none"
-        className="mt-8 grid divide-ink-200 sm:grid-cols-2 sm:divide-x lg:grid-cols-4 dark:divide-ink-200"
-      >
-        {STATS.map((s) => (
-          <div key={s.label} className="p-6">
-            <Stat
-              value={s.value}
-              label={s.label}
-              hint={s.context}
-              tone={s.tone}
-              size="md"
-            />
-          </div>
-        ))}
-      </Surface>
-
-      {/* Press row */}
-      <div className="mt-10">
-        <Divider label="Cytowani przez" />
-        <ul className="mt-5 flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
+      {/* Press row — w stylu Stripe / Linear (typografia bez logo) */}
+      <div className="mt-16 border-t border-ink-200 pt-7">
+        <p className="text-center text-[10px] font-semibold uppercase tracking-[0.2em] text-ink-500">
+          Cytowani przez
+        </p>
+        <ul className="mt-4 flex flex-wrap items-center justify-center gap-x-10 gap-y-3 lg:gap-x-14">
           {PRESS.map((p) => (
             <li
               key={p}
-              className="font-display text-base font-medium text-ink-500 transition-colors hover:text-ink-800 dark:text-ink-500 dark:hover:text-ink-800"
+              className="font-display text-[15px] font-semibold tracking-tight text-ink-500 transition-colors hover:text-ink-800"
             >
               {p}
             </li>

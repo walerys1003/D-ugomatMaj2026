@@ -28,7 +28,7 @@ const FAQ_ITEMS = [
  */
 export function FAQ() {
   return (
-    <section aria-labelledby="faq-title" className="bg-iron-50/60 py-20">
+    <section aria-labelledby="faq-title" className="bg-ink-50 py-20 sm:py-24 lg:py-28">
       <div className="container max-w-4xl px-6">
         <header className="text-center">
           <p className="text-xs uppercase tracking-wide text-dlugomat-500">Najczestsze pytania</p>

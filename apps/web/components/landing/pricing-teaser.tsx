@@ -58,7 +58,7 @@ const TIERS: readonly Tier[] = [
  */
 export function PricingTeaser() {
   return (
-    <section aria-labelledby="pricing-title" className="bg-white py-20">
+    <section aria-labelledby="pricing-title" className="bg-background py-20 sm:py-24 lg:py-28">
       <div className="container px-6">
         <header className="mx-auto max-w-2xl text-center">
           <p className="text-xs uppercase tracking-wide text-dlugomat-500">Cennik</p>
