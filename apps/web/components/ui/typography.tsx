@@ -42,9 +42,13 @@ const displayVariants = cva(
   {
     variants: {
       level: {
-        1: "text-5xl md:text-6xl lg:text-7xl font-semibold",   // 48 / 60 / 72
-        2: "text-4xl md:text-5xl font-semibold",                // 36 / 48
-        3: "text-3xl md:text-4xl font-semibold",                // 30 / 36
+        // Tarcza v4 — type scale +1: każdy poziom o stopień większy.
+        // Powód: na 14" laptopie hero h1 wyglądał za drobno (5xl=48px).
+        // Top-tier AI SaaS (Linear, Stripe, Anthropic) startuje hero
+        // od ~60-72px desktop, my szliśmy od 48px.
+        1: "text-6xl md:text-7xl lg:text-[5.5rem] xl:text-[6rem] font-semibold leading-[1.02]",   // 60 / 72 / 88 / 96
+        2: "text-5xl md:text-6xl font-semibold leading-[1.04]",                                    // 48 / 60
+        3: "text-4xl md:text-5xl font-semibold leading-[1.06]",                                    // 36 / 48
       },
     },
     defaultVariants: { level: 1 },
@@ -75,10 +79,11 @@ const headingVariants = cva(
   {
     variants: {
       level: {
-        1: "text-3xl md:text-4xl font-semibold",   // page title
-        2: "text-xl md:text-2xl font-semibold",    // section heading
-        3: "text-lg font-semibold",                // card title
-        4: "text-md font-semibold",                // list / column title
+        // Tarcza v4 — type scale +1 (each level one step larger).
+        1: "text-4xl md:text-5xl font-semibold leading-[1.08]",   // 36 / 48  (page title)
+        2: "text-2xl md:text-3xl font-semibold leading-[1.15]",   // 24 / 30  (section heading)
+        3: "text-xl md:text-2xl font-semibold leading-[1.2]",     // 20 / 24  (card title)
+        4: "text-lg font-semibold leading-[1.25]",                 // 18       (list / column title)
       },
     },
     defaultVariants: { level: 2 },
@@ -109,10 +114,13 @@ export const Heading = React.forwardRef<HTMLHeadingElement, HeadingProps>(
 const textVariants = cva("", {
   variants: {
     size: {
-      lg: "text-lg leading-relaxed",       // 18 — lead para
-      base: "text-base leading-relaxed",   // 15 — body default
-      sm: "text-sm",                       // 14 — caption
-      xs: "text-xs",                       // 12 — microcopy
+      // Tarcza v4 — body size bump. Standard SaaS marketing body to 17-18px,
+      // panel/admin może zostać na 15-16. `base` urośnie z 15 → 16, `lg` z
+      // 18 → 19 (między text-lg a text-xl).
+      lg: "text-xl leading-[1.55]",        // 20 — lead para (hero subheadline)
+      base: "text-[17px] leading-[1.65]",  // 17 — body default ↑ z 15
+      sm: "text-[15px] leading-[1.55]",    // 15 — caption ↑ z 14
+      xs: "text-[13px] leading-[1.5]",     // 13 — microcopy ↑ z 12
     },
     tone: {
       strong: "text-ink-900 dark:text-white",
@@ -157,7 +165,8 @@ export const Text = React.forwardRef<HTMLParagraphElement, TextProps>(function T
 // =========================================================================
 
 const eyebrowVariants = cva(
-  "inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase leading-none",
+  // Tarcza v4 — eyebrow 11 → 12.5px, lepsza czytelność na hero/section labels.
+  "inline-flex items-center gap-1.5 text-[12.5px] font-semibold uppercase leading-none",
   {
     variants: {
       tone: {
@@ -269,9 +278,10 @@ const STAT_VALUE_TONE: Record<NonNullable<StatProps["tone"]>, string> = {
 };
 
 const STAT_SIZE: Record<NonNullable<StatProps["size"]>, { value: string; gap: string }> = {
-  sm: { value: "text-2xl", gap: "gap-1" },
-  md: { value: "text-3xl", gap: "gap-1.5" },
-  lg: { value: "text-4xl md:text-5xl", gap: "gap-2" },
+  // Tarcza v4 — Stat +1 step (panel KPIs i hero stats wyglądały za drobnie).
+  sm: { value: "text-3xl", gap: "gap-1" },
+  md: { value: "text-4xl", gap: "gap-1.5" },
+  lg: { value: "text-5xl md:text-6xl", gap: "gap-2" },
 };
 
 export function Stat({
