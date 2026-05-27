@@ -41,6 +41,12 @@ export interface RenderedEmail {
   subject: string;
   bodyText: string;
   bodyHtml: string;
+  /**
+   * Opcjonalny inbox preview text (max ~120 znaków) — drip campaigns
+   * wykorzystują to do podniesienia open-rate w klientach pocztowych,
+   * które renderują preheader obok subjectu (Gmail/Apple Mail/Outlook).
+   */
+  preheader?: string;
 }
 
 export interface RenderedSms {

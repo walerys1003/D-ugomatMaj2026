@@ -74,11 +74,11 @@ Wykonaj polecenie i zwróć ZAKTUALIZOWANY pełny markdown dokumentu.`.trim();
     let result: { text: string; usage?: { input_tokens?: number; output_tokens?: number } };
     try {
       result = await complete({
-        system: REVISION_SYSTEM_PROMPT,
+        systemPrompt: REVISION_SYSTEM_PROMPT,
         messages: [{ role: "user", content: userPrompt }],
         maxTokens: 4000,
         temperature: 0.3,
-        modelHint: "sonnet",
+        role: "generator",
       });
     } catch (e) {
       logger.warn("revision.complete_failed", {

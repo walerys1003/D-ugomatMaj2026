@@ -72,7 +72,7 @@ ${ctaHref}
   return {
     subject,
     preheader,
-    html: wrapHtml({
+    bodyHtml: wrapHtml({
       preheader,
       hero,
       bodyHtml,
@@ -80,7 +80,7 @@ ${ctaHref}
       cta: { label: "Otwórz Skaner Nakazu", href: ctaHref },
       legalNote,
     }),
-    text: wrapText({
+    bodyText: wrapText({
       preheader,
       hero,
       bodyHtml: "",

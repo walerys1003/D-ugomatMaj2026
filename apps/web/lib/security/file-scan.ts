@@ -303,12 +303,19 @@ export async function scanUploadedFile(
   data: Uint8Array | ArrayBuffer | Buffer,
   opts: FileScanOptions = {},
 ): Promise<FileScanResult> {
+  // Note: in Node-typed TS `Buffer` extends `Uint8Array`, so after the first
+  // two branches TS narrows the `else` to `never`. Cast back to Buffer for
+  // the final branch — runtime behaviour is unchanged.
   const buf =
     data instanceof Uint8Array
       ? data
       : data instanceof ArrayBuffer
         ? new Uint8Array(data)
-        : new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
+        : new Uint8Array(
+            (data as Buffer).buffer,
+            (data as Buffer).byteOffset,
+            (data as Buffer).byteLength,
+          );
 
   const declaredMime = opts.declaredMime ?? "application/octet-stream";
   const maxBytes = opts.maxBytes ?? DEFAULT_MAX_BYTES;

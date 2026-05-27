@@ -64,7 +64,7 @@ W ciągu ostatnich 30 dni 247 użytkowników wygenerowało sprzeciw. 71 spraw ro
   return {
     subject,
     preheader,
-    html: wrapHtml({
+    bodyHtml: wrapHtml({
       preheader,
       hero,
       bodyHtml,
@@ -72,7 +72,7 @@ W ciągu ostatnich 30 dni 247 użytkowników wygenerowało sprzeciw. 71 spraw ro
       cta: { label: "Otwórz D2 Sprzeciw EPU", href: ctaHref },
       legalNote: "Materiał informacyjny. Indywidualne efekty mogą się różnić.",
     }),
-    text: wrapText({
+    bodyText: wrapText({
       preheader,
       hero,
       bodyHtml: "",

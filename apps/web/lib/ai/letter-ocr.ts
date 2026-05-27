@@ -258,11 +258,11 @@ Zwróć JSON: { "kind": "...", "confidence": 0..1, "notes": "..." }`.trim();
 
     try {
       const result = await complete({
-        system: "Jesteś asystentem klasyfikacji dokumentów prawniczych w Polsce.",
+        systemPrompt: "Jesteś asystentem klasyfikacji dokumentów prawniczych w Polsce.",
         messages: [{ role: "user", content: prompt }],
         maxTokens: 200,
         temperature: 0.0,
-        modelHint: "haiku",
+        role: "validator",
       });
       const cleaned = result.text.replace(/^```(?:json)?\s*/, "").replace(/\s*```\s*$/, "");
       const parsed = JSON.parse(cleaned) as HaikuClassification;

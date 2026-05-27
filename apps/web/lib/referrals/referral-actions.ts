@@ -64,7 +64,9 @@ function generateCandidateCode(): string {
 export async function getOrCreateReferralCode(
   userId: string,
 ): Promise<ReferralCodeRow> {
-  const admin = createSupabaseAdminClient();
+  const adminBase = createSupabaseAdminClient();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const admin: any = adminBase;
 
   // 1) Spróbuj odczytać istniejący aktywny kod.
   const { data: existing, error: selErr } = await admin
@@ -141,7 +143,9 @@ export async function logReferralClick(
   code: string,
   ctx: ReferralClickContext,
 ): Promise<void> {
-  const admin = createSupabaseAdminClient();
+  const adminBase = createSupabaseAdminClient();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const admin: any = adminBase;
   const ipHash = await hashIp(ctx.ip ?? null);
 
   const { error } = await admin.from("referral_clicks").insert({
@@ -220,7 +224,9 @@ export interface ReferralStats {
 export async function listReferralStats(
   userId: string,
 ): Promise<ReferralStats> {
-  const admin = createSupabaseAdminClient();
+  const adminBase = createSupabaseAdminClient();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const admin: any = adminBase;
 
   const [codeRes, convRes] = await Promise.all([
     admin
@@ -293,7 +299,9 @@ export async function recordReferralConversion(
   input: RecordConversionInput,
 ): Promise<{ recorded: boolean; reason?: string }> {
   try {
-    const admin = createSupabaseAdminClient();
+    const adminBase = createSupabaseAdminClient();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const admin: any = adminBase;
 
     // 1) Sprawdź profile.referred_by_code
     const { data: profile, error: pErr } = await admin

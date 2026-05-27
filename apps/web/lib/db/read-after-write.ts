@@ -73,7 +73,7 @@ export async function waitForReadAfterWrite<T extends { updated_at?: string | nu
       return lastRow;
     }
 
-    lastRow = (data as T) ?? null;
+    lastRow = (data as unknown as T) ?? null;
 
     if (!lastRow) {
       // Wiersz jeszcze nie widoczny — czekaj i retry
@@ -150,7 +150,7 @@ export async function writeWithReadback<T extends { id: string; updated_at?: str
       });
       return null;
     }
-    writeResult = data as T;
+    writeResult = data as unknown as T;
   } else if (params.update) {
     const { data, error } = await client
       .from(params.table)
@@ -165,7 +165,7 @@ export async function writeWithReadback<T extends { id: string; updated_at?: str
       });
       return null;
     }
-    writeResult = data as T;
+    writeResult = data as unknown as T;
   }
 
   if (!writeResult) return null;

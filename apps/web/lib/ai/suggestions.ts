@@ -176,11 +176,11 @@ Pisz po polsku, prawniczo, ale bez formalizmu.`.trim();
   let result: { text: string };
   try {
     result = await complete({
-      system: systemPrompt,
+      systemPrompt: systemPrompt,
       messages: [{ role: "user", content: userPrompt }],
       maxTokens: 800,
       temperature: 0.3,
-      modelHint: "haiku",
+      role: "validator",
     });
   } catch (e) {
     if (e instanceof AiUnavailableError) {

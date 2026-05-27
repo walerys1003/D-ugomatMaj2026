@@ -74,7 +74,7 @@ Możesz też trwale usunąć dane (RODO): ${appUrl("/panel/ustawienia/profil#usu
   return {
     subject,
     preheader,
-    html: wrapHtml({
+    bodyHtml: wrapHtml({
       preheader,
       hero,
       bodyHtml,
@@ -83,7 +83,7 @@ Możesz też trwale usunąć dane (RODO): ${appUrl("/panel/ustawienia/profil#usu
       legalNote:
         "Promocja jednorazowa, nie łączy się z innymi rabatami. Po 3 miesiącach standardowa cena wg cennika.",
     }),
-    text: wrapText({
+    bodyText: wrapText({
       preheader,
       hero,
       bodyHtml: "",

@@ -112,11 +112,11 @@ ${params.fastPath ? "FAST PATH: zwróć tylko severity=critical." : ""}`.trim();
     let response: { text: string; usage?: { input_tokens?: number; output_tokens?: number } };
     try {
       response = await complete({
-        system: AUDITOR_SYSTEM_PROMPT,
+        systemPrompt: AUDITOR_SYSTEM_PROMPT,
         messages: [{ role: "user", content: userPrompt }],
         maxTokens: 1500,
         temperature: 0.0, // deterministyczny audyt
-        modelHint: "haiku",
+        role: "validator",
       });
     } catch (e) {
       logger.warn("hallucination_guard.complete_failed", {

@@ -153,6 +153,7 @@ export function useOcrUpload(
           if (file.size > 10 * 1024 * 1024) {
             // Mimo niskiej jakości — submitujemy Tesseract; user dostaje review.
             const submit = await submitOcrResultAction({
+              csrf,
               fileHash,
               fileName: file.name,
               fileSize: file.size,
@@ -173,6 +174,7 @@ export function useOcrUpload(
           const fileBase64 = await fileToBase64(file);
           try {
             const fallback = await runServerOcrAction({
+              csrf,
               fileHash,
               fileName: file.name,
               fileBase64,
@@ -188,6 +190,7 @@ export function useOcrUpload(
           } catch (e) {
             // Fallback failure — zwracamy Tesseract z flag'ą low_confidence.
             const submit = await submitOcrResultAction({
+              csrf,
               fileHash,
               fileName: file.name,
               fileSize: file.size,
@@ -213,6 +216,7 @@ export function useOcrUpload(
         setProgress(0.9);
 
         const submit = await submitOcrResultAction({
+          csrf,
           fileHash,
           fileName: file.name,
           fileSize: file.size,
