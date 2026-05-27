@@ -6,6 +6,10 @@ afterEach(() => {
   cleanup();
 });
 
+// `server-only` package — Next.js guard that throws if imported in client bundle.
+// W jsdom-vitest nie ma znaczenia czy "server" czy "client", więc no-op mock.
+vi.mock("server-only", () => ({}));
+
 // next/navigation stubs — most components use these even in pure UI tests.
 vi.mock("next/navigation", () => ({
   useRouter: () => ({

@@ -61,22 +61,24 @@ describe("parsePolishDate", () => {
 });
 
 describe("validatePesel & parsePesel & maskPesel", () => {
-  // Przykładowy poprawny PESEL — 44051401358 (Lech Wałęsa, publicznie znany)
+  // Test PESEL: 02070803628 — syntetyczny valid (data 2002-07-08, suma OK).
+  // 0·1+2·3+0·7+7·9+0·1+8·3+0·7+3·9+6·1+2·3 = 132, (10-2)%10 = 8.
+  const VALID_PESEL = "02070803628";
   it("waliduje poprawny PESEL", () => {
-    expect(validatePesel("44051401358")).toBe(true);
+    expect(validatePesel(VALID_PESEL)).toBe(true);
   });
   it("odrzuca niepoprawny PESEL (zła suma kontrolna)", () => {
-    expect(validatePesel("44051401359")).toBe(false);
+    expect(validatePesel("02070803629")).toBe(false);
   });
   it("odrzuca PESEL o złej długości", () => {
     expect(validatePesel("123")).toBe(false);
-    expect(validatePesel("440514013589")).toBe(false);
+    expect(validatePesel("020708036289")).toBe(false);
   });
   it("wyciąga PESEL z tekstu", () => {
-    expect(parsePesel("PESEL: 44051401358 to dane")).toBe("44051401358");
+    expect(parsePesel(`PESEL: ${VALID_PESEL} to dane`)).toBe(VALID_PESEL);
   });
-  it("maskuje PESEL", () => {
-    expect(maskPesel("44051401358")).toBe("440*****58");
+  it("maskuje PESEL — XXX*****YY (RODO data minimization)", () => {
+    expect(maskPesel(VALID_PESEL)).toBe("020*****28");
   });
 });
 
@@ -116,7 +118,7 @@ ul. Marszałkowska 100, 00-001 Warszawa
 
 Pozwany: Jan Kowalski
 ul. Polna 5, 30-001 Kraków
-PESEL: 44051401358
+PESEL: 02070803628
 
 Tytułem należności głównej kwota 5 432,10 zł
 oraz odsetki w kwocie 234,56 zł
@@ -151,7 +153,7 @@ doręczono dnia 15.02.2025
 
   it("waliduje PESEL", () => {
     const r = parseNakaz(RAW);
-    expect(r.pozwany_pesel).toBe("44051401358");
+    expect(r.pozwany_pesel).toBe("02070803628");
   });
 
   it("parsuje wszystkie kwoty", () => {
@@ -194,7 +196,7 @@ Sygnatura: Km 4567/24
 ZAWIADOMIENIE O WSZCZĘCIU EGZEKUCJI
 
 Wierzyciel: PROKURA NSFIZ
-Dłużnik: Jan Kowalski, PESEL: 44051401358
+Dłużnik: Jan Kowalski, PESEL: 02070803628
 
 Zajęcie rachunku bankowego (art. 889 k.p.c.)
 Kwota dochodzona: 12 345,67 zł

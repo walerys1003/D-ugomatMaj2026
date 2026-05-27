@@ -52,6 +52,11 @@ const NIP_WEIGHTS = [6, 5, 7, 2, 3, 4, 5, 6, 7] as const;
 export function isValidNip(input: string): boolean {
   const digits = input.replace(/[^0-9]/g, "");
   if (digits.length !== 10) return false;
+  // Edge case: same zera technicznie spełniają mod-11 (0 == 0), ale to nie jest
+  // realny NIP — odrzucamy explicite. Analogicznie dla pozostałych "powtórek",
+  // ale tylko all-zeros wpada w algorytm jako "valid" — pozostałe powtórki
+  // (np. "1111111111") naturalnie nie przejdą sumy kontrolnej.
+  if (/^0+$/.test(digits)) return false;
   let sum = 0;
   for (let i = 0; i < 9; i += 1) {
     sum += Number(digits[i]) * NIP_WEIGHTS[i];

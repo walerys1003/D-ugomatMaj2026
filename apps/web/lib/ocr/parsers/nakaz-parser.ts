@@ -148,25 +148,43 @@ function extractKwoty(text: string): {
   koszty: number | null;
   razem: number | null;
 } {
+  // Łącznik między anchor-word a kwotą — opcjonalne słowa typu "kwota",
+  // "wynosi", "w wysokości", "w kwocie", "stanowi" + dwukropek/myślnik.
+  // Pozwala na: "głównej kwota 5 432,10 zł", "kosztów procesu w kwocie 100 zł".
+  const BRIDGE =
+    "(?:\\s*(?:[:\\-]|kwot[aęy]|wynosi|w\\s+wysoko[sś]ci|w\\s+kwocie|stanowi|to)\\b)*\\s*";
+
   // Należność główna
   const glowna = pickAmount(
     text,
-    /(?:należnośc[ią]?\s+głównej|kwoty\s+głównej|kwota\s+główna|tytułem\s+nale[zż]no[sś]ci\s+głównej)\s*[:\-]?\s*([\d\s.,]+)\s*(?:zł|PLN)/i,
+    new RegExp(
+      `(?:należnośc[ią]?\\s+głównej|kwoty\\s+głównej|kwota\\s+główna|tytułem\\s+nale[zż]no[sś]ci\\s+głównej)${BRIDGE}([\\d\\s.,]+?)\\s*(?:zł|PLN)`,
+      "i",
+    ),
   );
   // Odsetki
   const odsetki = pickAmount(
     text,
-    /(?:odset(?:ki|ek)|odsetkami)\s*(?:ustawowymi|umownymi)?\s*(?:w\s+kwocie)?\s*[:\-]?\s*([\d\s.,]+)\s*(?:zł|PLN)/i,
+    new RegExp(
+      `(?:odset(?:ki|ek)|odsetkami)\\s*(?:ustawowymi|umownymi)?${BRIDGE}([\\d\\s.,]+?)\\s*(?:zł|PLN)`,
+      "i",
+    ),
   );
   // Koszty
   const koszty = pickAmount(
     text,
-    /(?:koszt[óy]w?\s+(?:procesu|sądowych|postępowania|zastępstwa))\s*(?:w\s+kwocie)?\s*[:\-]?\s*([\d\s.,]+)\s*(?:zł|PLN)/i,
+    new RegExp(
+      `(?:koszt[óy]w?\\s+(?:procesu|sądowych|postępowania|zastępstwa))${BRIDGE}([\\d\\s.,]+?)\\s*(?:zł|PLN)`,
+      "i",
+    ),
   );
-  // Razem (WPS)
+  // Razem (WPS) — "łącznie 5 766,66 zł", "razem: 1000 zł", "ogółem 200 PLN"
   const razem = pickAmount(
     text,
-    /(?:warto[sś][cć]\s+przedmiotu\s+sporu|razem|łącznie|ogółem)\s*[:\-]?\s*([\d\s.,]+)\s*(?:zł|PLN)/i,
+    new RegExp(
+      `(?:warto[sś][cć]\\s+przedmiotu\\s+sporu|razem|łącznie|ogółem)${BRIDGE}([\\d\\s.,]+?)\\s*(?:zł|PLN)`,
+      "i",
+    ),
   );
 
   return { glowna, odsetki, koszty, razem };

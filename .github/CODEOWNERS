@@ -1,0 +1,25 @@
+# Długomat — code ownership.
+# Każda zmiana w wymienionych ścieżkach automatycznie taguje właściciela do review.
+# Patterns: glob-style, last-match-wins.
+
+# Default — wszystko trafia do owner repo.
+*                                       @walerys1003
+
+# AI / ML — wymaga review eksperta domenowego (legal-tech + Claude).
+/apps/web/lib/ai/                       @walerys1003
+/apps/web/lib/wizard/modules/           @walerys1003
+
+# Security-critical — CSRF, auth, RLS, RODO.
+/apps/web/lib/security/                 @walerys1003
+/apps/web/lib/auth/                     @walerys1003
+/apps/web/lib/rodo/                     @walerys1003
+/supabase/migrations/                   @walerys1003
+
+# Payments — Stripe, idempotency, invoicing.
+/apps/web/app/api/stripe/               @walerys1003
+/apps/web/lib/payments/                 @walerys1003
+
+# CI / infra — workflows + deploy config.
+/.github/                               @walerys1003
+/apps/web/next.config.mjs               @walerys1003
+/vercel.json                            @walerys1003

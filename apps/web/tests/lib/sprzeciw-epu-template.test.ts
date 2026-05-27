@@ -72,8 +72,16 @@ describe("renderSprzeciwEpuMarkdown", () => {
     };
     const { markdown } = renderSprzeciwEpuMarkdown(malicious);
     const html = markdownToHtml(markdown);
+    // Krytyczne: literalne taggi nie mogą pojawić się jako aktywne elementy.
     expect(html).not.toContain("<script>");
-    expect(html).not.toContain("onerror=");
+    expect(html).not.toContain("<img");
+    expect(html).not.toContain("</script>");
+    // Wszystkie groźne znaki zescape'owane do encji HTML.
     expect(html).toContain("&lt;script&gt;");
+    expect(html).toContain("&lt;img");
+    // Atrybut `onerror=` jako część tekstu (encoded) jest OK — przeglądarka
+    // zobaczy text, nie atrybut. `expect(html).not.toContain("<img")` powyżej
+    // gwarantuje, że żaden `<` nie został pominięty w escape'u (gdyby był,
+    // byłoby groźne).
   });
 });

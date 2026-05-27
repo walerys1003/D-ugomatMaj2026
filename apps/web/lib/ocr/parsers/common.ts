@@ -89,17 +89,33 @@ export function parsePolishDate(input: string | null | undefined): string | null
 
 /**
  * Wyciąga PESEL (11 cyfr) z dowolnego ciągu, walidując sumę kontrolną.
+ *
+ * Strategia:
+ *   1. Najpierw szukamy "PESEL: <11 cyfr>" — najsilniejszy sygnał.
+ *   2. Potem dowolny ciąg 11 cyfr w word-boundary z poprawną sumą kontrolną.
+ *   3. Wszystkie kandydaci walidowani algorytmem mod-10.
+ *
  * Zwraca string '12345678901' lub null.
  */
 export function parsePesel(input: string | null | undefined): string | null {
   if (!input) return null;
-  const m = input.match(/\b(\d{2})\s?\d?\s?\d?\s?(\d{6,9})\b/);
-  // Prostsze podejście: znajdź dokładnie 11 cyfr (z opcjonalną spacją w środku).
-  const digits = (input.match(/\d/g) ?? []).join("");
-  if (digits.length < 11) return null;
-  // Pobierz pierwsze 11
-  const candidate = digits.slice(0, 11);
-  return validatePesel(candidate) ? candidate : null;
+
+  // 1) Najpierw "PESEL: 12345678901" / "PESEL 12345678901" / "PESEL nr 12345678901"
+  const labeled = input.match(/PESEL[\s:.\-]*(?:nr|numer)?[\s:.\-]*(\d{11})\b/i);
+  if (labeled) {
+    const cand = labeled[1];
+    if (validatePesel(cand)) return cand;
+  }
+
+  // 2) Iteruj po wszystkich potencjalnych 11-cyfrowych ciągach i waliduj.
+  //    Używamy globalnego regex z word-boundary, żeby nie złapać np. fragmentu
+  //    sygnatury Nc-e 12345678/24 (8 cyfr nie 11) albo długiego numeru rachunku.
+  const all = input.matchAll(/\b(\d{11})\b/g);
+  for (const m of all) {
+    if (validatePesel(m[1])) return m[1];
+  }
+
+  return null;
 }
 
 /**
@@ -116,10 +132,14 @@ export function validatePesel(pesel: string): boolean {
 
 /**
  * Maskuje PESEL do bezpiecznej prezentacji w UI.
+ *
+ * Format: `XXX*****YY` — pierwsze 3 cyfry (rok) + 5 gwiazdek + ostatnie 2.
+ * Świadomie ukrywamy: dzień urodzenia + płeć + suma kontrolna częściowo.
+ * RODO art. 5(1)(c) — data minimization, art. 32 — pseudonimizacja.
  */
 export function maskPesel(pesel: string): string {
   if (!/^\d{11}$/.test(pesel)) return pesel;
-  return `${pesel.slice(0, 3)}*****${pesel.slice(8)}`;
+  return `${pesel.slice(0, 3)}*****${pesel.slice(9)}`;
 }
 
 /**

@@ -125,14 +125,16 @@ describe("computeBreakdown — VAT math (idempotent z Stripe amount_total)", () 
 });
 
 describe("NIP walidacja (Tier 4 zad. 157)", () => {
-  it("akceptuje poprawne NIP-y z czcecksum mod 11", () => {
-    // Generowane wg algorytmu: 525-21-52-828 = Microsoft Polska
-    expect(isValidNip("5252152828")).toBe(true);
-    expect(isValidNip("525-21-52-828")).toBe(true); // z myślnikami
+  it("akceptuje poprawne NIP-y z checksum mod 11", () => {
+    // 5260250274 = PKN ORLEN S.A. (publiczny, valid checksum mod 11).
+    expect(isValidNip("5260250274")).toBe(true);
+    expect(isValidNip("526-025-02-74")).toBe(true); // z myślnikami
   });
 
-  it("odrzuca niepoprawne NIP-y (zła suma kontrolna)", () => {
+  it("odrzuca niepoprawne NIP-y (zła suma kontrolna lub same zera)", () => {
     expect(isValidNip("1234567890")).toBe(false);
+    // "0000000000" technicznie ma checksum=0=lastDigit, ale to nie jest realny
+    // NIP — odrzucamy explicite jako biznesowy edge case.
     expect(isValidNip("0000000000")).toBe(false);
   });
 
@@ -143,8 +145,8 @@ describe("NIP walidacja (Tier 4 zad. 157)", () => {
   });
 
   it("normalizuje do formatu PL... dla Stripe metadata", () => {
-    expect(normalizeNip("5252152828")).toBe("PL5252152828");
-    expect(normalizeNip("525-21-52-828")).toBe("PL5252152828");
+    expect(normalizeNip("5260250274")).toBe("PL5260250274");
+    expect(normalizeNip("526-025-02-74")).toBe("PL5260250274");
     expect(normalizeNip("invalid")).toBeNull();
   });
 });
@@ -160,11 +162,11 @@ describe("decideVat — B2C/B2B logic (Tier 4 zad. 157)", () => {
   it("B2B PL z ważnym NIP — 23% + taxId z prefiksem PL", () => {
     const d = decideVat({
       customerType: "b2b",
-      nip: "5252152828",
+      nip: "5260250274",
       countryCode: "PL",
     });
     expect(d.vatRate).toBe(23);
-    expect(d.taxId).toBe("PL5252152828");
+    expect(d.taxId).toBe("PL5260250274");
     expect(d.reverseCharge).toBe(false);
   });
 

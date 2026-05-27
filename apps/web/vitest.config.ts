@@ -9,7 +9,13 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./tests/setup.ts"],
     include: ["**/*.{test,spec}.{ts,tsx}"],
-    exclude: ["**/node_modules/**", "**/.next/**", "**/e2e/**", "**/playwright-report/**"],
+    exclude: [
+      "**/node_modules/**",
+      "**/.next/**",
+      "**/e2e/**",
+      "**/playwright-report/**",
+      "**/visual/**", // visual-regression używa playwright, nie vitest
+    ],
     coverage: {
       reporter: ["text", "html", "lcov"],
       include: ["lib/**/*.{ts,tsx}", "components/**/*.{ts,tsx}"],
@@ -18,6 +24,8 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      // `server-only` — Next.js runtime guard, no-op w testach.
+      "server-only": path.resolve(__dirname, "./tests/__mocks__/server-only.ts"),
       "@": path.resolve(__dirname, "."),
       "@/app": path.resolve(__dirname, "./app"),
       "@/components": path.resolve(__dirname, "./components"),
