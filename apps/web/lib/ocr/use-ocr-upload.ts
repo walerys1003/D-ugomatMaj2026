@@ -28,6 +28,7 @@ import {
   runServerOcrAction,
 } from "./ocr-actions";
 import type { OcrIntent, OcrPipelineResult } from "./ocr-types";
+import { useCsrfToken } from "@/lib/security/use-csrf";
 
 export type OcrPhase =
   | "idle"
@@ -61,6 +62,7 @@ const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB (zgodnie z bucketem)
 export function useOcrUpload(
   opts: UseOcrUploadOptions = {},
 ): UseOcrUploadReturn {
+  const csrf = useCsrfToken();
   const [phase, setPhase] = useState<OcrPhase>("idle");
   const [progress, setProgress] = useState(0);
   const [statusMessage, setStatusMessage] = useState("");
@@ -107,6 +109,7 @@ export function useOcrUpload(
           setProgress(0.15);
 
           const upload = await createOcrUploadUrlAction({
+            csrf,
             fileName: file.name,
             contentType: file.type || "application/octet-stream",
           });

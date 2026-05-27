@@ -33,13 +33,13 @@ export function MobileWizard(props: MobileWizardProps) {
   const autosaveTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const currentStep = steps.find((s) => s.id === currentStepId);
-  const visible = currentStep ? isStepVisible(currentStep, answers) : false;
-  const percent = progressPercent(steps, currentStepId, answers);
+  const visible = currentStep ? isStepVisible(currentStep, answers as Record<string, any>) : false;
+  const percent = progressPercent(steps, currentStepId, answers as Record<string, any>);
 
   // Skip invisible steps automatically
   React.useEffect(() => {
     if (currentStep && !visible) {
-      const next = nextStep(steps, currentStepId, answers);
+      const next = nextStep(steps, currentStepId, answers as Record<string, any>);
       if (next) setCurrentStepId(next.id);
     }
   }, [currentStep, visible, steps, currentStepId, answers]);
@@ -69,7 +69,7 @@ export function MobileWizard(props: MobileWizardProps) {
 
   function handleNext() {
     if (!currentStep) return;
-    const next = nextStep(steps, currentStepId, answers);
+    const next = nextStep(steps, currentStepId, answers as Record<string, any>);
     if (next) {
       setCurrentStepId(next.id);
       setShowExplainer(false);
@@ -80,7 +80,7 @@ export function MobileWizard(props: MobileWizardProps) {
 
   function handleBack() {
     if (!currentStep) return;
-    const prev = previousStep(steps, currentStepId, answers);
+    const prev = previousStep(steps, currentStepId, answers as Record<string, any>);
     if (prev) {
       setCurrentStepId(prev.id);
       setShowExplainer(false);
@@ -145,13 +145,13 @@ export function MobileWizard(props: MobileWizardProps) {
         <button
           type="button"
           onClick={handleBack}
-          disabled={!previousStep(steps, currentStepId, answers)}
+          disabled={!previousStep(steps, currentStepId, answers as Record<string, any>)}
           style={{ ...navButtonStyle, ...secondaryButtonStyle }}
         >
           ← Wstecz
         </button>
         <button type="button" onClick={handleNext} style={{ ...navButtonStyle, ...primaryButtonStyle }}>
-          {nextStep(steps, currentStepId, answers) ? "Dalej →" : "Zakończ ✓"}
+          {nextStep(steps, currentStepId, answers as Record<string, any>) ? "Dalej →" : "Zakończ ✓"}
         </button>
       </div>
     </div>

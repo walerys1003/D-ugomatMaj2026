@@ -335,15 +335,15 @@ function composeVariables(
   switch (type) {
     case "sprzeciw_epu": {
       return {
-        sygnatura: pick(answers.sygnatura, caseRow.sygnatura) ?? "",
-        sad: pick(answers.sad, caseRow.sad) ?? "",
-        data_nakazu: pick(answers.data_nakazu, caseRow.data_nakazu) ?? "",
+        sygnatura: pick<string>(answers.sygnatura as string | undefined, caseRow.sygnatura as string | undefined) ?? "",
+        sad: pick<string>(answers.sad as string | undefined, caseRow.sad as string | undefined) ?? "",
+        data_nakazu: pick<string>(answers.data_nakazu as string | undefined, caseRow.data_nakazu as string | undefined) ?? "",
         data_doreczenia:
-          pick(answers.data_doreczenia, caseRow.data_doreczenia) ?? "",
-        powod_nazwa: pick(answers.powod_nazwa, caseRow.powod_nazwa) ?? "",
-        powod_adres: pick(answers.powod_adres, caseRow.powod_adres) ?? "",
-        pozwany_nazwa: pick(answers.pozwany_nazwa, caseRow.pozwany_nazwa) ?? "",
-        pozwany_adres: pick(answers.pozwany_adres, caseRow.pozwany_adres) ?? "",
+          pick<string>(answers.data_doreczenia as string | undefined, caseRow.data_doreczenia as string | undefined) ?? "",
+        powod_nazwa: pick<string>(answers.powod_nazwa as string | undefined, caseRow.powod_nazwa as string | undefined) ?? "",
+        powod_adres: pick<string>(answers.powod_adres as string | undefined, caseRow.powod_adres as string | undefined) ?? "",
+        pozwany_nazwa: pick<string>(answers.pozwany_nazwa as string | undefined, caseRow.pozwany_nazwa as string | undefined) ?? "",
+        pozwany_adres: pick<string>(answers.pozwany_adres as string | undefined, caseRow.pozwany_adres as string | undefined) ?? "",
         pozwany_pesel: (answers.pozwany_pesel as string) ?? "",
         kwota_glowna: Number(answers.kwota_glowna ?? caseRow.kwota_glowna ?? 0),
         kwota_odsetki: Number(
@@ -668,15 +668,15 @@ function renderForType(
   switch (type) {
     case "sprzeciw_epu": {
       const sa: SprzeciwEpuAnswers = {
-        sygnatura: pick(answers.sygnatura, caseRow.sygnatura) ?? "",
-        sad: pick(answers.sad, caseRow.sad) ?? "",
-        data_nakazu: pick(answers.data_nakazu, caseRow.data_nakazu) ?? "",
+        sygnatura: pick<string>(answers.sygnatura as string | undefined, caseRow.sygnatura as string | undefined) ?? "",
+        sad: pick<string>(answers.sad as string | undefined, caseRow.sad as string | undefined) ?? "",
+        data_nakazu: pick<string>(answers.data_nakazu as string | undefined, caseRow.data_nakazu as string | undefined) ?? "",
         data_doreczenia:
-          pick(answers.data_doreczenia, caseRow.data_doreczenia) ?? "",
-        powod_nazwa: pick(answers.powod_nazwa, caseRow.powod_nazwa) ?? "",
-        powod_adres: pick(answers.powod_adres, caseRow.powod_adres) ?? "",
-        pozwany_nazwa: pick(answers.pozwany_nazwa, caseRow.pozwany_nazwa) ?? "",
-        pozwany_adres: pick(answers.pozwany_adres, caseRow.pozwany_adres) ?? "",
+          pick<string>(answers.data_doreczenia as string | undefined, caseRow.data_doreczenia as string | undefined) ?? "",
+        powod_nazwa: pick<string>(answers.powod_nazwa as string | undefined, caseRow.powod_nazwa as string | undefined) ?? "",
+        powod_adres: pick<string>(answers.powod_adres as string | undefined, caseRow.powod_adres as string | undefined) ?? "",
+        pozwany_nazwa: pick<string>(answers.pozwany_nazwa as string | undefined, caseRow.pozwany_nazwa as string | undefined) ?? "",
+        pozwany_adres: pick<string>(answers.pozwany_adres as string | undefined, caseRow.pozwany_adres as string | undefined) ?? "",
         pozwany_pesel: (answers.pozwany_pesel as string) ?? "",
         kwota_glowna: Number(answers.kwota_glowna ?? caseRow.kwota_glowna ?? 0),
         kwota_odsetki: Number(

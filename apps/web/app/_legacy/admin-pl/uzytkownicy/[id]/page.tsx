@@ -281,6 +281,7 @@ export default async function AdminUserDetailPage({ params }: PageProps) {
   );
 }
 
+// W10-phase2: icon props relaxed to `any` for lucide-react ForwardRef compat
 function Row({
   label,
   value,
@@ -290,7 +291,8 @@ function Row({
 }: {
   label: string;
   value: string;
-  icon?: React.ComponentType<{ className?: string; "aria-hidden"?: boolean }>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  icon?: any;
   verified?: boolean;
   tone?: "success" | "warning";
 }) {
@@ -324,7 +326,9 @@ function LinkCard({
 }: {
   href: string;
   title: string;
-  icon: React.ComponentType<{ className?: string; "aria-hidden"?: boolean }>;
+  // W10-phase2: relax icon type for lucide-react compatibility
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  icon: any;
   count: number;
   unit: string;
 }) {

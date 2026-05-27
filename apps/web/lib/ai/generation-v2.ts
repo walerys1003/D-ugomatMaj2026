@@ -123,11 +123,11 @@ Wymagania:
 - nie generuj treści akapitów — tylko bullety jako szkielet`.trim();
 
     const result = await complete({
-      system: input.systemPrompt,
+      systemPrompt: input.systemPrompt,
       messages: [{ role: "user", content: planPrompt }],
       maxTokens: 1500,
       temperature: 0.2,
-      modelHint: "sonnet",
+      role: "generator",
     });
 
     const cleaned = result.text.replace(/^```(?:json)?\s*/, "").replace(/\s*```\s*$/, "");
@@ -145,8 +145,8 @@ Wymagania:
 
     return {
       plan,
-      inputTokens: result.usage?.input_tokens ?? 0,
-      outputTokens: result.usage?.output_tokens ?? 0,
+      inputTokens: result.tokensInput,
+      outputTokens: result.tokensOutput,
       ms: Date.now() - t0,
     };
   });
@@ -181,17 +181,17 @@ Wymagania:
 - BEZ list numerowanych — pisz akapitami`.trim();
 
   const result = await complete({
-    system: systemPrompt,
+    systemPrompt: systemPrompt,
     messages: [{ role: "user", content: writePrompt }],
     maxTokens: 800,
     temperature: 0.4,
-    modelHint: "haiku",
+    role: "validator",
   });
 
   return {
     md: result.text.trim(),
-    inputTokens: result.usage?.input_tokens ?? 0,
-    outputTokens: result.usage?.output_tokens ?? 0,
+    inputTokens: result.tokensInput,
+    outputTokens: result.tokensOutput,
   };
 }
 
@@ -269,17 +269,17 @@ ${draft}
 Zwróć POLEROWANY markdown (bez komentarzy, bez wyjaśnień).`.trim();
 
     const result = await complete({
-      system: input.systemPrompt,
+      systemPrompt: input.systemPrompt,
       messages: [{ role: "user", content: polishPrompt }],
       maxTokens: 3000,
       temperature: 0.2,
-      modelHint: "sonnet",
+      role: "generator",
     });
 
     return {
       finalMd: result.text.trim(),
-      inputTokens: result.usage?.input_tokens ?? 0,
-      outputTokens: result.usage?.output_tokens ?? 0,
+      inputTokens: result.tokensInput,
+      outputTokens: result.tokensOutput,
       ms: Date.now() - t0,
     };
   });

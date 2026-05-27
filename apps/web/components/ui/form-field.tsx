@@ -11,7 +11,11 @@ import { cn } from "@/lib/utils";
  */
 export interface FormFieldProps {
   label: string;
-  htmlFor: string;
+  /**
+   * Optional — when omitted we derive a stable id from the label slug.
+   * Required behavior preserved when caller supplies one (recommended).
+   */
+  htmlFor?: string;
   required?: boolean;
   help?: React.ReactNode;
   error?: React.ReactNode;
@@ -31,14 +35,21 @@ export function FormField({
   className,
   children,
 }: FormFieldProps) {
-  const helpId = help ? `${htmlFor}-help` : undefined;
-  const errorId = error ? `${htmlFor}-error` : undefined;
+  // W10-phase2: htmlFor now optional; fall back to deterministic slug of label.
+  const fieldId =
+    htmlFor ??
+    `field-${label
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")}`;
+  const helpId = help ? `${fieldId}-help` : undefined;
+  const errorId = error ? `${fieldId}-error` : undefined;
   const describedBy = [helpId, errorId].filter(Boolean).join(" ") || undefined;
 
   // Inject aria-describedby into the single child input/textarea/select.
   const child = React.isValidElement(children)
     ? React.cloneElement(children as React.ReactElement<Record<string, unknown>>, {
-        id: htmlFor,
+        id: fieldId,
         "aria-describedby": describedBy,
       })
     : children;
@@ -46,7 +57,7 @@ export function FormField({
   return (
     <div className={cn("flex flex-col gap-1.5", className)}>
       <div className="flex items-baseline justify-between gap-2">
-        <Label htmlFor={htmlFor} required={required}>
+        <Label htmlFor={fieldId} required={required}>
           {label}
         </Label>
         {hint ? <span className="text-fluid-xs text-ink-500">{hint}</span> : null}
