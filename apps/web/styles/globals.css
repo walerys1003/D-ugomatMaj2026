@@ -49,20 +49,24 @@
     --danger-50: 0 86% 97%; /* #FEF2F2 */
 
     /* ---- Iron neutrals (text, borders, surfaces) -------------------- */
-    /* DEPRECATED in v3 for body/borders/neutral surfaces — kept for
-       brand-touched contexts (focus complement, dark mode mapping). New
-       code should reach for `--ink-*` (true neutrals) instead. */
-    --iron-950: 222 47% 6%;
-    --iron-900: 222 39% 11%;
-    --iron-800: 217 33% 17%;
-    --iron-700: 215 25% 27%;
-    --iron-600: 215 16% 36%;
-    --iron-500: 215 14% 47%;
-    --iron-400: 214 13% 60%;
-    --iron-300: 213 16% 76%;
-    --iron-200: 214 22% 88%;
-    --iron-100: 214 26% 94%;
-    --iron-50: 210 33% 98%;
+    /* V4-ε/ζ remap: --iron-* zostały remapowane do achromatycznej skali
+       --ink-* (HSL 0 0% X%). Stare hity `iron-*` w kodzie (2309 wystąpień)
+       renderują się teraz identycznie z `ink-*` — bez wybijającego się
+       niebieskiego tintu (HSL 210-222) który dawał „demo banku" look.
+       Codemod sed-em odłożony do v5 (refactor importów, nie design).
+       Brand-touched konteksty wcześniej używające iron (focus complement,
+       dark mode chrome) — przenieść do dedykowanych tokenów akcentu. */
+    --iron-950: 0 0% 4%;    /* was: 222 47% 6%  → ink-950 */
+    --iron-900: 0 0% 7%;    /* was: 222 39% 11% → ink-900 */
+    --iron-800: 0 0% 13%;   /* was: 217 33% 17% → ink-800 */
+    --iron-700: 0 0% 22%;   /* was: 215 25% 27% → ink-700 */
+    --iron-600: 0 0% 32%;   /* was: 215 16% 36% → ink-600 */
+    --iron-500: 0 0% 46%;   /* was: 215 14% 47% → ink-500 */
+    --iron-400: 0 0% 64%;   /* was: 214 13% 60% → ink-400 */
+    --iron-300: 0 0% 84%;   /* was: 213 16% 76% → ink-300 */
+    --iron-200: 0 0% 91%;   /* was: 214 22% 88% → ink-200 */
+    --iron-100: 0 0% 96.5%; /* was: 214 26% 94% → ink-100 */
+    --iron-50:  0 0% 98.5%; /* was: 210 33% 98% → ink-50  */
 
     /* ---- Ink (Tarcza v3 — TRUE NEUTRALS) ---------------------------- *
      * Wprowadzone w v3 Stoic. Iron miało tinted-blue cast (HSL 210-222),
@@ -177,6 +181,21 @@
     --ink-800: 0 0% 92%;
     --ink-900: 0 0% 98%;
     --ink-950: 0 0% 100%;
+
+    /* V4-ε/ζ — Iron dark mode mirror Ink (same achromatic scale).
+       Stare hity iron-* w dark renderują się identycznie z ink-* — bez
+       niebieskiego nawisu który wcześniej szarpał dark theme. */
+    --iron-50:  0 0% 7%;
+    --iron-100: 0 0% 10%;
+    --iron-200: 0 0% 16%;
+    --iron-300: 0 0% 24%;
+    --iron-400: 0 0% 42%;
+    --iron-500: 0 0% 58%;
+    --iron-600: 0 0% 70%;
+    --iron-700: 0 0% 82%;
+    --iron-800: 0 0% 92%;
+    --iron-900: 0 0% 98%;
+    --iron-950: 0 0% 100%;
 
     /* Shadow tint dla dark — głębszy, mocniejszy. */
     --shadow-color: 220 60% 2%;
