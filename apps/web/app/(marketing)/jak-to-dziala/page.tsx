@@ -19,6 +19,10 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import {
+  MarketingPageHero,
+  MarketingCtaBanner,
+} from "@/components/marketing/page-hero";
 
 export const metadata: Metadata = {
   title: "Jak działa Długomat — od skanu do gotowego pisma w 12 minut",
@@ -121,44 +125,14 @@ export default function JakToDzialaPage() {
         }}
       />
 
-      {/* HERO */}
-      <section className="tarcza-hero-gradient relative overflow-hidden text-white">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -top-32 right-[-10%] h-[40rem] w-[40rem] rounded-full bg-dlugomat-500/20 blur-3xl"
-        />
-        <div className="container relative py-20 sm:py-24 lg:py-28">
-          <div className="mx-auto max-w-3xl text-center">
-            <Badge tone="info" withDot className="bg-white/10 text-white border-white/20">
-              4 kroki — 12 minut średnio
-            </Badge>
-            <h1 className="mt-4 text-balance text-fluid-5xl font-bold tracking-tight text-white">
-              Bez prawnika, bez kolejek, bez paniki.
-            </h1>
-            <p className="mt-4 text-fluid-lg text-iron-200">
-              Każde pismo procesowe składa się z tych samych elementów: dane stron,
-              opis sytuacji, zarzuty, wnioski, podpis, załączniki. Długomat
-              automatyzuje 90% tej pracy — a Ty zachowujesz pełną kontrolę.
-            </p>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-              <Button asChild size="lg" variant="success">
-                <Link href="/skaner-nakazu">
-                  Zeskanuj pismo — DARMOWE
-                  <ArrowRight className="size-4" />
-                </Link>
-              </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="ghost"
-                className="text-white hover:bg-white/10"
-              >
-                <Link href="/moduly">Zobacz moduły</Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* HERO — Tarcza v4 unified */}
+      <MarketingPageHero
+        eyebrow="4 kroki — 12 minut średnio"
+        title="Bez prawnika, bez kolejek, bez paniki."
+        subtitle="Każde pismo procesowe składa się z tych samych elementów: dane stron, opis sytuacji, zarzuty, wnioski, podpis, załączniki. Długomat automatyzuje 90% tej pracy — a Ty zachowujesz pełną kontrolę."
+        primaryCta={{ href: "/skaner-nakazu", label: "Zeskanuj pismo — DARMOWE" }}
+        secondaryCta={{ href: "/moduly", label: "Zobacz moduły" }}
+      />
 
       {/* STEPS — szczegóły */}
       <section className="container py-16 sm:py-20">
@@ -321,35 +295,14 @@ export default function JakToDzialaPage() {
         </div>
       </section>
 
-      {/* CTA */}
+      {/* CTA — Tarcza v4 unified */}
       <section className="container py-20 sm:py-24">
-        <div className="tarcza-hero-gradient relative overflow-hidden rounded-2xl px-6 py-12 sm:px-12 sm:py-16">
-          <div className="relative mx-auto max-w-2xl text-center text-white">
-            <h2 className="text-balance text-fluid-3xl font-bold tracking-tight text-white sm:text-fluid-4xl">
-              Wystarczy zeskanować pierwsze pismo.
-            </h2>
-            <p className="mt-3 text-fluid-base text-iron-200">
-              D1 Skaner Nakazu jest darmowy. Bez konta z karty. Bez abonamentu.
-              W 2 minuty wiesz, na czym stoisz.
-            </p>
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-              <Button asChild size="lg" variant="success">
-                <Link href="/skaner-nakazu">
-                  Rozpocznij teraz
-                  <ArrowRight className="size-4" />
-                </Link>
-              </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="ghost"
-                className="text-white hover:bg-white/10"
-              >
-                <Link href="/moduly">Wszystkie moduły</Link>
-              </Button>
-            </div>
-          </div>
-        </div>
+        <MarketingCtaBanner
+          title="Wystarczy zeskanować pierwsze pismo."
+          subtitle="D1 Skaner Nakazu jest darmowy. Bez konta z karty. Bez abonamentu. W 2 minuty wiesz, na czym stoisz."
+          primaryCta={{ href: "/skaner-nakazu", label: "Rozpocznij teraz" }}
+          secondaryCta={{ href: "/moduly", label: "Wszystkie moduły" }}
+        />
       </section>
     </>
   );

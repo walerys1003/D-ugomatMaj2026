@@ -4,6 +4,7 @@ import { Shield, FileDown, Trash2, Eye, Edit, Ban, ArrowRight } from "lucide-rea
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { MarketingPageHero } from "@/components/marketing/page-hero";
 
 export const metadata: Metadata = {
   title: "RODO — Twoje prawa w Długomacie",
@@ -73,28 +74,12 @@ const RIGHTS: readonly RodoRight[] = [
 export default function RodoPage() {
   return (
     <>
-      {/* HERO */}
-      <section className="tarcza-hero-gradient relative overflow-hidden text-white">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -top-32 right-[-10%] h-[40rem] w-[40rem] rounded-full bg-dlugomat-500/20 blur-3xl"
-        />
-        <div className="container relative py-16 sm:py-20 lg:py-24">
-          <div className="mx-auto max-w-3xl text-center">
-            <Badge tone="info" withDot className="bg-white/10 text-white border-white/20">
-              RODO
-            </Badge>
-            <h1 className="mt-4 text-balance text-fluid-5xl font-bold tracking-tight text-white">
-              Twoje dane są Twoje. Bez gwiazdek.
-            </h1>
-            <p className="mt-4 text-fluid-lg text-iron-200">
-              Pełna lista uprawnień, które przysługują Ci na mocy Rozporządzenia
-              2016/679 (RODO) — i dokładnie pokazane miejsce, gdzie z każdego z
-              nich skorzystasz.
-            </p>
-          </div>
-        </div>
-      </section>
+      {/* HERO — Tarcza v4 unified */}
+      <MarketingPageHero
+        eyebrow="RODO"
+        title="Twoje dane są Twoje. Bez gwiazdek."
+        subtitle="Pełna lista uprawnień, które przysługują Ci na mocy Rozporządzenia 2016/679 (RODO) — i dokładnie pokazane miejsce, gdzie z każdego z nich skorzystasz."
+      />
 
       {/* RIGHTS */}
       <section className="container py-16 sm:py-20">

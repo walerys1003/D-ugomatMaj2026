@@ -16,6 +16,10 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import {
+  MarketingPageHero,
+  MarketingCtaBanner,
+} from "@/components/marketing/page-hero";
 
 export const metadata: Metadata = {
   title: "Cennik Długomatu — od 0 zł, bez abonamentu, bez ukrytych kosztów",
@@ -230,28 +234,12 @@ const FAQ = [
 export default function CennikPage() {
   return (
     <>
-      {/* HERO */}
-      <section className="tarcza-hero-gradient relative overflow-hidden text-white">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -top-32 right-[-10%] h-[40rem] w-[40rem] rounded-full bg-dlugomat-500/20 blur-3xl"
-        />
-        <div className="container relative py-20 sm:py-24 lg:py-28">
-          <div className="mx-auto max-w-3xl text-center">
-            <Badge tone="info" withDot className="bg-white/10 text-white border-white/20">
-              Bez abonamentu • Bez ukrytych kosztów
-            </Badge>
-            <h1 className="mt-4 text-balance text-fluid-5xl font-bold tracking-tight text-white">
-              Płacisz tylko za pisma, które generujesz.
-            </h1>
-            <p className="mt-4 text-fluid-lg text-iron-200">
-              Skaner pism — DARMOWE. Pojedyncze pismo procesowe — od 79 zł.
-              Pakiet komorniczy (4 pisma) — 199 zł. Bez subskrypcji, bez abonamentu,
-              bez kart przy rejestracji.
-            </p>
-          </div>
-        </div>
-      </section>
+      {/* HERO — Tarcza v4 unified */}
+      <MarketingPageHero
+        eyebrow="Bez abonamentu • Bez ukrytych kosztów"
+        title="Płacisz tylko za pisma, które generujesz."
+        subtitle="Skaner pism — DARMOWE. Pojedyncze pismo procesowe — od 79 zł. Pakiet komorniczy (4 pisma) — 199 zł. Bez subskrypcji, bez abonamentu, bez kart przy rejestracji."
+      />
 
       {/* PRICING GRID */}
       <section className="container py-16 sm:py-20">
@@ -424,36 +412,14 @@ export default function CennikPage() {
         </div>
       </section>
 
-      {/* CTA */}
+      {/* CTA — Tarcza v4 unified */}
       <section className="container py-20 sm:py-24">
-        <div className="tarcza-hero-gradient relative overflow-hidden rounded-2xl px-6 py-12 sm:px-12 sm:py-16">
-          <div className="relative mx-auto max-w-2xl text-center text-white">
-            <h2 className="text-balance text-fluid-3xl font-bold tracking-tight text-white sm:text-fluid-4xl">
-              Zacznij od zera złotych.
-            </h2>
-            <p className="mt-3 text-fluid-base text-iron-200">
-              D1 Skaner Nakazu pokaże, czy potrzebujesz pisma — i którego.
-              Często okazuje się, że roszczenie jest przedawnione i nie musisz
-              kupować nic poza skanem.
-            </p>
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-              <Button asChild size="lg" variant="success">
-                <Link href="/skaner-nakazu">
-                  Zeskanuj pismo — DARMOWE
-                  <ArrowRight className="size-4" />
-                </Link>
-              </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="ghost"
-                className="text-white hover:bg-white/10"
-              >
-                <Link href="/moduly">Zobacz moduły</Link>
-              </Button>
-            </div>
-          </div>
-        </div>
+        <MarketingCtaBanner
+          title="Zacznij od zera złotych."
+          subtitle="D1 Skaner Nakazu pokaże, czy potrzebujesz pisma — i którego. Często okazuje się, że roszczenie jest przedawnione i nie musisz kupować nic poza skanem."
+          primaryCta={{ href: "/skaner-nakazu", label: "Zeskanuj pismo — DARMOWE" }}
+          secondaryCta={{ href: "/moduly", label: "Zobacz moduły" }}
+        />
       </section>
     </>
   );

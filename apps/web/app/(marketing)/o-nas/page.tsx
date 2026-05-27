@@ -10,6 +10,10 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  MarketingPageHero,
+  MarketingCtaBanner,
+} from "@/components/marketing/page-hero";
 
 export const metadata: Metadata = {
   title: "O nas — kim jest Długomat i dlaczego to robimy",
@@ -44,28 +48,12 @@ const VALUES = [
 export default function ONasPage() {
   return (
     <>
-      {/* HERO */}
-      <section className="tarcza-hero-gradient relative overflow-hidden text-white">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -top-32 right-[-10%] h-[40rem] w-[40rem] rounded-full bg-dlugomat-500/20 blur-3xl"
-        />
-        <div className="container relative py-20 sm:py-24">
-          <div className="mx-auto max-w-3xl text-center">
-            <Badge tone="info" withDot className="bg-white/10 text-white border-white/20">
-              O nas
-            </Badge>
-            <h1 className="mt-4 text-balance text-fluid-5xl font-bold tracking-tight text-white">
-              Tarcza dla osób zadłużonych — bo każdy zasługuje na obronę.
-            </h1>
-            <p className="mt-4 text-fluid-lg text-iron-200">
-              Długomat to projekt legal-tech, który automatyzuje pisma procesowe
-              przy użyciu AI zgodnej z polskim prawem. Robimy to dlatego, że
-              dostęp do narzędzi prawnych nie powinien zależeć od portfela.
-            </p>
-          </div>
-        </div>
-      </section>
+      {/* HERO — Tarcza v4 unified */}
+      <MarketingPageHero
+        eyebrow="O nas"
+        title="Tarcza dla osób zadłużonych — bo każdy zasługuje na obronę."
+        subtitle="Długomat to projekt legal-tech, który automatyzuje pisma procesowe przy użyciu AI zgodnej z polskim prawem. Robimy to dlatego, że dostęp do narzędzi prawnych nie powinien zależeć od portfela."
+      />
 
       {/* MISSION */}
       <section className="container py-16 sm:py-20">
@@ -177,35 +165,14 @@ export default function ONasPage() {
         </div>
       </section>
 
-      {/* CTA */}
+      {/* CTA — Tarcza v4 unified */}
       <section className="container py-20 sm:py-24">
-        <div className="tarcza-hero-gradient relative overflow-hidden rounded-2xl px-6 py-12 sm:px-12 sm:py-16">
-          <div className="relative mx-auto max-w-2xl text-center text-white">
-            <h2 className="text-balance text-fluid-3xl font-bold tracking-tight text-white sm:text-fluid-4xl">
-              Masz pytanie? Sugestię? Krytykę?
-            </h2>
-            <p className="mt-3 text-fluid-base text-iron-200">
-              Słuchamy. Każdy email czytamy w 24h. Każdy feedback od
-              użytkowników wraca jako poprawka w produkcie.
-            </p>
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-              <Button asChild size="lg" variant="success">
-                <Link href="/kontakt">
-                  Skontaktuj się
-                  <ArrowRight className="size-4" />
-                </Link>
-              </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="ghost"
-                className="text-white hover:bg-white/10"
-              >
-                <Link href="/skaner-nakazu">Wypróbuj skaner</Link>
-              </Button>
-            </div>
-          </div>
-        </div>
+        <MarketingCtaBanner
+          title="Masz pytanie? Sugestię? Krytykę?"
+          subtitle="Słuchamy. Każdy email czytamy w 24h. Każdy feedback od użytkowników wraca jako poprawka w produkcie."
+          primaryCta={{ href: "/kontakt", label: "Skontaktuj się" }}
+          secondaryCta={{ href: "/skaner-nakazu", label: "Wypróbuj skaner" }}
+        />
       </section>
     </>
   );

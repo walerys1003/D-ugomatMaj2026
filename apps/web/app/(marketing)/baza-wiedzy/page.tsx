@@ -9,6 +9,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  MarketingPageHero,
+  MarketingCtaBanner,
+} from "@/components/marketing/page-hero";
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://dlugomat.pl";
 
@@ -223,27 +227,12 @@ export default function BazaWiedzyPage() {
           __html: JSON.stringify(itemListLd).replace(/</g, "\\u003c"),
         }}
       />
-      {/* HERO */}
-      <section className="tarcza-hero-gradient relative overflow-hidden text-white">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -top-32 right-[-10%] h-[40rem] w-[40rem] rounded-full bg-dlugomat-500/20 blur-3xl"
-        />
-        <div className="container relative py-16 sm:py-20 lg:py-24">
-          <div className="mx-auto max-w-3xl text-center">
-            <Badge tone="info" withDot className="bg-white/10 text-white border-white/20">
-              Baza wiedzy
-            </Badge>
-            <h1 className="mt-4 text-balance text-fluid-5xl font-bold tracking-tight text-white">
-              Wiedza, która Cię chroni.
-            </h1>
-            <p className="mt-4 text-fluid-lg text-iron-200">
-              Bez prawniczego żargonu. Konkretne pytania, konkretne odpowiedzi —
-              z aktualnymi przepisami, terminami i orzecznictwem Sądu Najwyższego.
-            </p>
-          </div>
-        </div>
-      </section>
+      {/* HERO — Tarcza v4 unified */}
+      <MarketingPageHero
+        eyebrow="Baza wiedzy"
+        title="Wiedza, która Cię chroni."
+        subtitle="Bez prawniczego żargonu. Konkretne pytania, konkretne odpowiedzi — z aktualnymi przepisami, terminami i orzecznictwem Sądu Najwyższego."
+      />
 
       {/* CATEGORIES */}
       <section className="container py-16 sm:py-20">
@@ -336,29 +325,13 @@ export default function BazaWiedzyPage() {
         </div>
       </section>
 
-      {/* CTA */}
+      {/* CTA — Tarcza v4 unified */}
       <section className="container py-20 sm:py-24">
-        <div className="tarcza-hero-gradient relative overflow-hidden rounded-2xl px-6 py-12 sm:px-12 sm:py-16">
-          <div className="relative mx-auto max-w-2xl text-center text-white">
-            <h2 className="text-balance text-fluid-3xl font-bold tracking-tight text-white sm:text-fluid-4xl">
-              Wiedza to dopiero pierwszy krok.
-            </h2>
-            <p className="mt-3 text-fluid-base text-iron-200">
-              Po przeczytaniu artykułu często wiesz, czego potrzebujesz. Skaner
-              Nakazu pokaże Ci, czy nie ma dodatkowych szans (np. przedawnienie),
-              o których nie pomyślałeś.
-            </p>
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-              <Link
-                href="/skaner-nakazu"
-                className="inline-flex items-center gap-2 rounded-md bg-accent-600 px-5 py-3 text-fluid-sm font-semibold text-white shadow-sm transition-colors hover:bg-accent-500"
-              >
-                Zeskanuj pismo — DARMOWE
-                <ArrowRight className="size-4" />
-              </Link>
-            </div>
-          </div>
-        </div>
+        <MarketingCtaBanner
+          title="Wiedza to dopiero pierwszy krok."
+          subtitle="Po przeczytaniu artykułu często wiesz, czego potrzebujesz. Skaner Nakazu pokaże Ci, czy nie ma dodatkowych szans (np. przedawnienie), o których nie pomyślałeś."
+          primaryCta={{ href: "/skaner-nakazu", label: "Zeskanuj pismo — DARMOWE" }}
+        />
       </section>
     </>
   );

@@ -4,6 +4,10 @@ import { Mail, Shield, MessageCircle, Clock, ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  MarketingPageHero,
+  MarketingCtaBanner,
+} from "@/components/marketing/page-hero";
 
 export const metadata: Metadata = {
   title: "Kontakt — Długomat",
@@ -47,27 +51,12 @@ const CHANNELS: readonly ContactChannel[] = [
 export default function KontaktPage() {
   return (
     <>
-      {/* HERO */}
-      <section className="tarcza-hero-gradient relative overflow-hidden text-white">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -top-32 right-[-10%] h-[40rem] w-[40rem] rounded-full bg-dlugomat-500/20 blur-3xl"
-        />
-        <div className="container relative py-16 sm:py-20 lg:py-24">
-          <div className="mx-auto max-w-3xl text-center">
-            <Badge tone="info" withDot className="bg-white/10 text-white border-white/20">
-              Kontakt
-            </Badge>
-            <h1 className="mt-4 text-balance text-fluid-5xl font-bold tracking-tight text-white">
-              Słuchamy. Czytamy. Odpowiadamy.
-            </h1>
-            <p className="mt-4 text-fluid-lg text-iron-200">
-              Jeden zespół, trzy adresy, jasne SLA. Wybierz kanał odpowiedni do
-              Twojej sprawy — odpowiemy szybciej niż średnia branżowa.
-            </p>
-          </div>
-        </div>
-      </section>
+      {/* HERO — Tarcza v4 unified */}
+      <MarketingPageHero
+        eyebrow="Kontakt"
+        title="Słuchamy. Czytamy. Odpowiadamy."
+        subtitle="Jeden zespół, trzy adresy, jasne SLA. Wybierz kanał odpowiedni do Twojej sprawy — odpowiemy szybciej niż średnia branżowa."
+      />
 
       {/* CHANNELS */}
       <section className="container py-16 sm:py-20">
@@ -270,27 +259,13 @@ export default function KontaktPage() {
         </div>
       </section>
 
-      {/* CTA */}
+      {/* CTA — Tarcza v4 unified */}
       <section className="container py-20 sm:py-24">
-        <div className="tarcza-hero-gradient relative overflow-hidden rounded-2xl px-6 py-12 sm:px-12 sm:py-16">
-          <div className="relative mx-auto max-w-2xl text-center text-white">
-            <h2 className="text-balance text-fluid-3xl font-bold tracking-tight text-white sm:text-fluid-4xl">
-              Może wystarczy zacząć od skanu?
-            </h2>
-            <p className="mt-3 text-fluid-base text-iron-200">
-              D1 Skaner Nakazu — DARMOWE. Zwykle to wystarcza, żeby wiedzieć,
-              jaką ścieżką iść — albo czy w ogóle czegoś potrzebujesz.
-            </p>
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-              <Button asChild size="lg" variant="success">
-                <Link href="/skaner-nakazu">
-                  Wczytaj pismo
-                  <ArrowRight className="size-4" />
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </div>
+        <MarketingCtaBanner
+          title="Może wystarczy zacząć od skanu?"
+          subtitle="D1 Skaner Nakazu — DARMOWE. Zwykle to wystarcza, żeby wiedzieć, jaką ścieżką iść — albo czy w ogóle czegoś potrzebujesz."
+          primaryCta={{ href: "/skaner-nakazu", label: "Wczytaj pismo" }}
+        />
       </section>
     </>
   );

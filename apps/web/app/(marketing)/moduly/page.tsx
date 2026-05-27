@@ -10,6 +10,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  MarketingPageHero,
+  MarketingCtaBanner,
+} from "@/components/marketing/page-hero";
 
 export const metadata: Metadata = {
   title: "Moduły Długomatu — 8 narzędzi dla osób zadłużonych",
@@ -126,28 +130,12 @@ const CATEGORIES: ReadonlyArray<ModuleEntry["category"]> = [
 export default function ModulyPage() {
   return (
     <>
-      {/* HERO */}
-      <section className="tarcza-hero-gradient relative overflow-hidden text-white">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -top-32 right-[-10%] h-[40rem] w-[40rem] rounded-full bg-dlugomat-500/20 blur-3xl"
-        />
-        <div className="container relative py-20 sm:py-24 lg:py-28">
-          <div className="mx-auto max-w-3xl text-center">
-            <Badge tone="info" withDot className="bg-white/10 text-white border-white/20">
-              8 modułów — jedna tarcza
-            </Badge>
-            <h1 className="mt-4 text-balance text-fluid-5xl font-bold tracking-tight text-white">
-              Każdy moduł rozwiązuje jeden problem.
-            </h1>
-            <p className="mt-4 text-fluid-lg text-iron-200">
-              Nie kupujesz pakietu, którego nie potrzebujesz. Nie podpisujesz
-              abonamentu. Płacisz tylko za pisma, które wygenerujesz — z gotowym
-              PDF na końcu.
-            </p>
-          </div>
-        </div>
-      </section>
+      {/* HERO — Tarcza v4 unified */}
+      <MarketingPageHero
+        eyebrow="8 modułów — jedna tarcza"
+        title="Każdy moduł rozwiązuje jeden problem."
+        subtitle="Nie kupujesz pakietu, którego nie potrzebujesz. Nie podpisujesz abonamentu. Płacisz tylko za pisma, które wygenerujesz — z gotowym PDF na końcu."
+      />
 
       {/* MODULES GRID */}
       <section className="container py-16 sm:py-20">
@@ -249,35 +237,14 @@ export default function ModulyPage() {
         </div>
       </section>
 
-      {/* CTA */}
+      {/* CTA — Tarcza v4 unified */}
       <section className="container py-20 sm:py-24">
-        <div className="tarcza-hero-gradient relative overflow-hidden rounded-2xl px-6 py-12 sm:px-12 sm:py-16">
-          <div className="relative mx-auto max-w-2xl text-center text-white">
-            <h2 className="text-balance text-fluid-3xl font-bold tracking-tight text-white sm:text-fluid-4xl">
-              Nie wiesz, od czego zacząć? Zacznij od skanera.
-            </h2>
-            <p className="mt-3 text-fluid-base text-iron-200">
-              D1 jest darmowy. Wczytasz pismo i sam algorytm wskaże, którego
-              modułu potrzebujesz — albo czy w ogóle jakiegoś.
-            </p>
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-              <Button asChild size="lg" variant="success">
-                <Link href="/skaner-nakazu">
-                  Zeskanuj pismo — DARMOWE
-                  <ArrowRight className="size-4" />
-                </Link>
-              </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="ghost"
-                className="text-white hover:bg-white/10"
-              >
-                <Link href="/cennik">Zobacz cennik</Link>
-              </Button>
-            </div>
-          </div>
-        </div>
+        <MarketingCtaBanner
+          title="Nie wiesz, od czego zacząć? Zacznij od skanera."
+          subtitle="D1 jest darmowy. Wczytasz pismo i sam algorytm wskaże, którego modułu potrzebujesz — albo czy w ogóle jakiegoś."
+          primaryCta={{ href: "/skaner-nakazu", label: "Zeskanuj pismo — DARMOWE" }}
+          secondaryCta={{ href: "/cennik", label: "Zobacz cennik" }}
+        />
       </section>
     </>
   );
