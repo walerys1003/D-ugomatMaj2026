@@ -31,10 +31,30 @@ export const badgeVariants = cva(
   }
 );
 
+/**
+ * `BadgeLegacyVariant` — shadcn-compatible variant set, zachowane jako
+ * deprecated alias (Sprint typecheck A). Mapuje na canonical `tone`.
+ *
+ * Pełna migracja: <Badge variant="outline"> → <Badge tone="neutral">,
+ * <Badge variant="destructive"> → <Badge tone="danger">, etc.
+ * Do czasu codemod-u wszystkich 8 konsumentów (marketplace, dpa, precedensy,
+ * kalkulatory) compat-layer poniżej mapuje wartości w runtime.
+ */
+type BadgeLegacyVariant = "default" | "secondary" | "destructive" | "outline";
+
+const LEGACY_TONE_MAP: Record<BadgeLegacyVariant, NonNullable<BadgeProps["tone"]>> = {
+  default: "info",
+  secondary: "neutral",
+  destructive: "danger",
+  outline: "neutral",
+};
+
 export interface BadgeProps
   extends React.HTMLAttributes<HTMLSpanElement>,
     VariantProps<typeof badgeVariants> {
   withDot?: boolean;
+  /** @deprecated Use `tone` instead. Maps to canonical tone for back-compat. */
+  variant?: BadgeLegacyVariant;
 }
 
 const DOT: Record<NonNullable<BadgeProps["tone"]>, string> = {
@@ -45,11 +65,21 @@ const DOT: Record<NonNullable<BadgeProps["tone"]>, string> = {
   neutral: "bg-iron-400",
 };
 
-export function Badge({ className, tone = "neutral", withDot, children, ...props }: BadgeProps) {
+export function Badge({
+  className,
+  tone,
+  variant,
+  withDot,
+  children,
+  ...props
+}: BadgeProps) {
+  // Priorytet: tone (canonical) > variant (deprecated) > "neutral"
+  const resolvedTone: NonNullable<BadgeProps["tone"]> =
+    tone ?? (variant ? LEGACY_TONE_MAP[variant] : "neutral");
   return (
-    <span className={cn(badgeVariants({ tone }), className)} {...props}>
+    <span className={cn(badgeVariants({ tone: resolvedTone }), className)} {...props}>
       {withDot ? (
-        <span aria-hidden className={cn("size-1.5 rounded-full", DOT[tone ?? "neutral"])} />
+        <span aria-hidden className={cn("size-1.5 rounded-full", DOT[resolvedTone])} />
       ) : null}
       {children}
     </span>

@@ -123,6 +123,10 @@ export interface Database {
           avatar_url: string | null;
           onboarding_completed: boolean;
           settings: Json;
+          /** Referral attribution — kod polecającego, ustawiany w callback OAuth. */
+          referred_by_code: string | null;
+          /** Vlasny kod referral usera (do udostępniania). */
+          referral_code: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -137,6 +141,8 @@ export interface Database {
           avatar_url?: string | null;
           onboarding_completed?: boolean;
           settings?: Json;
+          referred_by_code?: string | null;
+          referral_code?: string | null;
           created_at?: string;
           updated_at?: string;
         };

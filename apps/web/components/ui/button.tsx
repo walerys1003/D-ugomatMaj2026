@@ -55,6 +55,26 @@ export const buttonVariants = cva(
           "bg-transparent text-dlugomat-600 underline-offset-4",
           "hover:underline hover:text-dlugomat-700"
         ),
+        // ---- Legacy shadcn aliases (Sprint typecheck A) -----------------
+        // Te warianty są tożsame z canonical Tarcza variants, ale używają
+        // shadcn-owej nazwy, którą znajdziemy w 19 konsumentach (marketplace,
+        // rodo, programa partnerski, share-card). Compat-layer eliminuje
+        // TS2322 bez codemod-u. Docelowo: refactor konsumentów do canonical.
+        default: cn(
+          "bg-dlugomat-700 text-white shadow-card",
+          "hover:bg-dlugomat-800 active:bg-dlugomat-900",
+          "active:shadow-pressed"
+        ),
+        destructive: cn(
+          "bg-danger-600 text-white shadow-card",
+          "hover:bg-danger-500 active:bg-danger-700"
+        ),
+        outline: cn(
+          "border border-iron-300 bg-transparent text-iron-800",
+          "hover:bg-iron-100 hover:text-iron-900 hover:border-iron-400",
+          "dark:border-iron-700 dark:text-iron-100",
+          "dark:hover:bg-dlugomat-850 dark:hover:border-dlugomat-700"
+        ),
       },
       size: {
         sm: "h-9 px-3 text-fluid-xs",

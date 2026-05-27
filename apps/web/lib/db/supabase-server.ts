@@ -66,3 +66,16 @@ export function createSupabaseAdminClient() {
     },
   });
 }
+
+/**
+ * Compatibility aliases (Tarcza v2 — Sprint typecheck A).
+ *
+ * Stara konwencja `createServerSupabase` była używana w 72 plikach. Zamiast
+ * codemod-ować wszystkie konsumentów (ryzyko regresji w czasie redesignu),
+ * eksportujemy aliasy z tej samej implementacji. Konsumenci mogą migrować
+ * stopniowo. Docelowo (Sprint A pełny) — refactor importów do canonical
+ * `createSupabaseServerClient` i usunięcie aliasów.
+ */
+export { createSupabaseServerClient as createServerSupabase };
+export { createSupabaseAdminClient as createServiceSupabase };
+export { createSupabaseAdminClient as createAdminSupabase };

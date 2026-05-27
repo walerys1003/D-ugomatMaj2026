@@ -264,7 +264,9 @@ function Field({
 }: {
   label: string;
   hint?: string;
-  icon?: React.ComponentType<{ className?: string; "aria-hidden"?: boolean }>;
+  // LucideIcon = ForwardRefExoticComponent<LucideProps & RefAttributes<SVGSVGElement>>
+  // Bezpieczne rozluźnienie — wszystkie ikony lucide przyjmują className i aria-hidden.
+  icon?: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   children: React.ReactNode;
 }) {
   return (
