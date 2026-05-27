@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createListing, listListings, ListingType, ListingStatus, PricingModel } from "@/lib/marketplace/listings";
 
 async function getSupabase() {
-  const { createSupabaseServerClient } = await import("@/lib/db/sb-server");
+  const { createSupabaseServerClient } = await import("@/lib/db/supabase-server");
   return createSupabaseServerClient();
 }
 

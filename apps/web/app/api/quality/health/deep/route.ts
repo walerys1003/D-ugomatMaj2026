@@ -6,6 +6,6 @@ export const runtime = "nodejs";
 
 export async function GET() {
   const report = await runDeepHealthChecks();
-  const httpStatus = report.aggregateStatus === "healthy" ? 200 : report.aggregateStatus === "degraded" ? 200 : 503;
+  const httpStatus = report.status === "ok" ? 200 : report.status === "degraded" ? 200 : 503;
   return NextResponse.json(report, { status: httpStatus });
 }

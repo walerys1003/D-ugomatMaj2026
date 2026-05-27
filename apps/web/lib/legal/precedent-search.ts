@@ -71,7 +71,7 @@ export async function searchPrecedents(input: PrecedentSearchInput): Promise<{ r
     return { results: [], total: 0 };
   }
 
-  const results: PrecedentResult[] = data.map((r) => {
+  const results: PrecedentResult[] = data.map((r: any) => {
     const haystack = `${r.citation ?? ""} ${r.body ?? ""}`.toLowerCase();
     let score = 0;
     for (const t of tokens) {

@@ -134,7 +134,7 @@ export const ACTIVE_EXPERIMENTS: ActiveExperimentDef[] = [
 export async function seedActiveExperiments(opts?: {
   sb?: unknown;
 }): Promise<{ inserted: number; updated: number; errors: number }> {
-  const { createServerSupabase } = await import("@/lib/db/sb-server");
+  const { createServerSupabase } = await import("@/lib/db/supabase-server");
   const sb = (opts?.sb as Awaited<ReturnType<typeof createServerSupabase>>) ??
     (await createServerSupabase());
 

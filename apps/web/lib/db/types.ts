@@ -625,3 +625,13 @@ export type PromoCodeRow       = T["promo_codes"]["Row"];
 export type PromoCodeInsert    = T["promo_codes"]["Insert"];
 export type PromoRedemptionRow = T["promo_redemptions"]["Row"];
 export type PromoRedemptionInsert = T["promo_redemptions"]["Insert"];
+
+// -----------------------------------------------------------------------------
+// Re-exports from sibling domain modules.
+//
+// Historically `@/lib/db/types` was the single import point for callers that
+// don't care where exactly a type lives. We keep that contract by re-exporting
+// the cross-cutting type names that appear in panel pages and route handlers.
+// -----------------------------------------------------------------------------
+export type { ParsedDocument } from "@/lib/ocr/ocr-types";
+export type { ModuleId } from "@/lib/cases/case-types";

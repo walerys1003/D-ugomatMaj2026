@@ -27,9 +27,9 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
     .from("evidence_uploads")
     .select("evidence_id")
     .eq("case_id", id);
-  const uploaded = (uploadedDocs ?? []).map((u) => ({ id: u.evidence_id }));
+  const uploaded = (uploadedDocs ?? []).map((u: any) => ({ id: u.evidence_id }));
 
   const requests = getEvidenceRequests(caseRow.case_type);
   const progress = summarizeEvidenceProgress(caseRow.case_type, uploaded);
-  return NextResponse.json({ requests, progress, uploaded_ids: uploaded.map((u) => u.id) });
+  return NextResponse.json({ requests, progress, uploaded_ids: uploaded.map((u: any) => u.id) });
 }

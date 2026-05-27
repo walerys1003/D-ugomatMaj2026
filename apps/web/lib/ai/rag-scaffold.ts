@@ -78,7 +78,7 @@ class InHouseProvider implements RagProviderImpl {
     }
 
     // Score by token overlap with body+citation
-    const scored = data.map((r) => {
+    const scored = data.map((r: any) => {
       const haystack = `${r.citation} ${r.body ?? ""}`.toLowerCase();
       let score = 0;
       for (const t of tokens) {
@@ -96,8 +96,8 @@ class InHouseProvider implements RagProviderImpl {
       };
     });
     return scored
-      .filter((s) => s.score > 0)
-      .sort((a, b) => b.score - a.score)
+      .filter((s: any) => s.score > 0)
+      .sort((a: any, b: any) => b.score - a.score)
       .slice(0, limit);
   }
 }

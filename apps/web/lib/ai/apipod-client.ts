@@ -412,3 +412,70 @@ async function* fallbackToComplete(
     };
   }
 }
+
+// -----------------------------------------------------------------------------
+// Legacy compatibility layer
+//
+// Wave 9-10 wprowadziły nowy typed interface (`complete()` + role-based
+// `CompletionRequest/Response`). Niektóre moduły zewnętrzne (qa-knowledge,
+// virtual-judge, pdf/redaction) wciąż używają starego API w stylu
+// Anthropic Messages — przyjmują `model`/`system`/`messages`/`max_tokens`
+// i czytają `resp.content[0].text` + `resp.usage.input_tokens`.
+//
+// Migracja ich na nowy typed interface wymaga zmian w 3 plikach (~40 LOC
+// każdy). W BRAMA 4 zostawiamy je w starym kształcie i udostępniamy tu cienki
+// adapter — koszt zerowy w runtime, surface kompatybilny.
+//
+// TODO(wave11): usunąć po migracji call sites na `complete()`.
+// -----------------------------------------------------------------------------
+export interface LegacyApipodRequest {
+  /** Anthropic model id, np. `claude-sonnet-4-5-20251022` lub alias roli. */
+  model: string;
+  system: string;
+  messages: ChatMessage[];
+  max_tokens?: number;
+  temperature?: number;
+}
+
+export interface LegacyApipodResponse {
+  content: Array<{ type: "text"; text: string }>;
+  usage: {
+    input_tokens: number;
+    output_tokens: number;
+  };
+  model: string;
+}
+
+/** Zmapuje konkretne model id (lub fragment) na rolę z naszego registry. */
+function resolveRoleFromModelId(modelId: string): ModelRole {
+  const lower = modelId.toLowerCase();
+  if (lower.includes("haiku")) return "validator";
+  if (lower.includes("opus")) return "escalator";
+  if (lower.includes("embedding")) return "embedding";
+  return "generator";
+}
+
+/**
+ * Cienka warstwa kompatybilności w stylu Anthropic Messages API.
+ * Pod spodem deleguje do typed `complete()` i przepakowuje odpowiedź.
+ */
+export async function sendApipodRequest(
+  req: LegacyApipodRequest,
+): Promise<LegacyApipodResponse> {
+  const role = resolveRoleFromModelId(req.model);
+  const result = await complete({
+    role,
+    systemPrompt: req.system,
+    messages: req.messages,
+    temperature: req.temperature,
+    maxTokens: req.max_tokens,
+  });
+  return {
+    content: [{ type: "text", text: result.text }],
+    usage: {
+      input_tokens: result.tokensInput,
+      output_tokens: result.tokensOutput,
+    },
+    model: result.modelId,
+  };
+}

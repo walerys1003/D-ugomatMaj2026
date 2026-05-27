@@ -56,7 +56,7 @@ export function initRumCollector(opts: {
 
   // Lazy-import web-vitals (~3KB)
   import("web-vitals")
-    .then(({ onCLS, onFID, onLCP, onINP, onFCP, onTTFB }) => {
+    .then(({ onCLS, onLCP, onINP, onFCP, onTTFB }) => {
       const send = (metric: any) => {
         const sample: RumSample = {
           metric_name: metric.name as RumSample["metric_name"],
@@ -97,8 +97,9 @@ export function initRumCollector(opts: {
           /* tolerable */
         }
       };
+      // web-vitals v4 dropped FID in favor of INP — INP is the new
+      // responsiveness Core Web Vital since March 2024.
       onCLS(send);
-      onFID(send);
       onLCP(send);
       onINP(send);
       onFCP(send);

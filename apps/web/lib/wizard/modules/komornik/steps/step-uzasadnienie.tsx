@@ -108,3 +108,6 @@ export function StepKomornikUzasadnienie({
     </form>
   );
 }
+
+// BRAMA 4 alias — index.ts imports the short name (`StepUzasadnienie`).
+export { StepKomornikUzasadnienie as StepUzasadnienie };

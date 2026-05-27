@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { fanoutPush } from "@/lib/push/subscriptions";
 
 async function getSupabase() {
-  const { createServerSupabase } = await import("@/lib/sb/server");
+  const { createServerSupabase } = await import("@/lib/db/supabase-server");
   return createSupabaseServerClient();
 }
 

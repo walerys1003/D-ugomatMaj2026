@@ -63,7 +63,7 @@ async function checkSupabase(): Promise<ComponentHealth> {
   const sb = supabase as any;
     if (!sb) return { name: "sb", status: "skipped" };
     // Minimal RTT query: query existing tiny table, head only.
-    const { error } = await withTimeout(
+    const { error } = await withTimeout<{ error: { message: string } | null }>(
       sb.from("audit_log").select("id", { head: true, count: "exact" }).limit(1),
       1500,
     );

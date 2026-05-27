@@ -126,3 +126,6 @@ export function StepKomornikWariant({
     </form>
   );
 }
+
+// BRAMA 4 alias — index.ts imports the short name (`StepWariant`).
+export { StepKomornikWariant as StepWariant };

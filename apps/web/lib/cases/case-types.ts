@@ -39,6 +39,12 @@ export interface CaseTypeMeta {
   priceGrosze: number;          // 0 = darmowe (np. D1 skan)
   deadline: { kind: DeadlineKind; days: number } | null;
   status: ModuleStatus;
+  /**
+   * Optional SEO-friendly URL slug override. When not set, callers fall back
+   * to `case_type` with underscores replaced by hyphens (see
+   * `lib/growth/seo-landing.ts`).
+   */
+  urlSlug?: string;
 }
 
 export const caseTypeMeta: Record<CaseType, CaseTypeMeta> = {

@@ -75,7 +75,7 @@ export async function searchSimilar(query: string, opts?: { corpus?: string; top
     doc: r as VectorDoc & { embedding: number[] },
     score: cosineSim(qVec, (r.embedding as number[]) ?? []),
   }));
-  items.sort((a, b) => b.score - a.score);
+  items.sort((a: any, b: any) => b.score - a.score);
   return items.slice(0, topK).map(({ doc, score }) => ({
     id: doc.id,
     corpus: doc.corpus,

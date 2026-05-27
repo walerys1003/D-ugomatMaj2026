@@ -109,7 +109,7 @@ export async function exportUserDataAction(input: {
   ]);
 
   // document_versions wymaga JOIN przez documents
-  const documentIds = (documentsRes.data ?? []).map((d) => (d as { id: string }).id);
+  const documentIds = (documentsRes.data ?? []).map((d: any) => (d as { id: string }).id);
   const { data: documentVersions } =
     documentIds.length > 0
       ? await sb
@@ -121,7 +121,7 @@ export async function exportUserDataAction(input: {
   // -------------------------------------------------------------------
   // Maskowanie wrażliwych pól
   // -------------------------------------------------------------------
-  const cases = (casesRes.data ?? []).map((c) => {
+  const cases = (casesRes.data ?? []).map((c: any) => {
     const row = c as Record<string, unknown> & {
       pozwany_pesel_enc: string | null;
     };
@@ -133,7 +133,7 @@ export async function exportUserDataAction(input: {
     };
   });
 
-  const ocrResults = (ocrRes.data ?? []).map((o) => {
+  const ocrResults = (ocrRes.data ?? []).map((o: any) => {
     const row = o as Record<string, unknown> & { raw_text: string | null };
     return {
       ...row,

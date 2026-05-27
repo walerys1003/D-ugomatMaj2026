@@ -7,7 +7,7 @@ import {
 import { recordSecurityEvent } from "@/lib/security/security-events";
 
 async function getSupabase() {
-  const { createSupabaseServerClient } = await import("@/lib/db/sb-server");
+  const { createSupabaseServerClient } = await import("@/lib/db/supabase-server");
   return createSupabaseServerClient();
 }
 

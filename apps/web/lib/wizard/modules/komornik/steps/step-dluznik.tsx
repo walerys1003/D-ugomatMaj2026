@@ -90,3 +90,6 @@ export function StepKomornikDluznik({
     </form>
   );
 }
+
+// BRAMA 4 alias — index.ts imports the short name (`StepDluznik`).
+export { StepKomornikDluznik as StepDluznik };
