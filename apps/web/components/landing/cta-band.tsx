@@ -34,7 +34,7 @@ export function CtaBand() {
         padded="none"
         className="overflow-hidden"
       >
-        <div className="grid gap-8 p-8 lg:grid-cols-[1.4fr_1fr] lg:items-center lg:gap-12 lg:p-12">
+        <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[1.4fr_1fr] lg:items-center lg:gap-12 lg:p-12">
           {/* LEFT — CTA copy */}
           <div className="flex flex-col gap-5">
             <Badge tone="warning">

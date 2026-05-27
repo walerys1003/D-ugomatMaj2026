@@ -178,7 +178,7 @@ export function SiteHeader() {
             <Logo />
           </Link>
 
-          <nav aria-label="Główna" className="hidden items-center gap-1 md:flex">
+          <nav aria-label="Główna" className="hidden items-center gap-1 lg:flex">
             {/* Mega-menu trigger: Produkt */}
             <DropdownTrigger
               label="Produkt"
@@ -225,7 +225,7 @@ export function SiteHeader() {
             aria-label={mobileOpen ? "Zamknij menu" : "Otwórz menu"}
             aria-expanded={mobileOpen}
             aria-controls="site-mobile-menu"
-            className="md:hidden"
+            className="lg:hidden"
             onClick={() => setMobileOpen((v) => !v)}
           >
             {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
@@ -235,7 +235,7 @@ export function SiteHeader() {
 
       {/* Desktop mega-menu: Produkt */}
       {openDropdown === "product" ? (
-        <div className="absolute left-0 right-0 top-full hidden border-b border-ink-200 bg-background/95 backdrop-blur-xl shadow-[0_8px_24px_-12px_hsl(220_40%_8%/0.12)] dark:border-dlugomat-800 dark:bg-dlugomat-950/95 md:block">
+        <div className="absolute left-0 right-0 top-full hidden border-b border-ink-200 bg-background/95 backdrop-blur-xl shadow-[0_8px_24px_-12px_hsl(220_40%_8%/0.12)] dark:border-dlugomat-800 dark:bg-dlugomat-950/95 lg:block">
           <div className="mx-auto max-w-[1200px] px-4 py-7 sm:px-6 lg:px-8">
             <div className="mb-4 flex items-center justify-between">
               <div>
@@ -286,7 +286,7 @@ export function SiteHeader() {
 
       {/* Desktop mega-menu: Zasoby */}
       {openDropdown === "resources" ? (
-        <div className="absolute left-0 right-0 top-full hidden border-b border-ink-200 bg-background/95 backdrop-blur-xl shadow-[0_8px_24px_-12px_hsl(220_40%_8%/0.12)] dark:border-dlugomat-800 dark:bg-dlugomat-950/95 md:block">
+        <div className="absolute left-0 right-0 top-full hidden border-b border-ink-200 bg-background/95 backdrop-blur-xl shadow-[0_8px_24px_-12px_hsl(220_40%_8%/0.12)] dark:border-dlugomat-800 dark:bg-dlugomat-950/95 lg:block">
           <div className="mx-auto max-w-[1200px] px-4 py-6 sm:px-6 lg:px-8">
             <div className="grid grid-cols-2 gap-1 lg:grid-cols-3">
               {RESOURCE_ITEMS.map((item) => (
@@ -309,7 +309,7 @@ export function SiteHeader() {
       {mobileOpen ? (
         <div
           id="site-mobile-menu"
-          className="fixed inset-x-0 top-[56px] z-50 max-h-[calc(100dvh-56px)] overflow-y-auto border-t border-ink-200 bg-background dark:border-dlugomat-800 dark:bg-dlugomat-950 md:hidden"
+          className="fixed inset-x-0 top-[56px] z-50 max-h-[calc(100dvh-56px)] overflow-y-auto border-t border-ink-200 bg-background dark:border-dlugomat-800 dark:bg-dlugomat-950 lg:hidden"
         >
           <nav aria-label="Mobilne" className="mx-auto flex w-full max-w-[1200px] flex-col gap-6 px-4 py-5 sm:px-6">
             {/* Produkt */}

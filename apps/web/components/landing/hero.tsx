@@ -53,8 +53,11 @@ export function Hero() {
       />
 
       <div className="grid items-center gap-12 xl:grid-cols-[1.1fr_0.9fr] xl:gap-14">
-        {/* LEFT — Editorial copy */}
-        <div className="flex flex-col gap-7">
+        {/* LEFT — Editorial copy. min-w-0 jest KLUCZOWY: bez niego Display
+            headline (text-balance + tabular nums) rośnie do swojego intrinsic
+            width i przy xl: 2-col grid zjada CAŁĄ szerokość, kurcząc prawą
+            kolumnę do 0px (bug Tailwind grid items default min-width: auto). */}
+        <div className="flex min-w-0 flex-col gap-7">
           <Eyebrow tone="brand" withDot>
             AI legal-tech · zgodne z polskim prawem
           </Eyebrow>
@@ -148,7 +151,7 @@ function HeroArtifact() {
   // Na xl+: 2-panel composition z absolute positioning + lekki tilt.
   // Wrapper ma h:auto na mobile (treść decyduje), h-[560px] tylko na xl.
   return (
-    <div className="relative mx-auto flex w-full max-w-[480px] flex-col gap-4 xl:block xl:h-[560px] xl:max-w-none xl:gap-0">
+    <div className="relative mx-auto flex w-full max-w-full flex-col gap-4 sm:max-w-[480px] xl:block xl:h-[560px] xl:max-w-none xl:gap-0">
       {/* Background card — Sprzeciw draft.
        *  - mobile: static block, no rotation, full column width
        *  - xl+: absolute top-right z lekkim tiltem (depth) */}
