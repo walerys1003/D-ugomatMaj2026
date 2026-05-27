@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { KnowledgeArticle, buildArticleJsonLd, buildBreadcrumbJsonLd } from "@/components/marketing/knowledge-article";
 
+// W9-1: edge runtime for static content delivery (faster TTFB, no Node APIs needed)
+export const runtime = "edge";
+
 const SLUG = "wniosek-zwolnienie-kosztow-sadowych";
 const TITLE = "Wniosek o zwolnienie z kosztów sądowych — szczegółowy przewodnik";
 const DESCRIPTION =

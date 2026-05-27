@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { KnowledgeArticle, buildArticleJsonLd, buildBreadcrumbJsonLd } from "@/components/marketing/knowledge-article";
 
+// W9-1: edge runtime for static content delivery (faster TTFB, no Node APIs needed)
+export const runtime = "edge";
+
 const SLUG = "reklamacja-bank-rzecznik-finansowy";
 const TITLE = "Reklamacja w banku i wniosek do Rzecznika Finansowego";
 const DESCRIPTION =

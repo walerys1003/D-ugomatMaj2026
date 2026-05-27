@@ -4,6 +4,9 @@ import { notFound } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
+// W9-1: edge runtime for static content delivery (faster TTFB, no Node APIs needed)
+export const runtime = "edge";
+
 interface CaseStudyDetail {
   slug: string;
   client_name: string;

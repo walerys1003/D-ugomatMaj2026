@@ -5,6 +5,9 @@ import {
   buildBreadcrumbJsonLd,
 } from "@/components/marketing/knowledge-article";
 
+// W9-1: edge runtime for static content delivery (faster TTFB, no Node APIs needed)
+export const runtime = "edge";
+
 const SLUG = "cesja-wierzytelnosci-fundusze";
 const TITLE = "Cesja wierzytelności — gdy Twój dług kupuje fundusz";
 const DESCRIPTION =

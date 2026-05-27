@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { KnowledgeArticle, buildArticleJsonLd, buildBreadcrumbJsonLd } from "@/components/marketing/knowledge-article";
 
+// W9-1: edge runtime for static content delivery (faster TTFB, no Node APIs needed)
+export const runtime = "edge";
+
 const SLUG = "d9-d16-przeglad-modulow";
 const TITLE = "Moduły D9-D16 — co nowego w Długomacie 2026";
 const DESCRIPTION =

@@ -5,6 +5,9 @@ import {
   buildBreadcrumbJsonLd,
 } from "@/components/marketing/knowledge-article";
 
+// W9-1: edge runtime for static content delivery (faster TTFB, no Node APIs needed)
+export const runtime = "edge";
+
 const SLUG = "upadlosc-konsumencka";
 const TITLE = "Upadłość konsumencka — kompletny przewodnik 2025";
 const DESCRIPTION =

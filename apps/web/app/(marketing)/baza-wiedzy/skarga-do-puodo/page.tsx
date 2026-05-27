@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { KnowledgeArticle, buildArticleJsonLd, buildBreadcrumbJsonLd } from "@/components/marketing/knowledge-article";
 
+// W9-1: edge runtime for static content delivery (faster TTFB, no Node APIs needed)
+export const runtime = "edge";
+
 const SLUG = "skarga-do-puodo";
 const TITLE = "Skarga do PUODO — naruszenia RODO przez wierzycieli i windykatorów";
 const DESCRIPTION =

@@ -16,6 +16,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
+// W9-1: edge runtime for static content delivery (faster TTFB, no Node APIs needed)
+export const runtime = "edge";
+
 export const metadata = {
   title: "Bezpieczenstwo - certyfikat - Dlugomat",
   description: "Szczegoly certyfikatow bezpieczenstwa, audytow i standardow stosowanych w platformie Dlugomat.",

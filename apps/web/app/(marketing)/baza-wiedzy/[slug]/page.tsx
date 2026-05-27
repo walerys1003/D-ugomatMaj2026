@@ -20,6 +20,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+// W9-1: edge runtime for static content delivery (faster TTFB, no Node APIs needed)
+export const runtime = "edge";
+
 export const metadata: Metadata = {
   title: "Artykul — Baza wiedzy Dlugomat",
   description: "Szczegolowy artykul z bazy wiedzy z odwolaniami do orzecznictwa.",

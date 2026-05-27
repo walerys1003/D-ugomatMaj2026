@@ -5,6 +5,9 @@ import {
   buildBreadcrumbJsonLd,
 } from "@/components/marketing/knowledge-article";
 
+// W9-1: edge runtime for static content delivery (faster TTFB, no Node APIs needed)
+export const runtime = "edge";
+
 const SLUG = "odpowiedz-na-pozew";
 const TITLE = "Odpowiedź na pozew — co napisać, gdy sąd już wyznaczył rozprawę";
 const DESCRIPTION =

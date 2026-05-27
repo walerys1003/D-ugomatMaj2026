@@ -4,6 +4,9 @@ import { CheckCircle2, Shield, Sparkles, Wrench, ZapOff } from "lucide-react";
 import { RELEASE_HISTORY, type ReleaseNote } from "@/lib/launch/release-notes";
 import { Badge } from "@/components/ui/badge";
 
+// W9-1: edge runtime for static content delivery (faster TTFB, no Node APIs needed)
+export const runtime = "edge";
+
 export const metadata: Metadata = {
   title: "Changelog · Długomat",
   description: "Najnowsze zmiany, funkcje i poprawki w Długomat.",

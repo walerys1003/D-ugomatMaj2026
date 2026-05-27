@@ -14,6 +14,9 @@ import {
   MarketingCtaBanner,
 } from "@/components/marketing/page-hero";
 
+// W9-1: edge runtime for static content delivery (faster TTFB, no Node APIs needed)
+export const runtime = "edge";
+
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://dlugomat.pl";
 
 export const metadata: Metadata = {

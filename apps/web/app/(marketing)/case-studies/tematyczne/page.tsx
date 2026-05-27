@@ -5,6 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
+// W9-1: edge runtime for static content delivery (faster TTFB, no Node APIs needed)
+export const runtime = "edge";
+
 export const metadata = {
   title: "Case studies tematyczne - Dlugomat",
   description: "Konkretne wdrozenia Dlugomat w bankach, kancelariach, windykacji i sektorze publicznym.",

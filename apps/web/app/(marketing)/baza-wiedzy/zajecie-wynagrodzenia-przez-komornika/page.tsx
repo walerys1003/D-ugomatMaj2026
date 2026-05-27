@@ -5,6 +5,9 @@ import {
   buildBreadcrumbJsonLd,
 } from "@/components/marketing/knowledge-article";
 
+// W9-1: edge runtime for static content delivery (faster TTFB, no Node APIs needed)
+export const runtime = "edge";
+
 const SLUG = "zajecie-wynagrodzenia-przez-komornika";
 const TITLE = "Zajęcie wynagrodzenia przez komornika — co możesz zrobić";
 const DESCRIPTION =

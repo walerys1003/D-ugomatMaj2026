@@ -5,6 +5,9 @@ import {
   buildBreadcrumbJsonLd,
 } from "@/components/marketing/knowledge-article";
 
+// W9-1: edge runtime for static content delivery (faster TTFB, no Node APIs needed)
+export const runtime = "edge";
+
 const SLUG = "skarga-na-czynnosci-komornika";
 const TITLE = "Skarga na czynności komornika — 7 dni na reakcję (2025)";
 const DESCRIPTION =
