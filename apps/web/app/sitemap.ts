@@ -67,6 +67,38 @@ const ROUTES: RouteEntry[] = [
   { path: "/regulamin", changeFrequency: "yearly", priority: 0.3 },
   { path: "/polityka-prywatnosci", changeFrequency: "yearly", priority: 0.3 },
   { path: "/rodo", changeFrequency: "yearly", priority: 0.3 },
+
+  // ────────────────────────────────────────────────────────────────────
+  // V5-INFRA · namespace (Wave 5 marketing + module pages)
+  // Niższy priority niż V4 dopóki nie zostanie zrobiony pełny cutover.
+  // ────────────────────────────────────────────────────────────────────
+  { path: "/v5", changeFrequency: "weekly", priority: 0.7 },
+  { path: "/v5/jak-to-dziala", changeFrequency: "weekly", priority: 0.65 },
+  { path: "/v5/skaner-nakazu", changeFrequency: "weekly", priority: 0.65 },
+  { path: "/v5/cennik", changeFrequency: "weekly", priority: 0.65 },
+  { path: "/v5/dla-firm", changeFrequency: "monthly", priority: 0.6 },
+  { path: "/v5/dla-kancelarii", changeFrequency: "monthly", priority: 0.6 },
+  { path: "/v5/baza-wiedzy", changeFrequency: "weekly", priority: 0.6 },
+  { path: "/v5/precedensy", changeFrequency: "daily", priority: 0.6 },
+  { path: "/v5/case-studies", changeFrequency: "weekly", priority: 0.6 },
+  { path: "/v5/bezpieczenstwo", changeFrequency: "monthly", priority: 0.55 },
+  { path: "/v5/rodo", changeFrequency: "yearly", priority: 0.3 },
+  { path: "/v5/changelog", changeFrequency: "weekly", priority: 0.5 },
+  { path: "/v5/status", changeFrequency: "hourly", priority: 0.4 },
+  { path: "/v5/porownanie-konkurencja", changeFrequency: "monthly", priority: 0.55 },
+  { path: "/v5/roi-b2b", changeFrequency: "monthly", priority: 0.55 },
+  { path: "/v5/o-nas", changeFrequency: "monthly", priority: 0.5 },
+  { path: "/v5/kontakt", changeFrequency: "monthly", priority: 0.5 },
+  { path: "/v5/faq", changeFrequency: "weekly", priority: 0.55 },
+  // V5 module pages (D1-D8) — kluczowe landing pages dla SEO V5
+  { path: "/v5/moduly/sprzeciw-epu", changeFrequency: "weekly", priority: 0.65 },
+  { path: "/v5/moduly/komornik", changeFrequency: "weekly", priority: 0.65 },
+  { path: "/v5/moduly/cesja", changeFrequency: "weekly", priority: 0.6 },
+  { path: "/v5/moduly/bik", changeFrequency: "weekly", priority: 0.6 },
+  { path: "/v5/moduly/ugoda", changeFrequency: "weekly", priority: 0.6 },
+  { path: "/v5/moduly/potracenia", changeFrequency: "weekly", priority: 0.6 },
+  { path: "/v5/moduly/upadlosc", changeFrequency: "weekly", priority: 0.6 },
+  { path: "/v5/moduly/wezwania", changeFrequency: "weekly", priority: 0.6 },
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {

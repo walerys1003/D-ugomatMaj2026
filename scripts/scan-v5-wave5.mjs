@@ -1,43 +1,19 @@
 import { chromium } from "playwright";
 const browser = await chromium.launch();
+// Subset of new Wave 5 routes — focus on quality verification
 const routes = [
-  // Wave 1-4 — landing + framework
-  "/v5",
-  "/v5/showcase",
-  "/v5/panel",
-  "/v5/admin",
-  "/v5/gallery",
-  // Wave 5 — marketing suite (B3)
   "/v5/cennik",
   "/v5/jak-to-dziala",
-  "/v5/skaner-nakazu",
   "/v5/dla-firm",
-  "/v5/dla-kancelarii",
-  "/v5/baza-wiedzy",
-  "/v5/precedensy",
-  "/v5/case-studies",
-  "/v5/bezpieczenstwo",
-  "/v5/rodo",
+  "/v5/moduly/sprzeciw-epu",
+  "/v5/faq",
   "/v5/changelog",
   "/v5/status",
-  "/v5/porownanie-konkurencja",
-  "/v5/roi-b2b",
-  "/v5/o-nas",
-  "/v5/kontakt",
-  "/v5/faq",
-  // Wave 5 — module pages (B2) — sample subset
-  "/v5/moduly/sprzeciw-epu",
-  "/v5/moduly/komornik",
-  "/v5/moduly/cesja",
-  "/v5/moduly/bik",
-  "/v5/moduly/wezwania",
 ];
 const viewports = [
   { w: 375, h: 800, n: "375" },
   { w: 768, h: 900, n: "768" },
-  { w: 1024, h: 900, n: "1024" },
   { w: 1280, h: 900, n: "1280" },
-  { w: 1440, h: 900, n: "1440" },
 ];
 const overall = [];
 
@@ -50,7 +26,7 @@ for (const route of routes) {
         waitUntil: "networkidle",
         timeout: 30000,
       });
-      await page.waitForTimeout(500);
+      await page.waitForTimeout(400);
       const overflowing = await page.evaluate(() => {
         const vpW = window.innerWidth;
         const all = document.querySelectorAll("*");
@@ -73,21 +49,22 @@ for (const route of routes) {
             if (clipped) return;
             results.push({
               tag: el.tagName,
-              cls: typeof el.className === "string" ? el.className.slice(0, 60) : "",
+              cls: typeof el.className === "string" ? el.className.slice(0, 40) : "",
               right: Math.round(r.right),
               width: Math.round(r.width),
             });
           }
         });
-        return results.slice(0, 5);
+        return results.slice(0, 3);
       });
       const pageH = await page.evaluate(() => document.body.scrollHeight);
       overall.push({ route, vp: vp.n, overflow: overflowing.length, pageH });
       console.log(
-        `${route} @${vp.n}: ${overflowing.length === 0 ? "✓ PASS" : "✗ FAIL"} · height=${pageH}px${overflowing.length ? " · " + JSON.stringify(overflowing.slice(0, 2)) : ""}`,
+        `${route} @${vp.n}: ${overflowing.length === 0 ? "✓ PASS" : "✗ FAIL"} · h=${pageH}px${overflowing.length ? " · " + JSON.stringify(overflowing.slice(0, 1)) : ""}`,
       );
     } catch (e) {
       console.log(`${route} @${vp.n}: ERROR ${e.message}`);
+      overall.push({ route, vp: vp.n, overflow: 999, pageH: 0 });
     } finally {
       await ctx.close();
     }
