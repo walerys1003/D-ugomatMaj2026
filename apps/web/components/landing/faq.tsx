@@ -6,6 +6,12 @@ import {
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import {
+  Display,
+  Eyebrow,
+  Heading,
+  Text,
+} from "@/components/ui/typography";
 
 const FAQ_ITEMS = [
   { q: "Czy Dlugomat jest kancelaria prawna?", a: "Nie. Dlugomat to narzedzie technologiczne, ktore generuje gotowe wzory pism procesowych z wykorzystaniem AI i bazy aktualnego orzecznictwa. Kazde pismo przed wysylka weryfikujesz osobiscie. Jesli sprawa jest zlozona - kierujemy do wspolpracujacej kancelarii." },
@@ -23,28 +29,45 @@ const FAQ_ITEMS = [
 ] as const;
 
 /**
- * FAQ v2 - premium minimalist (Design System Tarcza)
- * Accordion ASCII, kontekst-card z info wsparcia, bez search field (ten jest na podstronie /faq).
+ * FAQ v4 — primitives-driven, type scale +1, ink-* palette.
+ *
+ * Zmiany vs v3:
+ *  - Heading primitives zamiast raw <h2>/<h3>
+ *  - Type scale: Display lvl 2 dla title (był text-3xl/4xl, teraz 5xl/6xl)
+ *  - Aside cards: Heading lvl 3 (xl/2xl) zamiast text-base
+ *  - Paleta: ink-* zamiast dlugomat-*
+ *  - Eyebrow primitive zamiast raw uppercase text
  */
 export function FAQ() {
   return (
-    <section aria-labelledby="faq-title" className="bg-ink-50 py-20 sm:py-24 lg:py-28">
+    <section
+      aria-labelledby="faq-title"
+      className="bg-ink-50 py-20 sm:py-24 lg:py-28"
+    >
       <div className="container max-w-4xl px-6">
         <header className="text-center">
-          <p className="text-xs uppercase tracking-wide text-dlugomat-500">Najczestsze pytania</p>
-          <h2 id="faq-title" className="mt-2 font-display text-3xl text-dlugomat-900 sm:text-4xl">
-            Wiemy, ze masz watpliwosci. Mamy odpowiedzi.
-          </h2>
+          <div className="flex justify-center">
+            <Eyebrow tone="neutral" tracking="wide">
+              Najczęstsze pytania
+            </Eyebrow>
+          </div>
+          <Display level={2} id="faq-title" className="mt-4">
+            Wiemy, że masz wątpliwości. Mamy odpowiedzi.
+          </Display>
         </header>
 
-        <div className="mt-10 grid gap-6 lg:grid-cols-[1fr_320px]">
+        <div className="mt-12 grid gap-6 lg:grid-cols-[1fr_320px]">
           <Card elevation="subtle" className="p-2">
             <Accordion type="single" collapsible>
               {FAQ_ITEMS.map((item, i) => (
                 <AccordionItem key={i} value={`item-${i}`}>
-                  <AccordionTrigger>{item.q}</AccordionTrigger>
+                  <AccordionTrigger className="text-[16px] font-semibold">
+                    {item.q}
+                  </AccordionTrigger>
                   <AccordionContent>
-                    <p className="leading-relaxed text-dlugomat-700">{item.a}</p>
+                    <Text size="base" tone="default" className="leading-relaxed">
+                      {item.a}
+                    </Text>
                   </AccordionContent>
                 </AccordionItem>
               ))}
@@ -53,31 +76,37 @@ export function FAQ() {
 
           <aside className="space-y-4">
             <Card elevation="subtle" urgency="warning" className="p-5">
-              <Badge tone="warning" withDot>Pilny termin?</Badge>
-              <h3 className="mt-3 font-display text-base text-dlugomat-900">
-                Masz mniej niz 7 dni
-              </h3>
-              <p className="mt-2 text-sm text-dlugomat-600">
-                Skontaktuj sie z nasza obsluga - oddzwonimy w 30 minut w godzinach roboczych.
-              </p>
+              <Badge tone="warning" withDot>
+                Pilny termin?
+              </Badge>
+              <Heading level={3} as="h3" className="mt-3">
+                Masz mniej niż 7 dni
+              </Heading>
+              <Text size="sm" tone="default" className="mt-2">
+                Skontaktuj się z naszą obsługą — oddzwonimy w 30 minut w godzinach
+                roboczych.
+              </Text>
               <a
                 href="/kontakt"
-                className="mt-3 inline-block text-sm font-medium text-accent-600 hover:text-accent-700"
+                className="mt-3 inline-flex items-center gap-1 text-[14px] font-semibold text-ink-900 transition-colors hover:text-ink-700"
               >
-                Przejdz do kontaktu
+                Przejdź do kontaktu →
               </a>
             </Card>
 
             <Card elevation="subtle" className="p-5">
-              <h3 className="font-display text-base text-dlugomat-900">Centrum wiedzy</h3>
-              <p className="mt-2 text-sm text-dlugomat-600">
-                Ponad 60 artykulow o przedawnieniu, EPU, egzekucji, RODO i upadlosci.
-              </p>
+              <Heading level={3} as="h3">
+                Centrum wiedzy
+              </Heading>
+              <Text size="sm" tone="default" className="mt-2">
+                Ponad 60 artykułów o przedawnieniu, EPU, egzekucji, RODO i
+                upadłości.
+              </Text>
               <a
                 href="/baza-wiedzy"
-                className="mt-3 inline-block text-sm font-medium text-accent-600 hover:text-accent-700"
+                className="mt-3 inline-flex items-center gap-1 text-[14px] font-semibold text-ink-900 transition-colors hover:text-ink-700"
               >
-                Otworz baze wiedzy
+                Otwórz bazę wiedzy →
               </a>
             </Card>
           </aside>

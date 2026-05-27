@@ -3,6 +3,12 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import {
+  Display,
+  Eyebrow,
+  Heading,
+  Text,
+} from "@/components/ui/typography";
 
 interface Tier {
   name: string;
@@ -53,24 +59,30 @@ const TIERS: readonly Tier[] = [
 ];
 
 /**
- * PricingTeaser v2 - premium minimalist (Design System Tarcza)
- * Card elevation pop dla wyroznionego planu, tone info dla badge.
+ * PricingTeaser v4 — primitives-driven, type scale +1, ink palette.
  */
 export function PricingTeaser() {
   return (
-    <section aria-labelledby="pricing-title" className="bg-background py-20 sm:py-24 lg:py-28">
+    <section
+      aria-labelledby="pricing-title"
+      className="bg-background py-20 sm:py-24 lg:py-28"
+    >
       <div className="container px-6">
         <header className="mx-auto max-w-2xl text-center">
-          <p className="text-xs uppercase tracking-wide text-dlugomat-500">Cennik</p>
-          <h2 id="pricing-title" className="mt-2 font-display text-3xl text-dlugomat-900 sm:text-4xl">
-            Placisz raz, za konkretne pismo
-          </h2>
-          <p className="mt-3 text-sm text-dlugomat-600">
-            Bez subskrypcji. Bez ukrytych kosztow. Faktura w 24 godziny.
-          </p>
+          <div className="flex justify-center">
+            <Eyebrow tone="neutral" tracking="wide">
+              Cennik
+            </Eyebrow>
+          </div>
+          <Display level={2} id="pricing-title" className="mt-4">
+            Płacisz raz, za konkretne pismo.
+          </Display>
+          <Text size="lg" tone="default" className="mt-4">
+            Bez subskrypcji. Bez ukrytych kosztów. Faktura w 24 godziny.
+          </Text>
         </header>
 
-        <ul className="mt-12 grid gap-6 lg:grid-cols-3">
+        <ul className="mt-14 grid gap-6 lg:grid-cols-3">
           {TIERS.map((t) => (
             <li key={t.name}>
               <Card
@@ -78,24 +90,36 @@ export function PricingTeaser() {
                 urgency={t.highlight ? "warning" : "none"}
                 className="flex h-full flex-col p-6"
               >
-                <header className="flex items-center justify-between">
-                  <h3 className="font-display text-lg text-dlugomat-900">{t.name}</h3>
-                  {t.highlight ? <Badge tone="info" withDot>Najpopularniejsze</Badge> : null}
+                <header className="flex items-center justify-between gap-2">
+                  <Heading level={3} as="h3">
+                    {t.name}
+                  </Heading>
+                  {t.highlight ? (
+                    <Badge tone="info" withDot>
+                      Najpopularniejsze
+                    </Badge>
+                  ) : null}
                 </header>
                 <div className="mt-4 flex items-baseline gap-1.5">
-                  <span className="font-display text-3xl text-dlugomat-900">{t.price}</span>
+                  <span className="font-display text-4xl font-semibold tabular-nums tracking-tight text-ink-900">
+                    {t.price}
+                  </span>
                   {t.priceSuffix ? (
-                    <span className="text-sm text-dlugomat-500">{t.priceSuffix}</span>
+                    <span className="text-[15px] text-ink-500">
+                      {t.priceSuffix}
+                    </span>
                   ) : null}
                 </div>
-                <p className="mt-3 text-sm text-dlugomat-600">{t.desc}</p>
+                <Text size="sm" tone="default" className="mt-3">
+                  {t.desc}
+                </Text>
 
-                <ul className="mt-5 flex flex-col gap-2 text-sm text-dlugomat-700">
+                <ul className="mt-5 flex flex-col gap-2.5 text-[15px] text-ink-700">
                   {t.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2">
+                    <li key={f} className="flex items-start gap-2.5">
                       <span
                         aria-hidden
-                        className="mt-1.5 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-accent-500"
+                        className="mt-2 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-accent-500"
                       />
                       <span>{f}</span>
                     </li>
