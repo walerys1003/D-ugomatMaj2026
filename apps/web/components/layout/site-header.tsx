@@ -2,11 +2,25 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Command } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Kbd } from "@/components/ui/kbd";
 import { Logo } from "@/components/layout/logo";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { cn } from "@/lib/utils";
+
+/**
+ * SiteHeader v3 — Tarcza "Stoic".
+ *
+ * Zmiany vs v2:
+ *  - Wysokość 64 → 56 px (Linear/Vercel/Notion-grade dense chrome).
+ *  - Zawsze backdrop-blur + 1px bottom border (separacja od hero nawet
+ *    pre-scroll) zamiast transparent → blur on scroll (v2 niewidoczny pre).
+ *  - Container width=lg (1200) zamiast bare .container.
+ *  - Nav items: tighter font (text-sm), bez hover-bg (Linear: tylko text color).
+ *  - Cmd+K hint w prawym slocie (sygnał "to jest aplikacja, nie strona").
+ *  - Mobile drawer: cleaner, list-grouped.
+ */
 
 const NAV_ITEMS = [
   { href: "/jak-to-dziala", label: "Jak to działa" },
@@ -19,8 +33,6 @@ export function SiteHeader() {
   const [scrolled, setScrolled] = React.useState(false);
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
-  // Subtle elevation appears once the user has scrolled — keeps the
-  // hero feeling weightless on first paint.
   React.useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
@@ -31,42 +43,73 @@ export function SiteHeader() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-40 w-full border-b transition-all duration-base ease-shield-out",
-        scrolled
-          ? "border-iron-200/80 bg-background/85 backdrop-blur-md shadow-subtle dark:border-dlugomat-800/80 dark:bg-dlugomat-950/75"
-          : "border-transparent bg-background/0"
+        // v3 — zawsze widoczny, zawsze blur. Border-bottom subtelny ale stały.
+        "sticky top-0 z-40 w-full",
+        "border-b border-ink-200 dark:border-dlugomat-800/80",
+        "bg-background/80 backdrop-blur-xl backdrop-saturate-150",
+        "transition-shadow duration-150 ease-out",
+        scrolled ? "shadow-sm" : ""
       )}
     >
-      <div className="container flex h-16 items-center justify-between gap-4">
-        <Link href="/" className="rounded-md focus-visible:shadow-shield-focus">
-          <Logo />
-        </Link>
+      <div className="mx-auto flex h-header w-full max-w-[1200px] items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
+        {/* Left: Logo + Nav */}
+        <div className="flex items-center gap-8">
+          <Link
+            href="/"
+            className="rounded-sm focus-visible:shadow-shield-focus focus-visible:outline-none"
+            aria-label="Długomat — strona główna"
+          >
+            <Logo />
+          </Link>
 
-        <nav aria-label="Główna" className="hidden items-center gap-1 md:flex">
-          {NAV_ITEMS.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "rounded-md px-3 py-2 text-fluid-sm font-medium",
-                "text-iron-700 dark:text-iron-200",
-                "transition-colors duration-base hover:text-dlugomat-700 dark:hover:text-white",
-                "focus-visible:shadow-shield-focus focus-visible:outline-none"
-              )}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+          <nav aria-label="Główna" className="hidden items-center md:flex">
+            {NAV_ITEMS.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "rounded-sm px-2.5 py-1.5 text-sm font-medium",
+                  "text-ink-600 hover:text-ink-900",
+                  "dark:text-ink-700 dark:hover:text-white",
+                  "transition-colors duration-100",
+                  "focus-visible:shadow-shield-focus focus-visible:outline-none"
+                )}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
 
+        {/* Right: Cmd+K hint + ThemeToggle + Auth CTAs */}
         <div className="flex items-center gap-2">
+          {/* Cmd+K hint — visual indicator że to jest aplikacja, nie strona */}
+          <button
+            type="button"
+            className={cn(
+              "hidden h-8 items-center gap-2 rounded border border-ink-200 bg-white px-2 text-xs text-ink-500",
+              "transition-colors duration-100 hover:border-ink-300 hover:text-ink-700",
+              "focus-visible:shadow-shield-focus focus-visible:outline-none",
+              "dark:border-dlugomat-800 dark:bg-dlugomat-900 dark:text-ink-700 dark:hover:border-dlugomat-700",
+              "lg:inline-flex"
+            )}
+            aria-label="Wyszukaj (Cmd+K)"
+          >
+            <Command className="size-3.5" aria-hidden />
+            <span>Wyszukaj</span>
+            <Kbd className="ml-1.5">⌘K</Kbd>
+          </button>
+
           <ThemeToggle className="hidden sm:inline-flex" />
+
           <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
             <Link href="/auth/sign-in">Zaloguj</Link>
           </Button>
           <Button asChild size="sm" className="hidden sm:inline-flex">
             <Link href="/auth/sign-up">Rozpocznij</Link>
           </Button>
+
+          {/* Mobile burger */}
           <Button
             variant="ghost"
             size="icon"
@@ -81,23 +124,27 @@ export function SiteHeader() {
         </div>
       </div>
 
+      {/* Mobile drawer */}
       {mobileOpen ? (
         <div
           id="site-mobile-menu"
-          className="border-t border-iron-200 bg-background dark:border-dlugomat-800 md:hidden"
+          className="border-t border-ink-200 bg-background dark:border-dlugomat-800 md:hidden"
         >
-          <nav aria-label="Mobilne" className="container flex flex-col gap-1 py-3">
+          <nav
+            aria-label="Mobilne"
+            className="mx-auto flex w-full max-w-[1200px] flex-col gap-0.5 px-4 py-3 sm:px-6"
+          >
             {NAV_ITEMS.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setMobileOpen(false)}
-                className="rounded-md px-3 py-2.5 text-fluid-base font-medium text-iron-800 hover:bg-iron-100 dark:text-iron-100 dark:hover:bg-dlugomat-850"
+                className="rounded px-3 py-2.5 text-base font-medium text-ink-800 hover:bg-ink-100 dark:text-ink-800 dark:hover:bg-dlugomat-850"
               >
                 {item.label}
               </Link>
             ))}
-            <div className="mt-2 flex items-center gap-2 border-t border-iron-200 pt-3 dark:border-dlugomat-800">
+            <div className="mt-3 flex items-center gap-2 border-t border-ink-200 pt-3 dark:border-dlugomat-800">
               <Button asChild variant="secondary" size="sm" className="flex-1">
                 <Link href="/auth/sign-in" onClick={() => setMobileOpen(false)}>
                   Zaloguj
