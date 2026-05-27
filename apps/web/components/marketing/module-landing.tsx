@@ -17,6 +17,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Display, Text, Eyebrow } from "@/components/ui/typography";
+import { MarketingCtaBanner } from "@/components/marketing/page-hero";
 
 /**
  * Reusable landing-page surface for każdy moduł D1-D8.
@@ -74,78 +76,92 @@ export function ModuleLanding({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(buildFaqJsonLd(faq)) }}
       />
 
-      {/* HERO */}
+      {/* HERO — V4-β/ι unified light hero (zastępuje tarcza-hero-gradient).
+          Layout: 2-col od xl: (≥1280px), wcześniej 1-col stack — chroni
+          przed clippingiem po skali root font-size 1.2× (V4-ι.2). */}
       <section
         aria-labelledby={`module-${code}-headline`}
-        className="tarcza-hero-gradient relative overflow-hidden text-white"
+        className="relative overflow-hidden border-b border-ink-150/60 bg-gradient-to-b from-ink-50 via-background to-background"
       >
+        {/* Subtle dot-grid mask */}
         <div
           aria-hidden
-          className="pointer-events-none absolute -top-32 right-[-10%] h-[40rem] w-[40rem] rounded-full bg-dlugomat-500/20 blur-3xl"
+          className="pointer-events-none absolute inset-0 opacity-[0.35]"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 1px 1px, hsl(var(--ink-300)) 1px, transparent 0)",
+            backgroundSize: "32px 32px",
+            maskImage:
+              "radial-gradient(ellipse 80% 60% at 50% 30%, black 30%, transparent 75%)",
+            WebkitMaskImage:
+              "radial-gradient(ellipse 80% 60% at 50% 30%, black 30%, transparent 75%)",
+          }}
         />
-        <div className="container relative grid gap-10 py-20 sm:py-24 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-16 lg:py-28">
+        <div className="container relative grid gap-10 py-20 sm:py-24 xl:grid-cols-[1.1fr_0.9fr] xl:items-center xl:gap-14 xl:py-28">
           <div className="flex flex-col gap-6">
-            <div className="flex items-center gap-3">
-              <span className="rounded-md bg-white/10 px-2.5 py-1 font-mono text-fluid-xs font-bold uppercase tracking-wide text-white">
+            <div className="flex flex-wrap items-center gap-3">
+              <Eyebrow tone="brand" withDot>
                 Moduł {code}
-              </span>
-              <Badge tone="info" withDot className="bg-white/10 text-white border-white/20">
+              </Eyebrow>
+              <Badge tone="info" withDot>
                 {price}
               </Badge>
             </div>
 
-            <h1
+            <Display
+              level={1}
               id={`module-${code}-headline`}
-              className="max-w-2xl text-balance text-fluid-5xl font-bold tracking-tight text-white"
+              className="max-w-[16ch] text-balance"
             >
               {title}
-            </h1>
+            </Display>
 
-            <p className="max-w-xl text-fluid-lg text-ink-200">{tagline}</p>
+            <Text size="lg" tone="default" className="max-w-[46ch] text-balance">
+              {tagline}
+            </Text>
 
-            <p className="max-w-xl text-fluid-base text-ink-300">{description}</p>
+            <Text size="base" tone="muted" className="max-w-[52ch]">
+              {description}
+            </Text>
 
             <div className="flex flex-wrap items-center gap-3 pt-2">
-              <Button asChild size="lg" variant="success">
+              <Button asChild size="lg" variant="primary">
                 <Link href={ctaHref}>
                   {ctaLabel}
                   <ArrowRight className="size-4" />
                 </Link>
               </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="ghost"
-                className="text-white hover:bg-white/10"
-              >
+              <Button asChild size="lg" variant="outline">
                 <Link href="/jak-to-dziala">Jak to działa</Link>
               </Button>
             </div>
 
             {legalNote ? (
-              <p className="max-w-xl text-fluid-xs text-ink-400">{legalNote}</p>
+              <Text size="xs" tone="muted" className="max-w-[52ch]">
+                {legalNote}
+              </Text>
             ) : null}
           </div>
 
-          {/* Trust column */}
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+          {/* Trust column — jasne kafelki (zastępują dark white/5 tile'y) */}
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
             <TrustTile
-              icon={<Clock className="size-5 text-accent-400" aria-hidden />}
+              icon={<Clock className="size-5 text-accent-600" aria-hidden />}
               title="12 minut"
               desc="Średni czas obsługi sprawy w tym module."
             />
             <TrustTile
-              icon={<ShieldCheck className="size-5 text-accent-400" aria-hidden />}
+              icon={<ShieldCheck className="size-5 text-accent-600" aria-hidden />}
               title="Zgodność z KPC"
               desc="Wzory aktualizowane przy zmianach przepisów."
             />
             <TrustTile
-              icon={<FileText className="size-5 text-accent-400" aria-hidden />}
+              icon={<FileText className="size-5 text-accent-600" aria-hidden />}
               title="Pismo w PDF"
               desc="Z miejscem na podpis i listą załączników."
             />
             <TrustTile
-              icon={<Sparkles className="size-5 text-accent-400" aria-hidden />}
+              icon={<Sparkles className="size-5 text-accent-600" aria-hidden />}
               title="AI z walidacją"
               desc="Claude Sonnet 4.5 + walidator Haiku 4.5."
             />
@@ -269,41 +285,13 @@ export function ModuleLanding({
         </div>
       </section>
 
-      {/* FINAL CTA */}
-      <section className="container py-20 sm:py-24">
-        <div className="tarcza-hero-gradient relative overflow-hidden rounded-2xl px-6 py-12 sm:px-12 sm:py-16">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -top-12 right-[-10%] h-72 w-72 rounded-full bg-accent-500/15 blur-3xl"
-          />
-          <div className="relative mx-auto max-w-2xl text-center text-white">
-            <h2 className="text-balance text-fluid-3xl font-bold tracking-tight text-white sm:text-fluid-4xl">
-              Gotów rozpocząć? {title} czeka.
-            </h2>
-            <p className="mt-3 text-fluid-base text-ink-200">{tagline}</p>
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-              <Button asChild size="lg" variant="success">
-                <Link href={ctaHref}>
-                  {ctaLabel}
-                  <ArrowRight className="size-4" />
-                </Link>
-              </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="ghost"
-                className="text-white hover:bg-white/10"
-              >
-                <Link href="/cennik">Cennik</Link>
-              </Button>
-            </div>
-            <p className="mt-4 text-fluid-xs text-ink-300">
-              Długomat nie jest kancelarią prawną. Każde pismo weryfikujesz
-              przed wysyłką.
-            </p>
-          </div>
-        </div>
-      </section>
+      {/* FINAL CTA — V4-β unified MarketingCtaBanner (ink-900 dark surface) */}
+      <MarketingCtaBanner
+        title={`Gotów rozpocząć? ${title} czeka.`}
+        subtitle={tagline}
+        primaryCta={{ href: ctaHref, label: ctaLabel }}
+        secondaryCta={{ href: "/cennik", label: "Cennik" }}
+      />
     </>
   );
 }
@@ -320,12 +308,12 @@ function TrustTile({
   desc: string;
 }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
+    <div className="rounded-xl border border-ink-200 bg-white/80 p-4 shadow-sm backdrop-blur-sm">
       <div className="flex items-start gap-3">
-        <div className="rounded-md bg-white/10 p-2">{icon}</div>
+        <div className="rounded-md bg-ink-100 p-2">{icon}</div>
         <div className="flex flex-col gap-0.5">
-          <p className="text-fluid-sm font-semibold text-white">{title}</p>
-          <p className="text-fluid-xs text-ink-300">{desc}</p>
+          <p className="text-[15px] font-semibold text-ink-900">{title}</p>
+          <p className="text-[13px] text-ink-600">{desc}</p>
         </div>
       </div>
     </div>
