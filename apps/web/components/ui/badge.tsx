@@ -10,21 +10,22 @@ import { cn } from "@/lib/utils";
  */
 export const badgeVariants = cva(
   cn(
-    "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5",
-    "text-fluid-xs font-semibold tracking-wide"
+    // Tarcza v3 — square (rounded-sm 4px), tighter, Linear/Anthropic-grade.
+    "inline-flex items-center gap-1 rounded-sm border px-1.5 py-0.5",
+    "text-[11px] font-medium leading-[1.4] tracking-[0.005em]"
   ),
   {
     variants: {
       tone: {
-        info: "bg-dlugomat-100 border-dlugomat-200 text-dlugomat-800 dark:bg-dlugomat-850 dark:border-dlugomat-700 dark:text-dlugomat-200",
+        info: "bg-dlugomat-50 border-dlugomat-200/70 text-dlugomat-800 dark:bg-dlugomat-850/40 dark:border-dlugomat-700/50 dark:text-dlugomat-200",
         success:
-          "bg-accent-100 border-accent-200 text-accent-700 dark:bg-accent-700/20 dark:border-accent-600/40 dark:text-accent-300",
+          "bg-accent-50 border-accent-200/70 text-accent-700 dark:bg-accent-700/15 dark:border-accent-600/30 dark:text-accent-300",
         warning:
-          "bg-warn-100 border-warn-500/40 text-warn-600 dark:bg-warn-500/15 dark:border-warn-500/40 dark:text-warn-100",
+          "bg-warn-50 border-warn-500/30 text-warn-600 dark:bg-warn-500/10 dark:border-warn-500/30 dark:text-warn-100",
         danger:
-          "bg-danger-100 border-danger-500/40 text-danger-700 dark:bg-danger-500/15 dark:border-danger-500/40 dark:text-danger-100",
+          "bg-danger-50 border-danger-500/30 text-danger-700 dark:bg-danger-500/10 dark:border-danger-500/30 dark:text-danger-100",
         neutral:
-          "bg-iron-100 border-iron-200 text-iron-700 dark:bg-dlugomat-850 dark:border-dlugomat-800 dark:text-iron-200",
+          "bg-ink-50 border-ink-200 text-ink-700 dark:bg-dlugomat-850/40 dark:border-dlugomat-800/60 dark:text-ink-700",
       },
     },
     defaultVariants: { tone: "neutral" },
@@ -62,7 +63,7 @@ const DOT: Record<NonNullable<BadgeProps["tone"]>, string> = {
   success: "bg-accent-500",
   warning: "bg-warn-500",
   danger: "bg-danger-500",
-  neutral: "bg-iron-400",
+  neutral: "bg-ink-400",
 };
 
 export function Badge({

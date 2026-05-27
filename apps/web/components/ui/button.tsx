@@ -18,69 +18,74 @@ import { cn } from "@/lib/utils";
  */
 export const buttonVariants = cva(
   cn(
-    "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg",
-    "text-fluid-sm font-semibold",
-    "transition-[background,color,box-shadow,transform] duration-base ease-shield-out",
+    "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded",
+    "text-sm font-medium leading-none",
+    "transition-[background,color,box-shadow,border-color] duration-150 ease-out",
     "focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
-    // Tarcza shield focus ring (replaces default browser outline)
+    // Tarcza v3 — focus ring zachowuje shield-focus dla brand consistency.
     "focus-visible:shadow-shield-focus"
   ),
   {
     variants: {
       variant: {
+        // Primary — solid navy 800 (deeper than v2 700), inset highlight
+        // top dla "lifted button" efektu (Linear/Stripe pattern).
         primary: cn(
-          "bg-dlugomat-700 text-white shadow-card",
-          "hover:bg-dlugomat-800 active:bg-dlugomat-900",
-          "active:shadow-pressed"
+          "bg-dlugomat-800 text-white shadow-sm",
+          "shadow-[inset_0_1px_0_0_hsl(var(--dlugomat-500)/0.30),0_1px_2px_0_hsl(220_40%_8%/0.08)]",
+          "hover:bg-dlugomat-900 active:bg-dlugomat-950"
         ),
         success: cn(
-          "bg-accent-500 text-white shadow-card",
-          "hover:bg-accent-400 active:bg-accent-600"
+          "bg-accent-600 text-white shadow-sm",
+          "shadow-[inset_0_1px_0_0_hsl(var(--accent-400)/0.45),0_1px_2px_0_hsl(220_40%_8%/0.08)]",
+          "hover:bg-accent-700 active:bg-accent-700"
         ),
         danger: cn(
-          "bg-danger-600 text-white shadow-card",
-          "hover:bg-danger-500 active:bg-danger-700"
+          "bg-danger-600 text-white shadow-sm",
+          "shadow-[inset_0_1px_0_0_hsl(var(--danger-500)/0.45),0_1px_2px_0_hsl(220_40%_8%/0.08)]",
+          "hover:bg-danger-700 active:bg-danger-700"
         ),
+        // Secondary — Linear-style: białe tło + inset 1px ring + delikatny shadow.
         secondary: cn(
-          "bg-iron-100 text-iron-900 border border-iron-200",
-          "hover:bg-iron-200 active:bg-iron-300",
-          "dark:bg-dlugomat-850 dark:text-iron-100 dark:border-dlugomat-800",
-          "dark:hover:bg-dlugomat-800"
+          "bg-white text-ink-800 shadow-[inset_0_0_0_1px_hsl(var(--ink-300)),0_1px_1px_0_hsl(220_40%_8%/0.04)]",
+          "hover:bg-ink-50 hover:shadow-[inset_0_0_0_1px_hsl(var(--ink-400)),0_1px_2px_0_hsl(220_40%_8%/0.06)]",
+          "active:bg-ink-100",
+          "dark:bg-dlugomat-900 dark:text-ink-800 dark:shadow-[inset_0_0_0_1px_hsl(var(--dlugomat-800)),0_1px_1px_0_hsl(220_60%_2%/0.20)]",
+          "dark:hover:bg-dlugomat-850"
         ),
         ghost: cn(
-          "bg-transparent text-iron-700 hover:bg-iron-100",
-          "dark:text-iron-200 dark:hover:bg-dlugomat-850"
+          "bg-transparent text-ink-700",
+          "hover:bg-ink-100 hover:text-ink-900",
+          "dark:hover:bg-dlugomat-850 dark:hover:text-white"
         ),
         link: cn(
-          "bg-transparent text-dlugomat-600 underline-offset-4",
-          "hover:underline hover:text-dlugomat-700"
+          "bg-transparent text-dlugomat-700 underline-offset-4 px-0",
+          "hover:underline hover:text-dlugomat-800",
+          "dark:text-dlugomat-300 dark:hover:text-dlugomat-200"
         ),
-        // ---- Legacy shadcn aliases (Sprint typecheck A) -----------------
-        // Te warianty są tożsame z canonical Tarcza variants, ale używają
-        // shadcn-owej nazwy, którą znajdziemy w 19 konsumentach (marketplace,
-        // rodo, programa partnerski, share-card). Compat-layer eliminuje
-        // TS2322 bez codemod-u. Docelowo: refactor konsumentów do canonical.
+        // ---- Legacy shadcn aliases (zachowane z v2) -----------------
         default: cn(
-          "bg-dlugomat-700 text-white shadow-card",
-          "hover:bg-dlugomat-800 active:bg-dlugomat-900",
-          "active:shadow-pressed"
+          "bg-dlugomat-800 text-white shadow-sm",
+          "shadow-[inset_0_1px_0_0_hsl(var(--dlugomat-500)/0.30),0_1px_2px_0_hsl(220_40%_8%/0.08)]",
+          "hover:bg-dlugomat-900 active:bg-dlugomat-950"
         ),
         destructive: cn(
-          "bg-danger-600 text-white shadow-card",
-          "hover:bg-danger-500 active:bg-danger-700"
+          "bg-danger-600 text-white shadow-sm",
+          "hover:bg-danger-700 active:bg-danger-700"
         ),
         outline: cn(
-          "border border-iron-300 bg-transparent text-iron-800",
-          "hover:bg-iron-100 hover:text-iron-900 hover:border-iron-400",
-          "dark:border-iron-700 dark:text-iron-100",
-          "dark:hover:bg-dlugomat-850 dark:hover:border-dlugomat-700"
+          "bg-transparent text-ink-800 shadow-[inset_0_0_0_1px_hsl(var(--ink-300))]",
+          "hover:bg-ink-50 hover:shadow-[inset_0_0_0_1px_hsl(var(--ink-400))]",
+          "dark:text-ink-800 dark:shadow-[inset_0_0_0_1px_hsl(var(--dlugomat-800))]",
+          "dark:hover:bg-dlugomat-850"
         ),
       },
       size: {
-        sm: "h-9 px-3 text-fluid-xs",
-        md: "h-11 px-5",
-        lg: "h-12 px-6 text-fluid-base",
-        icon: "h-11 w-11 p-0",
+        // Tarcza v3 — tight 8pt: 32 / 36 / 40 (było 36/44/48).
+        sm: "h-8 px-2.5 text-xs gap-1.5",
+        md: "h-9 px-3.5",
+        lg: "h-10 px-5 text-base",
+        icon: "h-9 w-9 p-0",
       },
       block: {
         true: "w-full",

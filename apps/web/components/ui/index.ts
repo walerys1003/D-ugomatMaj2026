@@ -24,3 +24,5 @@ export * from "./section";
 export * from "./surface";
 export * from "./kbd";
 export * from "./divider";
+// Typography primitives (Tarcza v3 "Stoic")
+export * from "./typography";

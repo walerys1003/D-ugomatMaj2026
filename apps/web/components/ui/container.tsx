@@ -16,12 +16,14 @@ import { cn } from "@/lib/utils";
  * Padding boczny rośnie liniowo z viewport — dziedziczone z tailwind.config
  * theme.container, ale tu opakowane w komponent dla spójności DX.
  */
-export type ContainerWidth = "sm" | "md" | "lg";
+export type ContainerWidth = "sm" | "md" | "lg" | "xl";
 
 const WIDTH: Record<ContainerWidth, string> = {
-  sm: "max-w-3xl",
-  md: "max-w-[1120px]",
-  lg: "max-w-[1280px]",
+  // v3 — adopted from Linear/Vercel/Anthropic measurement.
+  sm: "max-w-[720px]",    // long-form (poprz. max-w-3xl ≈ 768)
+  md: "max-w-[1080px]",   // panel content (tighter than v2 1120)
+  lg: "max-w-[1200px]",   // landing default — Linear value
+  xl: "max-w-[1320px]",   // dashboard z gridem 12 — Stripe value
 };
 
 export interface ContainerProps extends React.HTMLAttributes<HTMLDivElement> {

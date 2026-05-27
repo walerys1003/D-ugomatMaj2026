@@ -19,16 +19,19 @@ export type SurfaceElevation = "flat" | "raised" | "floating";
 export type SurfacePadding = "none" | "sm" | "md" | "lg";
 
 const ELEV: Record<SurfaceElevation, string> = {
-  flat: "border border-iron-200/80 dark:border-iron-800/60 bg-card",
-  raised: "border border-iron-200/60 dark:border-iron-800/40 bg-card shadow-card",
-  floating: "border border-iron-200/60 dark:border-iron-800/40 bg-popover shadow-pop",
+  // Tarcza v3 — ink borders zamiast iron (true neutral, brak niebieskiego tintu),
+  // tighter shadows z navy-tinted color, refined rounded (md=8 zamiast lg=12).
+  flat: "border border-ink-200 dark:border-ink-200 bg-card",
+  raised: "border border-ink-200 dark:border-ink-200 bg-card shadow-sm",
+  floating: "border border-ink-200 dark:border-ink-200 bg-popover shadow-lg",
 };
 
 const PAD: Record<SurfacePadding, string> = {
+  // 8pt grid: 16 / 20 / 24 / 32.
   none: "",
-  sm: "p-4",
-  md: "p-6",
-  lg: "p-8",
+  sm: "p-4",   // 16
+  md: "p-5",   // 20 — był 24, v3 tighter
+  lg: "p-6",   // 24 — był 32
 };
 
 export interface SurfaceProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -46,11 +49,11 @@ export const Surface = React.forwardRef<HTMLDivElement, SurfaceProps>(function S
     <Component
       ref={ref}
       className={cn(
-        "rounded-lg",
+        "rounded-md",  // v3: 8px (było rounded-lg = 12px)
         ELEV[elevation],
         PAD[padded],
         interactive &&
-          "transition-all duration-base ease-shield-out hover:-translate-y-px hover:border-dlugomat-300/80 hover:shadow-pop focus-within:shadow-shield-focus",
+          "transition-[border-color,box-shadow,background-color] duration-150 ease-out hover:border-ink-300 hover:bg-ink-50/40 hover:shadow-md focus-within:shadow-shield-focus dark:hover:border-ink-300 dark:hover:bg-dlugomat-850/40",
         className
       )}
       {...props}

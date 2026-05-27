@@ -20,8 +20,8 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const ELEVATION: Record<Elevation, string> = {
   flat: "",
-  subtle: "shadow-card",
-  pop: "shadow-pop",
+  subtle: "shadow-sm",  // v3 token (was shadow-card v2 — soft/0.04)
+  pop: "shadow-lg",     // v3 token (was shadow-pop v2)
 };
 
 const URGENCY_STRIP: Record<Urgency, string> = {
@@ -38,7 +38,8 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
     <div
       ref={ref}
       className={cn(
-        "rounded-xl bg-card text-card-foreground border border-iron-200 dark:border-dlugomat-800",
+        // v3 — rounded-md (8px, było rounded-xl=20px) + ink-200 border
+        "rounded-md bg-card text-card-foreground border border-ink-200 dark:border-dlugomat-800",
         ELEVATION[elevation],
         URGENCY_STRIP[urgency],
         className

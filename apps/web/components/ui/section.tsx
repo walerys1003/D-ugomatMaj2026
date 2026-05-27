@@ -27,16 +27,21 @@ export interface SectionProps extends React.HTMLAttributes<HTMLElement> {
 }
 
 const TONE: Record<SectionTone, string> = {
+  // Tarcza v3 — muted używa ink-50 (true neutral), nie iron-50 (niebieski tint).
   default: "bg-background text-foreground",
-  muted: "bg-iron-50 text-foreground dark:bg-dlugomat-950/40",
+  muted: "bg-ink-50 text-foreground dark:bg-dlugomat-950/60",
   navy: "bg-dlugomat-900 text-white",
-  ink: "bg-iron-950 text-white",
+  ink: "bg-ink-950 text-white",
 };
 
 const DENSITY: Record<NonNullable<SectionProps["density"]>, string> = {
-  compact: "py-14 md:py-20 lg:py-24",
-  regular: "py-24 md:py-32 lg:py-40",
-  spacious: "py-32 md:py-48 lg:py-60",
+  // Tarcza v3 — 8pt grid. Wartości: wielokrotności 16. Mniej dramatyczne
+  // niż v2 (compact 56/80/96 → 48/64/80; regular 96/128/160 → 80/96/112;
+  // spacious 128/192/240 → 112/128/160). Daje tighter rytm, mniej
+  // „landingowy" feel.
+  compact: "py-12 md:py-16 lg:py-20",      // 48 / 64 / 80
+  regular: "py-20 md:py-24 lg:py-28",      // 80 / 96 / 112
+  spacious: "py-28 md:py-32 lg:py-40",     // 112 / 128 / 160
 };
 
 export const Section = React.forwardRef<HTMLElement, SectionProps>(function Section(
