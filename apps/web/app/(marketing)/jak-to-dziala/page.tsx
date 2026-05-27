@@ -29,6 +29,38 @@ export const metadata: Metadata = {
   description:
     "Cztery kroki: wczytaj pismo, OCR rozpozna treść, AI zbuduje pismo procesowe, pobierz PDF. Zgodność z KPC, walidacja Haiku 4.5, dane w UE.",
   alternates: { canonical: "/jak-to-dziala" },
+  // W10-6 — dynamic OG
+  openGraph: {
+    title: "Jak działa Długomat — 4 kroki, 12 minut",
+    description:
+      "Wczytaj pismo, OCR + AI generuje sprzeciw/skargę/ugodę, pobierz PDF. Dane w UE.",
+    type: "website",
+    url: "/jak-to-dziala",
+    images: [
+      {
+        url: `/api/og/jak-to-dziala?title=${encodeURIComponent(
+          "Jak działa Długomat",
+        )}&subtitle=${encodeURIComponent(
+          "4 kroki · 12 minut · OCR + AI + PDF",
+        )}&kind=marketing`,
+        width: 1200,
+        height: 630,
+        alt: "Jak działa Długomat",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Jak działa Długomat",
+    description: "4 kroki, 12 minut, gotowe pismo procesowe.",
+    images: [
+      `/api/og/jak-to-dziala?title=${encodeURIComponent(
+        "Jak działa Długomat",
+      )}&subtitle=${encodeURIComponent(
+        "4 kroki · 12 minut",
+      )}&kind=marketing`,
+    ],
+  },
 };
 
 const STEPS = [

@@ -99,6 +99,106 @@ const ROUTES: RouteEntry[] = [
   { path: "/v5/moduly/potracenia", changeFrequency: "weekly", priority: 0.6 },
   { path: "/v5/moduly/upadlosc", changeFrequency: "weekly", priority: 0.6 },
   { path: "/v5/moduly/wezwania", changeFrequency: "weekly", priority: 0.6 },
+
+  // ────────────────────────────────────────────────────────────────────
+  // W10-4 · Wave 5/9 (marketing) namespace — extended marketing pages
+  // Dodane podczas wave10 — rozszerzenie sitemap o nowe landingi.
+  // ────────────────────────────────────────────────────────────────────
+
+  // API publiczne + dokumentacja
+  { path: "/api-publiczne", changeFrequency: "monthly", priority: 0.65 },
+  { path: "/api-publiczne/dokumentacja", changeFrequency: "weekly", priority: 0.6 },
+
+  // Baza wiedzy — dodatkowe artykuły z (marketing)
+  { path: "/baza-wiedzy/d9-d16-przeglad-modulow", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/baza-wiedzy/powodztwo-przeciwegzekucyjne", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/baza-wiedzy/raty-sadowe-i-zwolnienie-z-kosztow", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/baza-wiedzy/reklamacja-bank-rzecznik-finansowy", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/baza-wiedzy/skarga-do-puodo", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/baza-wiedzy/upadlosc-konsumencka-pelny-wniosek", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/baza-wiedzy/wniosek-zwolnienie-kosztow-sadowych", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/baza-wiedzy/zazalenie-na-klauzule-wykonalnosci", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/baza-wiedzy/zwrot-oplat-windykacyjnych", changeFrequency: "monthly", priority: 0.7 },
+
+  // Bezpieczeństwo + DPA + zaufanie
+  { path: "/bezpieczenstwo", changeFrequency: "monthly", priority: 0.6 },
+  { path: "/dpa", changeFrequency: "yearly", priority: 0.4 },
+
+  // Case studies
+  { path: "/case-studies", changeFrequency: "weekly", priority: 0.7 },
+  { path: "/case-studies/tematyczne", changeFrequency: "weekly", priority: 0.65 },
+  { path: "/klienci-case-studies", changeFrequency: "weekly", priority: 0.65 },
+
+  // CEE + lokalizacja
+  { path: "/cee", changeFrequency: "monthly", priority: 0.55 },
+
+  // Cennik + porównania
+  { path: "/cennik/porownanie", changeFrequency: "weekly", priority: 0.8 },
+  { path: "/cennik/subskrypcje", changeFrequency: "weekly", priority: 0.8 },
+  { path: "/porownanie-konkurencja", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/porownanie-planow", changeFrequency: "weekly", priority: 0.8 },
+
+  // Dla firm / kancelarii / windykacji / klientów indywidualnych
+  { path: "/dla-firm", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/dla-firm/kalkulator-roi", changeFrequency: "monthly", priority: 0.65 },
+  { path: "/dla-kancelarii", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/dla-osob-fizycznych", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/dla-windykacji", changeFrequency: "monthly", priority: 0.65 },
+
+  // Edukacja + blog + FAQ + prasa
+  { path: "/blog", changeFrequency: "weekly", priority: 0.65 },
+  { path: "/edukacja", changeFrequency: "weekly", priority: 0.65 },
+  { path: "/faq", changeFrequency: "weekly", priority: 0.7 },
+  { path: "/prasa", changeFrequency: "monthly", priority: 0.5 },
+
+  // Integracje + marketplace
+  { path: "/integracje", changeFrequency: "weekly", priority: 0.6 },
+  { path: "/marketplace", changeFrequency: "weekly", priority: 0.6 },
+  { path: "/marketplace/partnerzy", changeFrequency: "weekly", priority: 0.55 },
+  { path: "/marketplace/szablony", changeFrequency: "weekly", priority: 0.55 },
+
+  // Kalkulatory (D-Calc — high-traffic)
+  { path: "/kalkulatory/koszty-postepowania", changeFrequency: "monthly", priority: 0.75 },
+  { path: "/kalkulatory/kwota-wolna", changeFrequency: "monthly", priority: 0.75 },
+  { path: "/kalkulatory/odsetki", changeFrequency: "monthly", priority: 0.75 },
+  { path: "/kalkulatory/przedawnienie", changeFrequency: "monthly", priority: 0.75 },
+  { path: "/kalkulatory/raty-sadowe", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/kalkulatory/roi-dlugomat", changeFrequency: "monthly", priority: 0.7 },
+
+  // Kariera
+  { path: "/kariera", changeFrequency: "weekly", priority: 0.55 },
+
+  // Kontakt
+  { path: "/kontakt/demo", changeFrequency: "monthly", priority: 0.6 },
+  { path: "/kontakt/firmy", changeFrequency: "monthly", priority: 0.6 },
+
+  // Landing pages (LP) — paid traffic targets
+  { path: "/lp/bik", changeFrequency: "monthly", priority: 0.6 },
+  { path: "/lp/dluznik-prywatny", changeFrequency: "monthly", priority: 0.6 },
+  { path: "/lp/epu", changeFrequency: "monthly", priority: 0.6 },
+  { path: "/lp/firma", changeFrequency: "monthly", priority: 0.6 },
+  { path: "/lp/komornik", changeFrequency: "monthly", priority: 0.6 },
+
+  // O nas
+  { path: "/o-nas/zespol", changeFrequency: "monthly", priority: 0.45 },
+
+  // Partnerzy + afiliacja
+  { path: "/partnerzy", changeFrequency: "weekly", priority: 0.5 },
+  { path: "/program-afiliacyjny", changeFrequency: "monthly", priority: 0.55 },
+  { path: "/program-afiliacyjny/zarejestruj", changeFrequency: "monthly", priority: 0.45 },
+  { path: "/program-resellerski", changeFrequency: "monthly", priority: 0.5 },
+
+  // Precedensy (high-traffic SEO target)
+  { path: "/precedensy", changeFrequency: "daily", priority: 0.75 },
+
+  // ROI B2B
+  { path: "/roi-b2b", changeFrequency: "monthly", priority: 0.6 },
+
+  // Showcase
+  { path: "/showcase/ai-artifact", changeFrequency: "monthly", priority: 0.45 },
+
+  // Status — history
+  { path: "/status/history", changeFrequency: "daily", priority: 0.4 },
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {

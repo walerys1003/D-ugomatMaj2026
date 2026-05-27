@@ -14,6 +14,39 @@ export const metadata: Metadata = {
     "Sprzeciw EPU, skargi komornicze, korekta BIK, propozycja ugody — pisma " +
     "procesowe generowane przez AI w 12 minut. Zgodne z polskim prawem.",
   alternates: { canonical: "/" },
+  // W10-6 — dynamic OG via /api/og/[slug] (next/og ImageResponse on edge)
+  openGraph: {
+    title: "Długomat — Tarcza dla osób zadłużonych",
+    description:
+      "Sprzeciw EPU, skargi komornicze, korekta BIK, ugody — pisma procesowe w 12 minut.",
+    type: "website",
+    url: "/",
+    images: [
+      {
+        url: `/api/og/home?title=${encodeURIComponent(
+          "Tarcza dla osób zadłużonych",
+        )}&subtitle=${encodeURIComponent(
+          "Pisma procesowe AI w 12 minut",
+        )}&kind=marketing`,
+        width: 1200,
+        height: 630,
+        alt: "Długomat — Tarcza dla osób zadłużonych",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Długomat — Tarcza dla osób zadłużonych",
+    description:
+      "Sprzeciw EPU, skargi komornicze, korekta BIK, ugody — pisma w 12 minut.",
+    images: [
+      `/api/og/home?title=${encodeURIComponent(
+        "Tarcza dla osób zadłużonych",
+      )}&subtitle=${encodeURIComponent(
+        "Pisma procesowe AI w 12 minut",
+      )}&kind=marketing`,
+    ],
+  },
 };
 
 const ORGANIZATION_JSONLD = {

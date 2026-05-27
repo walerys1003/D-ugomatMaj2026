@@ -34,6 +34,38 @@ export const metadata: Metadata = {
   description:
     "Skaner nakazu DARMOWY. Pisma od 79 zł do 249 zł. Pakiet komorniczy 199 zł (4 pisma). Bez abonamentu, bez subskrypcji. Faktura VAT na życzenie.",
   alternates: { canonical: "/cennik" },
+  // W10-6 — dynamic OG via /api/og/[slug]
+  openGraph: {
+    title: "Cennik Długomatu — od 0 zł",
+    description:
+      "Skaner DARMOWY. Pisma 79–249 zł. Pakiet komorniczy 199 zł. Bez abonamentu.",
+    type: "website",
+    url: "/cennik",
+    images: [
+      {
+        url: `/api/og/cennik?title=${encodeURIComponent(
+          "Cennik — od 0 zł",
+        )}&subtitle=${encodeURIComponent(
+          "Bez abonamentu · Faktura VAT · Pisma 79–249 zł",
+        )}&kind=marketing`,
+        width: 1200,
+        height: 630,
+        alt: "Cennik Długomatu",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Cennik Długomatu — od 0 zł",
+    description: "Pisma 79–249 zł. Bez abonamentu, bez ukrytych kosztów.",
+    images: [
+      `/api/og/cennik?title=${encodeURIComponent(
+        "Cennik — od 0 zł",
+      )}&subtitle=${encodeURIComponent(
+        "Bez abonamentu · Pisma 79–249 zł",
+      )}&kind=marketing`,
+    ],
+  },
 };
 
 interface PriceItem {

@@ -6,11 +6,37 @@ export const metadata: Metadata = {
   description:
     "Darmowy skaner pism procesowych. Wczytaj nakaz zapłaty, wezwanie z e-Sądu lub list od komornika — sprawdzimy przedawnienie, wskażemy terminy i podpowiemy co zrobić jako pierwsze.",
   alternates: { canonical: "/skaner-nakazu" },
+  // W10-6 — dynamic OG via /api/og/[slug]
   openGraph: {
     title: "Skaner Nakazu — Długomat",
     description:
       "DARMOWE: rozpoznanie pisma z sądu / komornika i ocena Twoich opcji w 2 minuty.",
     type: "website",
+    url: "/skaner-nakazu",
+    images: [
+      {
+        url: `/api/og/skaner-nakazu?title=${encodeURIComponent(
+          "Skaner Nakazu — DARMOWE",
+        )}&subtitle=${encodeURIComponent(
+          "OCR + AI · 2 minuty · pierwsze 5 kroków",
+        )}&kind=module`,
+        width: 1200,
+        height: 630,
+        alt: "Skaner Nakazu — Długomat",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Skaner Nakazu — DARMOWE",
+    description: "OCR + AI rozpoznają pismo i powiedzą, co masz robić.",
+    images: [
+      `/api/og/skaner-nakazu?title=${encodeURIComponent(
+        "Skaner Nakazu — DARMOWE",
+      )}&subtitle=${encodeURIComponent(
+        "OCR + AI · 2 minuty",
+      )}&kind=module`,
+    ],
   },
 };
 

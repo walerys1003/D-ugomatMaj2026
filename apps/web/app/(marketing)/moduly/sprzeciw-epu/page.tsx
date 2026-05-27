@@ -6,11 +6,37 @@ export const metadata: Metadata = {
   description:
     "Dostałeś nakaz zapłaty z e-Sądu? Masz 14 dni na sprzeciw. Sprzeciwomat EPU wygeneruje gotowe pismo procesowe ze wszystkimi zarzutami — brak legitymacji, przedawnienie, klauzule abuzywne.",
   alternates: { canonical: "/moduly/sprzeciw-epu" },
+  // W10-6 — dynamic OG via /api/og/[slug]
   openGraph: {
     title: "Sprzeciwomat EPU — Długomat",
     description:
       "Sprzeciw od nakazu zapłaty z e-Sądu. Pismo ze wszystkimi zarzutami w 12 minut. 159 zł.",
     type: "website",
+    url: "/moduly/sprzeciw-epu",
+    images: [
+      {
+        url: `/api/og/sprzeciw-epu?title=${encodeURIComponent(
+          "Sprzeciwomat EPU",
+        )}&subtitle=${encodeURIComponent(
+          "Sprzeciw od nakazu zapłaty z e-Sądu · 159 zł",
+        )}&kind=module`,
+        width: 1200,
+        height: 630,
+        alt: "Sprzeciwomat EPU — Długomat",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Sprzeciwomat EPU — Długomat",
+    description: "Sprzeciw od nakazu zapłaty z EPU. 14 dni → 12 minut. 159 zł.",
+    images: [
+      `/api/og/sprzeciw-epu?title=${encodeURIComponent(
+        "Sprzeciwomat EPU",
+      )}&subtitle=${encodeURIComponent(
+        "Sprzeciw EPU · 159 zł",
+      )}&kind=module`,
+    ],
   },
 };
 
