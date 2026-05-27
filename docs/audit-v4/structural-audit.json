@@ -1,0 +1,214 @@
+{
+  "landing": {
+    "htmlSize": 242705,
+    "elements": 839,
+    "uniqueClasses": 358,
+    "headings": {
+      "h1": 1,
+      "h2": 7,
+      "h3": 29,
+      "h4": 3,
+      "h5": 0,
+      "h6": 0
+    },
+    "sections": 8,
+    "sectionPreview": [
+      {
+        "tag": "section",
+        "classes": "relative isolate overflow-hidden bg-background text-foreground py-28 md:py-32 lg:py-40",
+        "heading": "Tarcza dla osób zadłużonych.",
+        "headingTag": "h1"
+      },
+      {
+        "tag": "section",
+        "classes": "relative isolate overflow-hidden bg-ink-50 text-foreground dark:bg-dlugomat-950/60 py-20 md:py-24 lg",
+        "heading": "Od skanu nakazu do gotowego sprzeciwu — w jednym oknie",
+        "headingTag": "h2"
+      },
+      {
+        "tag": "section",
+        "classes": "relative isolate overflow-hidden bg-background text-foreground py-12 md:py-16 lg:py-20",
+        "heading": "Cztery kroki — bez prawnika, bez stresu",
+        "headingTag": "h2"
+      },
+      {
+        "tag": "section",
+        "classes": "relative isolate overflow-hidden bg-ink-50 text-foreground dark:bg-dlugomat-950/60 py-12 md:py-16 lg",
+        "heading": "Osiem narzędzi — jedna tarcza",
+        "headingTag": "h2"
+      },
+      {
+        "tag": "section",
+        "classes": "relative isolate overflow-hidden bg-background text-foreground py-12 md:py-16 lg:py-20",
+        "heading": "Bezpieczeństwo prawne i techniczne na poziomie kancelarii en",
+        "headingTag": "h2"
+      },
+      {
+        "tag": "section",
+        "classes": "bg-white py-20",
+        "heading": "Placisz raz, za konkretne pismo",
+        "headingTag": "h2"
+      },
+      {
+        "tag": "section",
+        "classes": "bg-iron-50/60 py-20",
+        "heading": "Wiemy, ze masz watpliwosci. Mamy odpowiedzi.",
+        "headingTag": "h2"
+      },
+      {
+        "tag": "section",
+        "classes": "relative isolate overflow-hidden bg-background text-foreground py-12 md:py-16 lg:py-20",
+        "heading": "Masz 14 dni? My potrzebujemy 12 minut.",
+        "headingTag": "h2"
+      }
+    ],
+    "legacyTokens": {
+      "iron-": 117,
+      "fluid-": 24,
+      "text-fluid": 24,
+      "dlugomat-700": 55,
+      "dlugomat-600": 6,
+      "dlugomat-500": 16,
+      "rounded-full": 32,
+      "shadow-shield": 62
+    },
+    "tokenBalance": {
+      "ink": 462,
+      "iron": 117,
+      "dlugomat": 212
+    },
+    "ctaCount": 12
+  },
+  "cennik": {
+    "htmlSize": 178603,
+    "elements": 629,
+    "uniqueClasses": 260,
+    "headings": {
+      "h1": 1,
+      "h2": 3,
+      "h3": 14,
+      "h4": 3,
+      "h5": 0,
+      "h6": 0
+    },
+    "sections": 5,
+    "sectionPreview": [
+      {
+        "tag": "section",
+        "classes": "tarcza-hero-gradient relative overflow-hidden text-white",
+        "heading": "Płacisz tylko za pisma, które generujesz.",
+        "headingTag": "h1"
+      },
+      {
+        "tag": "section",
+        "classes": "container py-16 sm:py-20",
+        "heading": "Skaner Nakazu",
+        "headingTag": "h3"
+      },
+      {
+        "tag": "section",
+        "classes": "bg-iron-50/60 py-20 sm:py-24 dark:bg-dlugomat-950/40",
+        "heading": "Długomat • Adwokat • Sam",
+        "headingTag": "h2"
+      },
+      {
+        "tag": "section",
+        "classes": "container py-20 sm:py-24",
+        "heading": "Bez gwiazdek, bez druku 'mała czcionka'.",
+        "headingTag": "h2"
+      },
+      {
+        "tag": "section",
+        "classes": "container py-20 sm:py-24",
+        "heading": "Zacznij od zera złotych.",
+        "headingTag": "h2"
+      }
+    ],
+    "legacyTokens": {
+      "iron-": 280,
+      "fluid-": 123,
+      "text-fluid": 123,
+      "dlugomat-700": 42,
+      "dlugomat-600": 2,
+      "dlugomat-500": 13,
+      "rounded-full": 7,
+      "rounded-2xl": 1,
+      "shadow-shield": 43
+    },
+    "tokenBalance": {
+      "ink": 35,
+      "iron": 280,
+      "dlugomat": 177
+    },
+    "ctaCount": 15
+  },
+  "jak": {
+    "htmlSize": 110812,
+    "elements": 375,
+    "uniqueClasses": 250,
+    "headings": {
+      "h1": 1,
+      "h2": 5,
+      "h3": 18,
+      "h4": 3,
+      "h5": 0,
+      "h6": 0
+    },
+    "sections": 6,
+    "sectionPreview": [
+      {
+        "tag": "section",
+        "classes": "tarcza-hero-gradient relative overflow-hidden text-white",
+        "heading": "Bez prawnika, bez kolejek, bez paniki.",
+        "headingTag": "h1"
+      },
+      {
+        "tag": "section",
+        "classes": "container py-16 sm:py-20",
+        "heading": "Cztery kroki, bez ukrytych etapów.",
+        "headingTag": "h2"
+      },
+      {
+        "tag": "section",
+        "classes": "bg-iron-50/60 py-20 sm:py-24 dark:bg-dlugomat-950/40",
+        "heading": "Trzy zasady, których nie łamiemy.",
+        "headingTag": "h2"
+      },
+      {
+        "tag": "section",
+        "classes": "container py-20 sm:py-24",
+        "heading": "Co się dzieje, kiedy pismo dotrze do sądu?",
+        "headingTag": "h2"
+      },
+      {
+        "tag": "section",
+        "classes": "bg-iron-50/60 py-20 sm:py-24 dark:bg-dlugomat-950/40",
+        "heading": "Pod maską — bez tajemnic.",
+        "headingTag": "h2"
+      },
+      {
+        "tag": "section",
+        "classes": "container py-20 sm:py-24",
+        "heading": "Wystarczy zeskanować pierwsze pismo.",
+        "headingTag": "h2"
+      }
+    ],
+    "legacyTokens": {
+      "iron-": 123,
+      "fluid-": 74,
+      "text-fluid": 74,
+      "dlugomat-700": 26,
+      "dlugomat-600": 22,
+      "dlugomat-500": 4,
+      "rounded-full": 13,
+      "rounded-2xl": 1,
+      "shadow-shield": 37
+    },
+    "tokenBalance": {
+      "ink": 39,
+      "iron": 123,
+      "dlugomat": 107
+    },
+    "ctaCount": 9
+  }
+}

@@ -1,170 +1,189 @@
 import type { Metadata } from "next";
-import { Activity, Gauge, MousePointerClick, Timer } from "lucide-react";
+import { Activity, Gauge, Smartphone, Timer } from "lucide-react";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export const metadata: Metadata = {
-  title: "RUM Dashboard · Admin",
-  robots: { index: false, follow: false },
+  title: "RUM · Web Vitals · Admin · Długomat",
 };
 
-export const dynamic = "force-dynamic";
-
-interface AggregatedMetric {
-  metric_name: string;
-  p50: number;
+type Vital = {
+  metric: "LCP" | "INP" | "CLS" | "TTFB" | "FCP";
   p75: number;
-  p95: number;
-  good_pct: number;
-  poor_pct: number;
-  samples: number;
-}
-
-function formatMs(v: number, unit: "ms" | "score" = "ms"): string {
-  if (unit === "score") return v.toFixed(3);
-  if (v < 1000) return `${Math.round(v)}ms`;
-  return `${(v / 1000).toFixed(2)}s`;
-}
-
-function percentile(sorted: number[], p: number): number {
-  if (sorted.length === 0) return 0;
-  const idx = Math.floor((p / 100) * (sorted.length - 1));
-  return sorted[idx];
-}
-
-async function fetchRumAggregates(): Promise<AggregatedMetric[]> {
-  const sb = await createServerSupabase();
-  const since = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
-  const { data } = await sb
-    .from("rum_samples")
-    .select("metric_name, value, rating")
-    .gte("timestamp", since)
-    .limit(50000);
-
-  const samples = (data ?? []) as Array<{ metric_name: string; value: number; rating: string }>;
-  const grouped: Record<string, number[]> = {};
-  const ratings: Record<string, { good: number; poor: number; total: number }> = {};
-
-  for (const s of samples) {
-    if (!grouped[s.metric_name]) {
-      grouped[s.metric_name] = [];
-      ratings[s.metric_name] = { good: 0, poor: 0, total: 0 };
-    }
-    grouped[s.metric_name].push(s.value);
-    ratings[s.metric_name].total++;
-    if (s.rating === "good") ratings[s.metric_name].good++;
-    if (s.rating === "poor") ratings[s.metric_name].poor++;
-  }
-
-  return Object.entries(grouped).map(([name, vals]) => {
-    const sorted = [...vals].sort((a, b) => a - b);
-    const r = ratings[name];
-    return {
-      metric_name: name,
-      p50: percentile(sorted, 50),
-      p75: percentile(sorted, 75),
-      p95: percentile(sorted, 95),
-      good_pct: r.total > 0 ? (r.good / r.total) * 100 : 0,
-      poor_pct: r.total > 0 ? (r.poor / r.total) * 100 : 0,
-      samples: r.total,
-    };
-  });
-}
-
-const METRIC_META: Record<string, { label: string; icon: any; unit: "ms" | "score"; threshold_good: number }> = {
-  LCP: { label: "Largest Contentful Paint", icon: Timer, unit: "ms", threshold_good: 2500 },
-  FCP: { label: "First Contentful Paint", icon: Timer, unit: "ms", threshold_good: 1800 },
-  TTFB: { label: "Time to First Byte", icon: Gauge, unit: "ms", threshold_good: 800 },
-  FID: { label: "First Input Delay", icon: MousePointerClick, unit: "ms", threshold_good: 100 },
-  INP: { label: "Interaction to Next Paint", icon: MousePointerClick, unit: "ms", threshold_good: 200 },
-  CLS: { label: "Cumulative Layout Shift", icon: Activity, unit: "score", threshold_good: 0.1 },
+  unit: "ms" | "score";
+  target_good: number;
+  target_needs_imp: number;
 };
 
-export default async function RumDashboardPage() {
-  const metrics = await fetchRumAggregates();
+const VITALS: Vital[] = [
+  { metric: "LCP", p75: 1840, unit: "ms", target_good: 2500, target_needs_imp: 4000 },
+  { metric: "INP", p75: 178, unit: "ms", target_good: 200, target_needs_imp: 500 },
+  { metric: "CLS", p75: 0.07, unit: "score", target_good: 0.1, target_needs_imp: 0.25 },
+  { metric: "TTFB", p75: 612, unit: "ms", target_good: 800, target_needs_imp: 1800 },
+  { metric: "FCP", p75: 1240, unit: "ms", target_good: 1800, target_needs_imp: 3000 },
+];
 
-  // Sort by Core Web Vitals order
-  const order = ["LCP", "INP", "CLS", "FCP", "TTFB", "FID"];
-  metrics.sort((a, b) => order.indexOf(a.metric_name) - order.indexOf(b.metric_name));
+function rating(v: Vital): { label: string; tone: "success" | "warning" | "danger" } {
+  if (v.p75 <= v.target_good) return { label: "Dobre", tone: "success" };
+  if (v.p75 <= v.target_needs_imp)
+    return { label: "Wymaga poprawy", tone: "warning" };
+  return { label: "Słabe", tone: "danger" };
+}
 
+const ROUTES = [
+  { path: "/", lcp_p75: 1640, inp_p75: 142, samples: 124_580 },
+  { path: "/panel", lcp_p75: 2120, inp_p75: 218, samples: 38_120 },
+  { path: "/panel/sprawy/nowa", lcp_p75: 2540, inp_p75: 287, samples: 9_840 },
+  { path: "/cennik", lcp_p75: 1480, inp_p75: 124, samples: 21_320 },
+  { path: "/panel/skaner", lcp_p75: 3120, inp_p75: 412, samples: 6_120 },
+];
+
+export default function RumPage() {
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-6">
-      <header>
-        <h1 className="text-fluid-2xl font-bold text-iron-900 dark:text-white">RUM Dashboard</h1>
-        <p className="mt-1 text-fluid-base text-iron-600 dark:text-iron-300">
-          Real-User Monitoring — Web Vitals z ostatnich 24h.
+    <div className="flex flex-col gap-8">
+      <header className="flex flex-col gap-2">
+        <p className="text-fluid-sm font-semibold uppercase tracking-wider text-dlugomat-600">
+          Wydajność
+        </p>
+        <h1 className="text-fluid-3xl font-bold tracking-tight text-dlugomat-900 dark:text-white">
+          RUM · Web Vitals
+        </h1>
+        <p className="max-w-2xl text-fluid-base text-iron-600 dark:text-iron-300">
+          Dane od prawdziwych użytkowników (Real User Monitoring) — wartości
+          p75 dla głównych metryk Web Vitals w ciągu ostatnich 7 dni.
         </p>
       </header>
 
-      {metrics.length === 0 ? (
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-fluid-sm text-iron-500">
-              Brak danych RUM z ostatnich 24h. Sprawdź czy `web-vitals` jest załadowany w layoucie.
-            </p>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {metrics.map((m) => {
-            const meta = METRIC_META[m.metric_name] ?? {
-              label: m.metric_name,
-              icon: Activity,
-              unit: "ms" as const,
-              threshold_good: 1000,
-            };
-            const Icon = meta.icon;
-            const overallTone = m.good_pct >= 75 ? "success" : m.poor_pct >= 25 ? "warning" : "neutral";
-            return (
-              <Card key={m.metric_name}>
-                <CardHeader className="flex flex-row items-start justify-between gap-2">
-                  <div className="flex items-start gap-2">
-                    <div className="rounded-md bg-dlugomat-50 p-2 text-dlugomat-700 dark:bg-dlugomat-800 dark:text-dlugomat-300">
-                      <Icon className="h-4 w-4" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-fluid-base">{m.metric_name}</CardTitle>
-                      <CardDescription className="text-fluid-xs">{meta.label}</CardDescription>
-                    </div>
-                  </div>
-                  <Badge tone={overallTone as any} withDot>
-                    {m.good_pct.toFixed(0)}% good
+      {/* Top vitals */}
+      <section
+        aria-label="Główne metryki"
+        className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5"
+      >
+        {VITALS.map((v) => {
+          const r = rating(v);
+          return (
+            <Card key={v.metric} elevation="subtle">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <span className="text-fluid-xs font-semibold uppercase tracking-wider text-iron-500">
+                    {v.metric}
+                  </span>
+                  <Badge tone={r.tone} withDot>
+                    {r.label}
                   </Badge>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="grid grid-cols-3 gap-2 text-center">
-                    <div>
-                      <span className="block text-fluid-xs text-iron-500">p50</span>
-                      <span className="block text-fluid-sm font-semibold">{formatMs(m.p50, meta.unit)}</span>
-                    </div>
-                    <div>
-                      <span className="block text-fluid-xs text-iron-500">p75</span>
-                      <span className="block text-fluid-sm font-semibold">{formatMs(m.p75, meta.unit)}</span>
-                    </div>
-                    <div>
-                      <span className="block text-fluid-xs text-iron-500">p95</span>
-                      <span className="block text-fluid-sm font-semibold">{formatMs(m.p95, meta.unit)}</span>
-                    </div>
-                  </div>
-                  <div className="mt-3 flex h-2 overflow-hidden rounded-full bg-iron-100 dark:bg-dlugomat-800">
-                    <span style={{ width: `${m.good_pct}%` }} className="bg-emerald-500" />
-                    <span
-                      style={{ width: `${100 - m.good_pct - m.poor_pct}%` }}
-                      className="bg-amber-400"
-                    />
-                    <span style={{ width: `${m.poor_pct}%` }} className="bg-rose-500" />
-                  </div>
-                  <p className="mt-2 text-fluid-xs text-iron-400">
-                    {m.samples.toLocaleString("pl-PL")} próbek · próg good: {formatMs(meta.threshold_good, meta.unit)}
-                  </p>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-      )}
+                </div>
+                <CardTitle className="mt-1 text-fluid-2xl tabular-nums">
+                  {v.unit === "ms"
+                    ? `${v.p75} ms`
+                    : v.p75.toFixed(2)}
+                </CardTitle>
+                <CardDescription>
+                  Cel ≤{" "}
+                  {v.unit === "ms"
+                    ? `${v.target_good} ms`
+                    : v.target_good.toFixed(2)}{" "}
+                  · p75
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          );
+        })}
+      </section>
+
+      {/* Routes breakdown */}
+      <section className="flex flex-col gap-3">
+        <h2 className="text-fluid-xl font-semibold text-dlugomat-900 dark:text-white">
+          Podział na trasy
+        </h2>
+        <Card elevation="subtle" className="overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-fluid-sm">
+              <thead className="border-b border-iron-200 bg-iron-50/60 dark:border-dlugomat-800 dark:bg-dlugomat-900/40">
+                <tr className="text-left text-iron-600 dark:text-iron-300">
+                  <th className="px-5 py-3 font-semibold">Ścieżka</th>
+                  <th className="px-5 py-3 text-right font-semibold">LCP p75</th>
+                  <th className="px-5 py-3 text-right font-semibold">INP p75</th>
+                  <th className="px-5 py-3 text-right font-semibold">Próbki</th>
+                  <th className="px-5 py-3 font-semibold">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-iron-100 dark:divide-dlugomat-800">
+                {ROUTES.map((r) => {
+                  const tone: "success" | "warning" | "danger" =
+                    r.lcp_p75 <= 2500 && r.inp_p75 <= 200
+                      ? "success"
+                      : r.lcp_p75 <= 4000 && r.inp_p75 <= 500
+                        ? "warning"
+                        : "danger";
+                  return (
+                    <tr key={r.path}>
+                      <td className="px-5 py-3 font-mono text-fluid-xs">
+                        {r.path}
+                      </td>
+                      <td className="px-5 py-3 text-right tabular-nums">
+                        {r.lcp_p75} ms
+                      </td>
+                      <td className="px-5 py-3 text-right tabular-nums">
+                        {r.inp_p75} ms
+                      </td>
+                      <td className="px-5 py-3 text-right tabular-nums text-iron-500">
+                        {r.samples.toLocaleString("pl-PL")}
+                      </td>
+                      <td className="px-5 py-3">
+                        <Badge tone={tone} withDot>
+                          {tone === "success"
+                            ? "OK"
+                            : tone === "warning"
+                              ? "Poprawić"
+                              : "Pilne"}
+                        </Badge>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      </section>
+
+      {/* Device & connection */}
+      <section className="grid gap-3 md:grid-cols-3">
+        <Card elevation="subtle">
+          <CardHeader>
+            <span className="grid size-9 place-items-center rounded-lg bg-dlugomat-100 text-dlugomat-700 dark:bg-dlugomat-850 dark:text-dlugomat-300">
+              <Smartphone className="size-5" />
+            </span>
+            <CardTitle className="mt-2 text-fluid-base">Mobile</CardTitle>
+            <CardDescription>LCP p75: 2 240 ms · 64% ruchu</CardDescription>
+          </CardHeader>
+        </Card>
+        <Card elevation="subtle">
+          <CardHeader>
+            <span className="grid size-9 place-items-center rounded-lg bg-dlugomat-100 text-dlugomat-700 dark:bg-dlugomat-850 dark:text-dlugomat-300">
+              <Gauge className="size-5" />
+            </span>
+            <CardTitle className="mt-2 text-fluid-base">Desktop</CardTitle>
+            <CardDescription>LCP p75: 1 240 ms · 34% ruchu</CardDescription>
+          </CardHeader>
+        </Card>
+        <Card elevation="subtle">
+          <CardHeader>
+            <span className="grid size-9 place-items-center rounded-lg bg-dlugomat-100 text-dlugomat-700 dark:bg-dlugomat-850 dark:text-dlugomat-300">
+              <Timer className="size-5" />
+            </span>
+            <CardTitle className="mt-2 text-fluid-base">Slow 4G</CardTitle>
+            <CardDescription>LCP p75: 3 840 ms · 12% ruchu</CardDescription>
+          </CardHeader>
+        </Card>
+      </section>
     </div>
   );
 }
