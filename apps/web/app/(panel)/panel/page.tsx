@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Surface } from "@/components/ui/surface";
 import { Divider } from "@/components/ui/divider";
 import { EmptyState } from "@/components/ui/empty-state";
+import { Eyebrow, Heading, Text, Stat } from "@/components/ui/typography";
 import {
   listCasesForCurrentUser,
   listDeadlinesForCurrentUser,
@@ -30,19 +31,17 @@ import type { CaseStatus } from "@/lib/db/types";
 export const metadata: Metadata = { title: "Pulpit · Długomat" };
 
 /**
- * Pulpit użytkownika v2 (Tarcza Premium).
+ * Pulpit v3 — Tarcza "Stoic".
  *
- * Stary dashboard miał 3 quick-actions które dublowały sidebar i jeden CTA
- * prowadzący w to samo miejsce ("/panel/sprawy/nowa") z trzech kart. Nowy
- * dashboard skupia się na CO TERAZ:
- *
- *   1. Hero strip — przywitanie + 1 dominujący CTA bazujący na stanie
- *      (jeśli 0 spraw → "Zeskanuj nakaz"; jeśli >0 → "Otwórz najpilniejszą")
- *   2. Stat tiles — 4 liczby pokazujące postępy (sprawy aktywne, terminy w 7 dni,
- *      pisma w generowaniu, oszczędność vs prawnik)
- *   3. Najpilniejsze terminy — z urgency, tabular-nums, link wprost do sprawy
- *   4. Ostatnie sprawy — z modułem i timestampem
- *   5. Rekomendacje AI — co warto sprawdzić (BIK, plan spłaty)
+ * Vs v2:
+ *  - Wszystkie typography przez primitivy (Eyebrow/Heading/Text/Stat).
+ *  - Container/max-w przeniesione do layout (panel/layout.tsx + app-shell main),
+ *    page renderuje tylko treść — eliminuje ad-hoc max-w-[1120px].
+ *  - Stat primitive zamiast lokalnego StatTile helper (codeshare z TrustBar).
+ *  - Surface flat zamiast custom rounded-lg border iron-* — true ink.
+ *  - Tighter gap-8 zamiast gap-10 (8pt grid), tighter list gap-1.5.
+ *  - Hero strip — Eyebrow "Pulpit" + Heading level=1 (3xl/4xl) + Text base.
+ *  - Reco cards w Surface interactive — same primitive co landing modules.
  */
 
 export default async function PanelHomePage() {
@@ -60,31 +59,28 @@ export default async function PanelHomePage() {
   });
   const generatingCount = cases.filter((c) => c.status === "analysis" || c.status === "generated")
     .length;
-  // Oszczędność = liczba spraw × 2500 PLN (mediana ceny sprzeciwu w kancelarii)
   const savingsPln = cases.length * 2500;
 
   const heroCta = cases.length === 0
-    ? { href: "/panel/skaner", label: "Zeskanuj nakaz", icon: ScanLine, note: "darmowe, 2 minuty" }
+    ? { href: "/panel/skaner", label: "Zeskanuj nakaz", icon: ScanLine }
     : upcomingDeadlines.length > 0
-      ? { href: `/panel/sprawa/${upcomingDeadlines[0].case_id}`, label: "Otwórz najpilniejszą sprawę", icon: ArrowRight, note: `${upcomingDeadlines[0].description} · ${daysUntil(upcomingDeadlines[0].deadline_date)} dni` }
-      : { href: "/panel/sprawy/nowa", label: "Nowa sprawa", icon: Sparkles, note: "wybierz moduł i rozpocznij" };
+      ? { href: `/panel/sprawa/${upcomingDeadlines[0].case_id}`, label: "Otwórz najpilniejszą", icon: ArrowRight }
+      : { href: "/panel/sprawy/nowa", label: "Nowa sprawa", icon: Sparkles };
 
   return (
-    <div className="mx-auto flex max-w-[1120px] flex-col gap-10">
+    <div className="flex flex-col gap-8">
       {/* --- HERO STRIP --- */}
-      <header className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+      <header className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div className="flex flex-col gap-2">
-          <p className="text-fluid-xs font-semibold uppercase tracking-[0.18em] text-dlugomat-600 dark:text-dlugomat-300">
-            Pulpit
-          </p>
-          <h1 className="font-display text-fluid-4xl font-semibold tracking-tight text-iron-900 dark:text-white">
-            Witaj w Długomacie
-          </h1>
-          <p className="text-fluid-base text-iron-600 dark:text-iron-300">
+          <Eyebrow tone="brand">Pulpit</Eyebrow>
+          <Heading level={1} as="h1">
+            Witaj w&nbsp;Długomacie
+          </Heading>
+          <Text size="base" tone="muted" className="max-w-[60ch]">
             {cases.length === 0
               ? "Zacznij od skanu nakazu — sprawdzimy przedawnienie i podpowiemy następny krok."
               : `Masz ${activeCases.length} ${activeCases.length === 1 ? "aktywną sprawę" : "aktywne sprawy"}. ${upcomingDeadlines.length > 0 ? `${upcomingDeadlines.length} ${upcomingDeadlines.length === 1 ? "termin" : "terminy"} w najbliższych 7 dniach.` : "Brak pilnych terminów."}`}
-          </p>
+          </Text>
         </div>
 
         <Button asChild size="lg" className="self-start lg:self-auto">
@@ -95,54 +91,68 @@ export default async function PanelHomePage() {
         </Button>
       </header>
 
-      {/* --- STAT TILES --- */}
-      <dl className="grid divide-iron-200 rounded-lg border border-iron-200/80 bg-card sm:grid-cols-2 sm:divide-x lg:grid-cols-4 dark:divide-iron-800 dark:border-iron-800/60">
-        <StatTile
-          icon={FileText}
-          label="Sprawy aktywne"
-          value={String(activeCases.length)}
-          note={cases.length === 0 ? "Brak — zacznij od skanu" : `z ${cases.length} łącznie`}
-          tone="info"
-        />
-        <StatTile
-          icon={CalendarClock}
-          label="Terminy w 7 dniach"
-          value={String(upcomingDeadlines.length)}
-          note={upcomingDeadlines.length > 0 ? "Otwórz w kalendarzu" : "Wszystko pod kontrolą"}
-          tone={upcomingDeadlines.length > 2 ? "danger" : upcomingDeadlines.length > 0 ? "warning" : "success"}
-        />
-        <StatTile
-          icon={Sparkles}
-          label="Pisma w generowaniu"
-          value={String(generatingCount)}
-          note="AI pracuje w tle"
-          tone="info"
-        />
-        <StatTile
-          icon={TrendingUp}
-          label="Oszczędność"
-          value={`${(savingsPln / 1000).toFixed(1)} k PLN`}
-          note="vs. kancelaria (mediana 2 500 PLN/pismo)"
-          tone="success"
-        />
-      </dl>
+      {/* --- STAT TILES — używają Stat primitive --- */}
+      <Surface
+        elevation="raised"
+        padded="none"
+        className="grid divide-ink-200 sm:grid-cols-2 sm:divide-x lg:grid-cols-4 dark:divide-ink-200"
+      >
+        <div className="p-5">
+          <Stat
+            size="md"
+            icon={<FileText className="size-3.5" aria-hidden />}
+            label="Sprawy aktywne"
+            value={String(activeCases.length)}
+            hint={cases.length === 0 ? "Brak — zacznij od skanu" : `z ${cases.length} łącznie`}
+            tone="default"
+          />
+        </div>
+        <div className="p-5">
+          <Stat
+            size="md"
+            icon={<CalendarClock className="size-3.5" aria-hidden />}
+            label="Terminy w 7 dniach"
+            value={String(upcomingDeadlines.length)}
+            hint={upcomingDeadlines.length > 0 ? "Otwórz w kalendarzu" : "Wszystko pod kontrolą"}
+            tone={upcomingDeadlines.length > 2 ? "danger" : upcomingDeadlines.length > 0 ? "warning" : "success"}
+          />
+        </div>
+        <div className="p-5">
+          <Stat
+            size="md"
+            icon={<Sparkles className="size-3.5" aria-hidden />}
+            label="Pisma w generowaniu"
+            value={String(generatingCount)}
+            hint="AI pracuje w tle"
+            tone="brand"
+          />
+        </div>
+        <div className="p-5">
+          <Stat
+            size="md"
+            icon={<TrendingUp className="size-3.5" aria-hidden />}
+            label="Oszczędność"
+            value={`${(savingsPln / 1000).toFixed(1)} k`}
+            hint="vs. kancelaria (2 500 PLN/pismo)"
+            tone="success"
+          />
+        </div>
+      </Surface>
 
       {/* --- DEADLINES + RECENT CASES (two columns) --- */}
-      <div className="grid gap-8 lg:grid-cols-[1.05fr_1fr]">
+      <div className="grid gap-6 lg:grid-cols-[1.05fr_1fr]">
         {/* Pilne terminy */}
         <section aria-labelledby="upcoming-deadlines" className="flex flex-col gap-3">
           <div className="flex items-baseline justify-between">
-            <h2
-              id="upcoming-deadlines"
-              className="font-display text-fluid-xl font-semibold text-iron-900 dark:text-white"
-            >
+            <Heading level={2} id="upcoming-deadlines" as="h2">
               Nadchodzące terminy
-            </h2>
+            </Heading>
             <Link
               href="/panel/kalendarz"
-              className="text-fluid-sm font-medium text-dlugomat-700 hover:underline dark:text-dlugomat-300"
+              className="inline-flex items-center gap-1 text-sm font-semibold text-dlugomat-700 hover:underline dark:text-dlugomat-300"
             >
-              Kalendarz →
+              Kalendarz
+              <ArrowRight className="size-3" aria-hidden />
             </Link>
           </div>
 
@@ -155,7 +165,7 @@ export default async function PanelHomePage() {
               />
             </Surface>
           ) : (
-            <ul className="flex flex-col gap-2">
+            <ul className="flex flex-col gap-1.5">
               {deadlines.slice(0, 5).map((d) => {
                 const days = daysUntil(d.deadline_date);
                 const tone =
@@ -164,21 +174,21 @@ export default async function PanelHomePage() {
                   <li key={d.id}>
                     <Link
                       href={`/panel/sprawa/${d.case_id}`}
-                      className="group flex items-center justify-between gap-3 rounded-lg border border-iron-200/80 bg-card p-3.5 transition-colors hover:border-dlugomat-300 hover:bg-iron-50/60 dark:border-iron-800/60 dark:hover:border-dlugomat-700 dark:hover:bg-dlugomat-900/60"
+                      className="group flex items-center justify-between gap-3 rounded-md border border-ink-200 bg-card p-3 transition-colors hover:border-ink-300 hover:bg-ink-50 dark:border-ink-200 dark:hover:bg-dlugomat-900/60"
                     >
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-fluid-sm font-medium text-iron-900 dark:text-iron-50">
+                        <Text size="sm" tone="strong" weight="medium" as="div" className="truncate">
                           {d.description}
-                        </p>
-                        <p className="text-fluid-xs text-iron-500">
+                        </Text>
+                        <Text size="xs" tone="muted" as="div">
                           {formatDatePL(new Date(d.deadline_date))}
-                        </p>
+                        </Text>
                       </div>
-                      <Badge tone={tone} withDot className="shrink-0 tabular-nums">
+                      <Badge tone={tone} className="shrink-0 tabular-nums">
                         {days <= 0 ? "po terminie" : days === 1 ? "1 dzień" : `${days} dni`}
                       </Badge>
                       <ArrowRight
-                        className="size-4 shrink-0 text-iron-400 transition-colors group-hover:text-dlugomat-600"
+                        className="size-3.5 shrink-0 text-ink-400 transition-colors group-hover:text-dlugomat-700"
                         aria-hidden
                       />
                     </Link>
@@ -192,17 +202,15 @@ export default async function PanelHomePage() {
         {/* Ostatnie sprawy */}
         <section aria-labelledby="recent-cases" className="flex flex-col gap-3">
           <div className="flex items-baseline justify-between">
-            <h2
-              id="recent-cases"
-              className="font-display text-fluid-xl font-semibold text-iron-900 dark:text-white"
-            >
+            <Heading level={2} id="recent-cases" as="h2">
               Twoje sprawy
-            </h2>
+            </Heading>
             <Link
               href="/panel/sprawy"
-              className="text-fluid-sm font-medium text-dlugomat-700 hover:underline dark:text-dlugomat-300"
+              className="inline-flex items-center gap-1 text-sm font-semibold text-dlugomat-700 hover:underline dark:text-dlugomat-300"
             >
-              Wszystkie →
+              Wszystkie
+              <ArrowRight className="size-3" aria-hidden />
             </Link>
           </div>
 
@@ -220,22 +228,22 @@ export default async function PanelHomePage() {
               />
             </Surface>
           ) : (
-            <ul className="flex flex-col gap-2">
+            <ul className="flex flex-col gap-1.5">
               {cases.slice(0, 5).map((c) => {
                 const meta = caseTypeMeta[c.type];
                 return (
                   <li key={c.id}>
                     <Link
                       href={`/panel/sprawa/${c.id}`}
-                      className="group flex items-center justify-between gap-3 rounded-lg border border-iron-200/80 bg-card p-3.5 transition-colors hover:border-dlugomat-300 hover:bg-iron-50/60 dark:border-iron-800/60 dark:hover:border-dlugomat-700 dark:hover:bg-dlugomat-900/60"
+                      className="group flex items-center justify-between gap-3 rounded-md border border-ink-200 bg-card p-3 transition-colors hover:border-ink-300 hover:bg-ink-50 dark:border-ink-200 dark:hover:bg-dlugomat-900/60"
                     >
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-fluid-sm font-medium text-iron-900 dark:text-iron-50">
+                        <Text size="sm" tone="strong" weight="medium" as="div" className="truncate">
                           {c.title}
-                        </p>
-                        <p className="text-fluid-xs text-iron-500">
+                        </Text>
+                        <Text size="xs" tone="muted" as="div">
                           {meta.module} · {formatDateTimePL(new Date(c.updated_at))}
-                        </p>
+                        </Text>
                       </div>
                       <Badge tone={statusToTone(c.status)} className="shrink-0">
                         {caseStatusLabel[c.status]}
@@ -252,19 +260,18 @@ export default async function PanelHomePage() {
       <Divider />
 
       {/* --- AI RECOMMENDATIONS --- */}
-      <section aria-labelledby="ai-recos" className="flex flex-col gap-3">
-        <div className="flex items-center gap-2">
-          <Sparkles className="size-4 text-dlugomat-600 dark:text-dlugomat-300" aria-hidden />
-          <h2
-            id="ai-recos"
-            className="font-display text-fluid-xl font-semibold text-iron-900 dark:text-white"
-          >
+      <section aria-labelledby="ai-recos" className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1">
+          <Eyebrow tone="brand" withDot>
             Rekomendacje AI
-          </h2>
+          </Eyebrow>
+          <Heading level={2} id="ai-recos" as="h2">
+            Co warto sprawdzić dalej
+          </Heading>
+          <Text size="sm" tone="muted">
+            Sugestie na podstawie Twojej sytuacji. Każda akcja jest opcjonalna.
+          </Text>
         </div>
-        <p className="text-fluid-sm text-iron-500">
-          Sugestie na podstawie Twojej sytuacji. Każda akcja jest opcjonalna.
-        </p>
         <div className="grid gap-3 md:grid-cols-3">
           <RecoCard
             icon={ShieldCheck}
@@ -284,7 +291,7 @@ export default async function PanelHomePage() {
             icon={FileText}
             href="/panel/baza-orzecznicza"
             title="Baza wiedzy"
-            description="14 najnowszych wyroków SN dotyczących przedawnienia roszczeń konsumenckich."
+            description="14 najnowszych wyroków SN dotyczących przedawnienia roszczeń."
             cta="Czytaj"
           />
         </div>
@@ -297,39 +304,6 @@ export default async function PanelHomePage() {
 // Helpers
 // =========================================================================
 
-interface StatTileProps {
-  icon: React.ComponentType<{ className?: string }>;
-  label: string;
-  value: string;
-  note: string;
-  tone: "info" | "success" | "warning" | "danger";
-}
-
-function StatTile({ icon: Icon, label, value, note, tone }: StatTileProps) {
-  const toneClasses: Record<StatTileProps["tone"], string> = {
-    info: "text-dlugomat-700 dark:text-dlugomat-300",
-    success: "text-accent-700 dark:text-accent-300",
-    warning: "text-warn-600 dark:text-warn-500",
-    danger: "text-danger-600 dark:text-danger-500",
-  };
-  return (
-    <div className="flex flex-col gap-2 p-5">
-      <div className="flex items-center gap-2">
-        <Icon className={`size-4 ${toneClasses[tone]}`} aria-hidden />
-        <dt className="text-fluid-xs font-medium uppercase tracking-wider text-iron-500">
-          {label}
-        </dt>
-      </div>
-      <dd>
-        <p className="font-display text-fluid-3xl font-semibold tabular-nums text-iron-900 dark:text-white">
-          {value}
-        </p>
-        <p className="mt-0.5 text-fluid-xs text-iron-500 dark:text-iron-400">{note}</p>
-      </dd>
-    </div>
-  );
-}
-
 function RecoCard({
   icon: Icon,
   href,
@@ -337,29 +311,38 @@ function RecoCard({
   description,
   cta,
 }: {
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   href: string;
   title: string;
   description: string;
   cta: string;
 }) {
   return (
-    <Surface elevation="flat" padded="md" interactive className="flex h-full flex-col gap-3">
-      <span className="grid size-9 place-items-center rounded-md bg-dlugomat-100 text-dlugomat-700 dark:bg-dlugomat-850 dark:text-dlugomat-200">
-        <Icon className="size-4" aria-hidden />
-      </span>
-      <div className="flex flex-1 flex-col">
-        <h3 className="text-fluid-base font-semibold text-iron-900 dark:text-iron-50">{title}</h3>
-        <p className="mt-1 text-fluid-sm text-iron-600 dark:text-iron-300">{description}</p>
-      </div>
-      <Link
-        href={href}
-        className="inline-flex items-center gap-1 text-fluid-sm font-semibold text-dlugomat-700 hover:underline dark:text-dlugomat-300"
-      >
-        {cta}
-        <ArrowRight className="size-3.5" aria-hidden />
-      </Link>
-    </Surface>
+    <Link
+      href={href}
+      className="group block h-full rounded-md focus-visible:shadow-shield-focus focus-visible:outline-none"
+    >
+      <Surface elevation="flat" padded="md" interactive className="flex h-full flex-col gap-3">
+        <span className="grid size-8 place-items-center rounded bg-dlugomat-100 text-dlugomat-700 dark:bg-dlugomat-850 dark:text-dlugomat-200">
+          <Icon className="size-4" aria-hidden />
+        </span>
+        <div className="flex flex-1 flex-col gap-1">
+          <Heading level={3} as="h3">
+            {title}
+          </Heading>
+          <Text size="sm" tone="muted">
+            {description}
+          </Text>
+        </div>
+        <span className="mt-1 inline-flex items-center gap-1 text-sm font-semibold text-dlugomat-700 dark:text-dlugomat-300">
+          {cta}
+          <ArrowRight
+            className="size-3.5 transition-transform group-hover:translate-x-0.5"
+            aria-hidden
+          />
+        </span>
+      </Surface>
+    </Link>
   );
 }
 

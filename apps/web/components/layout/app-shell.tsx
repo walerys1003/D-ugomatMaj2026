@@ -141,7 +141,7 @@ export function AppShell({ user, children }: AppShellProps) {
   }, [pathname]);
 
   return (
-    <div className="flex min-h-screen w-full bg-iron-50/60 dark:bg-dlugomat-950">
+    <div className="flex min-h-screen w-full bg-ink-50 dark:bg-dlugomat-950">
       <a href="#main-content" className="sr-only sr-focusable">
         Przejdź do treści
       </a>
@@ -157,15 +157,15 @@ export function AppShell({ user, children }: AppShellProps) {
 
         {mobileNav ? (
           <div
-            className="lg:hidden fixed inset-0 z-50 bg-dlugomat-950/60 backdrop-blur-sm"
+            className="lg:hidden fixed inset-0 z-50 bg-ink-950/70 backdrop-blur-sm"
             onClick={() => setMobileNav(false)}
             aria-hidden
           >
             <div
-              className="absolute inset-y-0 left-0 flex w-72 max-w-[85%] flex-col bg-dlugomat-900 shadow-pop"
+              className="absolute inset-y-0 left-0 flex w-72 max-w-[85%] flex-col bg-dlugomat-900 shadow-xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-center justify-between border-b border-dlugomat-800 px-4 py-3">
+              <div className="flex h-header items-center justify-between border-b border-dlugomat-800 px-4">
                 <Logo className="text-white" />
                 <Button
                   variant="ghost"
@@ -182,8 +182,12 @@ export function AppShell({ user, children }: AppShellProps) {
           </div>
         ) : null}
 
-        <main id="main-content" className="flex-1 px-4 py-6 sm:px-6 lg:px-8">
-          {children}
+        {/* v3: main content z explicit max-w + ink-50 tło, padding 24/32/40 */}
+        <main
+          id="main-content"
+          className="flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10"
+        >
+          <div className="mx-auto w-full max-w-[1320px]">{children}</div>
         </main>
       </div>
     </div>
@@ -194,20 +198,20 @@ function Sidebar({ pathname }: { pathname: string }) {
   return (
     <aside
       aria-label="Nawigacja boczna"
-      className="hidden w-64 shrink-0 flex-col border-r border-dlugomat-800/80 bg-dlugomat-900 text-iron-200 lg:flex"
+      className="hidden w-sidebar shrink-0 flex-col border-r border-dlugomat-800/80 bg-dlugomat-900 text-ink-700 lg:flex"
     >
-      <div className="flex h-16 items-center px-6">
-        <Link href="/panel" className="rounded-md focus-visible:shadow-shield-focus">
+      <div className="flex h-header items-center px-5">
+        <Link href="/panel" className="rounded-sm focus-visible:shadow-shield-focus">
           <Logo className="text-white" />
         </Link>
       </div>
       <SidebarNav pathname={pathname} />
       <div className="mt-auto border-t border-dlugomat-800/60 p-4">
-        <p className="text-fluid-xs font-semibold uppercase tracking-[0.14em] text-iron-400">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-500">
           Wsparcie
         </p>
-        <p className="mt-1 text-fluid-xs text-iron-300">pomoc@dlugomat.pl</p>
-        <p className="mt-0.5 text-fluid-xs text-iron-500">Pon–Pt · 9:00–17:00</p>
+        <p className="mt-1 text-xs text-ink-600">pomoc@dlugomat.pl</p>
+        <p className="mt-0.5 text-xs text-ink-500">Pon–Pt · 9:00–17:00</p>
       </div>
     </aside>
   );
@@ -215,10 +219,10 @@ function Sidebar({ pathname }: { pathname: string }) {
 
 function SidebarNav({ pathname }: { pathname: string }) {
   return (
-    <nav className="flex flex-1 flex-col gap-5 overflow-y-auto px-3 py-4">
+    <nav className="flex flex-1 flex-col gap-4 overflow-y-auto px-2.5 py-4">
       {NAV_GROUPS.map((group) => (
         <div key={group.id} className="flex flex-col gap-0.5">
-          <p className="px-3 pb-1 text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-iron-500">
+          <p className="px-2.5 pb-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-ink-500">
             {group.label}
           </p>
           {group.items.map((item) => (
@@ -242,17 +246,18 @@ function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
       href={item.href}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "group relative flex items-center gap-3 rounded-md px-3 py-2",
-        "text-fluid-sm font-medium transition-colors duration-base ease-shield-out",
+        // v3: tighter (h-8 vs poprzednie h-10), rounded sm, font-medium 13px
+        "group relative flex h-8 items-center gap-2.5 rounded-sm px-2.5",
+        "text-[13px] font-medium leading-none transition-colors duration-100 ease-out",
         "focus-visible:shadow-shield-focus focus-visible:outline-none",
         active
-          ? "bg-dlugomat-700/90 text-white shadow-subtle"
-          : "text-iron-300 hover:bg-dlugomat-850/70 hover:text-white"
+          ? "bg-dlugomat-700 text-white shadow-[inset_0_0_0_1px_hsl(var(--dlugomat-500)/0.40)]"
+          : "text-ink-700 hover:bg-dlugomat-850/60 hover:text-white"
       )}
     >
       <Icon
         className={cn(
-          "size-4 shrink-0",
+          "size-3.5 shrink-0",
           active ? "text-white" : "text-dlugomat-300 group-hover:text-white"
         )}
         aria-hidden
@@ -261,7 +266,7 @@ function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
       {item.pill ? (
         <span
           className={cn(
-            "rounded-sm px-1.5 py-0.5 text-[0.5625rem] font-bold tracking-wider",
+            "rounded-xs px-1 py-px text-[9px] font-bold leading-none tracking-wider",
             item.pill === "AI" && "bg-accent-500/20 text-accent-300",
             item.pill === "PRO" && "bg-warn-500/20 text-warn-100",
             item.pill === "BETA" && "bg-dlugomat-500/30 text-dlugomat-100"
@@ -286,7 +291,7 @@ function Topbar({
   const initials = (user?.name || user?.email || "?").trim().slice(0, 1).toUpperCase();
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-iron-200/80 bg-background/90 px-4 backdrop-blur-md dark:border-dlugomat-800/60 dark:bg-dlugomat-950/90 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-30 flex h-header items-center gap-3 border-b border-ink-200 bg-background/80 px-4 backdrop-blur-xl backdrop-saturate-150 dark:border-dlugomat-800/80 dark:bg-dlugomat-950/80 sm:px-6 lg:px-8">
       <Button
         variant="ghost"
         size="icon"
@@ -298,29 +303,28 @@ function Topbar({
         <Menu className="size-5" />
       </Button>
 
-      {/* Search z hint na shortcut — premium SaaS standard */}
+      {/* Search z hint na shortcut — Linear-grade dense input */}
       <div className="hidden flex-1 max-w-md md:flex">
         <label htmlFor="topbar-search" className="sr-only">
           Szukaj
         </label>
         <div className="relative w-full">
-          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-iron-400" aria-hidden />
+          <Search className="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-ink-400" aria-hidden />
           <Input
             id="topbar-search"
             type="search"
             placeholder="Szukaj sprawy, pisma, terminu…"
-            className="pl-9 pr-16"
+            className="h-8 pl-8 pr-14 text-sm"
           />
           <span className="pointer-events-none absolute right-2 top-1/2 hidden -translate-y-1/2 items-center gap-1 md:inline-flex">
-            <Kbd>⌘</Kbd>
-            <Kbd>K</Kbd>
+            <Kbd>⌘K</Kbd>
           </span>
         </div>
       </div>
 
-      <div className="ml-auto flex items-center gap-1.5">
+      <div className="ml-auto flex items-center gap-1">
         <Button variant="ghost" size="icon" aria-label="Powiadomienia">
-          <Bell className="size-5" />
+          <Bell className="size-4" />
         </Button>
         <ThemeToggle />
         <DropdownMenu>
@@ -329,37 +333,37 @@ function Topbar({
               variant="ghost"
               size="icon"
               aria-label="Menu użytkownika"
-              className="bg-dlugomat-100 text-dlugomat-800 hover:bg-dlugomat-200 dark:bg-dlugomat-800 dark:text-iron-100"
+              className="ml-1 size-8 rounded-full bg-dlugomat-100 text-dlugomat-800 hover:bg-dlugomat-200 dark:bg-dlugomat-800 dark:text-ink-800"
             >
-              <span className="text-fluid-sm font-semibold">{initials}</span>
+              <span className="text-xs font-semibold">{initials}</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel className="flex flex-col">
-              <span className="text-fluid-sm font-medium text-iron-900 dark:text-iron-50">
+              <span className="text-sm font-medium text-ink-900 dark:text-white">
                 {user?.name ?? "Użytkownik"}
               </span>
               {user?.email ? (
-                <span className="text-fluid-xs text-iron-500">{user.email}</span>
+                <span className="text-xs text-ink-500">{user.email}</span>
               ) : null}
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
               <Link href="/panel/profil" className="flex items-center justify-between">
                 <span>Profil</span>
-                <ChevronRight className="size-3.5 text-iron-400" aria-hidden />
+                <ChevronRight className="size-3.5 text-ink-400" aria-hidden />
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link href="/panel/ustawienia" className="flex items-center justify-between">
                 <span>Ustawienia</span>
-                <ChevronRight className="size-3.5 text-iron-400" aria-hidden />
+                <ChevronRight className="size-3.5 text-ink-400" aria-hidden />
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link href="/panel/eksport" className="flex items-center justify-between">
                 <span>Eksport danych (RODO)</span>
-                <ChevronRight className="size-3.5 text-iron-400" aria-hidden />
+                <ChevronRight className="size-3.5 text-ink-400" aria-hidden />
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
