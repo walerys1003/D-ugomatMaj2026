@@ -133,6 +133,10 @@ const config: Config = {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
         serif: ["var(--font-serif)", "Georgia", "serif"],
         mono: ["var(--font-mono)", "ui-monospace", "monospace"],
+        // `display` to alias dla nagłówków hero/H1/H2 — Inter w tej samej
+        // rodzinie co sans, ale z osobnym tokenem żeby designer mógł kiedyś
+        // podmienić na display-font (np. Söhne, Geist) bez refaktoru JSX.
+        display: ["var(--font-sans)", "system-ui", "sans-serif"],
       },
       fontSize: {
         // Fluid type scale (clamp): brand spec §3.3.2.

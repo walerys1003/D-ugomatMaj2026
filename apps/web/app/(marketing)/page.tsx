@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Hero } from "@/components/landing/hero";
-import { SocialProof } from "@/components/landing/social-proof";
+import { AIShowcase } from "@/components/landing/ai-showcase";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { ModulesGrid } from "@/components/landing/modules";
+import { TrustBar } from "@/components/landing/trust-bar";
 import { PricingTeaser } from "@/components/landing/pricing-teaser";
 import { FAQ, faqJsonLd } from "@/components/landing/faq";
 import { CtaBand } from "@/components/landing/cta-band";
@@ -51,10 +52,22 @@ export default function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd()) }}
       />
 
+      {/*
+        Nowa kolejność landingu (Tarcza v2):
+        1. Hero            — propozycja wartości + dwa CTA
+        2. AIShowcase      — KONKRETNIE jak działa AI (dokument → analiza → pismo)
+        3. HowItWorks      — proces w 3 krokach (ogólny)
+        4. ModulesGrid     — 8 modułów D1–D8 z cenami
+        5. TrustBar        — compliance + KPI + press (zaufanie przed cennikiem)
+        6. PricingTeaser   — plany Stripe
+        7. FAQ             — obiekcje
+        8. CtaBand         — ostatni call-to-action
+      */}
       <Hero />
-      <SocialProof />
+      <AIShowcase />
       <HowItWorks />
       <ModulesGrid />
+      <TrustBar />
       <PricingTeaser />
       <FAQ />
       <CtaBand />

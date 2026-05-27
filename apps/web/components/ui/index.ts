@@ -18,3 +18,9 @@ export * from "./accordion";
 export * from "./dropdown-menu";
 export * from "./toast";
 export * from "./icon";
+// Layout primitives (Tarcza v2)
+export * from "./container";
+export * from "./section";
+export * from "./surface";
+export * from "./kbd";
+export * from "./divider";
