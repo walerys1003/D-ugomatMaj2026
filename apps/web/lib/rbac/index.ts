@@ -177,3 +177,47 @@ export {
   AdminAccessDeniedError,
 } from "@/lib/admin/rbac";
 export type { AdminContext } from "@/lib/admin/rbac";
+
+/**
+ * Wave 8 / W8-3 — Platform admin gate for API routes.
+ *
+ * Replaces 6 inline `(user.app_metadata as ...).role === "admin"` checks
+ * scattered across admin & compliance route handlers. Returns BOTH the
+ * boolean + the `userId` (which downstream code typically needs to pass
+ * to audit-log writers, impersonation, secret-vault, etc.).
+ *
+ * Defense-in-depth: checks JWT `app_metadata.role` (synced via Supabase
+ * triggers on `profiles.role` change) AND falls back to `profiles.role`
+ * directly — so a freshly-promoted admin doesn't have to wait for token
+ * refresh.
+ *
+ * Returns:
+ *   { ok: true,  userId: "<uuid>" } — when admin
+ *   { ok: false }                   — anonymous or insufficient role
+ */
+export async function requirePlatformAdmin(): Promise<
+  { ok: true; userId: string; email: string } | { ok: false }
+> {
+  const supabase = createSupabaseServerClient();
+  const { data: userData } = await supabase.auth.getUser();
+  if (!userData?.user) return { ok: false };
+  const user = userData.user;
+
+  // 1) Fast path — JWT app_metadata.role
+  const jwtRole = (user.app_metadata as Record<string, unknown> | undefined)?.role;
+  if (jwtRole === "admin") {
+    return { ok: true, userId: user.id, email: user.email ?? "" };
+  }
+
+  // 2) Fallback — profiles.role (defense-in-depth, handles stale tokens)
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+  if ((profile as { role?: string } | null)?.role === "admin") {
+    return { ok: true, userId: user.id, email: user.email ?? "" };
+  }
+
+  return { ok: false };
+}

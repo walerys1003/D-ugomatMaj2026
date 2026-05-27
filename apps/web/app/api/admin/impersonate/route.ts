@@ -7,7 +7,7 @@
  */
 
 import { NextResponse } from "next/server";
-import { createSupabaseServerClient } from "@/lib/db/supabase-server";
+import { requirePlatformAdmin } from "@/lib/rbac";
 import {
   startImpersonation,
   listActiveImpersonations,
@@ -18,12 +18,11 @@ import {
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+// W8-3: migrated to central RBAC facade. Local wrapper preserved for
+// minimal diff at call sites + backwards-compatible return shape.
 async function getAdmin(): Promise<{ ok: boolean; userId?: string }> {
-  const supabase = await createSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { ok: false };
-  const role = (user.app_metadata as Record<string, unknown> | undefined)?.role;
-  return { ok: role === "admin", userId: user.id };
+  const r = await requirePlatformAdmin();
+  return r.ok ? { ok: true, userId: r.userId } : { ok: false };
 }
 
 export async function POST(req: Request) {
