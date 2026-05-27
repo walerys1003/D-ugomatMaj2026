@@ -52,11 +52,11 @@ export function Hero() {
         className="pointer-events-none absolute inset-0 -z-10 opacity-[0.35] [background-image:radial-gradient(hsl(0_0%_85%)_1px,transparent_1px)] [background-size:32px_32px] [mask-image:radial-gradient(ellipse_at_top,black_30%,transparent_70%)]"
       />
 
-      <div className="grid items-center gap-12 xl:grid-cols-[1.1fr_0.9fr] xl:gap-14">
+      <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12 xl:gap-16">
         {/* LEFT — Editorial copy. min-w-0 jest KLUCZOWY: bez niego Display
             headline (text-balance + tabular nums) rośnie do swojego intrinsic
-            width i przy xl: 2-col grid zjada CAŁĄ szerokość, kurcząc prawą
-            kolumnę do 0px (bug Tailwind grid items default min-width: auto). */}
+            width i zjada CAŁĄ szerokość kolumny, kurcząc prawą kolumnę
+            (bug Tailwind grid items default min-width: auto). */}
         <div className="flex min-w-0 flex-col gap-7">
           <Eyebrow tone="brand" withDot>
             AI legal-tech · zgodne z polskim prawem
@@ -65,9 +65,9 @@ export function Hero() {
           <Display
             level={1}
             id="hero-headline"
-            className="max-w-[16ch] text-balance"
+            className="max-w-[14ch] text-balance"
           >
-            Tarcza dla osób&nbsp;zadłużonych.
+            Tarcza dla&nbsp;zadłużonych.
           </Display>
 
           <Text size="lg" tone="default" className="max-w-[46ch] text-balance">
@@ -126,9 +126,8 @@ export function Hero() {
         </div>
 
         {/* RIGHT — Real product composition. min-w-0 chroni przed
-            wypychaniem grid'a przez wewnętrzną zawartość kart (Tailwind
-            grid items mają domyślnie min-width: auto).  */}
-        <div className="relative isolate min-w-0">
+            wypychaniem grid'a przez wewnętrzną zawartość kart. */}
+        <div className="min-w-0">
           <HeroArtifact />
         </div>
       </div>
@@ -145,35 +144,29 @@ export function Hero() {
  * mockup terminala. Z premium depth: floating card + ground card behind.
  */
 function HeroArtifact() {
-  // V4-ι.3 — TOTAL clipping elimination.
-  // Poniżej xl (1280px): karty w PLAIN BLOCK FLOW (flex-col), bez absolute,
-  // bez rotacji, bez stacked depth — zwyczajnie jedna pod drugą.
-  // Na xl+: 2-panel composition z absolute positioning + lekki tilt.
-  // Wrapper ma h:auto na mobile (treść decyduje), h-[560px] tylko na xl.
+  // V4-ι.6 — PEŁNY REDESIGN.
+  // Koniec z absolute positioning. Karty są zwykłymi block elementami
+  // ułożonymi pionowo (flex-col). Depth effect uzyskany przez:
+  //   - lekki tilt każdej karty w przeciwnych kierunkach (transform rotate)
+  //   - negatywny margin-top na drugiej karcie (-mt-6) → wizualne overlap
+  //   - różne elevation shadows
+  //   - z-index porządek — Scanner (primary) on top
+  // Zero overflow, zero clipping, w pełni przewidywalne na każdym viewport.
   return (
-    <div className="relative mx-auto flex w-full max-w-full flex-col gap-4 sm:max-w-[480px] xl:block xl:h-[560px] xl:max-w-none xl:gap-0">
-      {/* Background card — Sprzeciw draft.
-       *  - mobile: static block, no rotation, full column width
-       *  - xl+: absolute top-right z lekkim tiltem (depth) */}
-      <Surface
-        elevation="raised"
-        padded="none"
-        className="overflow-hidden xl:absolute xl:right-2 xl:top-10 xl:w-[80%] xl:rotate-[1.8deg]"
-      >
-        <SprzeciwCard />
-      </Surface>
+    <div className="relative mx-auto flex w-full max-w-full flex-col items-stretch sm:max-w-[460px] lg:max-w-none">
+      {/* Background card — Sprzeciw draft. Lekki tilt w prawo. */}
+      <div className="origin-top-right rotate-[1.5deg] transform-gpu">
+        <Surface elevation="raised" padded="none" className="overflow-hidden">
+          <SprzeciwCard />
+        </Surface>
+      </div>
 
-      {/* Foreground card — Scanner result.
-       *  - mobile: static block (zostaje na -order-1 żeby Scanner był na górze
-       *    jako primary artifact)
-       *  - xl+: absolute bottom-left z odwrotnym tiltem */}
-      <Surface
-        elevation="floating"
-        padded="none"
-        className="-order-1 overflow-hidden xl:order-none xl:absolute xl:-bottom-2 xl:left-0 xl:w-[86%] xl:-rotate-[1deg]"
-      >
-        <ScannerCard />
-      </Surface>
+      {/* Foreground card — Scanner result. Lekki tilt w lewo + overlap. */}
+      <div className="relative z-10 -mt-6 origin-bottom-left -rotate-[1deg] transform-gpu">
+        <Surface elevation="floating" padded="none" className="overflow-hidden">
+          <ScannerCard />
+        </Surface>
+      </div>
     </div>
   );
 }

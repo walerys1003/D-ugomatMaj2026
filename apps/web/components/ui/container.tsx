@@ -19,11 +19,13 @@ import { cn } from "@/lib/utils";
 export type ContainerWidth = "sm" | "md" | "lg" | "xl";
 
 const WIDTH: Record<ContainerWidth, string> = {
-  // v3 — adopted from Linear/Vercel/Anthropic measurement.
-  sm: "max-w-[720px]",    // long-form (poprz. max-w-3xl ≈ 768)
-  md: "max-w-[1080px]",   // panel content (tighter than v2 1120)
-  lg: "max-w-[1200px]",   // landing default — Linear value
-  xl: "max-w-[1320px]",   // dashboard z gridem 12 — Stripe value
+  // v4-ι.6 — szerszy "lg" (landing) i mniejszy padding poziomy:
+  // landing teraz 1400px (z 1200) → po 1.2× root font scale realna treść
+  // mieści się komfortowo bez utraty rytmu kolumn.
+  sm: "max-w-[720px]",    // long-form
+  md: "max-w-[1080px]",   // panel content
+  lg: "max-w-[1400px]",   // landing default — szersze niż Linear (1200), bliżej Stripe (1280)
+  xl: "max-w-[1480px]",   // dashboard / wide canvas
 };
 
 export interface ContainerProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -36,7 +38,13 @@ export const Container = React.forwardRef<HTMLDivElement, ContainerProps>(
     return (
       <Component
         ref={ref}
-        className={cn("mx-auto w-full px-4 sm:px-6 lg:px-8", WIDTH[width], className)}
+        className={cn(
+          // Mniejszy padding poziomy: px-4 mobile (16px), sm:px-5 (20px), lg:px-6 (24px)
+          // zamiast wcześniejszego px-4/sm:px-6/lg:px-8 (16/24/32).
+          "mx-auto w-full px-4 sm:px-5 lg:px-6",
+          WIDTH[width],
+          className
+        )}
         {...props}
       />
     );
