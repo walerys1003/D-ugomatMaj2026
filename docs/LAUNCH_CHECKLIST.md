@@ -112,6 +112,45 @@ Lista kontrolna do uruchomienia produkcyjnego. Każdy punkt MUSI być zaznaczony
 - [ ] Usunięcie konta (art. 17 RODO) — testowy run (z anonimizacją)
 - [ ] Zgody marketingowe rozłączne od regulaminu
 
+## 9.5. Radca prawny — zgoda + aktywacja flagi (BLOCKING)
+
+Komponenty landing (`trust-bar.tsx` + `cta-band.tsx`) używają feature
+flag `NEXT_PUBLIC_RADCA_ENABLED`. Domyślnie WYŁĄCZONA → fallback
+"Współpraca w przygotowaniu". Pełny runbook: `docs/RADCA_CONSENT_CHECKLIST.md`.
+
+**Decyzja przed launch:**
+
+- **Wariant A — launch z radcą** (rekomendowany dla trust signal):
+  - [ ] Podpisana umowa o nadzór merytoryczny + pisemna zgoda RODO art. 6 ust. 1 lit. a
+  - [ ] Numer wpisu KIRP zweryfikowany w https://kirp.pl/szukaj-radcy/
+  - [ ] OC zawodowe radcy obejmuje współpracę z Długomat
+  - [ ] Ustawione zmienne na Vercel (production env):
+    - `NEXT_PUBLIC_RADCA_ENABLED=true`
+    - `NEXT_PUBLIC_RADCA_NAME=<imię nazwisko>`
+    - `NEXT_PUBLIC_RADCA_KIRP=<WA-XXXX / KR-XXXX / itd.>`
+    - `NEXT_PUBLIC_RADCA_SCOPE=<≤120 znaków>`
+    - `NEXT_PUBLIC_RADCA_OIRP=<nazwa OIRP>`
+    - `NEXT_PUBLIC_RADCA_INITIALS=<2 znaki>` (opcjonalne)
+  - [ ] Smoke test po deploy: `curl -s https://dlugomat.pl | grep "KIRP nr"` zwraca match
+  - [ ] Update RCP (rejestr czynności przetwarzania) — sekcja "Publikacja danych radcy"
+
+- **Wariant B — launch bez radcy** (akceptowalny dla MVP):
+  - [ ] `NEXT_PUBLIC_RADCA_ENABLED` puste lub `false` na Vercel
+  - [ ] Smoke test: `curl -s https://dlugomat.pl | grep "Współpraca z radcą prawnym"` zwraca match
+  - [ ] Brak "[Imię Nazwisko Radcy]" / "WA-XXXX" w HTML produkcji:
+    ```bash
+    curl -s https://dlugomat.pl | grep -E "Imię Nazwisko|WA-XXXX" # → 0 wyników
+    ```
+  - [ ] Polityka prywatności nie wspomina nieistniejącego radcy
+
+**Procedura cofnięcia zgody (emergency, SLA 7 dni):**
+
+- [ ] Vercel → Environment Variables → `NEXT_PUBLIC_RADCA_ENABLED=false`
+- [ ] Redeploy (~2 min)
+- [ ] Verify: `grep "KIRP nr"` na produkcji → 0 wyników
+- [ ] Email do radcy z potwierdzeniem usunięcia danych
+- [ ] Wpis do RCP — data cofnięcia zgody
+
 ## 10. Smoke testy E2E
 
 ```bash

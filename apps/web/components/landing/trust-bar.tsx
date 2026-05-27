@@ -10,6 +10,7 @@ import { Section } from "@/components/ui/section";
 import { Surface } from "@/components/ui/surface";
 import { Badge } from "@/components/ui/badge";
 import { Eyebrow, Heading, Text, Mono } from "@/components/ui/typography";
+import { getRadcaInfo } from "@/lib/features/radca-flag";
 
 /**
  * TrustBar v5 — od abstrakcyjnego "trust strip" do konkretnej historii.
@@ -94,6 +95,12 @@ const CASE_STUDIES: readonly CaseStudy[] = [
 ];
 
 export function TrustBar() {
+  // Feature flag — wyświetla dane radcy tylko gdy NEXT_PUBLIC_RADCA_ENABLED=true
+  // ORAZ wszystkie wymagane pola (NAME + KIRP) są obecne. W przeciwnym razie
+  // wyrenderowany jest neutralny fallback "Współpraca w przygotowaniu",
+  // który zachowuje layout sekcji. Patrz: docs/RADCA_CONSENT_CHECKLIST.md.
+  const radca = getRadcaInfo();
+
   return (
     <Section
       tone="default"
@@ -122,47 +129,83 @@ export function TrustBar() {
         </Text>
       </header>
 
-      {/* RADCA PRAWNY — fizyczna osoba z numerem wpisu KIRP. */}
+      {/*
+        RADCA PRAWNY — sekcja warunkowa (feature flag).
+        Layout identyczny w obu wariantach (ta sama Surface, ten sam grid),
+        żeby nie psuć kompozycji landing przy włączaniu/wyłączaniu flagi.
+
+        - radca === null  → karta "Współpraca z radcą prawnym — informacja
+                            dostępna wkrótce" (neutralna, bez fałszywych
+                            danych osobowych — zero ryzyka prawnego).
+        - radca !== null  → realne dane (imię + KIRP + scope + OIRP),
+                            wyrenderowane TYLKO gdy NEXT_PUBLIC_RADCA_ENABLED=true
+                            i wszystkie wymagane env'y są ustawione.
+      */}
       <Surface
         elevation="raised"
         padded="lg"
         className="mx-auto mt-12 max-w-3xl"
       >
         <div className="flex flex-col items-start gap-5 sm:flex-row sm:items-stretch sm:gap-7">
-          {/* Avatar — placeholder inicjały. Po deployu zastąpić <Image>. */}
+          {/* Avatar — inicjały radcy LUB neutralna ikona w fallbacku. */}
           <div
             aria-hidden
-            data-radca-placeholder
+            data-radca-placeholder={radca ? undefined : "fallback"}
             className="flex size-20 shrink-0 items-center justify-center rounded-md border border-ink-200 bg-gradient-to-br from-ink-50 to-ink-100 font-display text-2xl font-semibold text-ink-700 sm:size-24"
           >
-            AK
+            {radca ? (
+              radca.initials
+            ) : (
+              <ShieldCheck className="size-8 text-ink-400" aria-hidden />
+            )}
           </div>
 
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <Badge tone="info">
                 <ShieldCheck className="size-3" aria-hidden />
-                <span>Radca prawny — nadzór merytoryczny</span>
+                <span>
+                  {radca
+                    ? "Radca prawny — nadzór merytoryczny"
+                    : "Nadzór radcy prawnego — w przygotowaniu"}
+                </span>
               </Badge>
             </div>
-            <Heading level={3} as="h3" className="mt-3 !text-[18px]">
-              [Imię Nazwisko Radcy]
-            </Heading>
-            <Mono size="xs" tone="muted" className="mt-1 block">
-              KIRP nr WA-XXXX · Okręgowa Izba Radców Prawnych w&nbsp;Warszawie
-            </Mono>
-            <blockquote className="mt-4 border-l-2 border-ink-300 pl-4">
-              <Quote
-                className="mb-2 size-4 text-ink-400"
-                aria-hidden
-              />
-              <Text size="sm" tone="default" className="italic">
-                „Każdy szablon w Długomacie przechodzi przez moje ręce
-                co kwartał. Sprawdzam zgodność z aktualnym KPC,
-                orzecznictwem SN i&nbsp;praktyką sądów. AI generuje pismo —
-                merytorykę gwarantuję ja."
-              </Text>
-            </blockquote>
+
+            {radca ? (
+              <>
+                <Heading level={3} as="h3" className="mt-3 !text-[18px]">
+                  {radca.name}
+                </Heading>
+                <Mono size="xs" tone="muted" className="mt-1 block">
+                  KIRP nr {radca.kirp} · {radca.oirp}
+                </Mono>
+                <blockquote className="mt-4 border-l-2 border-ink-300 pl-4">
+                  <Quote
+                    className="mb-2 size-4 text-ink-400"
+                    aria-hidden
+                  />
+                  <Text size="sm" tone="default" className="italic">
+                    {radca.scope}
+                  </Text>
+                </blockquote>
+              </>
+            ) : (
+              <>
+                <Heading level={3} as="h3" className="mt-3 !text-[18px]">
+                  Współpraca z radcą prawnym
+                </Heading>
+                <Mono size="xs" tone="muted" className="mt-1 block">
+                  Informacja o&nbsp;radcy nadzorującym — dostępna&nbsp;wkrótce
+                </Mono>
+                <Text size="sm" tone="muted" className="mt-4">
+                  Pracujemy nad finalizacją umowy o&nbsp;nadzór merytoryczny.
+                  Dane radcy (imię, numer wpisu KIRP, zakres współpracy)
+                  zostaną opublikowane po podpisaniu zgody na publikację
+                  zgodnie z&nbsp;RODO art. 6 ust. 1&nbsp;lit.&nbsp;a.
+                </Text>
+              </>
+            )}
           </div>
         </div>
       </Surface>

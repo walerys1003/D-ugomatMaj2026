@@ -6,6 +6,7 @@ import { Surface } from "@/components/ui/surface";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eyebrow, Heading, Text, Mono } from "@/components/ui/typography";
+import { getRadcaInfo } from "@/lib/features/radca-flag";
 
 /**
  * CtaBand v3 — Tarcza Stoic.
@@ -27,6 +28,10 @@ const REASONS = [
 ];
 
 export function CtaBand() {
+  // Feature flag — disclaimer dynamiczny zależnie od dostępności danych radcy.
+  // Patrz: lib/features/radca-flag.ts oraz docs/RADCA_CONSENT_CHECKLIST.md.
+  const radca = getRadcaInfo();
+
   return (
     <Section tone="default" density="compact" aria-labelledby="cta-band-title">
       <Surface
@@ -63,17 +68,34 @@ export function CtaBand() {
               </Button>
             </div>
 
-            {/* V5 disclaimer — ofensywne, nie defensywne (audit §3.10).
-                Zamiast "nie jesteśmy kancelarią" → "mamy radcę,
-                który osobiście sprawdza szablony co kwartał". Ta sama
-                informacja, ale ramka pewności siebie zamiast obrony. */}
-            <Mono size="xs" tone="muted" className="block max-w-[42ch]">
-              Długomat nie jest kancelarią prawną — pisma weryfikujesz przed
-              wysyłką. Ale nad każdym szablonem czuwa radca prawny&nbsp;
-              <span className="text-ink-700">[Imię Nazwisko, KIRP nr WA-XXXX]</span>
-              , który osobiście sprawdza je co&nbsp;kwartał pod kątem
-              zgodności z&nbsp;KPC.
-            </Mono>
+            {/*
+              V5 disclaimer — gated feature flag.
+              - radca === null  → wariant defensywny (zgodny z ustawą o radcach
+                                  prawnych — Długomat to fintech-narzędzie,
+                                  nie świadczy pomocy prawnej).
+              - radca !== null  → wariant ofensywny (audit §3.10): "mamy radcę,
+                                  który osobiście sprawdza szablony".
+              W obu wariantach ten sam Mono component i ten sam max-width,
+              żeby layout cta-band był identyczny niezależnie od stanu flagi.
+            */}
+            {radca ? (
+              <Mono size="xs" tone="muted" className="block max-w-[42ch]">
+                Długomat nie jest kancelarią prawną — pisma weryfikujesz przed
+                wysyłką. Ale nad każdym szablonem czuwa radca prawny&nbsp;
+                <span className="text-ink-700">
+                  {radca.name}, KIRP nr&nbsp;{radca.kirp}
+                </span>
+                , który osobiście sprawdza je co&nbsp;kwartał pod kątem
+                zgodności z&nbsp;KPC.
+              </Mono>
+            ) : (
+              <Mono size="xs" tone="muted" className="block max-w-[42ch]">
+                Długomat to fintech-narzędzie do generowania pism procesowych.
+                Nie świadczy pomocy prawnej w&nbsp;rozumieniu ustawy
+                o&nbsp;radcach prawnych. Każde pismo weryfikujesz przed
+                wysyłką do&nbsp;sądu.
+              </Mono>
+            )}
           </div>
 
           {/* RIGHT — Reasons list */}
