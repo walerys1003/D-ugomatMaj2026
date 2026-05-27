@@ -3,7 +3,7 @@ import { fanoutPush } from "@/lib/push/subscriptions";
 
 async function getSupabase() {
   const { createServerSupabase } = await import("@/lib/db/supabase-server");
-  return createSupabaseServerClient();
+  return createServerSupabase();
 }
 
 async function requireAdmin(sb: any) {

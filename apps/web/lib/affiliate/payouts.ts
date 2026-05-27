@@ -47,7 +47,7 @@ export async function runMonthlyPayouts(): Promise<PayoutBatch[]> {
     const key = row.affiliate_id;
     const existing = grouped.get(key) ?? {
       sum: 0,
-      ids: [],
+      ids: [] as string[],
       email: row.affiliate?.payout_email ?? "",
       slug: row.affiliate?.slug ?? "",
     };

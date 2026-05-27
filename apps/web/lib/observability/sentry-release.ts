@@ -68,7 +68,6 @@ export async function initReleaseTracking(): Promise<void> {
 
   // Lazy Sentry — nie wymaga deps.
   try {
-    // @ts-expect-error — optional dep
     const Sentry = (await import("@sentry/nextjs").catch(() => null)) as
       | { setTag?: (k: string, v: string) => void; setContext?: (n: string, c: Record<string, unknown>) => void }
       | null;

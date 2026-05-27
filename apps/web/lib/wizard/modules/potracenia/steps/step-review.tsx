@@ -36,7 +36,7 @@ export function StepReview({
   } = useForm<PotraceniaReviewValues>({
     resolver: zodResolver(potraceniaReviewSchema),
     defaultValues: {
-      consent_truth: defaultValues.consent_truth ?? false,
+      consent_truth: (defaultValues.consent_truth ?? false) as true,
     },
   });
 

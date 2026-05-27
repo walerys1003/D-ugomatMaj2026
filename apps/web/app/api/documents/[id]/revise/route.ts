@@ -60,16 +60,20 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
 
   try {
     const result = await runRevision({
-      document_id: id,
-      case_id: (doc as any).case_id,
-      user_id: auth.user.id,
-      previous_markdown: (doc as any).content_markdown ?? "",
+      documentId: id,
+      caseId: (doc as any).case_id,
+      userId: auth.user.id,
+      currentMarkdown: (doc as any).content_markdown ?? "",
       instruction,
-      case_type: (doc as any).cases?.case_type,
-      case_facts: (doc as any).cases?.facts,
+      caseType: (doc as any).cases?.case_type,
+      caseFacts: (doc as any).cases?.facts ?? {},
     });
     if (idemKey && reservationId) {
-      await completeIdempotency({ scope: idemScope, key: idemKey, user_id: auth.user.id, result, http_status: 200 });
+      await completeIdempotency(
+        { scope: idemScope, key: idemKey, user_id: auth.user.id },
+        result,
+        200,
+      );
     }
     return NextResponse.json(result);
   } catch (err) {

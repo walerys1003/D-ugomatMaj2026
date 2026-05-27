@@ -115,7 +115,6 @@ export default function NowaSprawaPage() {
                       {isLive ? (
                         <form action={startCaseAction}>
                           {/* Tier 5 zad. 203 — CSRF token przed mutacją. */}
-                          {/* @ts-expect-error Async Server Component */}
                           <CsrfInput />
                           <input type="hidden" name="type" value={type} />
                           <Button type="submit" size="sm">

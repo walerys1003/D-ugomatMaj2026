@@ -26,7 +26,7 @@ interface DeadlineRule {
 }
 
 const RULES: Record<LetterKind, DeadlineRule | null> = {
-  nakaz_zaplaty_e_sad: {
+  nakaz_zaplaty_epu: {
     days: 14,
     kind: "sprzeciw_epu_14dni",
     title: "Sprzeciw od nakazu zapłaty (EPU)",

@@ -7,10 +7,12 @@ export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
   const message = typeof body?.message === "string" ? body.message : "unknown_client_error";
   await captureError(new Error(message), {
-    source: "client",
-    url: body?.url ?? null,
-    stack: body?.stack ?? null,
-    metadata: body?.metadata ?? {},
+    tags: { source: "client" },
+    extra: {
+      url: body?.url ?? null,
+      stack: body?.stack ?? null,
+      metadata: body?.metadata ?? {},
+    },
   });
   return NextResponse.json({ ok: true });
 }

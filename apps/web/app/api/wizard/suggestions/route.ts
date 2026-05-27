@@ -20,11 +20,10 @@ export async function POST(req: NextRequest) {
   }
   try {
     const result = await generateSuggestions({
-      user_id: auth.user.id,
-      case_id: body.case_id,
-      case_type: body.case_type,
-      answers: body.answers,
-      facts: body.facts,
+      caseId: body.case_id,
+      caseType: body.case_type,
+      stepId: typeof body.step_id === "string" ? body.step_id : "unknown",
+      answers: body.answers ?? {},
     });
     return NextResponse.json(result);
   } catch (err: any) {

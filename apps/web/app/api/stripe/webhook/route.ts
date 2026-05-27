@@ -530,23 +530,25 @@ async function handlePaymentFailed(event: {
   }
 
   try {
-    await dispatchNotification({
-      userId: payment.user_id,
-      caseId: payment.case_id ?? null,
-      channel: "email",
-      template: "payment_failed",
-      recipient,
-      dedupKey: `payment_failed:${paymentId}`,
-      variables: {
-        productName: payment.product_name,
-        amountGrosze: payment.amount,
-        caseId: payment.case_id ?? "",
-        reason: String(reason),
-        retryUrl: payment.case_id
-          ? `${process.env.NEXT_PUBLIC_APP_URL ?? "https://dlugomat.pl"}/panel/sprawa/${payment.case_id}`
-          : `${process.env.NEXT_PUBLIC_APP_URL ?? "https://dlugomat.pl"}/panel`,
+    await dispatchNotification(
+      {
+        userId: payment.user_id,
+        caseId: payment.case_id ?? null,
+        channel: "email",
+        template: "payment_failed",
+        recipient,
+        variables: {
+          productName: payment.product_name,
+          amountGrosze: payment.amount,
+          caseId: payment.case_id ?? "",
+          reason: String(reason),
+          retryUrl: payment.case_id
+            ? `${process.env.NEXT_PUBLIC_APP_URL ?? "https://dlugomat.pl"}/panel/sprawa/${payment.case_id}`
+            : `${process.env.NEXT_PUBLIC_APP_URL ?? "https://dlugomat.pl"}/panel`,
+        },
       },
-    });
+      { dedupKey: `payment_failed:${paymentId}` },
+    );
   } catch (e) {
     console.error(
       "[stripe-webhook] dispatchNotification(payment_failed) failed:",

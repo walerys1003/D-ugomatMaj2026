@@ -69,7 +69,7 @@ export default async function PlatnoscSukcesPage({
         <meta httpEquiv="refresh" content="3" />
       )}
 
-      <Card urgency={isStillPending ? "info" : "success"} elevation="pop">
+      <Card urgency={isStillPending ? "warning" : "success"} elevation="pop">
         <CardHeader className="text-center">
           {isStillPending ? (
             <>

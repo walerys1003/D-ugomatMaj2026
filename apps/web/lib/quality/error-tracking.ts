@@ -81,7 +81,9 @@ export async function captureMessage(
   return captureError(new Error(message), ctx);
 }
 
-function mapSeverity(s: ErrorSeverity): string {
+function mapSeverity(
+  s: ErrorSeverity,
+): "debug" | "info" | "warning" | "error" | "fatal" {
   switch (s) {
     case "debug": return "debug";
     case "info": return "info";

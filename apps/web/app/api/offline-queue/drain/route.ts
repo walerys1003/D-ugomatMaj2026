@@ -3,7 +3,7 @@ import { drainServerQueue, ServerQueuedAction } from "@/lib/pwa/offline-queue";
 
 async function getSupabase() {
   const { createServerSupabase } = await import("@/lib/db/supabase-server");
-  return createSupabaseServerClient();
+  return createServerSupabase();
 }
 
 // Drain handler — applies each queued action by op type. Real apps would

@@ -34,7 +34,7 @@ export function StepReview({
   } = useForm<UgodaReviewValues>({
     resolver: zodResolver(ugodaReviewSchema),
     defaultValues: {
-      consent_truth: defaultValues.consent_truth ?? false,
+      consent_truth: (defaultValues.consent_truth ?? false) as true,
     },
   });
 

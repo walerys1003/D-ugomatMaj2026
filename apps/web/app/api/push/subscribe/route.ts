@@ -4,7 +4,7 @@ import { createHash } from "crypto";
 
 async function getSupabase() {
   const { createServerSupabase } = await import("@/lib/db/supabase-server");
-  return createSupabaseServerClient();
+  return createServerSupabase();
 }
 
 export async function POST(req: NextRequest) {

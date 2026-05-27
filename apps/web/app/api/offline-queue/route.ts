@@ -3,7 +3,7 @@ import { persistServerAction, drainServerQueue, QueueOp } from "@/lib/pwa/offlin
 
 async function getSupabase() {
   const { createServerSupabase } = await import("@/lib/db/supabase-server");
-  return createSupabaseServerClient();
+  return createServerSupabase();
 }
 
 export async function GET(_req: NextRequest) {

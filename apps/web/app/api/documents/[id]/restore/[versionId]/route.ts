@@ -25,7 +25,11 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
     return NextResponse.json({ error: "not_found" }, { status: 404 });
   }
   try {
-    const restored = await restoreDocumentVersion({ document_id: id, version_id: versionId, user_id: auth.user.id });
+    const restored = await restoreDocumentVersion({
+      caseId: (doc as any).case_id,
+      sourceVersionId: versionId,
+      createdBy: auth.user.id,
+    });
     return NextResponse.json({ ok: true, version: restored });
   } catch (err) {
     logger.error("documents.restore_failed", { error: (err as Error).message });

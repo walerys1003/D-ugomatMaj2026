@@ -43,7 +43,7 @@ export const SCHEDULED_JOBS: ScheduledJob[] = [
     description: "Prune inactive mobile devices >90d",
     cron: "0 5 * * 0", // 05:00 sundays
     run: async () => {
-      const pruned = await pruneInactiveDevices(90);
+      const pruned = await pruneInactiveDevices();
       return { pruned } as Record<string, unknown>;
     },
   },

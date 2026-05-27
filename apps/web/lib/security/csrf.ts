@@ -40,7 +40,7 @@ export {
   CSRF_HEADER,
   CSRF_FIELD,
 } from "./csrf-constants";
-import { CSRF_COOKIE, CSRF_FIELD } from "./csrf-constants";
+import { CSRF_COOKIE, CSRF_FIELD, CSRF_HEADER } from "./csrf-constants";
 
 export class CsrfError extends Error {
   public readonly status = 403;

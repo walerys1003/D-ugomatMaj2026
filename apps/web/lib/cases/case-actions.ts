@@ -144,6 +144,7 @@ export async function saveWizardAction(input: {
   }
   const next: WizardState = {
     ...parsed.data.wizardState,
+    answers: parsed.data.wizardState.answers as WizardState["answers"],
     last_saved_at: new Date().toISOString(),
   };
   await patchCase({ id: parsed.data.caseId, wizardState: next });

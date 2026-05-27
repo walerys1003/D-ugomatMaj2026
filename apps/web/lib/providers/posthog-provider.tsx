@@ -104,9 +104,9 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
     initStartedRef.current = true;
 
     try {
-      // @ts-expect-error — `posthog-js` jest opcjonalną dependencją;
-      // jeśli paczka nie zostanie zainstalowana, ten import się wywali
-      // a provider pozostanie no-op (catch poniżej).
+      // posthog-js jest opcjonalną dependencją — jeśli paczka nie jest
+      // zainstalowana, import rzuci wyjątek, a provider pozostanie no-op
+      // (catch poniżej).
       const mod = await import("posthog-js");
       const posthog = (mod.default ?? mod) as PostHogClient;
       posthog.init(POSTHOG_KEY, {

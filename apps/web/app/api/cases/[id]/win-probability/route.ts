@@ -24,13 +24,9 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
   if (!caseRow) return NextResponse.json({ error: "case_not_found" }, { status: 404 });
 
   const result = calculateWinProbability({
-    case_type: caseRow.case_type,
-    deadline_at: caseRow.deadline_at,
-    documents_count: caseRow.documents_count ?? 0,
-    facts: caseRow.facts,
-    answers: caseRow.answers,
-    amount: caseRow.amount,
-    creditor_type: caseRow.creditor_type,
+    caseType: caseRow.case_type,
+    answers: caseRow.answers ?? {},
+    caseFacts: caseRow.facts ?? {},
   });
   return NextResponse.json(result);
 }

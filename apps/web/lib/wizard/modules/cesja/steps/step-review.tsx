@@ -33,7 +33,7 @@ export function StepReview({
   } = useForm<CesjaReviewValues>({
     resolver: zodResolver(cesjaReviewSchema),
     defaultValues: {
-      consent_truth: defaultValues.consent_truth ?? false,
+      consent_truth: (defaultValues.consent_truth ?? false) as true,
     },
   });
 

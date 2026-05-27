@@ -9,8 +9,10 @@
  * Used by: /panel/ustawienia/rodo (button "Pobierz moje dane").
  */
 import { NextResponse, type NextRequest } from "next/server";
+import { cookies } from "next/headers";
 
 import { exportUserDataAsJson } from "@/lib/rodo/data-export";
+import { CSRF_COOKIE } from "@/lib/security/csrf-constants";
 import {
   ActionRateLimitError,
   ActionUnauthenticatedError,
@@ -21,7 +23,10 @@ export const dynamic = "force-dynamic";
 
 export async function GET(_req: NextRequest): Promise<NextResponse> {
   try {
-    const { json, filename } = await exportUserDataAsJson();
+    // GET nie ma body; przekazujemy CSRF z cookie (download initiowany
+    // z autoryzowanej sesji panelu).
+    const csrf = cookies().get(CSRF_COOKIE)?.value ?? "";
+    const { json, filename } = await exportUserDataAsJson({ csrf });
     return new NextResponse(json, {
       status: 200,
       headers: {

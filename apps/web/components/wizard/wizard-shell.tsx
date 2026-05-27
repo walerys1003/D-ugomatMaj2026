@@ -156,7 +156,6 @@ export function WizardShell({ definition, snapshot, onSubmit }: Props) {
           transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
           className="rounded-2xl border border-ink-200 bg-white p-6 shadow-card dark:border-ink-800 dark:bg-ink-950"
         >
-          {/* @ts-expect-error: Components have varying schema types — wizard registry guarantees runtime compatibility */}
           <StepComponent {...stepProps} />
         </motion.div>
       </AnimatePresence>
