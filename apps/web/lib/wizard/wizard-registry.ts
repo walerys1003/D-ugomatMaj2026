@@ -35,6 +35,7 @@ import {
   ugodaWizardUmorzenie,
 } from "@/lib/wizard/modules/ugoda";
 import { upadloscWizard } from "@/lib/wizard/modules/upadlosc";
+import { upadloscPelnyWizard } from "@/lib/wizard/modules/upadlosc/index-pelny";
 
 const registry: Partial<Record<CaseType, WizardDefinition>> = {
   sprzeciw_epu: sprzeciwEpuWizard,
@@ -54,6 +55,7 @@ const registry: Partial<Record<CaseType, WizardDefinition>> = {
   ugoda_umorzenie: ugodaWizardUmorzenie,
   ugoda_propozycja: ugodaWizardPropozycja,
   upadlosc_wniosek: upadloscWizard,
+  upadlosc_pelny_wniosek: upadloscPelnyWizard,
 };
 
 export function getWizardDefinition(type: CaseType): WizardDefinition | null {

@@ -235,3 +235,79 @@ export interface UpadloscAnswers
     NiewyplacalnoscValues,
     ZalacznikiValues,
     UpadloscReviewValues {}
+
+// =========================================================================
+// D9 — Pełny wniosek o upadłość konsumencką (formularz urzędowy KRS-FORM-UPK1)
+// =========================================================================
+// D9 reusuje 8 schematów D8 i dodaje 3 schematy szczegółowe wymagane przez
+// formularz urzędowy. Patrz: art. 491² Pr.up. — wymaganie dokumentowania
+// dochodów z 12 miesięcy + propozycja planu spłaty.
+
+// 9) Dochody historyczne (12 miesięcy) -----------------------------------
+const incomeRowSchema = z.object({
+  miesiac: polishDate, // YYYY-MM-01 jako konwencja
+  zrodlo: z.string().min(2, "Min. 2 znaki").max(120),
+  brutto_pln: z.number().min(0).max(99999999),
+  netto_pln: z.number().min(0).max(99999999),
+  uwagi: z.string().max(280).optional().default(""),
+});
+export type IncomeRow = z.infer<typeof incomeRowSchema>;
+
+export const dochodyHistoryczneSchema = z.object({
+  dochody: z
+    .array(incomeRowSchema)
+    .min(1, "Dodaj co najmniej jeden miesiąc dochodu (najlepiej 12)")
+    .max(36, "Maksymalnie 36 wierszy"),
+  /** Średni miesięczny dochód netto z deklarowanych miesięcy (auto-compute UI). */
+  srednia_netto_pln: z.number().min(0).optional(),
+  /** Czy w okresie były miesiące bez dochodu? */
+  miesiace_bez_dochodu: z.number().int().min(0).max(36).default(0),
+});
+export type DochodyHistoryczneValues = z.infer<typeof dochodyHistoryczneSchema>;
+
+// 10) Plan spłaty (proponowany przez wnioskodawcę) -----------------------
+export const planSplatySchema = z.object({
+  /** Miesięczna rata, którą wnioskodawca jest w stanie spłacać. */
+  rata_miesieczna_pln: z
+    .number()
+    .min(0, "Wartość nie może być ujemna")
+    .max(99999999),
+  /** Czas trwania planu (miesiące). Standard 36 (krótszy = lepiej dla dłużnika). */
+  liczba_miesiecy: z.number().int().min(0).max(84),
+  /** Uzasadnienie kwoty raty (dlaczego dłużnik proponuje akurat tę kwotę). */
+  uzasadnienie_kwoty: z
+    .string()
+    .min(40, "Min. 40 znaków — sąd oczekuje konkretnego uzasadnienia")
+    .max(2000),
+  /** Czy wnioskodawca prosi o umorzenie pozostałej części po planie spłaty? */
+  wnioskuje_umorzenie_reszty: z.boolean().default(true),
+});
+export type PlanSplatyValues = z.infer<typeof planSplatySchema>;
+
+// 11) Uzasadnienie szczegółowe -------------------------------------------
+// Pełny wniosek wymaga rozszerzonej narracji (KPC art. 187 § 1 pkt 2,
+// Pr.up. art. 491² ust. 4). Min. 200 znaków, max 6000.
+export const uzasadnienieSchema = z.object({
+  okolicznosci_powstania: z
+    .string()
+    .min(80, "Opisz okoliczności w min. 80 znakach")
+    .max(2000),
+  proba_polubownych_rozwiazan: z
+    .string()
+    .min(40, "Opisz próby polubowne (min. 40 znaków)")
+    .max(2000),
+  sytuacja_rodzinna: z
+    .string()
+    .min(40, "Opisz sytuację rodzinną (min. 40 znaków)")
+    .max(2000),
+  /** Łączny tekst po sklejeniu — opcjonalne pole computed. */
+  full_text: z.string().optional(),
+});
+export type UzasadnienieValues = z.infer<typeof uzasadnienieSchema>;
+
+/** Pełny zestaw odpowiedzi D9 (8 D8 + 3 D9-only). */
+export interface UpadloscPelnyAnswers extends UpadloscAnswers {
+  dochody_historyczne: DochodyHistoryczneValues;
+  plan_splaty: PlanSplatyValues;
+  uzasadnienie: UzasadnienieValues;
+}
