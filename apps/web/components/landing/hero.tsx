@@ -52,7 +52,7 @@ export function Hero() {
         className="pointer-events-none absolute inset-0 -z-10 opacity-[0.35] [background-image:radial-gradient(hsl(0_0%_85%)_1px,transparent_1px)] [background-size:32px_32px] [mask-image:radial-gradient(ellipse_at_top,black_30%,transparent_70%)]"
       />
 
-      <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-12 xl:gap-16">
+      <div className="grid items-center gap-12 xl:grid-cols-[1.1fr_0.9fr] xl:gap-14">
         {/* LEFT — Editorial copy */}
         <div className="flex flex-col gap-7">
           <Eyebrow tone="brand" withDot>
@@ -148,12 +148,12 @@ function HeroArtifact() {
   // gridzie chronią przed wypchnięciem prawej kolumny przez wewnętrzną
   // szerokość kart (Tailwind grid items defaultują do min-width: auto).
   return (
-    <div className="relative mx-auto h-[480px] w-full max-w-[460px] sm:h-[520px] lg:h-[560px] lg:max-w-none">
+    <div className="relative mx-auto h-[480px] w-full max-w-[480px] sm:h-[520px] xl:h-[560px] xl:max-w-none">
       {/* Background card — Sprzeciw draft (subtle tilt, behind) */}
       <Surface
         elevation="raised"
         padded="none"
-        className="absolute right-0 top-6 w-[80%] rotate-[1.8deg] overflow-hidden lg:right-2 lg:top-10"
+        className="absolute right-0 top-6 w-[80%] rotate-[1.8deg] overflow-hidden xl:right-2 xl:top-10"
       >
         <SprzeciwCard />
       </Surface>
