@@ -25,8 +25,9 @@ const PRESS_HERO: readonly string[] = [
  * Zmiany vs v4 (redesign 2026-06):
  *  - Pełny dark-mode (deep navy mesh) zamiast split jasny/granat — koniec
  *    z estetyką "SaaS 2018". Jednolite, kinowe tło.
- *  - Centralny artefakt: wygenerowana RZEŹBA 3D "aegis" (szkło + stal +
- *    szafir), nie neon-antywirusowa tarcza. Plik: /public/hero/aegis-hero.webp
+ *  - Centralny wizual: emocjonalne zdjęcie przerażonej osoby trzymającej
+ *    nakaz zapłaty i pisma windykacyjne — natychmiastowa identyfikacja
+ *    („to o mnie") zamiast abstrakcji. Plik: /public/hero/hero-fear.webp
  *  - Floating glass-chipy (Analiza AI / Generowanie pism / Terminy / Ochrona)
  *    jako cienkie, świetliste sygnały zamiast labeli na liniach.
  *  - Realny produktowy mini-panel (Skaner) jako glassmorphic overlay — dowód,
@@ -172,49 +173,62 @@ export function Hero() {
 
 function HeroVisual() {
   return (
-    <div className="relative mx-auto aspect-square w-full max-w-[560px]">
-      {/* halo za obrazem */}
+    <div className="relative mx-auto aspect-[4/3] w-full max-w-[600px] lg:max-w-[640px]">
+      {/* halo za zdjęciem — chłodna poświata podbijająca dramat */}
       <div
         aria-hidden
-        className="absolute inset-[8%] -z-10 rounded-full bg-[radial-gradient(closest-side,hsl(212_100%_55%/0.35),transparent)] blur-2xl"
+        className="absolute -inset-4 -z-10 rounded-[28px] bg-[radial-gradient(closest-side,hsl(212_100%_55%/0.28),transparent)] blur-2xl"
       />
 
-      {/* wygenerowana rzeźba 3D — maska krawędziowa wtapia prostokąt renderu
-          w ciemne tło hero (radial fade), znika widoczna „ramka" obrazu */}
-      <Image
-        src="/hero/aegis-hero.webp"
-        alt="Długomat — cyfrowa tarcza chroniąca przed długami: rzeźba 3D z literą D"
-        width={1120}
-        height={1120}
-        priority
-        sizes="(min-width: 1024px) 560px, 90vw"
-        className="h-full w-full select-none object-contain drop-shadow-[0_24px_60px_rgba(0,0,0,0.55)] [mask-image:radial-gradient(ellipse_at_center,black_55%,transparent_85%)] [-webkit-mask-image:radial-gradient(ellipse_at_center,black_55%,transparent_85%)]"
-      />
+      {/* Emocjonalne zdjęcie — kadr w zaokrąglonej karcie z subtelną ramką.
+          Postać z przerażeniem trzymająca nakazy/pisma windykacyjne — buduje
+          natychmiastową identyfikację („to o mnie") mocniej niż abstrakcja. */}
+      <div className="relative h-full w-full overflow-hidden rounded-2xl border border-white/10 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.7)] ring-1 ring-inset ring-white/[0.06]">
+        <Image
+          src="/hero/hero-fear.webp"
+          alt="Przerażony mężczyzna trzymający nakaz zapłaty i pisma windykacyjne — Długomat pomaga odzyskać kontrolę"
+          fill
+          priority
+          sizes="(min-width: 1024px) 560px, 90vw"
+          className="select-none object-cover object-[60%_top]"
+        />
+        {/* gradient na krawędziach kadru — wtapia zdjęcie w ciemne tło hero
+            i poprawia czytelność nachodzących chipów */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,hsl(224_72%_6%/0.85)_0%,transparent_38%),linear-gradient(to_right,hsl(224_72%_6%/0.55)_0%,transparent_30%)]"
+        />
+        {/* górny vignette dla głębi */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_90%_at_70%_15%,transparent_45%,hsl(224_72%_5%/0.55)_100%)]"
+        />
+      </div>
 
       {/* Glass chip — góra-lewo: Analiza AI */}
       <FloatingChip
-        className="left-0 top-[14%] sm:-left-2"
+        className="left-0 top-[10%] sm:-left-6"
         icon={<Scan className="size-3.5" aria-hidden />}
         title="Analiza AI"
         sub="wykrywa błędy w sprawie"
       />
       {/* Glass chip — góra-prawo: Generowanie pism */}
       <FloatingChip
-        className="right-0 top-[6%] sm:-right-3"
+        className="right-0 -top-3 sm:-right-6"
         icon={<FileText className="size-3.5" aria-hidden />}
         title="Generowanie pism"
         sub="sprzeciw · skarga · ugoda"
       />
       {/* Glass chip — dół-prawo: Twoja ochrona */}
       <FloatingChip
-        className="bottom-[14%] right-0 sm:-right-2"
+        className="-bottom-3 right-0 sm:-right-6"
         icon={<ShieldCheck className="size-3.5" aria-hidden />}
         title="Twoja ochrona"
         sub="przed windykacją i egzekucją"
       />
 
       {/* Mini-panel produktowy (dół-lewo) — dowód „to działa" */}
-      <div className="absolute bottom-[6%] left-0 w-[58%] max-w-[230px] sm:-left-4">
+      <div className="absolute bottom-3 left-0 w-[58%] max-w-[250px] sm:-left-6">
         <div className="rounded-lg border border-white/10 bg-white/[0.06] p-3 shadow-[0_16px_40px_-12px_rgba(0,0,0,0.6)] backdrop-blur-xl">
           <div className="flex items-center justify-between gap-2">
             <span className="inline-flex items-center gap-1.5">
