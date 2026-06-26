@@ -27,7 +27,7 @@ const PRESS_HERO: readonly string[] = [
  *    z estetyką "SaaS 2018". Jednolite, kinowe tło.
  *  - Centralny wizual: emocjonalne zdjęcie przerażonej osoby trzymającej
  *    nakaz zapłaty i pisma windykacyjne — natychmiastowa identyfikacja
- *    („to o mnie") zamiast abstrakcji. Plik: /public/hero/hero-fear.webp
+ *    („to o mnie") zamiast abstrakcji. Plik: /public/hero/hero-fear-v2.webp
  *  - Floating glass-chipy (Analiza AI / Generowanie pism / Terminy / Ochrona)
  *    jako cienkie, świetliste sygnały zamiast labeli na liniach.
  *  - Realny produktowy mini-panel (Skaner) jako glassmorphic overlay — dowód,
@@ -185,7 +185,7 @@ function HeroVisual() {
           natychmiastową identyfikację („to o mnie") mocniej niż abstrakcja. */}
       <div className="relative h-full w-full overflow-hidden rounded-2xl border border-white/10 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.7)] ring-1 ring-inset ring-white/[0.06]">
         <Image
-          src="/hero/hero-fear.webp"
+          src="/hero/hero-fear-v2.webp"
           alt="Przerażony mężczyzna trzymający nakaz zapłaty i pisma windykacyjne — Długomat pomaga odzyskać kontrolę"
           fill
           priority
