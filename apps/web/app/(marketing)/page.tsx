@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
 import { Hero } from "@/components/landing/hero";
-import { AIShowcase } from "@/components/landing/ai-showcase";
-import { HowItWorks } from "@/components/landing/how-it-works";
-import { ModulesGrid } from "@/components/landing/modules";
 import { TrustBar } from "@/components/landing/trust-bar";
+import { AudienceSwitch } from "@/components/landing/audience-switch";
+import { HowItWorks } from "@/components/landing/how-it-works";
+import { AIEdge } from "@/components/landing/ai-edge";
+import { AIShowcase } from "@/components/landing/ai-showcase";
+import { ModulesGrid } from "@/components/landing/modules";
+import { SocialProof } from "@/components/landing/social-proof";
+import { ComplianceBand } from "@/components/landing/compliance-band";
 import { PricingTeaser } from "@/components/landing/pricing-teaser";
 import { FAQ, faqJsonLd } from "@/components/landing/faq";
 import { CtaBand } from "@/components/landing/cta-band";
@@ -86,21 +90,32 @@ export default function HomePage() {
       />
 
       {/*
-        Nowa kolejność landingu (Tarcza v2):
-        1. Hero            — propozycja wartości + dwa CTA
-        2. AIShowcase      — KONKRETNIE jak działa AI (dokument → analiza → pismo)
-        3. HowItWorks      — proces w 3 krokach (ogólny)
-        4. ModulesGrid     — 8 modułów D1–D8 z cenami
-        5. TrustBar        — compliance + KPI + press (zaufanie przed cennikiem)
-        6. PricingTeaser   — plany Stripe
-        7. FAQ             — obiekcje
-        8. CtaBand         — ostatni call-to-action
+        Nowa kolejność landingu (Tarcza v4 Stoic+, docs/redesign/03 §1):
+         1. Hero           — propozycja wartości + żywy artefakt + dwa CTA
+         2. TrustBar       — pasek zaufania (compliance + KPI + press) tuż pod foldem
+         3. AudienceSwitch — segmentacja B2C/B2B (dłużnik / firma / kancelaria / windykacja)
+         4. HowItWorks     — proces w 3 krokach (ogólny mental model)
+         5. AIEdge         — DLACZEGO my: przewagi AI + żywy ślad rozumowania IRAC
+         6. AIShowcase     — KONKRETNIE jak działa AI (dokument → analiza → pismo)
+         7. ModulesGrid    — 8 modułów D1–D8 z cenami
+         8. SocialProof    — dowód społeczny (opinie / liczby)
+         9. ComplianceBand — redukcja obiekcji bezpieczeństwa (navy band)
+        10. PricingTeaser  — plany Stripe
+        11. FAQ            — obiekcje
+        12. CtaBand        — ostatni call-to-action
+
+        Wszystkie sekcje używają wyłącznie tokenów kanonicznych (02 §8):
+        ink-* / dlugomat-* / accent-* / warn-* / danger-*. Zero iron-*, zero importu v5.
       */}
       <Hero />
-      <AIShowcase />
-      <HowItWorks />
-      <ModulesGrid />
       <TrustBar />
+      <AudienceSwitch />
+      <HowItWorks />
+      <AIEdge />
+      <AIShowcase />
+      <ModulesGrid />
+      <SocialProof />
+      <ComplianceBand />
       <PricingTeaser />
       <FAQ />
       <CtaBand />

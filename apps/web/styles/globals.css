@@ -7,6 +7,11 @@
  * Imported BEFORE V4 tokens so V5 components consuming `--v5-*` vars work
  * everywhere. V4 tokens remain authoritative for legacy components.
  * ========================================================================= */
+/* V5 tokens — RETAINED do Fali 7 (wygaszenie app/v5/* + codemod).
+   components/v5/primitives nadal je konsumują, a route'y /v5/* muszą
+   pozostać działające do czasu migracji (docs/redesign/05 Fala 7).
+   KANON (Tarcza v4) NIE używa już --v5-* — semantyka oparta wyłącznie na
+   --ink-* / --dlugomat-* (patrz sekcja Semantic tokens niżej). */
 @import "./v5/tokens.css";
 
 /* =========================================================================
@@ -112,29 +117,33 @@
       0 12px 24px -8px hsl(var(--shadow-color) / 0.08);
 
     /* ---- Semantic tokens (shadcn) — light theme --------------------- */
+    /* Tarcza v4 (redesign Fala 1): semantyka oparta na --ink-* (true neutral).
+       Wcześniej wskazywała na --iron-* (deprecated). Wartości identyczne
+       (iron==ink po remapie ε/ζ), więc zero regresji wizualnej — ale teraz
+       deprecated token nie jest już sercem semantyki (fix DS-3). */
     --background: 0 0% 100%;
-    --foreground: var(--iron-900);
+    --foreground: var(--ink-900);
 
     --card: 0 0% 100%;
-    --card-foreground: var(--iron-900);
+    --card-foreground: var(--ink-900);
 
     --popover: 0 0% 100%;
-    --popover-foreground: var(--iron-900);
+    --popover-foreground: var(--ink-900);
 
     --primary: var(--dlugomat-700);
     --primary-foreground: 0 0% 100%;
 
-    --secondary: var(--iron-100);
-    --secondary-foreground: var(--iron-900);
+    --secondary: var(--ink-100);
+    --secondary-foreground: var(--ink-900);
 
-    --muted: var(--iron-100);
-    --muted-foreground: var(--iron-600);
+    --muted: var(--ink-100);
+    --muted-foreground: var(--ink-600);
 
     --destructive: var(--danger-600);
     --destructive-foreground: 0 0% 100%;
 
-    --border: var(--iron-200);
-    --input: var(--iron-200);
+    --border: var(--ink-200);
+    --input: var(--ink-200);
     --ring: var(--dlugomat-500);
 
     /* ---- Typography (font-family vars) ------------------------------ */
@@ -166,7 +175,7 @@
     --secondary-foreground: 0 0% 98%;
 
     --muted: var(--dlugomat-850);
-    --muted-foreground: var(--iron-400);
+    --muted-foreground: var(--ink-500);
 
     --destructive: var(--danger-500);
     --destructive-foreground: 0 0% 98%;
