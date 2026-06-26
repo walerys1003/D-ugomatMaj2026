@@ -179,7 +179,8 @@ function HeroVisual() {
         className="absolute inset-[8%] -z-10 rounded-full bg-[radial-gradient(closest-side,hsl(212_100%_55%/0.35),transparent)] blur-2xl"
       />
 
-      {/* wygenerowana rzeźba 3D */}
+      {/* wygenerowana rzeźba 3D — maska krawędziowa wtapia prostokąt renderu
+          w ciemne tło hero (radial fade), znika widoczna „ramka" obrazu */}
       <Image
         src="/hero/aegis-hero.webp"
         alt="Długomat — cyfrowa tarcza chroniąca przed długami: rzeźba 3D z literą D"
@@ -187,7 +188,7 @@ function HeroVisual() {
         height={1120}
         priority
         sizes="(min-width: 1024px) 560px, 90vw"
-        className="h-full w-full select-none object-contain drop-shadow-[0_24px_60px_rgba(0,0,0,0.55)]"
+        className="h-full w-full select-none object-contain drop-shadow-[0_24px_60px_rgba(0,0,0,0.55)] [mask-image:radial-gradient(ellipse_at_center,black_55%,transparent_85%)] [-webkit-mask-image:radial-gradient(ellipse_at_center,black_55%,transparent_85%)]"
       />
 
       {/* Glass chip — góra-lewo: Analiza AI */}
@@ -213,7 +214,7 @@ function HeroVisual() {
       />
 
       {/* Mini-panel produktowy (dół-lewo) — dowód „to działa" */}
-      <div className="absolute -bottom-2 left-0 w-[58%] max-w-[230px] sm:-left-4">
+      <div className="absolute bottom-[6%] left-0 w-[58%] max-w-[230px] sm:-left-4">
         <div className="rounded-lg border border-white/10 bg-white/[0.06] p-3 shadow-[0_16px_40px_-12px_rgba(0,0,0,0.6)] backdrop-blur-xl">
           <div className="flex items-center justify-between gap-2">
             <span className="inline-flex items-center gap-1.5">
