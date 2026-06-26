@@ -76,8 +76,9 @@ export function Hero() {
               id="hero-headline"
               className="font-display text-balance text-[40px] font-bold leading-[1.04] tracking-[-0.02em] text-white sm:text-[52px] lg:text-[58px] xl:text-[64px]"
             >
-              Twoja tarcza
-              <br className="hidden sm:block" /> w&nbsp;walce z&nbsp;
+              <span className="whitespace-nowrap">Twoja tarcza w&nbsp;walce</span>
+              <br />
+              z&nbsp;
               <span className="relative whitespace-nowrap text-transparent bg-clip-text bg-gradient-to-r from-sky-300 via-sky-400 to-blue-500">
                 długami
               </span>
