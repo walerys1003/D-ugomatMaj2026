@@ -14,6 +14,7 @@ import "server-only";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 import type { UserRole } from "@/lib/db/types";
+import { DEV_PREVIEW_ENABLED, DEV_PREVIEW_ADMIN } from "@/lib/dev/preview";
 
 export class AdminAccessDeniedError extends Error {
   constructor(message = "Brak uprawnień administratora.") {
@@ -36,6 +37,15 @@ export interface AdminContext {
  *   const admin = await requireAdmin();
  */
 export async function requireAdmin(): Promise<AdminContext> {
+  // DEV-PREVIEW — przepuść mockowego admina (tylko poza produkcją + za flagą).
+  if (DEV_PREVIEW_ENABLED) {
+    return {
+      userId: DEV_PREVIEW_ADMIN.id,
+      email: DEV_PREVIEW_ADMIN.email,
+      role: DEV_PREVIEW_ADMIN.role,
+    };
+  }
+
   const supabase = createSupabaseServerClient();
   const { data: userData, error: userErr } = await supabase.auth.getUser();
   if (userErr || !userData?.user) {

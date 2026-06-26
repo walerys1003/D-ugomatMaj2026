@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { AppShell } from "@/components/layout/app-shell";
 import { createSupabaseServerClient } from "@/lib/db/supabase-server";
+import { DEV_PREVIEW_ENABLED, DEV_PREVIEW_USER } from "@/lib/dev/preview";
 
 /**
  * Panel layout — server-side guard that fetches the current user and
@@ -10,6 +11,15 @@ import { createSupabaseServerClient } from "@/lib/db/supabase-server";
  * request after a magic-link callback.
  */
 export default async function PanelLayout({ children }: { children: React.ReactNode }) {
+  // DEV-PREVIEW — wstrzyknij mockowego usera bez odpytywania backendu.
+  if (DEV_PREVIEW_ENABLED) {
+    return (
+      <AppShell user={{ email: DEV_PREVIEW_USER.email, name: DEV_PREVIEW_USER.fullName }}>
+        {children}
+      </AppShell>
+    );
+  }
+
   const supabase = createSupabaseServerClient();
   const {
     data: { user },

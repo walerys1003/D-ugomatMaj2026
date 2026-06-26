@@ -1,6 +1,8 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import type { Database } from "@/lib/db/types";
+import { DEV_PREVIEW_ENABLED } from "@/lib/dev/preview";
+import { createMockSupabaseClient } from "@/lib/dev/mock-supabase";
 
 /**
  * Server-side Supabase client bound to the current request's cookies.
@@ -17,6 +19,13 @@ export function createSupabaseServerClient() {
   const cookieStore = cookies();
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  // DEV-PREVIEW — gdy brak realnego backendu, zwróć mock zamiast rzucać błąd,
+  // by panele dało się podejrzeć wizualnie (tylko poza produkcją + za flagą).
+  if (DEV_PREVIEW_ENABLED && (!url || !anon)) {
+    return createMockSupabaseClient();
+  }
+
   if (!url || !anon) {
     throw new Error("Brak NEXT_PUBLIC_SUPABASE_URL lub NEXT_PUBLIC_SUPABASE_ANON_KEY");
   }

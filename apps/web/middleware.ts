@@ -42,6 +42,13 @@ function edgeCorrelationId(headers: Headers): string {
 export async function middleware(request: NextRequest) {
   const isDev = process.env.NODE_ENV !== "production";
 
+  // DEV-PREVIEW — w trybie podglądu paneli (poza produkcją + za flagą) traktuj
+  // wszystkie żądania jako zalogowane, by route-guard nie przekierowywał
+  // /panel i /admin na /auth/sign-in. Patrz lib/dev/preview.ts.
+  const devPreview =
+    process.env.NODE_ENV !== "production" &&
+    process.env.NEXT_PUBLIC_DEV_PREVIEW === "1";
+
   // -------------------------------------------------------------------
   // 1) Edge rate-limit (per IP, 120 / min) — wcześnie, by chronić Supabase
   // -------------------------------------------------------------------
@@ -131,7 +138,11 @@ export async function middleware(request: NextRequest) {
   // -------------------------------------------------------------------
   // 4) Route guards
   // -------------------------------------------------------------------
-  const guardResponse = enforceRouteGuards(request, response, userPresent);
+  const guardResponse = enforceRouteGuards(
+    request,
+    response,
+    userPresent || devPreview,
+  );
 
   // Rate-limit + nonce headers (info-only)
   guardResponse.headers.set(
