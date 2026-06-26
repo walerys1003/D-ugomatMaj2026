@@ -74,7 +74,7 @@ async function openDb(): Promise<IDBDatabase> {
 async function registerSync() {
   if (typeof navigator === "undefined" || !("serviceWorker" in navigator)) return;
   const reg = await navigator.serviceWorker.ready;
-  // @ts-ignore — sync optional
+  // @ts-expect-error — Background Sync API (reg.sync) not in TS lib types
   if (reg.sync) await reg.sync.register("dlugomat-offline-queue");
 }
 

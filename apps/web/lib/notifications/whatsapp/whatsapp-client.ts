@@ -1,3 +1,5 @@
+import { createHmac, timingSafeEqual } from "node:crypto";
+
 /**
  * Tier 18 — WhatsApp Business Cloud API client.
  *
@@ -117,11 +119,9 @@ function normalizePhone(raw: string): string {
 export function verifyWebhookSignature(rawBody: string, signatureHeader: string, appSecret: string): boolean {
   if (!signatureHeader.startsWith("sha256=")) return false;
   const expected = signatureHeader.slice("sha256=".length);
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const crypto = require("crypto") as typeof import("crypto");
-  const computed = crypto.createHmac("sha256", appSecret).update(rawBody).digest("hex");
+  const computed = createHmac("sha256", appSecret).update(rawBody).digest("hex");
   if (computed.length !== expected.length) return false;
-  return crypto.timingSafeEqual(Buffer.from(computed, "hex"), Buffer.from(expected, "hex"));
+  return timingSafeEqual(Buffer.from(computed, "hex"), Buffer.from(expected, "hex"));
 }
 
 export interface WhatsAppStatusUpdate {

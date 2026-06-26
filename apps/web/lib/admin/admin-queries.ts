@@ -349,7 +349,7 @@ export async function getFunnelMetrics(days = 30): Promise<AdminFunnelMetrics> {
 
   // Pobierz timestamps płatności dla średniej czasu konwersji.
   const caseIds = rows.map((r) => r.id);
-  let paymentByCase = new Map<string, string>();
+  const paymentByCase = new Map<string, string>();
   if (caseIds.length > 0) {
     const { data: payRows } = await sb
       .from("payments")

@@ -91,7 +91,7 @@ export async function enqueueGenerationJob(
   return { ok: true, job_id: data.id };
 }
 
-export interface ClaimedJob extends GenerationJob {}
+export type ClaimedJob = GenerationJob;
 
 export async function claimNextJob(workerId: string): Promise<ClaimedJob | null> {
   const supabase = getSupabaseAdmin();

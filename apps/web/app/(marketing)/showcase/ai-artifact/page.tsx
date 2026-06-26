@@ -64,13 +64,16 @@ Rekomendacja: złożyć sprzeciw + powołać zarzut nieudowodnienia roszczenia.
 Szacowana szansa wygranej: 62%.`}
           />
 
+          {/* Uwaga: to jest Server Component (eksportuje `metadata`), więc NIE
+              można przekazać funkcji `onRetry` do klienckiego <Artifact>.
+              Stan „error" renderuje się poprawnie bez handlera — przycisk
+              ponów po prostu się nie pokaże w tym statycznym showcase. */}
           <Artifact
             title="Anonimizacja korespondencji"
             subtitle="Pre-RODO redaction · 14 dokumentów"
             kind="redaction"
             state="error"
             initialContent="Częściowa anonimizacja — przerwano na pliku 7/14."
-            onRetry={() => undefined}
           />
         </div>
       </section>

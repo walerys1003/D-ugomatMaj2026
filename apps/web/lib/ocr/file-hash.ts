@@ -1,8 +1,11 @@
 /**
  * Plik → SHA-256 hash (do dedup + cache OCR).
  *
- * Działa zarówno w przeglądarce (Web Crypto API) jak i na serwerze
- * (node:crypto). Identyczny output → idempotentny cache key.
+ * Używa wyłącznie Web Crypto API (`crypto.subtle`) — dostępnego zarówno
+ * w przeglądarce, jak i w Node 20+ (wymagane przez `engines` w package.json)
+ * oraz w runtime Edge. Dzięki temu ten plik może być bezpiecznie importowany
+ * przez komponenty klienckie (skaner OCR) — bez `node:crypto`, którego webpack
+ * nie potrafi zbundlować dla przeglądarki (UnhandledSchemeError).
  */
 
 export async function hashFile(file: File | Blob): Promise<string> {
@@ -11,16 +14,14 @@ export async function hashFile(file: File | Blob): Promise<string> {
 }
 
 export async function hashArrayBuffer(buf: ArrayBuffer): Promise<string> {
-  // Browser path
-  if (typeof globalThis.crypto !== "undefined" && globalThis.crypto.subtle) {
-    const digest = await globalThis.crypto.subtle.digest("SHA-256", buf);
-    return bufferToHex(digest);
+  const subtle = globalThis.crypto?.subtle;
+  if (!subtle) {
+    throw new Error(
+      "Web Crypto API (crypto.subtle) niedostępne — wymagany Node 20+ lub nowoczesna przeglądarka.",
+    );
   }
-  // Node path
-  const { createHash } = await import("node:crypto");
-  const h = createHash("sha256");
-  h.update(Buffer.from(buf));
-  return h.digest("hex");
+  const digest = await subtle.digest("SHA-256", buf);
+  return bufferToHex(digest);
 }
 
 function bufferToHex(buf: ArrayBuffer): string {

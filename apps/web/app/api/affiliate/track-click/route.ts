@@ -6,6 +6,8 @@ import crypto from "node:crypto";
 import { NextResponse } from "next/server";
 import { trackAffiliateClick } from "@/lib/affiliate/tracking";
 
+// node:crypto wymaga Node runtime (webpack nie obsługuje `node:` w Edge).
+export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {

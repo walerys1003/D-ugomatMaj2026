@@ -45,7 +45,7 @@ export function isStandalone(): boolean {
   return (
     window.matchMedia?.("(display-mode: standalone)").matches ||
     // iOS Safari
-    // @ts-ignore
+    // @ts-expect-error — navigator.standalone is iOS-only, not in TS lib types
     window.navigator?.standalone === true
   );
 }

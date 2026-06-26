@@ -6,6 +6,9 @@ import { NextResponse } from "next/server";
 import crypto from "node:crypto";
 import { getExperiment, assignVariant, recordExposure } from "@/lib/experiments/ab-testing";
 
+// node:crypto wymaga Node runtime — bez tego Next próbuje zbundlować route
+// dla Edge, gdzie webpack nie obsługuje schematu `node:` (UnhandledSchemeError).
+export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
@@ -16,7 +19,7 @@ export async function GET(req: Request) {
   const seedParam = url.searchParams.get("seed");
   const cookieHeader = req.headers.get("cookie") ?? "";
   const anonCookie = /dlk_anon=([a-zA-Z0-9_-]+)/.exec(cookieHeader)?.[1];
-  let seed = seedParam ?? anonCookie ?? crypto.randomBytes(8).toString("hex");
+  const seed = seedParam ?? anonCookie ?? crypto.randomBytes(8).toString("hex");
 
   const exp = await getExperiment(key);
   if (!exp || exp.status !== "running") {

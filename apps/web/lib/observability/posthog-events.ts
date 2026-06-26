@@ -109,8 +109,11 @@ export function trackEvent(
 
     if (typeof window !== "undefined") {
       // Klient — preferuj posthog-js gdy dostępny.
-      const ph = (window as unknown as { posthog?: { capture: Function } })
-        .posthog;
+      const ph = (
+        window as unknown as {
+          posthog?: { capture: (name: string, props?: Record<string, unknown>) => void };
+        }
+      ).posthog;
       if (ph && typeof ph.capture === "function") {
         ph.capture(name, props);
         return;

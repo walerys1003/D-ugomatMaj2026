@@ -35,7 +35,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
     this.setState({ errorInfo });
     // Wyślij do Sentry jeśli dostępny
     try {
-      // @ts-ignore — Sentry browser SDK loads dynamically
+      // Sentry browser SDK loads dynamically; globalThis cast avoids hard dep.
       const Sentry = (globalThis as any).Sentry;
       if (Sentry?.captureException) {
         Sentry.captureException(error, {

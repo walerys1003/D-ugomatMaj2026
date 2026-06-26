@@ -436,17 +436,17 @@ export default function V5GalleryPage() {
             </div>
             <V5Surface variant="terminal" className="p-6">
               <div className="space-y-2 font-mono text-[0.8125rem]">
-                <div className="text-white/60">/* color */</div>
+                <div className="text-white/60">{"/* color */"}</div>
                 <div>--v5-violet-500: hsl(240 91% 66%);</div>
                 <div>--v5-audit-500: hsl(231 80% 64%);</div>
                 <div>--v5-ok:        hsl(156 100% 38%);</div>
-                <div className="text-white/60 mt-3">/* typography */</div>
+                <div className="text-white/60 mt-3">{"/* typography */"}</div>
                 <div>--v5-font-display: clamp(3rem, 6vw + 1rem, 8.75rem);</div>
                 <div>--v5-font-h1:      clamp(2.5rem, 5vw + .5rem, 5.5rem);</div>
-                <div className="text-white/60 mt-3">/* spacing */</div>
+                <div className="text-white/60 mt-3">{"/* spacing */"}</div>
                 <div>--v5-space-section: clamp(11.25rem, 14vw, 16.25rem);</div>
                 <div>--v5-space-card:    clamp(2.25rem, 3.5vw, 3.5rem);</div>
-                <div className="text-white/60 mt-3">/* motion */</div>
+                <div className="text-white/60 mt-3">{"/* motion */"}</div>
                 <div>--v5-ease-cinematic: cubic-bezier(.22,1,.36,1);</div>
                 <div>--v5-dur-base:       320ms;</div>
               </div>

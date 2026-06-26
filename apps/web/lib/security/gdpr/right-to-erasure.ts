@@ -3,7 +3,7 @@
 //  2. Hard-delete after grace: rows wiped or anonymized; audit_log retained
 //     for legal-retention obligations (anonymized).
 
-import { randomUUID } from "crypto";
+import { randomUUID, createHash } from "crypto";
 
 const GRACE_DAYS = 30;
 
@@ -98,7 +98,6 @@ export async function executeErasure(supabase: any, requestId: string): Promise<
 }
 
 function hashUser(userId: string): string {
-  const { createHash } = require("crypto");
   return createHash("sha256").update(userId).digest("hex").slice(0, 16);
 }
 
