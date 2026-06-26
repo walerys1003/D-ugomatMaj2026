@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -8,14 +9,8 @@ import {
   Sparkles,
 } from "lucide-react";
 
-import { Section } from "@/components/ui/section";
-import { Surface } from "@/components/ui/surface";
-import { Eyebrow, Display, Text, Mono } from "@/components/ui/typography";
-
 /**
  * Press logos shown directly under the hero CTAs.
- * V5 redesign moved this list out of TrustBar to give it maximum impact
- * \u2014 user sees "Rzeczpospolita" before they have to scroll.
  */
 const PRESS_HERO: readonly string[] = [
   "Rzeczpospolita",
@@ -25,376 +20,277 @@ const PRESS_HERO: readonly string[] = [
 ];
 
 /**
- * Hero v4 — Tarcza "Stoic" / real product artifact.
+ * Hero v5 "Apex" — premium dark-mode breakthrough.
  *
- * Zmiany vs v3 (audit V4 §3.2):
- *  - Usunięty terminal-mock (Mac traffic lights) — wyglądał jak demo CLI
- *  - Zamiast tego: **2-panel composition** — lewy panel "Skaner Nakazu"
- *    (extracted entities z prawdziwego dokumentu) + prawy panel "Sprzeciw"
- *    (draft pisma z konkretnymi paragrafami). To jest dokładnie ten sam UI
- *    który użytkownik dostanie w `/skaner-nakazu` i `/panel/sprawy/[id]`.
- *  - Stat row pod CTA — 3 KPI z PRAWDZIWYM disclosure (nie marketing claim)
- *  - Primary CTA z group-hover translate-x na ikonie (Stripe pattern)
- *  - Secondary CTA "Zobacz demo" — wyraźniej linki do showcase niż "Jak działa"
- *  - Aside note "Skaner darmowy — bez karty" jako trust micro-signal
+ * Zmiany vs v4 (redesign 2026-06):
+ *  - Pełny dark-mode (deep navy mesh) zamiast split jasny/granat — koniec
+ *    z estetyką "SaaS 2018". Jednolite, kinowe tło.
+ *  - Centralny artefakt: wygenerowana RZEŹBA 3D "aegis" (szkło + stal +
+ *    szafir), nie neon-antywirusowa tarcza. Plik: /public/hero/aegis-hero.webp
+ *  - Floating glass-chipy (Analiza AI / Generowanie pism / Terminy / Ochrona)
+ *    jako cienkie, świetliste sygnały zamiast labeli na liniach.
+ *  - Realny produktowy mini-panel (Skaner) jako glassmorphic overlay — dowód,
+ *    że to działający produkt, nie ilustracja.
+ *  - Typografia mocniejsza, większy oddech, świetlisty akcent na słowie kluczu.
  *
- * Hierarchy:
- *  - Display level=1 (modular 5xl→7xl)
- *  - Text size=lg dla sub-h1 (44ch readable line)
- *  - Eyebrow brand z dotem (jeden anchor wizualny)
- *
- * Composition (audit V4 §5.2 — benchmark Stripe):
- *  - Lewa kolumna: editorial copy + CTA + trust
- *  - Prawa kolumna: gniazdo z 2 panelami stacked (overlapping shadow,
- *    lewy lekko z tyłu, prawy z przodu — depth bez tinted shadowów)
- *  - Tło hero: bg-background (kontynuacja z headerem)
+ * Layout: 2 kolumny na lg+ (copy lewo / wizual prawo), single-column mobile.
  */
 export function Hero() {
   return (
-    <Section
-      tone="default"
-      density="spacious"
-      width="lg"
-      className="relative overflow-hidden"
+    <section
       aria-labelledby="hero-headline"
+      className="relative isolate overflow-hidden bg-dlugomat-950 text-white"
     >
-      {/* Subtle dot grid background — premium signal bez wizualnego hałasu */}
+      {/* ── Tło: mesh gradient + aurora glow + siatka "shield grid" ───────── */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-20">
+        {/* baza: głęboki granat → prawie czerń */}
+        <div className="absolute inset-0 bg-[radial-gradient(125%_125%_at_75%_10%,hsl(222_70%_18%)_0%,hsl(224_72%_9%)_42%,hsl(226_76%_5%)_100%)]" />
+        {/* aurora — błękitna poświata z prawej, w stronę tarczy */}
+        <div className="absolute -right-1/4 top-[-20%] h-[80%] w-[70%] rounded-full bg-[radial-gradient(closest-side,hsl(212_100%_55%/0.28),transparent)] blur-3xl" />
+        {/* druga, chłodniejsza poświata przy dole-lewo dla balansu */}
+        <div className="absolute -left-[10%] bottom-[-25%] h-[60%] w-[55%] rounded-full bg-[radial-gradient(closest-side,hsl(199_95%_55%/0.16),transparent)] blur-3xl" />
+      </div>
+      {/* siatka shield grid (subtelna) */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 opacity-[0.35] [background-image:radial-gradient(hsl(0_0%_85%)_1px,transparent_1px)] [background-size:32px_32px] [mask-image:radial-gradient(ellipse_at_top,black_30%,transparent_70%)]"
+        className="pointer-events-none absolute inset-0 -z-10 opacity-[0.5] [background-image:linear-gradient(to_right,hsl(212_100%_70%/0.05)_1px,transparent_1px),linear-gradient(to_bottom,hsl(212_100%_70%/0.05)_1px,transparent_1px)] [background-size:54px_54px] [mask-image:radial-gradient(ellipse_at_top_right,black_30%,transparent_75%)]"
+      />
+      {/* hairline na górze dla "edge premium" */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent"
       />
 
-      <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12 xl:gap-16">
-        {/* LEFT — Editorial copy. min-w-0 jest KLUCZOWY: bez niego Display
-            headline (text-balance + tabular nums) rośnie do swojego intrinsic
-            width i zjada CAŁĄ szerokość kolumny, kurcząc prawą kolumnę
-            (bug Tailwind grid items default min-width: auto). */}
-        <div className="flex min-w-0 flex-col gap-7">
-          <Eyebrow tone="brand" withDot>
-            AI legal-tech · nadzór radcy prawnego · zgodne z&nbsp;KPC
-          </Eyebrow>
-
-          <Display
-            level={1}
-            id="hero-headline"
-            className="max-w-[14ch] text-balance"
-          >
-            Tarcza dla&nbsp;zadłużonych.
-          </Display>
-
-          <Text size="lg" tone="default" className="max-w-[46ch] text-balance">
-            Wczytaj nakaz zapłaty, list od&nbsp;komornika lub raport BIK.
-            AI&nbsp;Długomata rozpozna dokument, oceni przedawnienie
-            i&nbsp;wygeneruje pismo procesowe — w&nbsp;12&nbsp;minut, bez
-            prawnika.
-          </Text>
-
-          {/* V5 dodatek — odpowiedź na ukrytą obiekcję "co potem?".
-              Użytkownik czuje lęk przed pierwszym kontaktem z sądem, więc
-              od razu pokazujemy że wysyłka jest jego, ale nie zostaje sam. */}
-          <Text size="sm" tone="muted" className="max-w-[46ch] -mt-2">
-            <span className="inline-flex items-center gap-1.5">
-              <FileText className="size-3.5 text-ink-500" aria-hidden />
-              Gotowe pismo wysyłasz sam (e-mail, ePUAP lub poczta) —
-              pokazujemy jak, krok po kroku.
+      <div className="mx-auto w-full max-w-[1200px] px-5 py-24 sm:px-8 md:py-28 lg:py-32">
+        <div className="grid items-center gap-14 lg:grid-cols-[1.02fr_0.98fr] lg:gap-12 xl:gap-16">
+          {/* ── LEFT — editorial copy ─────────────────────────────────────── */}
+          <div className="flex min-w-0 flex-col gap-7">
+            {/* Eyebrow / brand chip */}
+            <span className="inline-flex w-fit items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-sky-200/90 backdrop-blur">
+              <span aria-hidden className="size-1.5 rounded-full bg-sky-400 shadow-[0_0_8px_2px_hsl(212_100%_60%/0.7)]" />
+              AI legal-tech · nadzór radcy · zgodne z&nbsp;KPC
             </span>
-          </Text>
 
-          {/* CTAs */}
-          <div className="mt-1 flex flex-col gap-3 sm:flex-row sm:items-center">
-            <Link
-              href="/skaner-nakazu"
-              className="group inline-flex h-11 items-center justify-center gap-2 rounded-sm bg-ink-900 px-5 text-[14px] font-semibold text-white shadow-[inset_0_1px_0_0_hsl(0_0%_100%/0.12)] transition-all duration-150 ease-out hover:bg-ink-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink-900 focus-visible:ring-offset-2"
+            <h1
+              id="hero-headline"
+              className="font-display text-balance text-[40px] font-bold leading-[1.04] tracking-[-0.02em] text-white sm:text-[52px] lg:text-[58px] xl:text-[64px]"
             >
-              <Scan className="size-4" aria-hidden />
-              Zeskanuj nakaz — darmowe
-              <ArrowRight
-                className="size-3.5 -mr-0.5 transition-transform duration-150 ease-out group-hover:translate-x-0.5"
-                aria-hidden
-              />
-            </Link>
-            <Link
-              href="/jak-to-dziala"
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-sm border border-ink-200 bg-white px-5 text-[14px] font-semibold text-ink-900 shadow-[inset_0_0_0_1px_hsl(220_15%_100%/0.5)] transition-colors duration-150 hover:border-ink-300 hover:bg-ink-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink-900 focus-visible:ring-offset-2"
-            >
-              Zobacz demo (90 sek)
-            </Link>
-          </div>
+              Twoja tarcza
+              <br className="hidden sm:block" /> w&nbsp;walce z&nbsp;
+              <span className="relative whitespace-nowrap text-transparent bg-clip-text bg-gradient-to-r from-sky-300 via-sky-400 to-blue-500">
+                długami
+              </span>
+              .
+            </h1>
 
-          <Text size="xs" tone="muted" className="-mt-1">
-            <span className="inline-flex items-center gap-1.5">
-              <Check className="size-3 text-ink-500" aria-hidden />
-              Skaner i analiza AI — darmowe. Bez karty. Bez subskrypcji.
-            </span>
-          </Text>
-
-          {/* Trust row — 4 metryki (V5: "70% na telefonie" dodane jako
-              mobile-first sygnał, bo większość ruchu Długomata to telefony).
-              Grid 2×2 na mobile, 4-col na lg+. */}
-          <dl className="mt-6 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-ink-200 pt-6 lg:grid-cols-4">
-            <TrustStat
-              value="12 min"
-              label="średni czas od skanu do pisma"
-              hint="mediana 2 851 spraw, Q1–Q3 2026"
-            />
-            <TrustStat
-              value="14 dni"
-              label="ustawowy termin sprzeciwu od EPU"
-              hint="art. 502 §1 KPC"
-            />
-            <TrustStat
-              value="70%"
-              label="użytkowników kończy na telefonie"
-              hint="OCR z aparatu · mobile-first UI"
-            />
-            <TrustStat
-              value="AES-256"
-              label="szyfrowanie at-rest"
-              hint="audyt SOC 2 Type II w toku"
-            />
-          </dl>
-
-          {/* Press logos — V5 przeniesione z TrustBar do hero (audit §3.4).
-              Tu mają największy impact — user widzi "Rzeczpospolita" zanim
-              przewinie. Lekka typografia, bez ramek, bez logo plików. */}
-          <div className="mt-2 flex flex-col gap-2.5">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-ink-500">
-              Pisali o&nbsp;nas
+            <p className="max-w-[48ch] text-balance text-[16px] leading-relaxed text-slate-300 sm:text-[17px]">
+              Wczytaj nakaz zapłaty, list od&nbsp;komornika lub raport BIK.
+              AI&nbsp;Długomata rozpozna dokument, oceni przedawnienie
+              i&nbsp;wygeneruje pismo procesowe — w&nbsp;12&nbsp;minut, bez
+              prawnika.
             </p>
-            <ul className="flex flex-wrap items-center gap-x-6 gap-y-1.5">
-              {PRESS_HERO.map((p) => (
-                <li
-                  key={p}
-                  className="font-display text-[13px] font-semibold tracking-tight text-ink-500"
-                >
-                  {p}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
 
-        {/* RIGHT — Real product composition. min-w-0 chroni przed
-            wypychaniem grid'a przez wewnętrzną zawartość kart. */}
-        <div className="min-w-0">
-          <HeroArtifact />
+            <p className="-mt-2 max-w-[48ch] text-[13px] leading-relaxed text-slate-400">
+              <span className="inline-flex items-center gap-1.5">
+                <FileText className="size-3.5 text-sky-400/80" aria-hidden />
+                Gotowe pismo wysyłasz sam (e-mail, ePUAP lub poczta) — pokazujemy
+                jak, krok po kroku.
+              </span>
+            </p>
+
+            {/* CTAs */}
+            <div className="mt-1 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <Link
+                href="/skaner-nakazu"
+                className="group inline-flex h-12 items-center justify-center gap-2 rounded-md bg-white px-6 text-[14px] font-semibold text-dlugomat-950 shadow-[0_8px_30px_-8px_hsl(212_100%_60%/0.5)] transition-all duration-150 ease-out hover:bg-sky-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-dlugomat-950"
+              >
+                <Scan className="size-4" aria-hidden />
+                Zeskanuj nakaz — darmowe
+                <ArrowRight
+                  className="size-3.5 -mr-0.5 transition-transform duration-150 ease-out group-hover:translate-x-0.5"
+                  aria-hidden
+                />
+              </Link>
+              <Link
+                href="/jak-to-dziala"
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-md border border-white/15 bg-white/[0.04] px-6 text-[14px] font-semibold text-white backdrop-blur transition-colors duration-150 hover:border-white/30 hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-dlugomat-950"
+              >
+                Zobacz demo (90&nbsp;sek)
+              </Link>
+            </div>
+
+            <p className="-mt-1 text-[12px] text-slate-400">
+              <span className="inline-flex items-center gap-1.5">
+                <Check className="size-3 text-sky-400/80" aria-hidden />
+                Skaner i&nbsp;analiza AI — darmowe. Bez karty. Bez subskrypcji.
+              </span>
+            </p>
+
+            {/* Trust row */}
+            <dl className="mt-6 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-white/10 pt-6 lg:grid-cols-4">
+              <TrustStat value="12 min" label="średni czas od skanu do pisma" hint="mediana 2 851 spraw" />
+              <TrustStat value="14 dni" label="ustawowy termin sprzeciwu EPU" hint="art. 502 §1 KPC" />
+              <TrustStat value="70%" label="kończy na telefonie" hint="OCR z aparatu" />
+              <TrustStat value="AES-256" label="szyfrowanie at-rest" hint="SOC 2 Type II w toku" />
+            </dl>
+
+            {/* Press */}
+            <div className="mt-2 flex flex-col gap-2.5">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500">
+                Pisali o&nbsp;nas
+              </p>
+              <ul className="flex flex-wrap items-center gap-x-6 gap-y-1.5">
+                {PRESS_HERO.map((p) => (
+                  <li
+                    key={p}
+                    className="font-display text-[13px] font-semibold tracking-tight text-slate-400"
+                  >
+                    {p}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* ── RIGHT — aegis 3D artwork + glass overlays ─────────────────── */}
+          <div className="relative min-w-0">
+            <HeroVisual />
+          </div>
         </div>
       </div>
-    </Section>
+
+      {/* miękkie zejście do następnej sekcji (jasnej) */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-background/0"
+      />
+    </section>
   );
 }
 
-/**
- * HeroArtifact — 2-panel composition:
- *   1. ScannerCard (front-right) — wynik OCR + ekstrakcja encji
- *   2. SprzeciwCard (behind-left) — draft pisma generowany w 12 min
- *
- * Obie karty wyglądają jak prawdziwe UI z `/panel/sprawy/[id]`, nie jak
- * mockup terminala. Z premium depth: floating card + ground card behind.
- */
-function HeroArtifact() {
-  // V4-ι.6 — PEŁNY REDESIGN.
-  // Koniec z absolute positioning. Karty są zwykłymi block elementami
-  // ułożonymi pionowo (flex-col). Depth effect uzyskany przez:
-  //   - lekki tilt każdej karty w przeciwnych kierunkach (transform rotate)
-  //   - negatywny margin-top na drugiej karcie (-mt-6) → wizualne overlap
-  //   - różne elevation shadows
-  //   - z-index porządek — Scanner (primary) on top
-  // Zero overflow, zero clipping, w pełni przewidywalne na każdym viewport.
-  return (
-    <div className="relative mx-auto flex w-full max-w-full flex-col items-stretch sm:max-w-[460px] lg:max-w-none">
-      {/* Background card — Sprzeciw draft. Lekki tilt w prawo. */}
-      <div className="origin-top-right rotate-[1.5deg] transform-gpu">
-        <Surface elevation="raised" padded="none" className="overflow-hidden">
-          <SprzeciwCard />
-        </Surface>
-      </div>
+/* ─── Right-side visual: generated aegis + floating glass chips ─────────── */
 
-      {/* Foreground card — Scanner result. Lekki tilt w lewo + overlap. */}
-      <div className="relative z-10 -mt-6 origin-bottom-left -rotate-[1deg] transform-gpu">
-        <Surface elevation="floating" padded="none" className="overflow-hidden">
-          <ScannerCard />
-        </Surface>
+function HeroVisual() {
+  return (
+    <div className="relative mx-auto aspect-square w-full max-w-[560px]">
+      {/* halo za obrazem */}
+      <div
+        aria-hidden
+        className="absolute inset-[8%] -z-10 rounded-full bg-[radial-gradient(closest-side,hsl(212_100%_55%/0.35),transparent)] blur-2xl"
+      />
+
+      {/* wygenerowana rzeźba 3D */}
+      <Image
+        src="/hero/aegis-hero.webp"
+        alt="Długomat — cyfrowa tarcza chroniąca przed długami: rzeźba 3D z literą D"
+        width={1120}
+        height={1120}
+        priority
+        sizes="(min-width: 1024px) 560px, 90vw"
+        className="h-full w-full select-none object-contain drop-shadow-[0_24px_60px_rgba(0,0,0,0.55)]"
+      />
+
+      {/* Glass chip — góra-lewo: Analiza AI */}
+      <FloatingChip
+        className="left-0 top-[14%] sm:-left-2"
+        icon={<Scan className="size-3.5" aria-hidden />}
+        title="Analiza AI"
+        sub="wykrywa błędy w sprawie"
+      />
+      {/* Glass chip — góra-prawo: Generowanie pism */}
+      <FloatingChip
+        className="right-0 top-[6%] sm:-right-3"
+        icon={<FileText className="size-3.5" aria-hidden />}
+        title="Generowanie pism"
+        sub="sprzeciw · skarga · ugoda"
+      />
+      {/* Glass chip — dół-prawo: Twoja ochrona */}
+      <FloatingChip
+        className="bottom-[14%] right-0 sm:-right-2"
+        icon={<ShieldCheck className="size-3.5" aria-hidden />}
+        title="Twoja ochrona"
+        sub="przed windykacją i egzekucją"
+      />
+
+      {/* Mini-panel produktowy (dół-lewo) — dowód „to działa" */}
+      <div className="absolute -bottom-2 left-0 w-[58%] max-w-[230px] sm:-left-4">
+        <div className="rounded-lg border border-white/10 bg-white/[0.06] p-3 shadow-[0_16px_40px_-12px_rgba(0,0,0,0.6)] backdrop-blur-xl">
+          <div className="flex items-center justify-between gap-2">
+            <span className="inline-flex items-center gap-1.5">
+              <span className="flex size-4 items-center justify-center rounded-sm bg-sky-500/90 text-white">
+                <Sparkles className="size-2.5" aria-hidden />
+              </span>
+              <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300">
+                Skaner nakazu
+              </span>
+            </span>
+            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-400/15 px-1.5 py-0.5">
+              <span aria-hidden className="size-1 rounded-full bg-emerald-400" />
+              <span className="text-[9px] font-medium text-emerald-300">live</span>
+            </span>
+          </div>
+          <div className="mt-2.5 flex flex-col gap-1.5">
+            <PanelRow label="Kwota" value="3 247,18 zł" />
+            <PanelRow label="Przedawnienie" value="408 dni" danger />
+          </div>
+          <div className="mt-2.5 inline-flex items-center gap-1.5 rounded-md bg-white/[0.06] px-2 py-1.5">
+            <ShieldCheck className="size-3 text-emerald-300" aria-hidden />
+            <span className="text-[10px] font-medium text-slate-200">
+              Sprzeciw z zarzutem przedawnienia
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
-/* ─── Foreground: Scanner result ──────────────────────────────────────── */
-
-function ScannerCard() {
+function FloatingChip({
+  className,
+  icon,
+  title,
+  sub,
+}: {
+  className?: string;
+  icon: React.ReactNode;
+  title: string;
+  sub: string;
+}) {
   return (
-    <article aria-label="Wynik skanera">
-      {/* Header */}
-      <header className="flex items-center justify-between gap-3 border-b border-ink-200 bg-white px-4 py-2.5">
-        <div className="flex items-center gap-2">
-          <span className="flex size-5 items-center justify-center rounded-sm bg-ink-900 text-white">
-            <Scan className="size-3" aria-hidden />
-          </span>
-          <Mono size="xs" tone="strong">Skaner Nakazu</Mono>
-        </div>
-        <span className="inline-flex items-center gap-1.5 rounded-sm bg-ink-50 px-1.5 py-0.5">
-          <span aria-hidden className="size-1.5 rounded-full bg-accent-500" />
-          <Mono size="xs" tone="muted">live</Mono>
-        </span>
-      </header>
-
-      {/* Body */}
-      <div className="flex flex-col gap-3.5 bg-white px-4 py-4">
-        {/* Sygnatura row */}
-        <div className="flex items-baseline justify-between gap-3">
-          <div className="flex flex-col gap-0.5">
-            <Eyebrow tone="neutral">Sygnatura</Eyebrow>
-            <Mono size="sm" tone="strong">Nc-e 4118723/24</Mono>
-          </div>
-          <span className="inline-flex items-center gap-1 rounded-sm bg-ink-50 px-1.5 py-1">
-            <Sparkles className="size-3 text-ink-700" aria-hidden />
-            <Mono size="xs" tone="muted">Claude 4.6</Mono>
-          </span>
-        </div>
-
-        {/* Extracted entities — 2col grid */}
-        <dl className="grid grid-cols-2 gap-x-4 gap-y-2 rounded-sm border border-ink-200 bg-ink-50 p-3">
-          <EntityRow label="Kwota" value="3 247,18 PLN" />
-          <EntityRow label="Wymagalność" value="12.08.2018" />
-          <EntityRow label="Powód" value="EOS KSI Polska" />
-          <EntityRow label="Sąd" value="Lublin-Zachód VI" />
-        </dl>
-
-        {/* Findings — 3 risk chips */}
-        <div className="flex flex-col gap-1.5">
-          <FindingRow
-            tone="danger"
-            label="Przedawnienie roszczenia"
-            detail="termin upłynął 14.03.2024 · 408 dni temu"
-          />
-          <FindingRow
-            tone="warning"
-            label="Doręczenie zastępcze"
-            detail="art. 139 KPC — możliwy zarzut"
-          />
-          <FindingRow
-            tone="info"
-            label="Pozostały termin"
-            detail="12 dni do złożenia sprzeciwu"
-          />
-        </div>
-      </div>
-
-      {/* Footer — rekomendacja */}
-      <footer className="flex items-center justify-between gap-3 border-t border-ink-200 bg-ink-50 px-4 py-2.5">
-        <Mono size="xs" tone="muted">Rekomendacja</Mono>
-        <span className="inline-flex items-center gap-1.5">
-          <ShieldCheck className="size-3.5 text-accent-700" aria-hidden />
-          <Text size="xs" tone="success" weight="semibold" as="span">
-            Sprzeciw z zarzutem przedawnienia
-          </Text>
-        </span>
-      </footer>
-    </article>
+    <div
+      className={`absolute z-10 flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.07] py-1.5 pl-2 pr-3.5 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.6)] backdrop-blur-xl ${className ?? ""}`}
+    >
+      <span className="flex size-7 items-center justify-center rounded-full bg-gradient-to-br from-sky-400/90 to-blue-600/90 text-white shadow-[0_0_12px_2px_hsl(212_100%_60%/0.45)]">
+        {icon}
+      </span>
+      <span className="flex flex-col leading-tight">
+        <span className="text-[12px] font-semibold text-white">{title}</span>
+        <span className="text-[10px] text-slate-300">{sub}</span>
+      </span>
+    </div>
   );
 }
 
-/* ─── Behind: Sprzeciw draft preview ──────────────────────────────────── */
-
-function SprzeciwCard() {
+function PanelRow({
+  label,
+  value,
+  danger,
+}: {
+  label: string;
+  value: string;
+  danger?: boolean;
+}) {
   return (
-    <article aria-label="Podgląd pisma — sprzeciw">
-      <header className="flex items-center justify-between gap-3 border-b border-ink-200 bg-white px-4 py-2.5">
-        <div className="flex items-center gap-2">
-          <span className="flex size-5 items-center justify-center rounded-sm border border-ink-200 bg-white text-ink-700">
-            <FileText className="size-3" aria-hidden />
-          </span>
-          <Mono size="xs" tone="strong">sprzeciw-Nc-e-4118723.docx</Mono>
-        </div>
-        <Mono size="xs" tone="muted">12 / 14 min</Mono>
-      </header>
-
-      <div className="flex flex-col gap-2 bg-white px-5 py-4">
-        <Text size="xs" tone="strong" weight="semibold" as="p">
-          SPRZECIW OD NAKAZU ZAPŁATY
-        </Text>
-        <Text size="xs" tone="muted" as="p">
-          wydanego w postępowaniu upominawczym Nc-e 4118723/24
-        </Text>
-        <div className="mt-2 flex flex-col gap-1.5 text-[11px] leading-relaxed text-ink-700">
-          <p>
-            <span className="font-semibold text-ink-900">I.</span>&nbsp; Zaskarżam
-            w&nbsp;całości nakaz zapłaty z&nbsp;dnia&nbsp;…
-          </p>
-          <p>
-            <span className="font-semibold text-ink-900">II.</span>&nbsp; Podnoszę
-            zarzut <span className="bg-warn-100 px-0.5 font-medium text-ink-900">przedawnienia</span> roszczenia (art. 118 KC).
-          </p>
-          <p>
-            <span className="font-semibold text-ink-900">III.</span>&nbsp; Wnoszę
-            o&nbsp;oddalenie powództwa…
-          </p>
-        </div>
-
-        <div className="mt-3 grid grid-cols-3 gap-1.5">
-          <DraftChip label="6 zarzutów" />
-          <DraftChip label="3 załączniki" />
-          <DraftChip label="ePUAP gotowy" />
-        </div>
-      </div>
-    </article>
-  );
-}
-
-/* ─── helpers ─────────────────────────────────────────────────────────── */
-
-function EntityRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex flex-col gap-0.5">
-      <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-ink-500">
+    <div className="flex items-center justify-between gap-2">
+      <span className="text-[10px] uppercase tracking-[0.1em] text-slate-400">
         {label}
       </span>
-      <span className="font-mono text-[12px] font-medium tabular-nums text-ink-900">
+      <span
+        className={`font-mono text-[11px] font-medium tabular-nums ${danger ? "text-rose-300" : "text-white"}`}
+      >
         {value}
       </span>
     </div>
-  );
-}
-
-function FindingRow({
-  tone,
-  label,
-  detail,
-}: {
-  tone: "danger" | "warning" | "info";
-  label: string;
-  detail: string;
-}) {
-  const dotColor = {
-    danger: "bg-danger-500",
-    warning: "bg-warn-500",
-    info: "bg-ink-700",
-  }[tone];
-
-  return (
-    <div className="flex items-start gap-2.5 rounded-sm px-1 py-1">
-      <span
-        aria-hidden
-        className={`mt-1.5 size-1.5 shrink-0 rounded-full ${dotColor}`}
-      />
-      <div className="min-w-0 flex-1">
-        <Text size="xs" tone="strong" weight="medium" as="div">
-          {label}
-        </Text>
-        <Text size="xs" tone="muted" as="div" className="mt-0.5">
-          {detail}
-        </Text>
-      </div>
-    </div>
-  );
-}
-
-function DraftChip({ label }: { label: string }) {
-  return (
-    <span className="flex items-center justify-center rounded-sm border border-ink-200 bg-ink-50 px-1.5 py-1 text-[10px] font-medium text-ink-700">
-      {label}
-    </span>
   );
 }
 
@@ -409,11 +305,11 @@ function TrustStat({
 }) {
   return (
     <div className="flex flex-col">
-      <dt className="font-display text-[22px] font-semibold leading-none text-ink-900 tabular-nums">
+      <dt className="font-display text-[22px] font-semibold leading-none text-white tabular-nums">
         {value}
       </dt>
-      <dd className="mt-1.5 text-[12px] leading-snug text-ink-600">{label}</dd>
-      <dd className="mt-0.5 text-[10px] leading-snug text-ink-400">{hint}</dd>
+      <dd className="mt-1.5 text-[12px] leading-snug text-slate-300">{label}</dd>
+      <dd className="mt-0.5 text-[10px] leading-snug text-slate-500">{hint}</dd>
     </div>
   );
 }
