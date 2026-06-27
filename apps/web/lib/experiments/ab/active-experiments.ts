@@ -8,6 +8,8 @@
  * przez `seedActiveExperiments()` (wywoływane raz przy deploy / przez admin UI).
  */
 import type { ExperimentVariant } from "./experiment-engine";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/lib/db/types";
 
 export interface ActiveExperimentDef {
   key: string;
@@ -132,13 +134,10 @@ export const ACTIVE_EXPERIMENTS: ActiveExperimentDef[] = [
  * lub ręcznie przez admin (POST /api/admin/experiments/sync).
  */
 export async function seedActiveExperiments(opts?: {
-  sb?: unknown;
+  sb?: SupabaseClient<Database>;
 }): Promise<{ inserted: number; updated: number; errors: number }> {
   const { createSupabaseServerClient } = await import("@/lib/db/supabase-server");
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // (Tier 7 added experiments table; codegen types not regen'd yet).
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = opts?.sb ?? (await createSupabaseServerClient());
+  const sb: SupabaseClient<Database> = opts?.sb ?? (await createSupabaseServerClient());
 
   let inserted = 0;
   let updated = 0;
@@ -152,10 +151,17 @@ export async function seedActiveExperiments(opts?: {
       .eq("key", def.key)
       .maybeSingle();
 
+    // REALNY BUG (audyt #6, iter 19): payload zawiera kolumny Tier20 (hypothesis,
+    // layer, traffic_percent, variants jsonb, control_variant, goal_event,
+    // guardrail_events, min_sample_size, mde_percent), które NIE ISTNIEJĄ w żywej
+    // tabeli `experiments` (schemat TIER8 wygrał przez `create table if not exists`).
+    // W praktyce insert/update zwróci błąd (errors++). Boundary cast przez `unknown`
+    // jest świadomy — naprawa wymaga migracji ujednolicającej schemat (poza #6).
+    const existingRow = existing as { id: string; status: string } | null;
     const payload = {
       key: def.key,
       hypothesis: def.hypothesis,
-      status: existing?.status ?? status,
+      status: existingRow?.status ?? status,
       layer: def.layer,
       traffic_percent: def.traffic_percent,
       variants: def.variants,
@@ -168,8 +174,11 @@ export async function seedActiveExperiments(opts?: {
       updated_at: new Date().toISOString(),
     };
 
-    if (existing) {
-      const { error } = await sb.from("experiments").update(payload).eq("id", existing.id);
+    if (existingRow) {
+      const { error } = await sb
+        .from("experiments")
+        .update(payload as unknown as Database["public"]["Tables"]["experiments"]["Update"])
+        .eq("id", existingRow.id);
       if (error) errors++;
       else updated++;
     } else {
@@ -177,7 +186,7 @@ export async function seedActiveExperiments(opts?: {
         ...payload,
         started_at: def.auto_start ? new Date().toISOString() : null,
         created_at: new Date().toISOString(),
-      });
+      } as unknown as Database["public"]["Tables"]["experiments"]["Insert"]);
       if (error) errors++;
       else inserted++;
     }

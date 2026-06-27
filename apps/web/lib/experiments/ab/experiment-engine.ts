@@ -18,6 +18,7 @@
 
 import { createHash } from "crypto";
 import { createSupabaseServerClient } from "@/lib/db/supabase-server";
+import type { Json } from "@/lib/db/types";
 
 export type ExperimentStatus = "draft" | "running" | "paused" | "completed" | "archived";
 
@@ -61,16 +62,20 @@ export interface Assignment {
 
 export async function getExperiment(key: string): Promise<Experiment | null> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
-  const { data, error } = await sb
+  const { data, error } = await supabase
     .from("experiments")
     .select("*")
     .eq("key", key)
     .maybeSingle();
   if (error) throw error;
-  return (data ?? null) as Experiment | null;
+  // REALNY BUG (audyt #6, iter 19): KOLIZJA migracji `experiments`. Żywa tabela
+  // ma schemat TIER8 (variants text[], traffic_split, primary_metric...), a ten
+  // silnik (Tier20) oczekuje kolumn hypothesis/layer/traffic_percent/variants(jsonb)/
+  // control_variant/goal_event — które NIE ISTNIEJĄ. W praktyce zwrócony obiekt nie
+  // ma pól Tier20, więc assignVariant zawsze degraduje do "control". Boundary cast
+  // przez `unknown` jest świadomy i celowo udokumentowany — naprawa wymaga migracji
+  // ujednolicającej schemat (poza zakresem #6 = usuwanie `as any`).
+  return (data ?? null) as unknown as Experiment | null;
 }
 
 /**
@@ -82,16 +87,13 @@ export async function assignVariant(
   ctx: AssignmentContext,
 ): Promise<Assignment> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
   const exp = await getExperiment(experimentKey);
   if (!exp || exp.status !== "running") {
     return { experimentKey, variant: "control", reason: "paused" };
   }
 
   // 1) Sticky bucketing — sprawdź istniejący zapis.
-  const { data: existing } = await sb
+  const { data: existing } = await supabase
     .from("experiment_assignments")
     .select("variant")
     .eq("experiment_key", experimentKey)
@@ -108,7 +110,7 @@ export async function assignVariant(
 
   // 2) Layer exclusion — jeśli user już jest w innym eksperymencie z tej samej warstwy.
   if (exp.layer) {
-    const { data: layerAssign } = await sb
+    const { data: layerAssign } = await supabase
       .from("experiment_assignments")
       .select("experiment_key,layer")
       .eq("user_id", ctx.userId)
@@ -130,19 +132,23 @@ export async function assignVariant(
   // 4) Variant bucketing — deterministic hash → wagi.
   const variant = pickVariant(exp, ctx.userId);
 
-  await sb
-    .from("experiment_assignments")
-    .insert({
-      experiment_key: experimentKey,
-      user_id: ctx.userId,
-      layer: exp.layer,
-      variant,
-      assigned_at: new Date().toISOString(),
-    })
-    .select("variant")
-    .single()
-    .then(() => undefined)
-    .catch(() => undefined);
+  // Fire-and-forget zapis assignment. Typowany query-builder NIE ma `.catch()`
+  // (PostgrestBuilder jest thenable, ale bez metody catch) — dlatego try/catch.
+  try {
+    await supabase
+      .from("experiment_assignments")
+      .insert({
+        experiment_key: experimentKey,
+        user_id: ctx.userId,
+        layer: exp.layer,
+        variant,
+        assigned_at: new Date().toISOString(),
+      })
+      .select("variant")
+      .single();
+  } catch {
+    /* ignore — sticky bucketing best-effort */
+  }
 
   return {
     experimentKey,
@@ -184,11 +190,8 @@ export async function trackExposure(args: {
   context?: Record<string, unknown>;
 }): Promise<void> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
   const today = new Date().toISOString().slice(0, 10);
-  await sb
+  await supabase
     .from("experiment_exposures")
     .upsert(
       {
@@ -197,7 +200,7 @@ export async function trackExposure(args: {
         variant: args.variant,
         exposure_date: today,
         first_seen_at: new Date().toISOString(),
-        context: args.context ?? {},
+        context: (args.context ?? {}) as Json,
       },
       { onConflict: "experiment_key,user_id,exposure_date" },
     );
@@ -211,15 +214,12 @@ export async function trackGoal(args: {
   metadata?: Record<string, unknown>;
 }): Promise<void> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
-  await sb.from("experiment_goals").insert({
+  await supabase.from("experiment_goals").insert({
     experiment_key: args.experimentKey,
     user_id: args.userId,
     goal_event: args.goalEvent,
     value: args.value ?? 1,
-    metadata: args.metadata ?? {},
+    metadata: (args.metadata ?? {}) as Json,
     occurred_at: new Date().toISOString(),
   });
 }

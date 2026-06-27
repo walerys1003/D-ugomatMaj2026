@@ -1829,6 +1829,133 @@ export interface Database {
         >;
         Relationships: [];
       };
+      // UWAGA (audyt #6, iter 19): KOLIZJA `create table if not exists experiments`.
+      // Dwie migracje tworzą `public.experiments` z RÓŻNYM schematem:
+      //   - Tier8  (20260513100000) — WYGRYWA (wcześniejsza): variants text[],
+      //     traffic_split numeric[], primary_metric, winner_variant, description.
+      //   - Tier20 (20260523000000) — `if not exists` => POMINIĘTA: hypothesis,
+      //     layer, traffic_percent, variants jsonb, control_variant, goal_event...
+      // Żywa tabela ma schemat TIER8 — dlatego typujemy Tier8. Kod Tier20
+      // (experiment-engine.ts / active-experiments.ts) odpytuje nieistniejące
+      // kolumny => REALNY BUG udokumentowany w tych plikach (boundary casts).
+      experiments: {
+        Row: {
+          id: string;
+          key: string;
+          description: string;
+          variants: string[];
+          traffic_split: number[];
+          status: "draft" | "running" | "paused" | "completed";
+          primary_metric: string;
+          started_at: string | null;
+          ended_at: string | null;
+          winner_variant: string | null;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["experiments"]["Row"]
+        > & {
+          key: string;
+          description: string;
+          variants: string[];
+          traffic_split: number[];
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["experiments"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      experiment_events: {
+        Row: {
+          id: string;
+          experiment_key: string;
+          variant: string;
+          seed: string;
+          event_type: "exposure" | "conversion";
+          metric_name: string | null;
+          metric_value: number | null;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["experiment_events"]["Row"]
+        > & {
+          experiment_key: string;
+          variant: string;
+          seed: string;
+          event_type: "exposure" | "conversion";
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["experiment_events"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      // Tabele Tier20 (siostrzane) — istnieją w DB niezależnie od kolizji `experiments`.
+      experiment_assignments: {
+        Row: {
+          id: string;
+          experiment_key: string;
+          user_id: string;
+          layer: string | null;
+          variant: string;
+          assigned_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["experiment_assignments"]["Row"]
+        > & {
+          experiment_key: string;
+          user_id: string;
+          variant: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["experiment_assignments"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      experiment_exposures: {
+        Row: {
+          id: string;
+          experiment_key: string;
+          user_id: string;
+          variant: string;
+          exposure_date: string;
+          first_seen_at: string;
+          context: Json;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["experiment_exposures"]["Row"]
+        > & {
+          experiment_key: string;
+          user_id: string;
+          variant: string;
+          exposure_date: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["experiment_exposures"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      experiment_goals: {
+        Row: {
+          id: string;
+          experiment_key: string;
+          user_id: string;
+          goal_event: string;
+          value: number;
+          metadata: Json;
+          occurred_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["experiment_goals"]["Row"]
+        > & {
+          experiment_key: string;
+          user_id: string;
+          goal_event: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["experiment_goals"]["Insert"]
+        >;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     // Audyt 2026-06-27: większość RPC nie jest jeszcze dotypowana (degraduje

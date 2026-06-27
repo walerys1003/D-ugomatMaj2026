@@ -31,15 +31,12 @@ export interface Experiment {
 
 export async function getExperiment(key: string): Promise<Experiment | null> {
   const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
-  const { data } = await sb
+  const { data } = await supabase
     .from("experiments")
     .select("*")
     .eq("key", key)
     .maybeSingle();
-  return (data as Experiment) ?? null;
+  return (data as Experiment | null) ?? null;
 }
 
 /**
@@ -69,10 +66,7 @@ export async function recordExposure(
   seed: string,
 ): Promise<void> {
   const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
-  await sb.from("experiment_events").upsert(
+  await supabase.from("experiment_events").upsert(
     {
       experiment_key: experimentKey,
       variant,
@@ -90,11 +84,8 @@ export async function recordConversion(
   metricValue: number = 1,
 ): Promise<void> {
   const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
   // Find variant for this seed
-  const { data: exposure } = await sb
+  const { data: exposure } = await supabase
     .from("experiment_events")
     .select("variant")
     .eq("experiment_key", experimentKey)
@@ -103,7 +94,7 @@ export async function recordConversion(
     .maybeSingle();
   if (!exposure) return; // no exposure yet, skip
 
-  await sb.from("experiment_events").insert({
+  await supabase.from("experiment_events").insert({
     experiment_key: experimentKey,
     variant: (exposure as { variant: string }).variant,
     seed,
@@ -134,13 +125,10 @@ export interface ExperimentResults {
  */
 export async function computeResults(experimentKey: string): Promise<ExperimentResults | null> {
   const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
   const exp = await getExperiment(experimentKey);
   if (!exp) return null;
 
-  const { data: events } = await sb
+  const { data: events } = await supabase
     .from("experiment_events")
     .select("variant, event_type")
     .eq("experiment_key", experimentKey);
