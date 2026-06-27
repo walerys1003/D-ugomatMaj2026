@@ -14,6 +14,7 @@
 
 import { createHash, randomBytes, createHmac, timingSafeEqual } from "crypto";
 import { createSupabaseServerClient } from "@/lib/db/supabase-server";
+import type { Json } from "@/lib/db/types";
 
 export type ImpersonationScope = "read_only" | "support" | "debug" | "full";
 
@@ -85,9 +86,7 @@ export async function startImpersonation(args: {
 
   // Verify admin role
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { data: { user: actor } } = await sb.auth.getUser();
   const actorRole = (actor?.app_metadata as Record<string, unknown> | undefined)?.role;
   if (actor?.id !== args.adminId || actorRole !== "admin") {
@@ -118,17 +117,22 @@ export async function startImpersonation(args: {
     .single();
   if (error) throw error;
 
-  // Audit: dispatch + log
-  await sb.from("admin_audit_log").insert({
-    actor_id: args.adminId,
-    action: "impersonation.start",
-    target_type: "user",
-    target_id: args.targetUserId,
-    metadata: { scope, ttl_minutes: ttl, reason: args.reason },
-    ip: args.ipAddress ?? null,
-    user_agent: args.userAgent ?? null,
-    created_at: now.toISOString(),
-  }).then(() => null).catch(() => null);
+  // Audit: dispatch + log (best-effort — typowany builder nie ma .catch(),
+  // dlatego try/await/catch zamiast .then().catch()).
+  try {
+    await sb.from("admin_audit_log").insert({
+      actor_id: args.adminId,
+      action: "impersonation.start",
+      target_type: "user",
+      target_id: args.targetUserId,
+      metadata: { scope, ttl_minutes: ttl, reason: args.reason } as Json,
+      ip: args.ipAddress ?? null,
+      user_agent: args.userAgent ?? null,
+      created_at: now.toISOString(),
+    });
+  } catch {
+    /* ignore audit failure */
+  }
 
   return {
     session: data as ImpersonationSession,
@@ -145,9 +149,7 @@ export async function verifyImpersonationToken(token: string): Promise<Impersona
   const tokenHash = createHash("sha256").update(tokenSigned).digest("hex");
 
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { data } = await sb
     .from("impersonation_sessions")
     .select("*")
@@ -164,13 +166,15 @@ export async function verifyImpersonationToken(token: string): Promise<Impersona
     return null;
   }
 
-  // Bump use_count
-  await sb
-    .from("impersonation_sessions")
-    .update({ use_count: ((data as ImpersonationSession).use_count ?? 0) + 1 })
-    .eq("id", (data as ImpersonationSession).id)
-    .then(() => null)
-    .catch(() => null);
+  // Bump use_count (best-effort).
+  try {
+    await sb
+      .from("impersonation_sessions")
+      .update({ use_count: ((data as ImpersonationSession).use_count ?? 0) + 1 })
+      .eq("id", (data as ImpersonationSession).id);
+  } catch {
+    /* ignore use_count bump failure */
+  }
 
   return data as ImpersonationSession;
 }
@@ -198,9 +202,7 @@ export async function revokeImpersonation(args: {
   revokedByUserId: string;
 }): Promise<void> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const now = new Date().toISOString();
   const { error } = await sb
     .from("impersonation_sessions")
@@ -209,21 +211,23 @@ export async function revokeImpersonation(args: {
     .is("revoked_at", null);
   if (error) throw error;
 
-  await sb.from("admin_audit_log").insert({
-    actor_id: args.revokedByUserId,
-    action: "impersonation.revoke",
-    target_type: "impersonation_session",
-    target_id: args.sessionId,
-    metadata: {},
-    created_at: now,
-  }).then(() => null).catch(() => null);
+  try {
+    await sb.from("admin_audit_log").insert({
+      actor_id: args.revokedByUserId,
+      action: "impersonation.revoke",
+      target_type: "impersonation_session",
+      target_id: args.sessionId,
+      metadata: {} as Json,
+      created_at: now,
+    });
+  } catch {
+    /* ignore audit failure */
+  }
 }
 
 export async function listActiveImpersonations(adminId?: string): Promise<ImpersonationSession[]> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   let q = sb
     .from("impersonation_sessions")
     .select("*")
@@ -240,9 +244,7 @@ export async function listActiveImpersonations(adminId?: string): Promise<Impers
  */
 export async function sweepExpiredImpersonations(): Promise<number> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { data } = await sb
     .from("impersonation_sessions")
     .update({ revoked_at: new Date().toISOString() })

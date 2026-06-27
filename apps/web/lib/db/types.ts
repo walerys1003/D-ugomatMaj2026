@@ -1617,6 +1617,68 @@ export interface Database {
         >;
         Relationships: [];
       };
+      // -----------------------------------------------------------------
+      // Tier 23 — Admin impersonation. Źródło:
+      // 20260526000000_tier23_compliance_security.sql.
+      // -----------------------------------------------------------------
+      impersonation_sessions: {
+        Row: {
+          id: string;
+          admin_id: string;
+          target_user_id: string;
+          reason: string;
+          scope: "read_only" | "support" | "debug" | "full";
+          token_hash: string;
+          ip_address: string | null;
+          user_agent: string | null;
+          started_at: string;
+          expires_at: string;
+          revoked_at: string | null;
+          use_count: number;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["impersonation_sessions"]["Row"]
+        > & {
+          admin_id: string;
+          target_user_id: string;
+          reason: string;
+          scope: "read_only" | "support" | "debug" | "full";
+          token_hash: string;
+          expires_at: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["impersonation_sessions"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      // -----------------------------------------------------------------
+      // Tier 10 — Admin audit log. Źródło:
+      // 20260513300000_tier10_final_polish.sql.
+      // -----------------------------------------------------------------
+      admin_audit_log: {
+        Row: {
+          id: number;
+          actor_id: string;
+          action: string;
+          target_type: string;
+          target_id: string | null;
+          metadata: Json | null;
+          ip: string | null;
+          user_agent: string | null;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["admin_audit_log"]["Row"]
+        > & {
+          actor_id: string;
+          action: string;
+          target_type: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["admin_audit_log"]["Insert"]
+        >;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     // Audyt 2026-06-27: większość RPC nie jest jeszcze dotypowana (degraduje
