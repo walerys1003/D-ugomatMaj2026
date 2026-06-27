@@ -29,7 +29,7 @@ import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 import {
   RATE_LIMIT_PROFILES,
   clientIdFromHeaders,
-  rateLimit,
+  rateLimitDistributed,
 } from "@/lib/security/rate-limit";
 import {
   runGenerationPipeline,
@@ -120,7 +120,13 @@ export async function POST(req: NextRequest): Promise<Response> {
   // ---------------------------------------------------------------------
   // 3) Rate-limit per user (drogie wywołania AI)
   // ---------------------------------------------------------------------
-  const rl = rateLimit(`ai:generate:user:${userId}`, RATE_LIMIT_PROFILES.documentGenerate);
+  // Audyt #2 — rozproszony rate-limit (Upstash Redis). Gdy brak konfiguracji
+  // Redis, funkcja degraduje do limitu in-memory (zachowanie jak dotąd),
+  // ale w środowisku wieloinstancyjnym limit jest egzekwowany globalnie.
+  const rl = await rateLimitDistributed(
+    `ai:generate:user:${userId}`,
+    RATE_LIMIT_PROFILES.documentGenerate,
+  );
   if (!rl.allowed) {
     return NextResponse.json(
       { error: "rate_limit_exceeded", retry_after_ms: rl.resetMs },
@@ -131,7 +137,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     );
   }
   // Drugi limit po IP (anty-spam jednego user_id z wielu kont)
-  const ipLimit = rateLimit(
+  const ipLimit = await rateLimitDistributed(
     `ai:generate:ip:${clientIdFromHeaders(req.headers)}`,
     RATE_LIMIT_PROFILES.api,
   );
@@ -273,6 +279,32 @@ export async function POST(req: NextRequest): Promise<Response> {
           durationMs: result.durationMs,
           finalRole: result.finalRole,
         });
+
+        // Audyt #3 — DOMKNIĘCIE idempotency. Bez tego rezerwacja zostawała
+        // na zawsze "in_progress" → każdy retry z tym samym kluczem dostawał
+        // 409 przez 24h. Zapisujemy completed z metadanymi (PII-safe — bez
+        // pełnej treści pisma; klient i tak dostał ją przez SSE).
+        if (idemKey) {
+          try {
+            await completeIdempotency(
+              { scope: idemScope, key: idemKey, user_id: userId },
+              {
+                cached: true,
+                modelId: result.modelId,
+                finalRole: result.finalRole,
+                tokensInput: result.tokensInput,
+                tokensOutput: result.tokensOutput,
+                costUsd: result.costUsd,
+              },
+              200,
+            );
+          } catch (e) {
+            logger.warn("ai.generate.idempotency_complete_failed", {
+              caseId,
+              error: e instanceof Error ? e.message : String(e),
+            });
+          }
+        }
       } catch (err) {
         const isAiOff = err instanceof AiUnavailableError;
         const message =
@@ -281,6 +313,16 @@ export async function POST(req: NextRequest): Promise<Response> {
           code: isAiOff ? "ai_unavailable" : "internal",
           message,
         });
+
+        // Audyt #3 — przy błędzie ZWALNIAMY rezerwację (delete), aby klient
+        // mógł ponowić to samo żądanie z tym samym Idempotency-Key.
+        if (idemKey) {
+          try {
+            await abortIdempotency({ scope: idemScope, key: idemKey, user_id: userId });
+          } catch {
+            /* best-effort — TTL i tak posprząta */
+          }
+        }
       } finally {
         clearInterval(hb);
         try {

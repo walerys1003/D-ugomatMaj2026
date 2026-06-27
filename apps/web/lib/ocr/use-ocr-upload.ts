@@ -242,7 +242,10 @@ export function useOcrUpload(
         return null;
       }
     },
-    [opts.intentHint, opts.caseId, opts.skipUpload],
+    // Audyt #13 — `csrf` jest używany wewnątrz callbacku (nagłówek CSRF
+    // w każdym wywołaniu fetch), więc musi być zależnością useCallback,
+    // inaczej zamknięcie przechwytuje nieaktualny token po jego odświeżeniu.
+    [opts.intentHint, opts.caseId, opts.skipUpload, csrf],
   );
 
   return { phase, progress, statusMessage, result, error, reset, run };

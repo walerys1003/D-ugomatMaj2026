@@ -115,3 +115,79 @@ export function clientIdFromHeaders(headers: Headers): string {
   if (cf) return cf.trim();
   return "anon";
 }
+
+// -----------------------------------------------------------------------------
+// Rozproszony rate-limit (audyt #2) — Upstash Redis (REST, Edge-safe).
+//
+// Gdy ustawione UPSTASH_REDIS_REST_URL + _TOKEN, używamy atomowego licznika
+// (INCR + EXPIRE) współdzielonego między instancjami. W przeciwnym razie
+// fallback do in-memory `rateLimit()` (jak dotychczas).
+//
+// API celowo asynchroniczne — `rateLimitDistributed`. Istniejące synchroniczne
+// `rateLimit()` zostaje dla call-sites Edge, które nie mogą await'ować.
+// -----------------------------------------------------------------------------
+
+function redisConfigured(): boolean {
+  return (
+    !!process.env.UPSTASH_REDIS_REST_URL &&
+    !!process.env.UPSTASH_REDIS_REST_TOKEN
+  );
+}
+
+/**
+ * Atomowy fixed-window licznik w Redis przez REST API.
+ * Zwraca liczbę żądań w bieżącym oknie (po inkrementacji) lub null gdy błąd.
+ */
+async function redisIncr(key: string, windowSec: number): Promise<number | null> {
+  const url = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url || !token) return null;
+  try {
+    // Pipeline: INCR key; EXPIRE key windowSec NX
+    const res = await fetch(`${url.replace(/\/+$/, "")}/pipeline`, {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify([
+        ["INCR", key],
+        ["EXPIRE", key, String(windowSec), "NX"],
+      ]),
+    });
+    if (!res.ok) return null;
+    const json = (await res.json()) as Array<{ result?: number }>;
+    const count = json?.[0]?.result;
+    return typeof count === "number" ? count : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Rozproszony rate-limit. Preferuje Redis; przy braku konfiguracji lub błędzie
+ * sieci — fallback do in-memory (degradacja, ale nie blokada ruchu).
+ *
+ * @param key    unikalny klucz (np. `ai:generate:user:<id>`)
+ * @param config profil (capacity = max żądań / okno; refillPerSec → okno)
+ */
+export async function rateLimitDistributed(
+  key: string,
+  config: RateLimitConfig,
+): Promise<RateLimitResult> {
+  if (!redisConfigured()) {
+    return rateLimit(key, config);
+  }
+  // Okno = czas potrzebny na pełne uzupełnienie kubełka (capacity / refillPerSec).
+  const windowSec = Math.max(1, Math.ceil(config.capacity / config.refillPerSec));
+  const windowKey = `rl:${key}:${Math.floor(Date.now() / 1000 / windowSec)}`;
+  const count = await redisIncr(windowKey, windowSec);
+  if (count === null) {
+    // Redis niedostępny — degraduj do in-memory.
+    return rateLimit(key, config);
+  }
+  if (count <= config.capacity) {
+    return { allowed: true, remaining: config.capacity - count, resetMs: 0 };
+  }
+  return { allowed: false, remaining: 0, resetMs: windowSec * 1000 };
+}

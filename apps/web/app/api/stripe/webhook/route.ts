@@ -38,8 +38,13 @@ import { createSupabaseAdminClient } from "@/lib/db/supabase-server";
 import {
   RATE_LIMIT_PROFILES,
   clientIdFromHeaders,
-  rateLimit,
+  rateLimitDistributed,
 } from "@/lib/security/rate-limit";
+import {
+  reserveIdempotency,
+  completeIdempotency,
+  abortIdempotency,
+} from "@/lib/observability/idempotency";
 
 export const runtime = "nodejs"; // potrzebujemy node:crypto
 export const dynamic = "force-dynamic";
@@ -48,7 +53,11 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   // 0) Rate-limit per-IP (anty-flood; webhook ma wyższy limit niż user API).
   // Stripe wysyła z kilku stałych IP — limit 60/min jest bezpieczny.
   const clientId = clientIdFromHeaders(req.headers);
-  const rl = rateLimit(`webhook:stripe:${clientId}`, RATE_LIMIT_PROFILES.webhook);
+  // Audyt #2 — rozproszony rate-limit; degraduje do in-memory bez Redisa.
+  const rl = await rateLimitDistributed(
+    `webhook:stripe:${clientId}`,
+    RATE_LIMIT_PROFILES.webhook,
+  );
   if (!rl.allowed) {
     return NextResponse.json(
       { error: "rate_limit_exceeded" },
@@ -86,6 +95,27 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     throw e;
   }
 
+  // 1.5) Audyt #5 — DEDUPLIKACJA po event.id (Stripe dostarcza at-least-once!).
+  // Rezerwujemy klucz idempotencyjny scope="stripe.webhook" key=event.id.
+  // - hit completed  → event już przetworzony, zwracamy 200 bez side-effectów.
+  // - hit in_progress→ równoległa dostawa, zwracamy 200 (Stripe nie retry'uje 2xx).
+  // - miss           → rezerwacja in_progress, przetwarzamy poniżej.
+  const idemKeyObj = { scope: "stripe.webhook", key: event.id };
+  let alreadyProcessed = false;
+  try {
+    const lookup = await reserveIdempotency<{ type: string }>(idemKeyObj);
+    if (lookup.hit) {
+      alreadyProcessed = true;
+    }
+  } catch (e) {
+    // Jeśli dedup-store padnie — nie blokujemy płatności, ale logujemy.
+    // (Best-effort: handlery i tak mają per-row status checks.)
+    console.warn("[stripe-webhook] idempotency reserve failed:", e);
+  }
+  if (alreadyProcessed) {
+    return NextResponse.json({ received: true, deduplicated: true, type: event.type });
+  }
+
   // 2) Dispatch event
   try {
     switch (event.type) {
@@ -109,11 +139,24 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     }
   } catch (e) {
     console.error("[stripe-webhook] handler error:", e);
+    // Audyt #5 — zwalniamy rezerwację, by retry Stripe mógł przetworzyć event.
+    try {
+      await abortIdempotency(idemKeyObj);
+    } catch {
+      /* best-effort */
+    }
     // Zwracamy 500 — Stripe zretry'uje
     return NextResponse.json(
       { error: e instanceof Error ? e.message : "handler error" },
       { status: 500 },
     );
+  }
+
+  // Audyt #5 — oznaczamy event jako przetworzony (completed).
+  try {
+    await completeIdempotency(idemKeyObj, { type: event.type }, 200);
+  } catch {
+    /* best-effort — per-row checks i tak chronią przed duplikatami */
   }
 
   return NextResponse.json({ received: true, type: event.type });

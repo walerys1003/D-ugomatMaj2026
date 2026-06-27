@@ -62,19 +62,20 @@ export const metadata: Metadata = {
     description: "Skanuj nakaz, AI generuje sprzeciw. 78% skuteczności.",
     images: [`${BASE}/og/v5-default.png`],
   },
+  // Audyt #1 — /v5 to eksperymentalny duplikat marketingu. NOINDEX, by uniknąć
+  // duplicate content i kanibalizacji słów kluczowych z (marketing). follow:true
+  // pozostawiamy, by linki wewnętrzne nadal przekazywały sygnał.
   robots: {
-    index: true,
+    index: false,
     follow: true,
     googleBot: {
-      index: true,
+      index: false,
       follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
     },
   },
   alternates: {
-    canonical: `${BASE}/v5`,
+    // Kanonikalizujemy do strony głównej (treść v5 powiela marketing).
+    canonical: `${BASE}/`,
   },
   category: "legal technology",
 };

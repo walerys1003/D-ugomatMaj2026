@@ -17,6 +17,9 @@ export default function robots(): MetadataRoute.Robots {
           "/api/",
           "/admin/",
           "/panel/ustawienia/rodo",
+          // Audyt #1 — /v5 to eksperymentalny duplikat marketingu (noindex).
+          "/v5/",
+          "/_legacy/",
         ],
       },
       {
@@ -24,7 +27,7 @@ export default function robots(): MetadataRoute.Robots {
         // tutaj zawęzić jak będzie potrzeba.
         userAgent: "Googlebot",
         allow: "/",
-        disallow: ["/panel/", "/auth/", "/api/", "/admin/"],
+        disallow: ["/panel/", "/auth/", "/api/", "/admin/", "/v5/", "/_legacy/"],
       },
     ],
     sitemap: `${BASE}/sitemap.xml`,

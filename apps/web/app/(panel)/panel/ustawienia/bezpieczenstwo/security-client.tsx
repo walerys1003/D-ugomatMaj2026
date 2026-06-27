@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Image from "next/image";
 import { Fingerprint, KeyRound, ShieldOff, Smartphone, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -119,7 +120,17 @@ export function SecurityClient({ mfaEnabled: initialEnabled, webauthnCredentials
         <div className="flex flex-col gap-3 rounded-lg border border-ink-200 p-4 dark:border-dlugomat-700">
           <h3 className="text-fluid-base font-semibold">1. Zeskanuj kod QR</h3>
           {setup.qr_data_url && (
-            <img src={setup.qr_data_url} alt="QR code MFA" className="h-48 w-48 rounded-md border" />
+            // Audyt #14 — next/image zamiast surowego <img>. QR jest data-URL
+            // (base64 PNG generowany po stronie serwera), więc używamy
+            // `unoptimized`, bo optymalizator Next nie obsługuje data: URI.
+            <Image
+              src={setup.qr_data_url}
+              alt="QR code MFA"
+              width={192}
+              height={192}
+              unoptimized
+              className="h-48 w-48 rounded-md border"
+            />
           )}
           <p className="text-fluid-xs text-ink-500">
             Lub wprowadź ręcznie: <code className="font-mono">{setup.secret}</code>

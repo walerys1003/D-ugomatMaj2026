@@ -19,6 +19,17 @@
  */
 export async function register() {
   if (process.env.NEXT_RUNTIME === "nodejs") {
+    // Audyt #11 — walidacja środowiska raz na boot (rzuca w prod gdy brak
+    // krytycznych zmiennych; loguje ostrzeżenia poza produkcją).
+    try {
+      const { assertEnv } = await import("./lib/env");
+      assertEnv();
+    } catch (err) {
+      // W produkcji propagujemy (fail-fast), poza nią tylko logujemy.
+      if (process.env.NODE_ENV === "production") throw err;
+      // eslint-disable-next-line no-console
+      console.warn("[instrumentation] env validation:", err);
+    }
     try {
       await import("./sentry.server.config");
     } catch {
