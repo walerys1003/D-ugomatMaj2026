@@ -266,3 +266,89 @@ ocr/ocr-actions (4), experiments/ab* (8), cases/case-actions (4),
 ai/suggestions (4), admin/admin-actions (4) oraz liczne pliki po 2–3 casty
 (notifications, invoices, growth, versioning, public-api, app/api/security/*,
 app/api/marketplace/partners).
+
+---
+
+## Iteracje 18–27 (kontynuacja #6 — redukcja `as any`)
+
+Kontynuacja rozbioru rodzina-po-rodzinie (per grupa tabel DB). Każda iteracja:
+dotypowanie tabel w `lib/db/types.ts`, usunięcie castów, naprawa realnych bugów
+maskowanych przez `as any`, walidacja `tsc --noEmit` (0) + `next lint` (0).
+
+### Iteracja 18 — commit fca9124
+Batch: `sharing/lawyer-share`, `experiments/ai-suggestions`, `ocr/ocr-actions`,
+`security/rbac-fine/policy-engine`. Dotypowane tabele, usunięte casty.
+
+### Iteracja 19 — commit 4adb976
+`experiments/ab*` — usunięte casty. **KOLIZJA schematu `experiments`**
+(`create table if not exists` — wygrywa najwcześniejszy timestamp migracji).
+
+### Iteracja 20 — commit df0c34a
+`cases/case-actions`, `admin/admin-actions` — usunięte casty, dotypowane tabele.
+
+### Iteracja 21 — commit 14898d9
+`push/web-push`, `invoices`, `leads`, `row-lock` — 12 castów. Dotypowane:
+push_subscriptions, invoices, leads.
+
+### Iteracja 22 — commit 6caac3b
+`versioning`, `event-triggers`. **2 REALNE BUGI**: kolizja schematu
+`document_versions` + błąd w `scanUpcomingDeadlines`.
+
+### Iteracja 23 — commit 623c6dc
+`public-api`, `api-keys`, `gdpr`, `marketplace`, `restore`, `agent-memory`.
+**2 REALNE BUGI** roli `'owner'` (UserRole = user|admin|moderator, BEZ owner).
+Dotypowane: agent_memory, api_keys, webhook_subscriptions, webhook_secrets.
+
+### Iteracja 24 — commit 17f768b
+`v1/public-cases`, `webhooks`, `plugin-lifecycle`. **1 REALNY BUG**:
+select nieistniejących kolumn na `public/cases`.
+
+### Iteracja 25 — commit 415caad (12 castów, 0 bugów, 4 tabele)
+- `notifications/orchestration/preferences` — boundary jsonb→domena (`as Json`).
+- `notifications/orchestration/frequency-cap` — dotypowane `notification_log`.
+- `documents/document-actions` — documents/document_versions/validation_runs.
+- `affiliate/payouts` — embedded join (`CommissionWithAffiliate`).
+- `growth/conversion-tracking` — attribution/meta `as Json`.
+- `analytics/cohort-analysis` — usunięte `as any[]` + guard `user_id`.
+Dotypowane: notification_preferences, notification_log, conversion_events,
+analytics_events.
+**KOLIZJA udokumentowana**: `notification_preferences` — Tier18
+(20260521000000, channels/categories/caps jsonb) WYGRYWA nad Tier27
+(20260528000000). Kod używa Tier18 → spójne, BEZ buga.
+
+### Iteracja 26 — commit c9c0123 (6 castów, 3 REALNE BUGI, 2 tabele)
+- `app/api/security/sessions/route.ts` — 2 MARTWE casty (`sb` nigdy nieużyty).
+- `app/api/security/webauthn/register/route.ts` — **REALNY BUG**: insert używał
+  `rp_id` (kolumna nie istnieje) + `device_name` (realna kolumna to `label`) →
+  rejestracja passkey ZAWSZE failowała.
+- `app/api/security/webauthn/authenticate/route.ts` — **REALNE BUGI**: GET i POST
+  filtrowały `.is("revoked_at", null)` na nieistniejącej kolumnie → lista zawsze
+  pusta / logowanie passkey zawsze `credential_not_found`.
+Dotypowane: webauthn_challenges, webauthn_credentials (Tier17 20260520000000).
+
+### Iteracja 27 — commit 940b4d8 (4 casty, 1 REALNY BUG, 2 tabele)
+- `lib/quality/error-tracking.ts` — **REALNY BUG**: `captureError` DB-fallback
+  insertował 5 nieistniejących kolumn (`severity`/`route`/`case_id`/`tags`/
+  `extra`) → zawsze cichy fail w try/catch → raporty błędów NIGDY nie trafiały
+  do DB gdy Sentry niedostępny. Fix: `route`→`url`, `source:"server"`, reszta
+  do `metadata` jsonb (`as Json`).
+- `lib/realtime/channel/channel-broker.ts` — boundary `payload as Json` (insert)
+  + `(data ?? []) as unknown as RealtimeEvent[]` (odczyt jsonb→domena).
+Dotypowane: error_reports (Tier10 20260513300000), realtime_events
+(Tier21 20260524000000).
+
+### Postęp `as any` (zweryfikowany)
+262 (iter17) → 210 → ... → 148 (iter23) → 141 (iter24) → 129 (iter25) →
+125 (iter26) → 122 (iter27) → **97** (bieżący stan, bez linii komentarzy).
+
+### Poza zakresem audytu DB (NIE usuwać — casty SDK/klienta)
+- `lib/billing/subscriptions.ts` (3× `new (Stripe as any)`), `lib/billing/upgrade-flow.ts`
+  (2×) — `@types/stripe` niezainstalowane w sandboxie.
+- `lib/pdf/pdfa-conformance.ts` (3), `lib/integrations/court/court-efiling.ts` (3),
+  `lib/analytics/rum-collector.ts` (4), `app/(panel)/.../integracje/page.tsx` (4).
+
+### Pozostałe rodziny DB (do dalszych iteracji, ~97)
+`lib/sw/background-sync`, `lib/security/encryption/field-crypto`,
+`lib/pwa/offline-queue`, `lib/observability/retry`,
+`lib/ai/agents/orchestrator/agent-loop`, `app/api/security/gdpr/consent/route`
+oraz liczne pliki po 2 casty.
