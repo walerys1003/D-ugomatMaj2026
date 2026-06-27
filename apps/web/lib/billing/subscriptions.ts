@@ -109,10 +109,7 @@ export async function createSubscriptionCheckout(
 export async function syncSubscriptionFromStripe(
   stripeSub: Record<string, any>,
 ): Promise<void> {
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseAdminClient();
   const userId = stripeSub.metadata?.user_id;
   if (!userId) {
     if (process.env.NODE_ENV !== "production") {
@@ -146,10 +143,7 @@ export async function syncSubscriptionFromStripe(
 }
 
 export async function getActiveSubscription(userId: string): Promise<SubscriptionRecord | null> {
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseAdminClient();
   const { data } = await sb
     .from("subscriptions")
     .select("*")
@@ -203,10 +197,7 @@ export interface UsageSnapshot {
 }
 
 export async function getCurrentUsage(userId: string): Promise<UsageSnapshot> {
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseAdminClient();
   const sub = await getActiveSubscription(userId);
   const planId = sub?.plan_id ?? "free";
   const plan = getPlan(planId);
@@ -225,8 +216,8 @@ export async function getCurrentUsage(userId: string): Promise<UsageSnapshot> {
     planId,
     periodStart,
     periodEnd,
-    casesCreated: (data as any)?.cases_created ?? 0,
-    aiGenerations: (data as any)?.ai_generations ?? 0,
+    casesCreated: data?.cases_created ?? 0,
+    aiGenerations: data?.ai_generations ?? 0,
     caseLimit: plan.caseLimit,
     aiGenerationsLimit: plan.aiGenerationsPerMonth,
   };
@@ -237,10 +228,7 @@ export async function incrementUsage(
   field: "cases_created" | "ai_generations",
   delta: number = 1,
 ): Promise<void> {
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseAdminClient();
   const sub = await getActiveSubscription(userId);
   const periodStart = sub?.current_period_start ?? monthStartIso();
   const periodEnd = sub?.current_period_end ?? monthEndIso();

@@ -404,50 +404,72 @@ export interface Database {
       //   subscriptions → 20260522000000_tier19_rag_payments_ux.sql
       //   refunds       → 20260510190000_refunds.sql
       // Docelowo zastąpione przez `npm run gen:types` (patrz docs/audit).
+      // Audyt 2026-06-27: SUPERSET schematu Tier 8 (plan_id/cycle/tenant_id) +
+      // Tier 19 (plan_code/org_id/paused_*) — patrz migracja
+      // 20260627040000_audit_reconcile_subscriptions_schema.sql. Oba zestawy
+      // kolumn są opcjonalne (nullable), bo żywa tabela powstała z jednego z
+      // dwóch sprzecznych `create table if not exists`, a superset dopełnia
+      // brakujące kolumny. `status` modelowany szeroko (text), bo dwie wersje
+      // miały różne CHECK-i.
       subscriptions: {
         Row: {
           id: string;
           user_id: string;
+          // Tier 19
           org_id: string | null;
-          plan_code: "free" | "lite" | "pro" | "business" | "enterprise";
-          status:
-            | "trialing"
-            | "active"
-            | "past_due"
-            | "paused"
-            | "canceled"
-            | "incomplete"
-            | "incomplete_expired";
+          plan_code:
+            | "free" | "lite" | "pro" | "business" | "enterprise" | null;
+          paused_at: string | null;
+          paused_until: string | null;
+          past_due_retries: number;
+          pending_plan_change: string | null;
+          pending_effective_at: string | null;
+          metadata: Json;
+          // Tier 8
+          plan_id:
+            | "free" | "starter" | "pro" | "family" | "company" | null;
+          cycle: "monthly" | "annual" | null;
+          tenant_id: string | null;
+          // Wspólne
+          status: string;
           trial_end: string | null;
           current_period_start: string;
           current_period_end: string;
           cancel_at_period_end: boolean;
-          paused_at: string | null;
-          paused_until: string | null;
-          past_due_retries: number;
           stripe_subscription_id: string | null;
           stripe_customer_id: string | null;
-          pending_plan_change: string | null;
-          pending_effective_at: string | null;
-          metadata: Json;
           created_at: string;
           updated_at: string;
         };
         Insert: Partial<Database["public"]["Tables"]["subscriptions"]["Row"]> & {
           user_id: string;
-          plan_code: "free" | "lite" | "pro" | "business" | "enterprise";
-          status:
-            | "trialing"
-            | "active"
-            | "past_due"
-            | "paused"
-            | "canceled"
-            | "incomplete"
-            | "incomplete_expired";
+          status: string;
           current_period_start: string;
           current_period_end: string;
         };
         Update: Partial<Database["public"]["Tables"]["subscriptions"]["Insert"]>;
+        Relationships: [];
+      };
+      subscription_usage: {
+        Row: {
+          id: string;
+          user_id: string;
+          period_start: string;
+          period_end: string;
+          cases_created: number;
+          ai_generations: number;
+          updated_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["subscription_usage"]["Row"]
+        > & {
+          user_id: string;
+          period_start: string;
+          period_end: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["subscription_usage"]["Insert"]
+        >;
         Relationships: [];
       };
       // -----------------------------------------------------------------
@@ -664,7 +686,28 @@ export interface Database {
       };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    // Audyt 2026-06-27: większość RPC nie jest jeszcze dotypowana (degraduje
+    // do luźnego wywołania jak wcześniej przy Record<string, never>). Dotypowane
+    // są tylko te, które tego wymagają do usunięcia `as any`. Indeks `[fn: string]`
+    // zachowuje kompatybilność z pozostałymi wywołaniami `.rpc(...)`.
+    Functions: {
+      // RPC z 20260513100000_tier8_pricing_affiliate_growth.sql — atomowy
+      // upsert+inkrementacja licznika użycia subskrypcji.
+      fn_increment_subscription_usage: {
+        Args: {
+          p_user_id: string;
+          p_period_start: string;
+          p_period_end: string;
+          p_field: "cases_created" | "ai_generations";
+          p_delta: number;
+        };
+        Returns: undefined;
+      };
+      [fn: string]: {
+        Args: Record<string, unknown>;
+        Returns: unknown;
+      };
+    };
     Enums: {
       case_type: CaseType;
       case_status: CaseStatus;
