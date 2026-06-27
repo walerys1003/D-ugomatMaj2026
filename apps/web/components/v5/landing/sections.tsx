@@ -8,25 +8,8 @@
  */
 import * as React from "react";
 
-import {
-  V5Body,
-  V5Container,
-  V5Eyebrow,
-  V5Headline,
-  V5Pill,
-  V5Section,
-  V5Surface,
-  V5Stat,
-  V5Hairline,
-  V5Terminal,
-} from "@/components/v5/primitives";
-import {
-  V5DataFlow,
-  V5LivePulse,
-  V5Reveal,
-  V5Counter,
-  V5AmbientGlow,
-} from "@/components/v5/motion";
+import { V5Body, V5Container, V5Eyebrow, V5Headline, V5Section, V5Surface, V5Hairline, V5Terminal } from "@/components/v5/primitives";
+import { V5LivePulse, V5Reveal, V5Counter, V5AmbientGlow } from "@/components/v5/motion";
 
 /* ============================================================================
  * PROOF STRIP — Trust signals from enterprises / authorities

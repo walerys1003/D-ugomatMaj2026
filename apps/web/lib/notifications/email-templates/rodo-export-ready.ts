@@ -1,7 +1,7 @@
 /**
  * Email — RODO art. 20 export gotowy do pobrania (zadanie 162).
  */
-import { appUrl, requireVar, wrapHtml, wrapText } from "./_layout";
+import { requireVar, wrapHtml, wrapText } from "./_layout";
 import type { RenderedEmail } from "../types";
 
 export function renderRodoExportReady(

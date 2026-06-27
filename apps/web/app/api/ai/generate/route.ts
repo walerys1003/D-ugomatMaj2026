@@ -26,23 +26,11 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import { createSupabaseServerClient } from "@/lib/db/supabase-server";
-import {
-  RATE_LIMIT_PROFILES,
-  clientIdFromHeaders,
-  rateLimitDistributed,
-} from "@/lib/security/rate-limit";
-import {
-  runGenerationPipelineStreaming,
-  AiUnavailableError,
-} from "@/lib/ai/generation-pipeline";
+import { RATE_LIMIT_PROFILES, clientIdFromHeaders, rateLimitDistributed } from "@/lib/security/rate-limit";
+import { runGenerationPipelineStreaming, AiUnavailableError } from "@/lib/ai/generation-pipeline";
 import type { CaseRow } from "@/lib/db/types";
-import {
-  parseIdempotencyHeader,
-  reserveIdempotency,
-  completeIdempotency,
-  abortIdempotency,
-} from "@/lib/observability/idempotency";
-import { logger, withLogContext, generateCorrelationId } from "@/lib/observability/logger";
+import { parseIdempotencyHeader, reserveIdempotency, completeIdempotency, abortIdempotency } from "@/lib/observability/idempotency";
+import { logger, generateCorrelationId } from "@/lib/observability/logger";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";

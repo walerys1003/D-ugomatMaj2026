@@ -1,28 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import {
-  Upload,
-  ScanLine,
-  Sparkles,
-  FileDown,
-  ShieldCheck,
-  Clock,
-  CheckCircle2,
-  ArrowRight,
-} from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Upload, ScanLine, Sparkles, FileDown, ShieldCheck, Clock, CheckCircle2 } from "lucide-react";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import {
-  MarketingPageHero,
-  MarketingCtaBanner,
-} from "@/components/marketing/page-hero";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { MarketingPageHero, MarketingCtaBanner } from "@/components/marketing/page-hero";
 
 export const metadata: Metadata = {
   title: "Jak działa Długomat — od skanu do gotowego pisma w 12 minut",

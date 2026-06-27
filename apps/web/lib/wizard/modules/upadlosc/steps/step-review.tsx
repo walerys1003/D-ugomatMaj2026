@@ -4,17 +4,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
+
 import type { WizardStepProps } from "@/lib/wizard/wizard-types";
 
-import {
-  PRZYCZYNY_NIEWYPLACALNOSCI,
-  STATUS_ZAWODOWY,
-  ZALACZNIKI,
-  upadloscReviewSchema,
-  type UpadloscAnswers,
-  type UpadloscReviewValues,
-} from "../schemas";
+import { PRZYCZYNY_NIEWYPLACALNOSCI, STATUS_ZAWODOWY, ZALACZNIKI, upadloscReviewSchema, type UpadloscAnswers, type UpadloscReviewValues } from "../schemas";
 
 interface StepReviewProps extends WizardStepProps<UpadloscReviewValues> {
   allAnswers?: Partial<UpadloscAnswers>;

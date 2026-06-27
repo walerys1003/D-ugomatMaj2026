@@ -1,13 +1,9 @@
 import { redirect } from "next/navigation";
-import { Copy, Share2, TrendingUp, Users } from "lucide-react";
+import { Share2, TrendingUp, Users } from "lucide-react";
 import * as React from "react";
 
 import { createSupabaseServerClient } from "@/lib/db/supabase-server";
-import {
-  buildReferralLink,
-  getOrCreateReferralCode,
-  listReferralStats,
-} from "@/lib/referrals/referral-actions";
+import { buildReferralLink, getOrCreateReferralCode, listReferralStats } from "@/lib/referrals/referral-actions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { ReferralCodeShareCard } from "./share-card";

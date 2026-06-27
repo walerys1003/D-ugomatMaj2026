@@ -1,24 +1,6 @@
 import type { Metadata } from "next";
-import {
-  Target,
-  Scale,
-  HandHeart,
-  Eye,
-  Sparkles,
-  ShieldCheck,
-  Users,
-  TrendingUp,
-} from "lucide-react";
-import {
-  PageHero,
-  PageSection,
-  FeatureGrid,
-  FeatureCard,
-  StepGrid,
-  StepCard,
-  CheckList,
-  CtaBand,
-} from "@/components/marketing/premium-page";
+import { Target, Scale, HandHeart, Eye, Sparkles, ShieldCheck, TrendingUp } from "lucide-react";
+import { PageHero, PageSection, FeatureGrid, FeatureCard, StepGrid, StepCard, CheckList, CtaBand } from "@/components/marketing/premium-page";
 
 export const metadata: Metadata = {
   title: "Misja — wyrównujemy szanse wobec prawa",

@@ -1,14 +1,8 @@
 import type { Metadata } from "next";
-import { Activity, Gauge, Smartphone, Timer } from "lucide-react";
+import { Gauge, Smartphone, Timer } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const metadata: Metadata = {
   title: "RUM · Web Vitals · Admin · Długomat",

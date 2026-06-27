@@ -10,13 +10,7 @@
  *
  * Tarcza ton: stanowczy, formalny polski, bez emocji, z konkretnym petitum.
  */
-import {
-  FORMA_ZATRUDNIENIA,
-  POTRACENIA_VARIANTS,
-  POTRACENIE_TYPY,
-  SYTUACJA_ZYCIOWA,
-  type PotraceniaAnswers,
-} from "@/lib/wizard/modules/potracenia/schemas";
+import { FORMA_ZATRUDNIENIA, POTRACENIA_VARIANTS, POTRACENIE_TYPY, SYTUACJA_ZYCIOWA, type PotraceniaAnswers } from "@/lib/wizard/modules/potracenia/schemas";
 import { formatDatePL, formatPLN } from "@/lib/utils";
 
 export interface PotraceniaRenderResult {

@@ -9,7 +9,7 @@
 import * as React from "react";
 
 import { V5Surface, V5Pill, V5Eyebrow } from "@/components/v5/primitives";
-import { V5LivePulse, V5DataFlow, V5Reveal } from "@/components/v5/motion";
+import { V5LivePulse, V5DataFlow } from "@/components/v5/motion";
 import { cn } from "@/lib/utils";
 
 /* ─────────────────────────────────────────────────────────────────────

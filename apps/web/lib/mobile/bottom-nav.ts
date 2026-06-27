@@ -1,5 +1,4 @@
 // Bottom navigation config — 5-slot mobile nav with badge + active state model.
-import type { ReactNode } from "react";
 
 export interface BottomNavItem {
   id: string;

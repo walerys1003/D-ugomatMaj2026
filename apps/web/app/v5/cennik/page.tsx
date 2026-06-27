@@ -1,30 +1,6 @@
 import type { Metadata } from "next";
-import {
-  V5MarketingLayout,
-  V5HeroSimple,
-  V5StatBand,
-  V5FeatureGrid,
-  V5StepsList,
-  V5Faq,
-  V5CtaBand,
-  V5Testimonial,
-  V5ComparisonTable,
-  V5PricingTier,
-  V5SocialProofStrip,
-  V5IconBullet,
-  V5Logos,
-} from "@/components/v5/marketing";
-import {
-  V5Container,
-  V5Section,
-  V5Surface,
-  V5Eyebrow,
-  V5Headline,
-  V5Body,
-  V5Pill,
-  V5Hairline,
-  V5Button,
-} from "@/components/v5/primitives";
+import { V5MarketingLayout, V5HeroSimple, V5StatBand, V5Faq, V5CtaBand, V5ComparisonTable, V5PricingTier } from "@/components/v5/marketing";
+import { V5Container, V5Section, V5Eyebrow, V5Headline } from "@/components/v5/primitives";
 
 export const metadata: Metadata = {
   title: "Cennik · Mandatomat V5",

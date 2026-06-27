@@ -10,12 +10,7 @@
  *               "saldo", "zaległość".
  */
 import type { BikParsed } from "../ocr-types";
-import {
-  parsePolishAmount,
-  parsePolishDate,
-  computeCompleteness,
-  extractAfter,
-} from "./common";
+import { parsePolishAmount, parsePolishDate, computeCompleteness } from "./common";
 
 export function parseBik(rawText: string): BikParsed {
   const text = rawText.replace(/\r/g, "").replace(/[ \t]+/g, " ").trim();

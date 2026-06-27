@@ -1,23 +1,7 @@
 import * as React from "react";
 import Link from "next/link";
 import type { Metadata } from "next";
-import {
-  ShieldCheck,
-  ShieldAlert,
-  ArrowLeft,
-  LayoutDashboard,
-  Activity,
-  Bug,
-  ToggleRight,
-  UserCog,
-  Gavel,
-  KeyRound,
-  Lock,
-  Workflow,
-  Sparkles,
-  BarChart3,
-  Gauge,
-} from "lucide-react";
+import { ShieldCheck, ShieldAlert, ArrowLeft, LayoutDashboard, Activity, Bug, ToggleRight, UserCog, Gavel, Lock, Workflow, Sparkles, BarChart3, Gauge } from "lucide-react";
 
 import { requireAdminOrRedirect } from "@/lib/admin/rbac";
 import { Badge } from "@/components/ui/badge";

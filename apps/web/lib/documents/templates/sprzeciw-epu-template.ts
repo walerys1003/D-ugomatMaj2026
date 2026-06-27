@@ -13,7 +13,6 @@
  *   - Zwięzłe akapity, każdy zarzut osobno z odnośnikiem do podstawy prawnej.
  */
 
-import { sprzeciwEpuZarzutyOptions } from "@/lib/wizard/modules/sprzeciw-epu";
 import { formatDatePL, formatPLN } from "@/lib/utils";
 
 export interface SprzeciwEpuTemplateInput {

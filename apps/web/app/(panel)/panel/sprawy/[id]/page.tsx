@@ -1,26 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import {
-  AlertTriangle,
-  ArrowRight,
-  CalendarDays,
-  FileText,
-  Gavel,
-  Mail,
-  Phone,
-  Scale,
-  Shield,
-} from "lucide-react";
+import { AlertTriangle, CalendarDays, FileText, Gavel, Mail, Phone, Scale, Shield } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const metadata: Metadata = {
   title: "Szczegoly sprawy — Dlugomat",

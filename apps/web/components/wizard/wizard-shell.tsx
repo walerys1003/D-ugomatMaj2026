@@ -4,13 +4,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { CheckCircle2, CircleAlert, Loader2 } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 
-import { Button } from "@/components/ui/button";
 import { cn, formatDateTimePL } from "@/lib/utils";
 import { useWizardAutosave } from "@/lib/wizard/use-wizard-autosave";
-import type {
-  WizardDefinition,
-  WizardSnapshot,
-} from "@/lib/wizard/wizard-types";
+import type { WizardDefinition, WizardSnapshot } from "@/lib/wizard/wizard-types";
 import type { WizardState } from "@/lib/db/types";
 
 import { WizardProgress } from "./wizard-progress";

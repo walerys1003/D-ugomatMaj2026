@@ -1,18 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import {
-  Bell,
-  CreditCard,
-  KeyRound,
-  Link2,
-  Lock,
-  ShieldCheck,
-  Smartphone,
-  User,
-} from "lucide-react";
+import { Bell, CreditCard, KeyRound, Link2, Lock, ShieldCheck, Smartphone, User } from "lucide-react";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 

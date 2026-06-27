@@ -1,13 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Mail, Shield, MessageCircle, Clock, ArrowRight } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Mail, Shield, MessageCircle, Clock } from "lucide-react";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  MarketingPageHero,
-  MarketingCtaBanner,
-} from "@/components/marketing/page-hero";
+import { MarketingPageHero, MarketingCtaBanner } from "@/components/marketing/page-hero";
 
 export const metadata: Metadata = {
   title: "Kontakt — Długomat",

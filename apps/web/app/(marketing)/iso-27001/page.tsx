@@ -1,23 +1,6 @@
 import type { Metadata } from "next";
-import {
-  ShieldCheck,
-  Lock,
-  ServerCog,
-  FileSearch,
-  KeyRound,
-  Users,
-  RefreshCw,
-  AlertTriangle,
-  ClipboardCheck,
-} from "lucide-react";
-import {
-  PageHero,
-  PageSection,
-  FeatureGrid,
-  FeatureCard,
-  CheckList,
-  CtaBand,
-} from "@/components/marketing/premium-page";
+import { Lock, ServerCog, FileSearch, KeyRound, RefreshCw, AlertTriangle, ClipboardCheck } from "lucide-react";
+import { PageHero, PageSection, FeatureGrid, FeatureCard, CheckList, CtaBand } from "@/components/marketing/premium-page";
 
 export const metadata: Metadata = {
   title: "ISO 27001 — bezpieczeństwo informacji w Długomat",

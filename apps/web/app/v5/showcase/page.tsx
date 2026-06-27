@@ -9,44 +9,16 @@ import type { Metadata } from "next";
 
 import { V5Header, V5Footer } from "@/components/v5/landing/header";
 import { V5HeroCockpit } from "@/components/v5/landing/hero-cockpit";
-import {
-  V5ProofStrip,
-  V5MetricsBand,
-  V5ReasoningSection,
-  V5ModulesGrid,
-  V5EnterpriseTrust,
-  V5EnterpriseCta,
-} from "@/components/v5/landing/sections";
-import {
-  V5Body,
-  V5Container,
-  V5Eyebrow,
-  V5Headline,
-  V5Section,
-  V5Surface,
-  V5Hairline,
-  V5Pill,
-} from "@/components/v5/primitives";
+import { V5ProofStrip, V5MetricsBand, V5ReasoningSection, V5ModulesGrid, V5EnterpriseTrust, V5EnterpriseCta } from "@/components/v5/landing/sections";
+import { V5Body, V5Container, V5Eyebrow, V5Headline, V5Section, V5Surface, V5Pill } from "@/components/v5/primitives";
 import { V5Reveal } from "@/components/v5/motion";
 import { V5PanelShell, V5PanelTopBar } from "@/components/v5/panel/shell";
 import { V5PanelDashboard } from "@/components/v5/panel/dashboard";
 import { V5AdminShell, V5OpsCenter } from "@/components/v5/admin/ops-center";
-import {
-  V5IracChain,
-  V5AuditChain,
-  V5RetrievalTopology,
-} from "@/components/v5/reasoning/topology";
+import { V5IracChain, V5AuditChain, V5RetrievalTopology } from "@/components/v5/reasoning/topology";
 import { V5ModelRouter, V5AgentRun } from "@/components/v5/ai/orchestration";
-import {
-  V5CaseTimeline,
-  V5WinProbability,
-  V5EvidenceGrid,
-} from "@/components/v5/case/case-system";
-import {
-  V5VersionTree,
-  V5LegalDiff,
-  V5SignaturePanel,
-} from "@/components/v5/docs/document-infra";
+import { V5CaseTimeline, V5WinProbability, V5EvidenceGrid } from "@/components/v5/case/case-system";
+import { V5VersionTree, V5LegalDiff, V5SignaturePanel } from "@/components/v5/docs/document-infra";
 import { V5MobileTabBar, V5MobileTopBar, V5MobileCard } from "@/components/v5/mobile";
 
 export const metadata: Metadata = {

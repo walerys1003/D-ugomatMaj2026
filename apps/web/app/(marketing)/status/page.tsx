@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import * as React from "react";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 
 import { StatusAutoRefresh } from "./auto-refresh";
 

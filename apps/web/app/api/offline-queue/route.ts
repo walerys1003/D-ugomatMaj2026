@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { persistServerAction, drainServerQueue, QueueOp } from "@/lib/pwa/offline-queue";
+import { persistServerAction, QueueOp } from "@/lib/pwa/offline-queue";
 
 async function getSupabase() {
   const { createSupabaseServerClient } = await import("@/lib/db/supabase-server");

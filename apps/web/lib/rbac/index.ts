@@ -128,26 +128,35 @@ export async function isAdmin(): Promise<boolean> {
  * a specific organization. Returns null when not signed in or not a
  * member of that org.
  *
- * The implementation expects an `org_members` table with columns:
- *   (org_id uuid, user_id uuid, role text /* member | org_admin | owner * /)
- * It tolerates a missing table by returning null (typical during early
- * migrations).
+ * Audyt #15 — kanoniczną tabelą członkostwa jest `org_memberships`
+ * (20260516000000_tier13_enterprise_multitenant.sql), NIE nieistniejące
+ * `org_members`. Wcześniej zapytanie do `org_members` zawsze zwracało błąd
+ * (brak tabeli) → `resolveOrgRole` po cichu zwracało null, więc każdy
+ * org-scoped check RBAC był nieaktywny. Dodatkowo normalizujemy nazwę roli:
+ * w DB owner/admin/member, w kodzie owner/org_admin/member.
  */
+function normalizeOrgRole(dbRole: string | null | undefined): OrgRole | null {
+  if (!dbRole) return null;
+  if (dbRole === "owner") return "owner";
+  if (dbRole === "admin" || dbRole === "org_admin") return "org_admin";
+  if (dbRole === "member") return "member";
+  return null;
+}
+
 export async function resolveOrgRole(orgId: string): Promise<OrgRole | null> {
   const supabase = createSupabaseServerClient();
   const { data: userData } = await supabase.auth.getUser();
   if (!userData?.user) return null;
 
   const { data, error } = await supabase
-    .from("org_members")
+    .from("org_memberships")
     .select("role")
     .eq("org_id", orgId)
     .eq("user_id", userData.user.id)
     .maybeSingle();
 
   if (error) return null;
-  const role = (data as { role?: string } | null)?.role;
-  return role ? (role as OrgRole) : null;
+  return normalizeOrgRole((data as { role?: string } | null)?.role);
 }
 
 export async function requireOrgRole(

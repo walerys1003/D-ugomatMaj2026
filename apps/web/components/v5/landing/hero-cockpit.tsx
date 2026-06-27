@@ -13,16 +13,8 @@
 import * as React from "react";
 import Link from "next/link";
 
-import {
-  V5Body,
-  V5Button,
-  V5Container,
-  V5Eyebrow,
-  V5Headline,
-  V5Pill,
-  V5Surface,
-} from "@/components/v5/primitives";
-import { V5DataFlow, V5LivePulse, V5Reveal, V5Stagger } from "@/components/v5/motion";
+import { V5Body, V5Button, V5Container, V5Eyebrow, V5Headline, V5Pill, V5Surface } from "@/components/v5/primitives";
+import { V5DataFlow, V5LivePulse, V5Reveal } from "@/components/v5/motion";
 
 export function V5HeroCockpit() {
   return (

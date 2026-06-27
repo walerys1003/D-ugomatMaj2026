@@ -4,13 +4,7 @@ import { ArrowRight, BookOpen, ChevronRight, HelpCircle, Search } from "lucide-r
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 
 export const metadata: Metadata = {
   title: "Baza wiedzy — Wsparcie Długomat",

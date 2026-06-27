@@ -1,19 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import {
-  ShieldCheck,
-  Sparkles,
-  Scale,
-  Heart,
-  ArrowRight,
-} from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { ShieldCheck, Sparkles, Scale, Heart } from "lucide-react";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  MarketingPageHero,
-  MarketingCtaBanner,
-} from "@/components/marketing/page-hero";
+import { MarketingPageHero, MarketingCtaBanner } from "@/components/marketing/page-hero";
 
 export const metadata: Metadata = {
   title: "O nas — kim jest Długomat i dlaczego to robimy",

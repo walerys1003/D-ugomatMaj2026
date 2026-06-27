@@ -10,7 +10,7 @@
 import * as React from "react";
 import Link from "next/link";
 
-import { V5Surface, V5Pill, V5Eyebrow, V5Stat, V5Terminal, V5Hairline } from "@/components/v5/primitives";
+import { V5Pill, V5Eyebrow, V5Terminal } from "@/components/v5/primitives";
 import { V5DataFlow, V5LivePulse, V5Reveal, V5Counter } from "@/components/v5/motion";
 import { cn } from "@/lib/utils";
 

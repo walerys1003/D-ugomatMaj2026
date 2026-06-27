@@ -8,13 +8,7 @@
  */
 import * as React from "react";
 
-import {
-  V5Eyebrow,
-  V5Pill,
-  V5Surface,
-  V5Hairline,
-  V5Stat,
-} from "@/components/v5/primitives";
+import { V5Eyebrow, V5Pill, V5Surface, V5Stat } from "@/components/v5/primitives";
 import { V5DataFlow, V5LivePulse, V5Reveal } from "@/components/v5/motion";
 
 export function V5PanelDashboard() {

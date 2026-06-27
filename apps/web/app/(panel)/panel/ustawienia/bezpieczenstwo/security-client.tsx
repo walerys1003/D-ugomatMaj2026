@@ -6,7 +6,6 @@ import { Fingerprint, KeyRound, ShieldOff, Smartphone, Trash2 } from "lucide-rea
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
 interface WebauthnCred {
   id: string;

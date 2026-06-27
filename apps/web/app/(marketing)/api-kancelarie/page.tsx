@@ -1,22 +1,6 @@
 import type { Metadata } from "next";
-import {
-  Code2,
-  Webhook,
-  KeyRound,
-  Layers,
-  Gauge,
-  ShieldCheck,
-  FileText,
-  GitBranch,
-} from "lucide-react";
-import {
-  PageHero,
-  PageSection,
-  FeatureGrid,
-  FeatureCard,
-  CheckList,
-  CtaBand,
-} from "@/components/marketing/premium-page";
+import { Code2, Webhook, KeyRound, Layers, Gauge, FileText, GitBranch } from "lucide-react";
+import { PageHero, PageSection, FeatureGrid, FeatureCard, CheckList, CtaBand } from "@/components/marketing/premium-page";
 
 export const metadata: Metadata = {
   title: "API dla kancelarii — Długomat dla profesjonalistów",

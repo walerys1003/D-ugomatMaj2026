@@ -1,32 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Check, Minus } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import {
-  MarketingPageHero,
-  MarketingCtaBanner,
-} from "@/components/marketing/page-hero";
-import {
-  Display,
-  Eyebrow,
-  Heading,
-  Text,
-  Mono,
-} from "@/components/ui/typography";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { MarketingPageHero, MarketingCtaBanner } from "@/components/marketing/page-hero";
+import { Display, Eyebrow, Heading, Text } from "@/components/ui/typography";
 import { PricingTiers } from "@/components/marketing/pricing-tiers";
 
 export const metadata: Metadata = {

@@ -11,11 +11,7 @@
  *
  * Tarcza ton: stanowczy, formalny polski, bez emocji, z konkretną propozycją.
  */
-import {
-  SYTUACJA_ZYCIOWA,
-  UGODA_VARIANTS,
-  type UgodaAnswers,
-} from "@/lib/wizard/modules/ugoda/schemas";
+import { SYTUACJA_ZYCIOWA, UGODA_VARIANTS, type UgodaAnswers } from "@/lib/wizard/modules/ugoda/schemas";
 import { formatDatePL, formatPLN } from "@/lib/utils";
 
 export interface UgodaRenderResult {

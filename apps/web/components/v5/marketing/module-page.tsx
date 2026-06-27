@@ -5,26 +5,8 @@
  */
 import * as React from "react";
 
-import {
-  V5MarketingLayout,
-  V5HeroSimple,
-  V5FeatureGrid,
-  V5StepsList,
-  V5Faq,
-  V5CtaBand,
-  V5StatBand,
-  V5Testimonial,
-} from "@/components/v5/marketing";
-import {
-  V5Body,
-  V5Container,
-  V5Eyebrow,
-  V5Headline,
-  V5Pill,
-  V5Section,
-  V5Surface,
-  V5Hairline,
-} from "@/components/v5/primitives";
+import { V5MarketingLayout, V5HeroSimple, V5FeatureGrid, V5StepsList, V5Faq, V5CtaBand, V5StatBand, V5Testimonial } from "@/components/v5/marketing";
+import { V5Container, V5Pill, V5Section } from "@/components/v5/primitives";
 import { V5Reveal } from "@/components/v5/motion";
 import { V5FaqJsonLd, V5ServiceJsonLd } from "@/components/v5/seo/json-ld";
 

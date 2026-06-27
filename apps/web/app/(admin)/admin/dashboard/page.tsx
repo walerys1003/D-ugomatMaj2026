@@ -3,14 +3,7 @@ import { Activity, AlertCircle, ArrowDown, ArrowUp, Briefcase, Bug, CreditCard, 
 
 import { getAdminMetrics } from "@/lib/admin/dashboard-metrics";
 import { getRealtimeKpis, deriveAlerts } from "@/lib/admin/realtime-kpis";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 
 export const metadata: Metadata = {
   title: "Dashboard administracyjny",

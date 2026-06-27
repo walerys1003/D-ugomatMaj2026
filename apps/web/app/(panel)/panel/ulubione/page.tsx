@@ -1,7 +1,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { Star, FileText, Scale, BookOpen, Search, Filter, ChevronRight } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 

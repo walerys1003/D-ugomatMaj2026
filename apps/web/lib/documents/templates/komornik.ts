@@ -13,12 +13,7 @@
  *
  * Tarcza ton: stanowczy, formalny polski, bez emocji, z konkretnym petitum.
  */
-import {
-  KOMORNIK_VARIANTS,
-  SYTUACJA_ZYCIOWA,
-  ZAJECIE_TYPY,
-  type KomornikAnswers,
-} from "@/lib/wizard/modules/komornik/schemas";
+import { KOMORNIK_VARIANTS, SYTUACJA_ZYCIOWA, ZAJECIE_TYPY, type KomornikAnswers } from "@/lib/wizard/modules/komornik/schemas";
 import { formatDatePL, formatPLN } from "@/lib/utils";
 
 export interface KomornikRenderResult {

@@ -1,26 +1,6 @@
 import type { Metadata } from "next";
-import {
-  Sparkles,
-  Scan,
-  Scale,
-  FileText,
-  ShieldCheck,
-  Search,
-  GitBranch,
-  CalendarClock,
-  BookOpen,
-  Cpu,
-} from "lucide-react";
-import {
-  PageHero,
-  PageSection,
-  FeatureGrid,
-  FeatureCard,
-  StepGrid,
-  StepCard,
-  CheckList,
-  CtaBand,
-} from "@/components/marketing/premium-page";
+import { Scan, Scale, FileText, ShieldCheck, Search, GitBranch, BookOpen, Cpu } from "lucide-react";
+import { PageHero, PageSection, FeatureGrid, FeatureCard, StepGrid, StepCard, CheckList, CtaBand } from "@/components/marketing/premium-page";
 
 export const metadata: Metadata = {
   title: "Funkcje AI — silnik prawny Długomat",

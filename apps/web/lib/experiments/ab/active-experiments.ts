@@ -7,7 +7,7 @@
  * Aktywacja: te eksperymenty są synchronizowane do tabeli `experiments`
  * przez `seedActiveExperiments()` (wywoływane raz przy deploy / przez admin UI).
  */
-import type { Experiment, ExperimentVariant } from "./experiment-engine";
+import type { ExperimentVariant } from "./experiment-engine";
 
 export interface ActiveExperimentDef {
   key: string;

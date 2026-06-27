@@ -1,24 +1,6 @@
 import type { Metadata } from "next";
-import {
-  ShieldCheck,
-  Scan,
-  FileText,
-  CalendarClock,
-  Scale,
-  Sparkles,
-  Lock,
-  Wallet,
-} from "lucide-react";
-import {
-  PageHero,
-  PageSection,
-  FeatureGrid,
-  FeatureCard,
-  StepGrid,
-  StepCard,
-  CheckList,
-  CtaBand,
-} from "@/components/marketing/premium-page";
+import { ShieldCheck, Scan, FileText, Scale, Sparkles, Lock, Wallet } from "lucide-react";
+import { PageHero, PageSection, FeatureGrid, FeatureCard, StepGrid, StepCard, CheckList, CtaBand } from "@/components/marketing/premium-page";
 
 export const metadata: Metadata = {
   title: "Dla Ciebie — przejmij kontrolę nad swoim długiem",

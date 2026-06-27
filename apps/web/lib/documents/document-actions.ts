@@ -16,16 +16,12 @@
  * AI errora; w najgorszym wypadku dostaje pismo z static template
  * (Tarcza zawsze dostarcza dokument).
  */
-import { revalidatePath } from "next/cache";
+
 import { revalidateDocument } from "@/lib/cache/revalidation";
 import { createHash } from "node:crypto";
 import { assertCsrfFromFormData } from "@/lib/security/csrf";
 
-import {
-  getCaseById,
-  logCaseEvent,
-  patchCase,
-} from "@/lib/cases/case-repository";
+import { getCaseById, logCaseEvent, patchCase } from "@/lib/cases/case-repository";
 import { renderSprzeciwEpuMarkdown } from "@/lib/documents/templates/sprzeciw-epu";
 import { renderBikFixMarkdown } from "@/lib/documents/templates/bik-fix";
 import { renderKomornikMarkdown } from "@/lib/documents/templates/komornik";
@@ -39,24 +35,12 @@ import type { KomornikAnswers } from "@/lib/wizard/modules/komornik/schemas";
 import type { PotraceniaAnswers } from "@/lib/wizard/modules/potracenia/schemas";
 import type { CesjaAnswers } from "@/lib/wizard/modules/cesja/schemas";
 import type { UgodaAnswers } from "@/lib/wizard/modules/ugoda/schemas";
-import type {
-  UpadloscAnswers,
-  WierzycielItem,
-} from "@/lib/wizard/modules/upadlosc/schemas";
+import type { UpadloscAnswers, WierzycielItem } from "@/lib/wizard/modules/upadlosc/schemas";
 import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 import { markdownToHtml } from "@/lib/documents/markdown-to-html";
 import type { CaseRow, CaseType, Json } from "@/lib/db/types";
-import {
-  runGenerationPipeline,
-  AiUnavailableError,
-  PromptNotFoundError,
-  type GenerationResult,
-} from "@/lib/ai/generation-pipeline";
-import {
-  ActionRateLimitError,
-  ActionUnauthenticatedError,
-  guardAction,
-} from "@/lib/security/server-action-guard";
+import { runGenerationPipeline, AiUnavailableError, PromptNotFoundError, type GenerationResult } from "@/lib/ai/generation-pipeline";
+import { ActionRateLimitError, ActionUnauthenticatedError, guardAction } from "@/lib/security/server-action-guard";
 
 export interface GeneratedDocumentSummary {
   documentId: string;

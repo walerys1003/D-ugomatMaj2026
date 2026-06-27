@@ -1,28 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import {
-  AlertCircle,
-  ArrowRight,
-  Banknote,
-  CalendarClock,
-  Gavel,
-  Scale,
-  TrendingDown,
-} from "lucide-react";
+import { AlertCircle, ArrowRight, Banknote, CalendarClock, Gavel, Scale, TrendingDown } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { listCasesForCurrentUser } from "@/lib/cases/case-repository";
 import { caseStatusLabel, caseTypeMeta } from "@/lib/cases/case-types";
-import { formatDatePL, urgencyFromDays, daysUntil } from "@/lib/utils";
+import { formatDatePL } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Moje zadłużenie · Długomat",
