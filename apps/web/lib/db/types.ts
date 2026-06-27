@@ -1246,6 +1246,36 @@ export interface Database {
         >;
         Relationships: [];
       };
+      // -----------------------------------------------------------------
+      // Audyt 2026-06-27 (iter. 10): secret vault. Źródło:
+      // 20260526000000_tier23_compliance_security.sql.
+      // -----------------------------------------------------------------
+      secret_vault: {
+        Row: {
+          id: string;
+          organization_id: string | null;
+          key: string;
+          description: string | null;
+          ciphertext: string;
+          version: number;
+          created_by: string;
+          created_at: string;
+          last_accessed_at: string | null;
+          access_count: number;
+          rotation_due_at: string | null;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["secret_vault"]["Row"]
+        > & {
+          key: string;
+          ciphertext: string;
+          created_by: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["secret_vault"]["Insert"]
+        >;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     // Audyt 2026-06-27: większość RPC nie jest jeszcze dotypowana (degraduje

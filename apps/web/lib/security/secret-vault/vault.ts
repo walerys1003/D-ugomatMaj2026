@@ -108,20 +108,21 @@ export async function setSecret(args: {
 
   const ciphertext = encryptSecret(args.value);
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const rotationDueAt = args.rotationDays
     ? new Date(Date.now() + args.rotationDays * 86_400_000).toISOString()
     : null;
 
-  // Upsert by (org, key) — increments version
-  const { data: existing } = await sb
-    .from("secret_vault")
-    .select("version")
-    .eq("organization_id", args.organizationId ?? null)
-    .eq("key", args.key)
-    .maybeSingle();
+  // Upsert by (org, key) — increments version.
+  // Audyt 2026-06-27 (iter. 10): poprzednio `.eq("organization_id", null)` —
+  // w PostgREST `col=eq.null` NIE matchuje wierszy z NULL (porównanie = NULL
+  // jest zawsze unknown). Sekrety osobiste (org=null) NIGDY nie były
+  // znajdowane. Poprawka: dla null używamy `.is(...)`. `as any` to maskował.
+  let existingQ = sb.from("secret_vault").select("version").eq("key", args.key);
+  existingQ = args.organizationId
+    ? existingQ.eq("organization_id", args.organizationId)
+    : existingQ.is("organization_id", null);
+  const { data: existing } = await existingQ.maybeSingle();
   const nextVersion = ((existing as { version?: number } | null)?.version ?? 0) + 1;
 
   const { data, error } = await sb
@@ -162,15 +163,12 @@ export async function getSecret(args: {
   actorId: string;
 }): Promise<string | null> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
-  const { data, error } = await sb
-    .from("secret_vault")
-    .select("*")
-    .eq("organization_id", args.organizationId ?? null)
-    .eq("key", args.key)
-    .maybeSingle();
+  const sb = supabase;
+  let getQ = sb.from("secret_vault").select("*").eq("key", args.key);
+  getQ = args.organizationId
+    ? getQ.eq("organization_id", args.organizationId)
+    : getQ.is("organization_id", null);
+  const { data, error } = await getQ.maybeSingle();
   if (error) throw error;
   if (!data) return null;
 
@@ -192,15 +190,18 @@ export async function getSecret(args: {
     throw new Error("decrypt_failed");
   }
 
-  // Touch access stats
-  await sb
-    .from("secret_vault")
-    .update({
-      last_accessed_at: new Date().toISOString(),
-      access_count: (stored.access_count ?? 0) + 1,
-    })
-    .eq("id", stored.id)
-    .then(() => null).catch(() => null);
+  // Touch access stats (best-effort).
+  try {
+    await sb
+      .from("secret_vault")
+      .update({
+        last_accessed_at: new Date().toISOString(),
+        access_count: (stored.access_count ?? 0) + 1,
+      })
+      .eq("id", stored.id);
+  } catch {
+    /* ignore */
+  }
 
   await appendAuditEntry({
     actorId: args.actorId,
@@ -222,14 +223,12 @@ export async function deleteSecret(args: {
   actorId: string;
 }): Promise<void> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
-  const { error } = await sb
-    .from("secret_vault")
-    .delete()
-    .eq("organization_id", args.organizationId ?? null)
-    .eq("key", args.key);
+  const sb = supabase;
+  let delQ = sb.from("secret_vault").delete().eq("key", args.key);
+  delQ = args.organizationId
+    ? delQ.eq("organization_id", args.organizationId)
+    : delQ.is("organization_id", null);
+  const { error } = await delQ;
   if (error) throw error;
   await appendAuditEntry({
     actorId: args.actorId,
@@ -244,14 +243,14 @@ export async function listSecrets(args: {
   organizationId?: string | null;
 }): Promise<Omit<VaultSecret, "ciphertext">[]> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
-  const { data, error } = await sb
+  const sb = supabase;
+  let listQ = sb
     .from("secret_vault")
-    .select("id, organization_id, key, description, version, created_by, created_at, last_accessed_at, access_count, rotation_due_at")
-    .eq("organization_id", args.organizationId ?? null)
-    .order("key", { ascending: true });
+    .select("id, organization_id, key, description, version, created_by, created_at, last_accessed_at, access_count, rotation_due_at");
+  listQ = args.organizationId
+    ? listQ.eq("organization_id", args.organizationId)
+    : listQ.is("organization_id", null);
+  const { data, error } = await listQ.order("key", { ascending: true });
   if (error) throw error;
   return (data ?? []) as Omit<VaultSecret, "ciphertext">[];
 }
@@ -261,9 +260,7 @@ export async function listSecrets(args: {
  */
 export async function listSecretsDueForRotation(): Promise<Omit<VaultSecret, "ciphertext">[]> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { data } = await sb
     .from("secret_vault")
     .select("id, organization_id, key, description, version, created_by, created_at, last_accessed_at, access_count, rotation_due_at")
@@ -279,9 +276,7 @@ export async function listSecretsDueForRotation(): Promise<Omit<VaultSecret, "ci
  */
 export async function rotateAllSecrets(actorId: string): Promise<{ rotated: number; failed: number }> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { data } = await sb.from("secret_vault").select("*");
   let rotated = 0;
   let failed = 0;
