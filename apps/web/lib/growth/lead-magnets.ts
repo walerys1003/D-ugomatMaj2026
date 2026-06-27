@@ -70,10 +70,7 @@ export async function captureLead(input: CaptureLeadInput): Promise<{ ok: boolea
   if (!isValidEmail(input.email)) return { ok: false, magnet };
   if (!input.consentMarketing) return { ok: false, magnet };
 
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseAdminClient();
   const { data: lead } = await sb
     .from("leads")
     .upsert(
@@ -93,12 +90,16 @@ export async function captureLead(input: CaptureLeadInput): Promise<{ ok: boolea
     .single();
 
   // Auto-enroll w welcome campaign (jeśli mamy user_id)
-  if (lead && (lead as any).user_id) {
-    await enrollInCampaign({
-      userId: (lead as any).user_id,
-      campaignKey: "welcome",
-      context: { magnet_slug: magnet.slug, magnet_title: magnet.title },
-    }).catch(() => undefined);
+  if (lead?.user_id) {
+    try {
+      await enrollInCampaign({
+        userId: lead.user_id,
+        campaignKey: "welcome",
+        context: { magnet_slug: magnet.slug, magnet_title: magnet.title },
+      });
+    } catch {
+      /* ignore — enrollment best-effort */
+    }
   }
 
   return { ok: true, magnet };

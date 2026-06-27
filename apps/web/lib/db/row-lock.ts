@@ -47,14 +47,7 @@ export interface ClaimedWork<T> {
  * from racing on the same scoped task.
  */
 export async function tryAdvisoryLock(scope: string): Promise<boolean> {
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
-  if (!sb) {
-    logger.warn("rowlock.no_admin", { scope });
-    return false;
-  }
+  const sb = createSupabaseAdminClient();
   // Hash scope → bigint (Postgres advisory locks używają int8).
   let h = 0;
   for (let i = 0; i < scope.length; i++) {
@@ -71,11 +64,7 @@ export async function tryAdvisoryLock(scope: string): Promise<boolean> {
 }
 
 export async function releaseAdvisoryLock(scope: string): Promise<void> {
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
-  if (!sb) return;
+  const sb = createSupabaseAdminClient();
   let h = 0;
   for (let i = 0; i < scope.length; i++) {
     h = (h * 31 + scope.charCodeAt(i)) | 0;
@@ -111,13 +100,7 @@ export async function withAdvisoryLock<T>(
 export async function claimWork<T>(
   params: ClaimWorkParams,
 ): Promise<ClaimedWork<T>> {
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
-  if (!sb) {
-    return { rows: [], release: async () => {} };
-  }
+  const sb = createSupabaseAdminClient();
 
   const { data, error } = await sb.rpc("claim_work_batch", {
     p_table: params.table,

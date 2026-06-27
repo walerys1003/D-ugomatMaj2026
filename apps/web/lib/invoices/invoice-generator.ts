@@ -16,6 +16,7 @@
  */
 import "server-only";
 import { createSupabaseAdminClient } from "@/lib/db/supabase-server";
+import type { Json } from "@/lib/db/types";
 
 export interface InvoiceLineItem {
   description: string;
@@ -75,10 +76,7 @@ export interface InvoiceRecord {
  * Używa RPC fn_next_invoice_number(year) dla atomicity.
  */
 async function nextInvoiceNumber(year: number, isCorrection: boolean): Promise<string> {
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseAdminClient();
   const { data, error } = await sb.rpc("fn_next_invoice_number", {
     p_year: year,
     p_is_correction: isCorrection,
@@ -92,10 +90,7 @@ async function nextInvoiceNumber(year: number, isCorrection: boolean): Promise<s
 }
 
 export async function createInvoice(input: InvoiceInput): Promise<InvoiceRecord> {
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseAdminClient();
   const issueDate = input.issueDate ?? new Date();
   const sellDate = input.sellDate ?? issueDate;
   const isCorrection = !!input.originalInvoiceNumber;
@@ -142,8 +137,8 @@ export async function createInvoice(input: InvoiceInput): Promise<InvoiceRecord>
       customer_nip: input.customer.nip ?? null,
       customer_vat_id: input.customer.vatId ?? null,
       customer_type: input.customer.customerType,
-      items: input.items,
-      vat_summary: vatSummary,
+      items: input.items as unknown as Json,
+      vat_summary: vatSummary as unknown as Json,
       total_net_grosze: totalNet,
       total_vat_grosze: totalVat,
       total_gross_grosze: totalGross,
@@ -158,7 +153,7 @@ export async function createInvoice(input: InvoiceInput): Promise<InvoiceRecord>
     .single();
 
   if (error) throw error;
-  return data as InvoiceRecord;
+  return data as unknown as InvoiceRecord;
 }
 
 /**
@@ -264,10 +259,7 @@ export async function syncInvoiceToFakturownia(
     const json = (await res.json()) as { id?: number };
     if (!json.id) return null;
 
-    const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+    const sb = createSupabaseAdminClient();
     await sb
       .from("invoices")
       .update({ fakturownia_id: String(json.id) })

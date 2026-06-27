@@ -28,12 +28,12 @@ export async function GET(req: Request, ctx: { params: { id: string } }) {
   const format = url.searchParams.get("format") ?? "json";
 
   if (format === "pdf") {
-    const pdf = await renderInvoicePdf(inv as InvoiceRecord);
+    const pdf = await renderInvoicePdf(inv as unknown as InvoiceRecord);
     return new NextResponse(pdf, {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="${(inv as InvoiceRecord).invoice_number.replace(/\//g, "_")}.pdf"`,
+        "Content-Disposition": `attachment; filename="${(inv as unknown as InvoiceRecord).invoice_number.replace(/\//g, "_")}.pdf"`,
       },
     });
   }

@@ -58,10 +58,7 @@ export function getVapidPublicKey(): string | null {
  * Save / upsert a push subscription for the authenticated user.
  */
 export async function saveSubscription(rec: PushSubscriptionRecord): Promise<{ ok: true } | { ok: false; error: string }> {
-  const supabase = getSupabaseAdmin();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = getSupabaseAdmin();
   try {
     const { error } = await sb.from("push_subscriptions").upsert(
       {
@@ -82,10 +79,7 @@ export async function saveSubscription(rec: PushSubscriptionRecord): Promise<{ o
 }
 
 export async function removeSubscription(endpoint: string): Promise<void> {
-  const supabase = getSupabaseAdmin();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = getSupabaseAdmin();
   await sb.from("push_subscriptions").delete().eq("endpoint", endpoint);
 }
 
@@ -114,10 +108,7 @@ export async function sendPushToUser(userId: string, payload: PushPayload): Prom
 
   webpush.setVapidDetails(cfg.subject, cfg.publicKey, cfg.privateKey);
 
-  const supabase = getSupabaseAdmin();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = getSupabaseAdmin();
   const { data: subs, error } = await sb
     .from("push_subscriptions")
     .select("id, endpoint, keys, failed_count")

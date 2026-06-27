@@ -1956,6 +1956,115 @@ export interface Database {
         >;
         Relationships: [];
       };
+      // UWAGA (audyt #6): KOLIZJA `create table if not exists push_subscriptions`.
+      //   - Tier7  (20260512200000) — WYGRYWA: keys JSONB, failed_count, endpoint UNIQUE.
+      //   - Tier16 (20260519000000) — POMINIĘTA: endpoint_hash, p256dh, auth, active.
+      // Żywy kod (lib/notifications/push-notifications.ts) używa schematu TIER7
+      // (keys, failed_count) — zgodny z wygrywającą migracją, brak buga.
+      push_subscriptions: {
+        Row: {
+          id: string;
+          user_id: string;
+          endpoint: string;
+          keys: Json;
+          user_agent: string | null;
+          failed_count: number;
+          created_at: string;
+          last_seen_at: string | null;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["push_subscriptions"]["Row"]
+        > & {
+          user_id: string;
+          endpoint: string;
+          keys: Json;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["push_subscriptions"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      // UWAGA (audyt #6): KOLIZJA `create table if not exists invoices`.
+      //   - Tier8  (20260513100000) — WYGRYWA: items jsonb, vat_summary jsonb,
+      //     customer_* pełen zestaw, total_*_grosze, customer_type CHECK(b2c/b2b).
+      //   - Tier19 (20260522000000) — POMINIĘTA.
+      // Żywy kod (lib/invoices/invoice-generator.ts) używa schematu TIER8 — brak buga.
+      invoices: {
+        Row: {
+          id: string;
+          invoice_number: string;
+          payment_id: string | null;
+          user_id: string;
+          customer_name: string;
+          customer_email: string;
+          customer_address: string | null;
+          customer_city: string | null;
+          customer_zip: string | null;
+          customer_country: string;
+          customer_nip: string | null;
+          customer_vat_id: string | null;
+          customer_type: "b2c" | "b2b";
+          items: Json;
+          vat_summary: Json;
+          total_net_grosze: number;
+          total_vat_grosze: number;
+          total_gross_grosze: number;
+          issue_date: string;
+          sell_date: string;
+          is_correction: boolean;
+          original_invoice_number: string | null;
+          correction_reason: string | null;
+          pdf_url: string | null;
+          fakturownia_id: string | null;
+          status: "draft" | "issued" | "sent" | "paid" | "cancelled";
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["invoices"]["Row"]
+        > & {
+          invoice_number: string;
+          user_id: string;
+          customer_name: string;
+          customer_email: string;
+          customer_type: "b2c" | "b2b";
+          items: Json;
+          vat_summary: Json;
+          total_net_grosze: number;
+          total_vat_grosze: number;
+          total_gross_grosze: number;
+          issue_date: string;
+          sell_date: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["invoices"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      leads: {
+        Row: {
+          id: string;
+          email: string;
+          user_id: string | null;
+          magnet_slug: string;
+          source: string | null;
+          medium: string | null;
+          campaign: string | null;
+          consent_marketing: boolean;
+          consent_at: string | null;
+          tags: string[] | null;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["leads"]["Row"]
+        > & {
+          email: string;
+          magnet_slug: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["leads"]["Insert"]
+        >;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     // Audyt 2026-06-27: większość RPC nie jest jeszcze dotypowana (degraduje
