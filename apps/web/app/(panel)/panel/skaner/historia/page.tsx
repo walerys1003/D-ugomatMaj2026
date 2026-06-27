@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { ArrowLeft, ArrowRight, FileSearch, Filter } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -11,102 +12,59 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export const metadata: Metadata = {
   title: "Historia skanów — Skaner nakazu",
   description: "Wszystkie analizy nakazów zapłaty i pism procesowych.",
 };
 
+export const dynamic = "force-dynamic";
+
 interface ScanRecord {
   id: string;
   ts: string;
-  doc_type: "nakaz zapłaty" | "pozew" | "tytuł wykonawczy" | "wezwanie";
+  doc_type: string;
   filename: string;
   pages: number;
   status: "done" | "in_progress" | "failed";
-  risk_score: number;
+  risk_score: number | null;
   case_ref?: string;
   amount_pln?: number;
   creditor?: string;
   recommendation: string;
 }
 
-const SCANS: ScanRecord[] = [
-  {
-    id: "scan_018",
-    ts: "2026-05-10T14:42:00Z",
-    doc_type: "nakaz zapłaty",
-    filename: "nakaz_SR_Warszawa_2026-05.pdf",
-    pages: 3,
-    status: "done",
-    risk_score: 78,
-    amount_pln: 14200,
-    creditor: "BestCollect Sp. z o.o.",
-    recommendation: "Złóż sprzeciw — wykryto cesję wierzytelności bez udokumentowania.",
-  },
-  {
-    id: "scan_017",
-    ts: "2026-05-08T11:14:00Z",
-    doc_type: "wezwanie",
-    filename: "wezwanie_mBank.pdf",
-    pages: 2,
-    status: "done",
-    risk_score: 32,
-    amount_pln: 4800,
-    creditor: "mBank S.A.",
-    recommendation: "Niskie ryzyko — sprawdź czy dług nie jest przedawniony (>6 lat).",
-  },
-  {
-    id: "scan_016",
-    ts: "2026-05-04T16:08:00Z",
-    doc_type: "pozew",
-    filename: "pozew_KrukSA.pdf",
-    pages: 7,
-    status: "done",
-    risk_score: 64,
-    amount_pln: 22400,
-    creditor: "Kruk S.A.",
-    case_ref: "case_011",
-    recommendation: "Średnie ryzyko — odpowiedź na pozew wymagana w 14 dni.",
-  },
-  {
-    id: "scan_015",
-    ts: "2026-04-28T09:32:00Z",
-    doc_type: "tytuł wykonawczy",
-    filename: "tytul_KM_412.pdf",
-    pages: 4,
-    status: "done",
-    risk_score: 91,
-    amount_pln: 36800,
-    creditor: "Komornik J. Nowak",
-    case_ref: "case_007",
-    recommendation: "Wysokie ryzyko — natychmiast skontaktuj się z prawnikiem.",
-  },
-  {
-    id: "scan_014",
-    ts: "2026-04-22T13:48:00Z",
-    doc_type: "nakaz zapłaty",
-    filename: "nakaz_PKO_BP.pdf",
-    pages: 2,
-    status: "done",
-    risk_score: 41,
-    amount_pln: 8200,
-    creditor: "PKO BP S.A.",
-    recommendation: "Średnio-niskie ryzyko — sprzeciw uzasadniony jeśli umowa zawiera klauzule abuzywne.",
-  },
-  {
-    id: "scan_013",
-    ts: "2026-04-18T10:24:00Z",
-    doc_type: "wezwanie",
-    filename: "wezwanie_TauronOdbiorca.pdf",
-    pages: 1,
-    status: "done",
-    risk_score: 18,
-    amount_pln: 1240,
-    creditor: "Tauron Sprzedaż",
-    recommendation: "Niskie ryzyko — najprawdopodobniej przedawnione (z 2018 r.).",
-  },
-];
+/** Bezpieczne odczytanie pola z JSON-a extracted_data. */
+function ed(data: unknown): Record<string, unknown> {
+  return data && typeof data === "object" && !Array.isArray(data)
+    ? (data as Record<string, unknown>)
+    : {};
+}
+
+function edStr(data: Record<string, unknown>, ...keys: string[]): string | undefined {
+  for (const k of keys) {
+    const v = data[k];
+    if (typeof v === "string" && v.trim()) return v.trim();
+  }
+  return undefined;
+}
+
+function edNum(data: Record<string, unknown>, ...keys: string[]): number | undefined {
+  for (const k of keys) {
+    const v = data[k];
+    if (typeof v === "number" && Number.isFinite(v)) return v;
+    if (typeof v === "string" && v.trim() && Number.isFinite(Number(v))) return Number(v);
+  }
+  return undefined;
+}
+
+function mapStatus(s: string): ScanRecord["status"] {
+  if (s === "completed") return "done";
+  if (s === "failed") return "failed";
+  return "in_progress"; // pending | processing
+}
 
 const STATUS_TONE: Record<ScanRecord["status"], "success" | "warning" | "danger"> = {
   done: "success",
@@ -141,10 +99,51 @@ function fmtDate(iso: string): string {
   }).format(new Date(iso));
 }
 
-export default function SkanerHistoriaPage() {
+export default async function SkanerHistoriaPage() {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/logowanie?next=/panel/skaner/historia");
+
+  const { data: rows } = await supabase
+    .from("ocr_results")
+    .select(
+      "id, original_filename, case_id, status, created_at, extracted_data",
+    )
+    .order("created_at", { ascending: false })
+    .limit(100);
+
+  const SCANS: ScanRecord[] = (rows ?? []).map((r) => {
+    const data = ed(r.extracted_data);
+    const risk = edNum(data, "risk_score", "ryzyko");
+    return {
+      id: r.id,
+      ts: r.created_at,
+      doc_type: edStr(data, "doc_type", "typ", "document_type") ?? "dokument",
+      filename: r.original_filename,
+      pages: edNum(data, "pages", "strony") ?? 0,
+      status: mapStatus(r.status),
+      risk_score: risk ?? null,
+      case_ref: r.case_id ?? undefined,
+      amount_pln: edNum(data, "amount_pln", "kwota", "amount"),
+      creditor: edStr(data, "creditor", "wierzyciel"),
+      recommendation:
+        edStr(data, "recommendation", "rekomendacja", "summary") ??
+        "Analiza dokumentu zakończona.",
+    };
+  });
+
   const total = SCANS.length;
-  const highRisk = SCANS.filter((s) => s.risk_score >= 70).length;
+  const withRisk = SCANS.filter((s) => s.risk_score != null);
+  const highRisk = withRisk.filter((s) => (s.risk_score ?? 0) >= 70).length;
   const totalAmount = SCANS.reduce((s, sc) => s + (sc.amount_pln ?? 0), 0);
+  const avgRisk =
+    withRisk.length > 0
+      ? Math.round(
+          withRisk.reduce((s, sc) => s + (sc.risk_score ?? 0), 0) / withRisk.length,
+        )
+      : null;
 
   return (
     <div className="space-y-8">
@@ -208,7 +207,7 @@ export default function SkanerHistoriaPage() {
           <CardHeader>
             <CardDescription>Średnie ryzyko</CardDescription>
             <CardTitle className="font-display text-fluid-h2 text-warn">
-              {Math.round(SCANS.reduce((s, sc) => s + sc.risk_score, 0) / SCANS.length)}/100
+              {avgRisk != null ? `${avgRisk}/100` : "—"}
             </CardTitle>
           </CardHeader>
         </Card>
@@ -260,6 +259,12 @@ export default function SkanerHistoriaPage() {
         </CardContent>
       </Card>
 
+      {SCANS.length === 0 ? (
+        <EmptyState
+          title="Brak skanów"
+          description="Nie masz jeszcze żadnych analiz dokumentów. Wgraj nakaz zapłaty lub pismo procesowe, aby rozpocząć."
+        />
+      ) : (
       <ul className="space-y-3" aria-label="Lista skanów">
         {SCANS.map((s) => (
           <li key={s.id}>
@@ -275,9 +280,11 @@ export default function SkanerHistoriaPage() {
                     <Badge tone={STATUS_TONE[s.status]} withDot>
                       {s.status === "done" ? "ukończony" : s.status === "in_progress" ? "w trakcie" : "błąd"}
                     </Badge>
-                    <Badge tone={riskTone(s.risk_score)} withDot>
-                      ryzyko: {riskLabel(s.risk_score)} ({s.risk_score}/100)
-                    </Badge>
+                    {s.risk_score != null ? (
+                      <Badge tone={riskTone(s.risk_score)} withDot>
+                        ryzyko: {riskLabel(s.risk_score)} ({s.risk_score}/100)
+                      </Badge>
+                    ) : null}
                     {s.case_ref ? (
                       <Badge tone="neutral">sprawa: {s.case_ref}</Badge>
                     ) : null}
@@ -315,6 +322,7 @@ export default function SkanerHistoriaPage() {
           </li>
         ))}
       </ul>
+      )}
     </div>
   );
 }

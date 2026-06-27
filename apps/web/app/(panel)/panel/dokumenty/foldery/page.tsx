@@ -1,89 +1,28 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Folder, FolderPlus, Lock } from "lucide-react";
+import { redirect } from "next/navigation";
+import { ArrowRight, Folder, FolderPlus } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export const metadata: Metadata = {
   title: "Foldery dokumentów — Długomat",
-  description: "Organizacja dokumentów w folderach z poziomami dostępu.",
+  description: "Organizacja dokumentów w folderach (wg spraw) z poziomami dostępu.",
 };
+
+export const dynamic = "force-dynamic";
 
 interface FolderItem {
   id: string;
   name: string;
   description: string;
   documents_count: number;
-  size_mb: number;
-  shared: boolean;
   last_modified: string;
   color: "blue" | "amber" | "green" | "gray" | "red";
 }
-
-const FOLDERS: FolderItem[] = [
-  {
-    id: "f_001",
-    name: "Sprawa BIK — kredyt mBank 2019",
-    description: "Wniosek o korektę, korespondencja z bankiem, raporty BIK",
-    documents_count: 14,
-    size_mb: 12.4,
-    shared: true,
-    last_modified: "2026-05-10",
-    color: "blue",
-  },
-  {
-    id: "f_002",
-    name: "Egzekucja komornicza KM 412/25",
-    description: "Tytuł wykonawczy, wnioski, korespondencja z komornikiem",
-    documents_count: 22,
-    size_mb: 18.7,
-    shared: false,
-    last_modified: "2026-05-08",
-    color: "red",
-  },
-  {
-    id: "f_003",
-    name: "Umowy kredytowe",
-    description: "Skany umów, regulaminy, aneksy",
-    documents_count: 8,
-    size_mb: 24.1,
-    shared: false,
-    last_modified: "2026-05-04",
-    color: "amber",
-  },
-  {
-    id: "f_004",
-    name: "Korespondencja z windykatorami",
-    description: "Pisma, wezwania, propozycje ugody",
-    documents_count: 16,
-    size_mb: 6.8,
-    shared: true,
-    last_modified: "2026-04-30",
-    color: "gray",
-  },
-  {
-    id: "f_005",
-    name: "Wzory pism (własne)",
-    description: "Szablony reklamacji, wniosków, odwołań",
-    documents_count: 11,
-    size_mb: 2.3,
-    shared: false,
-    last_modified: "2026-04-22",
-    color: "green",
-  },
-  {
-    id: "f_006",
-    name: "Archiwum 2024",
-    description: "Zamknięte sprawy z 2024 roku",
-    documents_count: 47,
-    size_mb: 89.2,
-    shared: false,
-    last_modified: "2025-01-15",
-    color: "gray",
-  },
-];
 
 const COLOR_CLASS: Record<FolderItem["color"], string> = {
   blue: "text-dlugomat-700",
@@ -93,9 +32,49 @@ const COLOR_CLASS: Record<FolderItem["color"], string> = {
   gray: "text-ink-500",
 };
 
-export default function DokumentyFolderyPage() {
+const COLOR_CYCLE: FolderItem["color"][] = ["blue", "amber", "green", "red", "gray"];
+
+const fmtDate = (iso: string | null) =>
+  iso ? new Intl.DateTimeFormat("pl-PL", { dateStyle: "medium" }).format(new Date(iso)) : "—";
+
+export default async function DokumentyFolderyPage() {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/logowanie?next=/panel/dokumenty/foldery");
+
+  // Foldery = sprawy uzytkownika; liczymy dokumenty per sprawa.
+  const [casesRes, docsRes] = await Promise.all([
+    supabase
+      .from("cases")
+      .select("id, title, type, status, updated_at")
+      .eq("user_id", user.id)
+      .order("updated_at", { ascending: false }),
+    supabase.from("documents").select("case_id, updated_at").eq("user_id", user.id),
+  ]);
+
+  const docsByCase = new Map<string, { count: number; last: string | null }>();
+  for (const d of docsRes.data ?? []) {
+    const prev = docsByCase.get(d.case_id) ?? { count: 0, last: null };
+    const last =
+      !prev.last || (d.updated_at && d.updated_at > prev.last) ? d.updated_at : prev.last;
+    docsByCase.set(d.case_id, { count: prev.count + 1, last });
+  }
+
+  const FOLDERS: FolderItem[] = (casesRes.data ?? []).map((c, i) => {
+    const agg = docsByCase.get(c.id) ?? { count: 0, last: null };
+    return {
+      id: c.id,
+      name: c.title ?? "Sprawa",
+      description: `${c.type ?? ""}${c.status ? ` · ${c.status}` : ""}`.trim() || "Sprawa",
+      documents_count: agg.count,
+      last_modified: fmtDate(agg.last ?? c.updated_at ?? null),
+      color: COLOR_CYCLE[i % COLOR_CYCLE.length],
+    };
+  });
+
   const totalDocs = FOLDERS.reduce((s, f) => s + f.documents_count, 0);
-  const totalSize = FOLDERS.reduce((s, f) => s + f.size_mb, 0);
 
   return (
     <div className="space-y-8">
@@ -155,53 +134,48 @@ export default function DokumentyFolderyPage() {
         </Card>
         <Card>
           <CardHeader>
-            <CardDescription>Zajęte miejsce</CardDescription>
+            <CardDescription>Sprawy z dokumentami</CardDescription>
             <CardTitle className="font-display text-fluid-h3 text-dlugomat-950">
-              {totalSize.toFixed(1)} MB
+              {FOLDERS.filter((f) => f.documents_count > 0).length}
             </CardTitle>
           </CardHeader>
         </Card>
       </section>
 
-      <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-3" aria-label="Lista folderów">
-        {FOLDERS.map((f) => (
-          <li key={f.id}>
-            <Link
-              href={`/panel/dokumenty?folder=${f.id}`}
-              className="group block h-full rounded-lg border border-ink-200 bg-white p-5 shadow-card transition hover:shadow-pop focus-visible:outline-none focus-visible:shadow-shield-focus"
-            >
-              <div className="flex items-start justify-between">
-                <Folder className={`h-7 w-7 ${COLOR_CLASS[f.color]}`} aria-hidden />
-                <ArrowRight
-                  className="h-5 w-5 text-ink-400 group-hover:text-dlugomat-700"
-                  aria-hidden
-                />
-              </div>
-              <h3 className="mt-4 font-semibold text-dlugomat-950 line-clamp-2">
-                {f.name}
-              </h3>
-              <p className="mt-1 text-sm text-ink-600 line-clamp-2">{f.description}</p>
-              <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-ink-500">
-                <span>{f.documents_count} dokumentów</span>
-                <span aria-hidden>·</span>
-                <span>{f.size_mb} MB</span>
-                <span aria-hidden>·</span>
-                <span>{f.last_modified}</span>
-              </div>
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                {f.shared ? (
-                  <Badge tone="info">Współdzielony</Badge>
-                ) : (
-                  <Badge tone="neutral">
-                    <Lock className="mr-1 h-3 w-3" aria-hidden />
-                    Prywatny
-                  </Badge>
-                )}
-              </div>
-            </Link>
-          </li>
-        ))}
-      </ul>
+      {FOLDERS.length === 0 ? (
+        <EmptyState
+          title="Brak folderow"
+          description="Foldery odpowiadaja Twoim sprawom. Utworz sprawe, aby zaczac porzadkowac dokumenty."
+        />
+      ) : (
+        <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-3" aria-label="Lista folderów">
+          {FOLDERS.map((f) => (
+            <li key={f.id}>
+              <Link
+                href={`/panel/dokumenty?case=${f.id}`}
+                className="group block h-full rounded-lg border border-ink-200 bg-white p-5 shadow-card transition hover:shadow-pop focus-visible:outline-none focus-visible:shadow-shield-focus"
+              >
+                <div className="flex items-start justify-between">
+                  <Folder className={`h-7 w-7 ${COLOR_CLASS[f.color]}`} aria-hidden />
+                  <ArrowRight
+                    className="h-5 w-5 text-ink-400 group-hover:text-dlugomat-700"
+                    aria-hidden
+                  />
+                </div>
+                <h3 className="mt-4 font-semibold text-dlugomat-950 line-clamp-2">
+                  {f.name}
+                </h3>
+                <p className="mt-1 text-sm text-ink-600 line-clamp-2">{f.description}</p>
+                <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-ink-500">
+                  <span>{f.documents_count} dokumentów</span>
+                  <span aria-hidden>·</span>
+                  <span>{f.last_modified}</span>
+                </div>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Hash, Plus, Tag } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -11,56 +12,63 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export const metadata: Metadata = {
   title: "Tagi dokumentów — Długomat",
   description: "Organizacja dokumentów poprzez tagi z chmurą rozmiarów.",
 };
 
+export const dynamic = "force-dynamic";
+
 interface TagItem {
   id: string;
   name: string;
   count: number;
-  color: "blue" | "green" | "amber" | "red" | "gray" | "purple";
+  tone: "info" | "success" | "warning" | "danger" | "neutral";
 }
 
-const TAGS: TagItem[] = [
-  { id: "t_001", name: "BIK", count: 24, color: "blue" },
-  { id: "t_002", name: "komornik", count: 19, color: "red" },
-  { id: "t_003", name: "bank", count: 31, color: "amber" },
-  { id: "t_004", name: "wzór pisma", count: 14, color: "green" },
-  { id: "t_005", name: "wniosek", count: 22, color: "purple" },
-  { id: "t_006", name: "reklamacja", count: 11, color: "gray" },
-  { id: "t_007", name: "ugoda", count: 7, color: "green" },
-  { id: "t_008", name: "windykacja", count: 17, color: "red" },
-  { id: "t_009", name: "kredyt frankowy", count: 8, color: "purple" },
-  { id: "t_010", name: "upadłość", count: 5, color: "amber" },
-  { id: "t_011", name: "przedawnienie", count: 9, color: "blue" },
-  { id: "t_012", name: "klauzule abuzywne", count: 6, color: "purple" },
-  { id: "t_013", name: "raport BIK", count: 12, color: "blue" },
-  { id: "t_014", name: "tytuł wykonawczy", count: 8, color: "red" },
-  { id: "t_015", name: "zabezpieczenie", count: 4, color: "gray" },
-];
-
-const COLOR_TONE: Record<TagItem["color"], "info" | "success" | "warning" | "danger" | "neutral"> = {
-  blue: "info",
-  green: "success",
-  amber: "warning",
-  red: "danger",
-  purple: "info",
-  gray: "neutral",
-};
+const TONE_CYCLE: TagItem["tone"][] = ["info", "success", "warning", "danger", "neutral"];
 
 function sizeClass(count: number, max: number): string {
-  const pct = count / max;
+  const pct = max > 0 ? count / max : 0;
   if (pct > 0.75) return "text-2xl";
   if (pct > 0.5) return "text-xl";
   if (pct > 0.3) return "text-lg";
   return "text-base";
 }
 
-export default function DokumentyTagiPage() {
-  const max = Math.max(...TAGS.map((t) => t.count));
+export default async function DokumentyTagiPage() {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/logowanie?next=/panel/dokumenty/tagi");
+
+  const { data: docs } = await supabase
+    .from("documents")
+    .select("tags")
+    .eq("user_id", user.id);
+
+  // Agregacja tagow ze wszystkich dokumentow uzytkownika.
+  const counts = new Map<string, number>();
+  for (const d of docs ?? []) {
+    for (const t of d.tags ?? []) {
+      const name = (t ?? "").trim();
+      if (!name) continue;
+      counts.set(name, (counts.get(name) ?? 0) + 1);
+    }
+  }
+
+  const TAGS: TagItem[] = Array.from(counts.entries()).map(([name, count], i) => ({
+    id: `tag-${i}`,
+    name,
+    count,
+    tone: TONE_CYCLE[i % TONE_CYCLE.length],
+  }));
+
+  const max = TAGS.length ? Math.max(...TAGS.map((t) => t.count)) : 0;
   const total = TAGS.reduce((s, t) => s + t.count, 0);
   const sorted = [...TAGS].sort((a, b) => b.count - a.count);
 
@@ -124,12 +132,19 @@ export default function DokumentyTagiPage() {
           <CardHeader>
             <CardDescription>Najpopularniejszy</CardDescription>
             <CardTitle className="font-display text-fluid-h4 text-dlugomat-950">
-              {sorted[0].name} ({sorted[0].count})
+              {sorted[0] ? `${sorted[0].name} (${sorted[0].count})` : "—"}
             </CardTitle>
           </CardHeader>
         </Card>
       </section>
 
+      {TAGS.length === 0 ? (
+        <EmptyState
+          title="Brak tagow"
+          description="Oznacz dokumenty tagami, aby latwiej je organizowac i przeszukiwac."
+        />
+      ) : (
+      <>
       <Card>
         <CardHeader>
           <CardTitle>Chmura tagów</CardTitle>
@@ -175,13 +190,15 @@ export default function DokumentyTagiPage() {
                     <Tag className="h-3.5 w-3.5 text-ink-400" aria-hidden />
                     <span className="text-dlugomat-900">{t.name}</span>
                   </span>
-                  <Badge tone={COLOR_TONE[t.color]}>{t.count}</Badge>
+                  <Badge tone={t.tone}>{t.count}</Badge>
                 </Link>
               </li>
             ))}
           </ul>
         </CardContent>
       </Card>
+      </>
+      )}
     </div>
   );
 }
