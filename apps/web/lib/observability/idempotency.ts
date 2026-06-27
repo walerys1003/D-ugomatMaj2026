@@ -17,6 +17,7 @@
  */
 
 import { createSupabaseAdminClient } from "@/lib/db/supabase-server";
+import type { Json } from "@/lib/db/types";
 import { logger } from "./logger";
 
 export interface IdempotencyKey {
@@ -48,10 +49,7 @@ const TTL_MS = 24 * 60 * 60 * 1000;
 export async function reserveIdempotency<T>(
   k: IdempotencyKey,
 ): Promise<IdempotencyLookup<T>> {
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseAdminClient();
   if (!sb) {
     // Bez admin clienta nie możemy gwarantować idempotencji — pomiń.
     logger.warn("idempotency.no_admin", { scope: k.scope });
@@ -115,16 +113,13 @@ export async function completeIdempotency<T>(
   result: T,
   httpStatus = 200,
 ): Promise<void> {
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseAdminClient();
   if (!sb) return;
   const { error } = await sb
     .from("idempotency_records")
     .update({
       status: "completed",
-      result: result as unknown as object,
+      result: result as unknown as Json,
       http_status: httpStatus,
       completed_at: new Date().toISOString(),
     })
@@ -137,10 +132,7 @@ export async function completeIdempotency<T>(
 }
 
 export async function abortIdempotency(k: IdempotencyKey): Promise<void> {
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseAdminClient();
   if (!sb) return;
   await sb
     .from("idempotency_records")

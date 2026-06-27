@@ -1401,6 +1401,33 @@ export interface Database {
         >;
         Relationships: [];
       };
+      // -----------------------------------------------------------------
+      // Tier 6 — Idempotency-Key cache (24 h TTL). Źródło:
+      // 20260511100000_tier6_idempotency_and_circuit.sql.
+      // -----------------------------------------------------------------
+      idempotency_records: {
+        Row: {
+          id: number;
+          scope: string;
+          key: string;
+          user_id: string | null;
+          status: "in_progress" | "completed";
+          result: Json | null;
+          http_status: number | null;
+          created_at: string;
+          completed_at: string | null;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["idempotency_records"]["Row"]
+        > & {
+          scope: string;
+          key: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["idempotency_records"]["Insert"]
+        >;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     // Audyt 2026-06-27: większość RPC nie jest jeszcze dotypowana (degraduje
