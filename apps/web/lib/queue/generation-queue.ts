@@ -7,6 +7,7 @@
  */
 
 import { getSupabaseAdmin } from "@/lib/db/supabase-admin";
+import type { Json } from "@/lib/db/types";
 import { logger } from "@/lib/observability/logger";
 
 export type JobPriority = "critical" | "high" | "normal" | "low";
@@ -49,9 +50,7 @@ export async function enqueueGenerationJob(
   input: EnqueueInput,
 ): Promise<{ ok: true; job_id: string } | { ok: false; error: string }> {
   const supabase = getSupabaseAdmin();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const priority = input.priority ?? "normal";
   const scheduled_at = input.delay_seconds
     ? new Date(Date.now() + input.delay_seconds * 1000).toISOString()
@@ -80,7 +79,7 @@ export async function enqueueGenerationJob(
       priority,
       priority_rank: PRIORITY_RANK[priority],
       status: "queued",
-      payload: input.payload,
+      payload: input.payload as Json,
       attempts: 0,
       max_attempts: input.max_attempts ?? 3,
       scheduled_at,
@@ -95,14 +94,13 @@ export type ClaimedJob = GenerationJob;
 
 export async function claimNextJob(workerId: string): Promise<ClaimedJob | null> {
   const supabase = getSupabaseAdmin();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   // Use RPC if available, else fallback to a 2-step claim
   try {
     const { data } = await sb.rpc("claim_next_generation_job", { p_worker_id: workerId });
     if (data && Array.isArray(data) && data[0]) return data[0] as ClaimedJob;
-    if (data && !Array.isArray(data) && (data as any).id) return data as ClaimedJob;
+    if (data && !Array.isArray(data) && (data as { id?: string }).id)
+      return data as ClaimedJob;
   } catch (err) {
     logger.debug("queue.rpc_unavailable_fallback", { error: (err as Error).message });
   }
@@ -135,20 +133,16 @@ export async function claimNextJob(workerId: string): Promise<ClaimedJob | null>
 
 export async function completeJob(jobId: string, result: Record<string, unknown>): Promise<void> {
   const supabase = getSupabaseAdmin();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   await sb
     .from("generation_jobs")
-    .update({ status: "completed", completed_at: new Date().toISOString(), result })
+    .update({ status: "completed", completed_at: new Date().toISOString(), result: result as Json })
     .eq("id", jobId);
 }
 
 export async function failJob(jobId: string, error: string, retry = true): Promise<void> {
   const supabase = getSupabaseAdmin();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { data } = await sb
     .from("generation_jobs")
     .select("attempts, max_attempts")
@@ -178,9 +172,7 @@ export async function failJob(jobId: string, error: string, retry = true): Promi
 
 export async function cancelJob(userId: string, jobId: string): Promise<{ ok: boolean }> {
   const supabase = getSupabaseAdmin();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { error } = await sb
     .from("generation_jobs")
     .update({ status: "cancelled", completed_at: new Date().toISOString() })
@@ -192,9 +184,7 @@ export async function cancelJob(userId: string, jobId: string): Promise<{ ok: bo
 
 export async function getJob(jobId: string, userId: string): Promise<GenerationJob | null> {
   const supabase = getSupabaseAdmin();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { data } = await sb
     .from("generation_jobs")
     .select("*")
@@ -206,9 +196,7 @@ export async function getJob(jobId: string, userId: string): Promise<GenerationJ
 
 export async function listUserJobs(userId: string, opts?: { status?: JobStatus; limit?: number }): Promise<GenerationJob[]> {
   const supabase = getSupabaseAdmin();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   let q = sb
     .from("generation_jobs")
     .select("*")

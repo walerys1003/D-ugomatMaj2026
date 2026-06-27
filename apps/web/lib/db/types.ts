@@ -917,6 +917,163 @@ export interface Database {
         >;
         Relationships: [];
       };
+      // -----------------------------------------------------------------
+      // Audyt 2026-06-27 (iter. 8): referral program v2. Źródło:
+      // 20260513100000_tier8_pricing_affiliate_growth.sql.
+      // -----------------------------------------------------------------
+      referral_codes_v2: {
+        Row: {
+          id: string;
+          user_id: string;
+          code: string;
+          uses: number;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["referral_codes_v2"]["Row"]
+        > & {
+          user_id: string;
+          code: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["referral_codes_v2"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      referral_redemptions_v2: {
+        Row: {
+          id: string;
+          referrer_user_id: string;
+          invitee_user_id: string;
+          code: string;
+          status: "signed_up" | "credited" | "limit_exceeded" | "expired";
+          credited_at: string | null;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["referral_redemptions_v2"]["Row"]
+        > & {
+          referrer_user_id: string;
+          invitee_user_id: string;
+          code: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["referral_redemptions_v2"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      referral_credits_v2: {
+        Row: {
+          id: string;
+          user_id: string;
+          amount_grosze: number;
+          used_grosze: number;
+          source_redemption_id: string | null;
+          expires_at: string;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["referral_credits_v2"]["Row"]
+        > & {
+          user_id: string;
+          amount_grosze: number;
+          expires_at: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["referral_credits_v2"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      // -----------------------------------------------------------------
+      // Audyt 2026-06-27 (iter. 8): generation queue. Źródło:
+      // 20260512200000_tier7_tables.sql.
+      // -----------------------------------------------------------------
+      generation_jobs: {
+        Row: {
+          id: string;
+          user_id: string;
+          case_id: string;
+          kind: "generation" | "revision" | "polish" | "summary" | "ocr";
+          priority: "critical" | "high" | "normal" | "low";
+          priority_rank: number;
+          status: "queued" | "running" | "completed" | "failed" | "cancelled";
+          payload: Json;
+          result: Json | null;
+          error: string | null;
+          attempts: number;
+          max_attempts: number;
+          worker_id: string | null;
+          scheduled_at: string;
+          started_at: string | null;
+          completed_at: string | null;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["generation_jobs"]["Row"]
+        > & {
+          user_id: string;
+          case_id: string;
+          kind: "generation" | "revision" | "polish" | "summary" | "ocr";
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["generation_jobs"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      // -----------------------------------------------------------------
+      // Audyt 2026-06-27 (iter. 8): automation (workflows). Źródło:
+      // 20260525000000_tier22_agents_automation.sql.
+      // -----------------------------------------------------------------
+      automation_workflows: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string;
+          description: string | null;
+          trigger: Json;
+          conditions: Json;
+          actions: Json;
+          enabled: boolean;
+          last_run_at: string | null;
+          run_count: number;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["automation_workflows"]["Row"]
+        > & {
+          user_id: string;
+          name: string;
+          trigger: Json;
+          actions: Json;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["automation_workflows"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      automation_runs: {
+        Row: {
+          id: string;
+          workflow_id: string;
+          user_id: string;
+          trigger_payload: Json;
+          status: "running" | "completed" | "failed" | "skipped";
+          steps: Json;
+          started_at: string;
+          finished_at: string | null;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["automation_runs"]["Row"]
+        > & {
+          workflow_id: string;
+          user_id: string;
+          status: "running" | "completed" | "failed" | "skipped";
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["automation_runs"]["Insert"]
+        >;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     // Audyt 2026-06-27: większość RPC nie jest jeszcze dotypowana (degraduje

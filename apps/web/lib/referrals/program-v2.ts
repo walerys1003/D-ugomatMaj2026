@@ -31,9 +31,7 @@ export interface ReferralCode {
 
 export async function getOrCreateReferralCode(userId: string): Promise<ReferralCode> {
   const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { data: existing } = await sb
     .from("referral_codes_v2")
     .select("*")
@@ -53,9 +51,7 @@ export async function getOrCreateReferralCode(userId: string): Promise<ReferralC
 
 export async function findReferralByCode(code: string): Promise<ReferralCode | null> {
   const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { data } = await sb
     .from("referral_codes_v2")
     .select("*")
@@ -72,9 +68,7 @@ export async function recordReferralRedemption(
   code: string,
 ): Promise<void> {
   const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const ref = await findReferralByCode(code);
   if (!ref) return;
   if (ref.user_id === inviteeUserId) return; // self-referral block
@@ -97,9 +91,7 @@ export async function recordReferralRedemption(
  */
 export async function awardReferralCredits(inviteeUserId: string): Promise<void> {
   const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { data: redemption } = await sb
     .from("referral_redemptions_v2")
     .select("*")
@@ -108,7 +100,7 @@ export async function awardReferralCredits(inviteeUserId: string): Promise<void>
     .maybeSingle();
   if (!redemption) return;
 
-  const r = redemption as any;
+  const r = redemption;
 
   // Check yearly limit
   const yearAgo = new Date(Date.now() - 365 * 86_400_000).toISOString();
@@ -166,9 +158,7 @@ export interface ReferralBalance {
 
 export async function getReferralBalance(userId: string): Promise<ReferralBalance> {
   const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const now = new Date().toISOString();
   const soon = new Date(Date.now() + 30 * 86_400_000).toISOString();
 
@@ -179,7 +169,7 @@ export async function getReferralBalance(userId: string): Promise<ReferralBalanc
     .gt("expires_at", now)
     .order("expires_at", { ascending: true });
 
-  const credits = ((data as any[]) ?? []).map((c) => ({
+  const credits = (data ?? []).map((c) => ({
     id: c.id,
     amount_grosze: c.amount_grosze,
     expires_at: c.expires_at,
@@ -202,9 +192,7 @@ export async function consumeReferralCredits(
   amountGrosze: number,
 ): Promise<number> {
   const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const balance = await getReferralBalance(userId);
   let remaining = Math.min(amountGrosze, balance.totalGrosze);
   const consumed = remaining;
