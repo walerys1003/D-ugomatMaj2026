@@ -1,172 +1,138 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = { title: "Leady | Partner | Długomat" };
 
-interface Lead {
-  id: string;
-  company_name: string;
-  contact_name: string;
-  contact_email: string;
-  contact_phone?: string;
-  status: "new" | "contacted" | "qualified" | "converted" | "lost";
-  expected_plan: "starter" | "growth" | "enterprise";
-  estimated_mrr_pln: number;
-  source: "referral_link" | "manual" | "campaign";
-  created_at: string;
-  last_activity_at?: string;
-  notes?: string;
+function fmtDate(value: string | null): string {
+  if (!value) return "-";
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "-";
+  return d.toLocaleDateString("pl-PL", { day: "2-digit", month: "2-digit", year: "numeric" });
 }
 
-async function fetchLeads(status?: string): Promise<Lead[]> {
-  try {
-    const qs = status ? `?status=${status}` : "";
-    const res = await fetch(`/api/partner/leads${qs}`, { cache: "no-store" });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return data.leads ?? [];
-  } catch {
-    return [];
+const STATUS_LABEL: Record<string, string> = {
+  signed_up: "Zarejestrowany",
+  converted: "Konwersja",
+  expired: "Wygasły",
+};
+
+const STATUS_TONE: Record<string, "neutral" | "info" | "success"> = {
+  signed_up: "info",
+  converted: "success",
+  expired: "neutral",
+};
+
+export default async function PartnerLeadyPage() {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/logowanie?next=/panel/partner/leady");
+
+  const { data: account } = await supabase
+    .from("affiliate_accounts")
+    .select("id")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  let referrals: {
+    id: string;
+    user_id: string;
+    status: string;
+    attributed_at: string;
+    converted_at: string | null;
+  }[] = [];
+
+  if (account) {
+    const { data } = await supabase
+      .from("affiliate_referrals")
+      .select("id, user_id, status, attributed_at, converted_at")
+      .eq("affiliate_id", account.id)
+      .order("attributed_at", { ascending: false })
+      .limit(200);
+    referrals = data ?? [];
   }
-}
-
-const STATUS_BADGE: Record<Lead["status"], string> = {
-  new: "bg-accent-50 text-accent-700 border-accent-200",
-  contacted: "bg-warn-50 text-warn-700 border-warn-200",
-  qualified: "bg-warn-50 text-warn-700 border-warn-200",
-  converted: "bg-accent-50 text-accent-700 border-accent-200",
-  lost: "bg-ink-100 text-ink-600 border-ink-200",
-};
-
-const STATUS_LABEL: Record<Lead["status"], string> = {
-  new: "Nowy",
-  contacted: "Skontaktowany",
-  qualified: "Zakwalifikowany",
-  converted: "Skonwertowany",
-  lost: "Utracony",
-};
-
-const FILTER_OPTIONS: Array<{ value: string; label: string }> = [
-  { value: "", label: "Wszystkie" },
-  { value: "new", label: "Nowe" },
-  { value: "contacted", label: "Skontaktowane" },
-  { value: "qualified", label: "Zakwalifikowane" },
-  { value: "converted", label: "Skonwertowane" },
-  { value: "lost", label: "Utracone" },
-];
-
-export default async function LeadyPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ status?: string }>;
-}) {
-  const sp = await searchParams;
-  const leads = await fetchLeads(sp.status);
-  const newCount = leads.filter((l) => l.status === "new").length;
 
   return (
-    <main className="container mx-auto px-4 py-8 max-w-6xl space-y-6">
+    <main className="container mx-auto max-w-5xl space-y-6 px-4 py-8">
       <div>
         <Link href="/panel/partner" className="text-xs text-ink-500 hover:text-ink-700">
           ← Panel partnera
         </Link>
-        <h1 className="font-display text-3xl font-semibold text-ink-900 dark:text-ink-50 mt-2">
-          Leady
+        <h1 className="mt-2 font-display text-3xl font-semibold text-ink-900 dark:text-ink-50">
+          Leady partnerskie
         </h1>
-        <p className="text-sm text-ink-500 mt-1">
-          {leads.length} leadów w widoku · {newCount} oczekuje na pierwszy kontakt
+        <p className="mt-1 text-sm text-ink-500">
+          Użytkownicy polecani przez Twój link partnerski wraz ze statusem atrybucji.
         </p>
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        {FILTER_OPTIONS.map((opt) => {
-          const active = (sp.status ?? "") === opt.value;
-          const href = opt.value
-            ? `/panel/partner/leady?status=${opt.value}`
-            : "/panel/partner/leady";
-          return (
-            <Link
-              key={opt.value || "all"}
-              href={href}
-              className={`text-sm px-3 py-1.5 rounded-full border transition ${
-                active
-                  ? "border-ink-900 dark:border-ink-50 bg-ink-900 dark:bg-ink-50 text-ink-50 dark:text-ink-900"
-                  : "border-ink-300 dark:border-ink-700 text-ink-700 dark:text-ink-300 hover:border-ink-400"
-              }`}
-            >
-              {opt.label}
-            </Link>
-          );
-        })}
-      </div>
-
-      <Card elevation="subtle">
-        <CardHeader>
-          <CardTitle>Lista leadów</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {leads.length === 0 ? (
-            <div className="space-y-3 text-sm text-ink-500">
-              <p>Brak leadów w tym widoku.</p>
-              <Link href="/panel/partner/materialy">
-                <Button variant="secondary">Pobierz link partnerski</Button>
-              </Link>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-left border-b border-ink-200 dark:border-ink-800 text-xs uppercase tracking-wider text-ink-500">
-                    <th className="py-2 pr-3">Firma / kontakt</th>
-                    <th className="py-2 pr-3">Status</th>
-                    <th className="py-2 pr-3">Plan</th>
-                    <th className="py-2 pr-3">Szac. MRR</th>
-                    <th className="py-2 pr-3">Źródło</th>
-                    <th className="py-2 pr-3">Aktywność</th>
+      {!account ? (
+        <EmptyState
+          title="Brak konta partnerskiego"
+          description="Aby śledzić leady, dołącz najpierw do programu partnerskiego."
+        />
+      ) : referrals.length === 0 ? (
+        <EmptyState
+          title="Brak leadów"
+          description="Nie zarejestrowano jeszcze żadnych poleceń przez Twój link partnerski."
+        />
+      ) : (
+        <Card elevation="subtle" className="overflow-hidden">
+          <CardHeader>
+            <CardTitle className="text-fluid-lg">Polecenia</CardTitle>
+          </CardHeader>
+          <CardContent className="overflow-x-auto p-0">
+            <table className="w-full text-fluid-sm">
+              <thead className="border-y border-ink-200 bg-ink-50/60 dark:border-dlugomat-800 dark:bg-dlugomat-900/40">
+                <tr className="text-left text-ink-600 dark:text-ink-300">
+                  <th className="px-5 py-3 font-semibold">Użytkownik</th>
+                  <th className="px-5 py-3 font-semibold">Status</th>
+                  <th className="px-5 py-3 font-semibold">Atrybucja</th>
+                  <th className="px-5 py-3 font-semibold">Konwersja</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-ink-100 dark:divide-dlugomat-800">
+                {referrals.map((r) => (
+                  <tr key={r.id}>
+                    <td className="px-5 py-3 font-mono text-xs">{r.user_id.slice(0, 8)}</td>
+                    <td className="px-5 py-3">
+                      <span
+                        className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs ${
+                          STATUS_TONE[r.status] === "success"
+                            ? "bg-emerald-50 text-emerald-700"
+                            : STATUS_TONE[r.status] === "info"
+                              ? "bg-accent-50 text-accent-700"
+                              : "bg-ink-100 text-ink-600"
+                        }`}
+                      >
+                        {STATUS_LABEL[r.status] ?? r.status}
+                      </span>
+                    </td>
+                    <td className="px-5 py-3 text-xs">{fmtDate(r.attributed_at)}</td>
+                    <td className="px-5 py-3 text-xs">{fmtDate(r.converted_at)}</td>
                   </tr>
-                </thead>
-                <tbody>
-                  {leads.map((l) => (
-                    <tr key={l.id} className="border-b border-ink-100 dark:border-ink-900">
-                      <td className="py-3 pr-3">
-                        <div className="font-medium text-ink-900 dark:text-ink-50">
-                          {l.company_name}
-                        </div>
-                        <div className="text-xs text-ink-500">
-                          {l.contact_name} · {l.contact_email}
-                        </div>
-                      </td>
-                      <td className="py-3 pr-3">
-                        <span
-                          className={`text-xs px-2 py-0.5 rounded-full border ${STATUS_BADGE[l.status]}`}
-                        >
-                          {STATUS_LABEL[l.status]}
-                        </span>
-                      </td>
-                      <td className="py-3 pr-3 capitalize text-ink-700 dark:text-ink-300">
-                        {l.expected_plan}
-                      </td>
-                      <td className="py-3 pr-3 font-medium text-ink-900 dark:text-ink-50">
-                        {l.estimated_mrr_pln.toLocaleString("pl-PL")} zł
-                      </td>
-                      <td className="py-3 pr-3 text-xs text-ink-500 font-mono">
-                        {l.source}
-                      </td>
-                      <td className="py-3 pr-3 text-ink-500 text-xs">
-                        {l.last_activity_at
-                          ? new Date(l.last_activity_at).toLocaleDateString("pl-PL")
-                          : new Date(l.created_at).toLocaleDateString("pl-PL")}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                ))}
+              </tbody>
+            </table>
+          </CardContent>
+          <div className="border-t border-ink-100 p-4 dark:border-dlugomat-800">
+            <Link href="/panel/partner/pipeline">
+              <Button variant="ghost" size="sm">
+                Zobacz pipeline
+              </Button>
+            </Link>
+          </div>
+        </Card>
+      )}
     </main>
   );
 }

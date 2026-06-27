@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
+import { getActiveOrgForUser } from "@/lib/orgs/server";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = { title: "SSO | Organizacja | Długomat" };
 
@@ -14,18 +19,17 @@ interface SsoConfig {
   configured_at?: string;
 }
 
-async function fetchSso(): Promise<SsoConfig | null> {
-  try {
-    const res = await fetch("/api/orgs/sso", { cache: "no-store" });
-    if (!res.ok) return null;
-    return (await res.json()) as SsoConfig;
-  } catch {
-    return null;
-  }
-}
-
 export default async function SsoPage() {
-  const sso = (await fetchSso()) ?? { enabled: false, protocol: null };
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/logowanie?next=/panel/organizacja/sso");
+
+  await getActiveOrgForUser(user.id);
+  // SSO nie jest jeszcze skonfigurowane dla zadnej organizacji (brak tabeli
+  // konfiguracji SSO) — pokazujemy uczciwy stan "wylaczone".
+  const sso: SsoConfig = { enabled: false, protocol: null };
 
   return (
     <main className="container mx-auto px-4 py-8 max-w-4xl space-y-6">

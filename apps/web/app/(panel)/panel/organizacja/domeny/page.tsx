@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
+import { getActiveOrgForUser } from "@/lib/orgs/server";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = { title: "Domeny | Organizacja | Długomat" };
 
@@ -9,19 +14,6 @@ interface DomainRow {
   id: string;
   domain: string;
   status: "verified" | "pending" | "failed";
-  txt_record: string;
-  verified_at?: string;
-}
-
-async function fetchDomains(): Promise<DomainRow[]> {
-  try {
-    const res = await fetch("/api/orgs/domains", { cache: "no-store" });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return data.domains ?? [];
-  } catch {
-    return [];
-  }
 }
 
 const STATUS_BADGE: Record<DomainRow["status"], string> = {
@@ -37,7 +29,16 @@ const STATUS_LABEL: Record<DomainRow["status"], string> = {
 };
 
 export default async function DomenyPage() {
-  const domains = await fetchDomains();
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/logowanie?next=/panel/organizacja/domeny");
+
+  const org = await getActiveOrgForUser(user.id);
+  const domains: DomainRow[] = org?.domain
+    ? [{ id: org.id, domain: org.domain, status: "verified" }]
+    : [];
 
   return (
     <main className="container mx-auto px-4 py-8 max-w-5xl space-y-6">
@@ -104,19 +105,6 @@ export default async function DomenyPage() {
                       {STATUS_LABEL[d.status]}
                     </span>
                   </div>
-                  {d.status !== "verified" && (
-                    <div className="text-xs text-ink-600 dark:text-ink-400">
-                      Rekord TXT:{" "}
-                      <code className="font-mono px-1.5 py-0.5 rounded bg-ink-100 dark:bg-ink-800">
-                        {d.txt_record}
-                      </code>
-                    </div>
-                  )}
-                  {d.verified_at && (
-                    <div className="text-xs text-ink-500">
-                      Zweryfikowano: {new Date(d.verified_at).toLocaleDateString("pl-PL")}
-                    </div>
-                  )}
                 </li>
               ))}
             </ul>

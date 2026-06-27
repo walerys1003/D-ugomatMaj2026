@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
+import { getActiveOrgForUser } from "@/lib/orgs/server";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = { title: "SCIM | Organizacja | Długomat" };
 
@@ -13,18 +18,17 @@ interface ScimConfig {
   users_synced?: number;
 }
 
-async function fetchScim(): Promise<ScimConfig> {
-  try {
-    const res = await fetch("/api/orgs/scim", { cache: "no-store" });
-    if (!res.ok) return { enabled: false };
-    return (await res.json()) as ScimConfig;
-  } catch {
-    return { enabled: false };
-  }
-}
-
 export default async function ScimPage() {
-  const scim = await fetchScim();
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/logowanie?next=/panel/organizacja/scim");
+
+  await getActiveOrgForUser(user.id);
+  // SCIM nie jest jeszcze skonfigurowane (brak tabeli konfiguracji SCIM) —
+  // pokazujemy uczciwy stan "wylaczone".
+  const scim: ScimConfig = { enabled: false };
 
   return (
     <main className="container mx-auto px-4 py-8 max-w-4xl space-y-6">

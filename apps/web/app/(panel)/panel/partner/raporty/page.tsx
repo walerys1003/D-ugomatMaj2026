@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { ArrowDownRight, ArrowUpRight, BarChart3, Download } from "lucide-react";
+import { redirect } from "next/navigation";
+import { BarChart3 } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -9,29 +9,25 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Raporty · Partner · Długomat",
   description:
-    "Twoje wyniki partnerskie miesiąc do miesiąca: prowizje, konwersje, retencja.",
+    "Twoje wyniki partnerskie miesiąc do miesiąca: prowizje i konwersje.",
 };
 
 type Month = {
+  key: string;
   label: string;
   commission_pln: number;
-  new_clients: number;
-  active_clients: number;
-  conversion_pct: number;
-  churn_pct: number;
+  count: number;
 };
 
-const MONTHS: Month[] = [
-  { label: "Sty 2026", commission_pln: 12_800, new_clients: 4, active_clients: 18, conversion_pct: 22, churn_pct: 0 },
-  { label: "Lut 2026", commission_pln: 14_400, new_clients: 5, active_clients: 23, conversion_pct: 25, churn_pct: 4 },
-  { label: "Mar 2026", commission_pln: 18_900, new_clients: 7, active_clients: 28, conversion_pct: 28, churn_pct: 2 },
-  { label: "Kwi 2026", commission_pln: 21_200, new_clients: 6, active_clients: 33, conversion_pct: 31, churn_pct: 3 },
-  { label: "Maj 2026", commission_pln: 24_800, new_clients: 8, active_clients: 38, conversion_pct: 34, churn_pct: 5 },
-];
+const MONTHS_PL = ["Sty", "Lut", "Mar", "Kwi", "Maj", "Cze", "Lip", "Sie", "Wrz", "Paź", "Lis", "Gru"];
 
 function pln(n: number) {
   return new Intl.NumberFormat("pl-PL", {
@@ -41,11 +37,89 @@ function pln(n: number) {
   }).format(n);
 }
 
-export default function PartnerRaportyPage() {
-  const last = MONTHS.at(-1)!;
-  const prev = MONTHS.at(-2)!;
-  const commissionTrend = ((last.commission_pln - prev.commission_pln) / prev.commission_pln) * 100;
-  const max = Math.max(...MONTHS.map((m) => m.commission_pln));
+export default async function PartnerRaportyPage() {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/logowanie?next=/panel/partner/raporty");
+
+  const { data: account } = await supabase
+    .from("affiliate_accounts")
+    .select("id")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (!account) {
+    return (
+      <div className="mx-auto flex max-w-6xl flex-col gap-8">
+        <header>
+          <p className="text-fluid-sm font-semibold uppercase tracking-wider text-dlugomat-600">
+            Partner · Wyniki
+          </p>
+          <h1 className="text-fluid-3xl font-bold tracking-tight text-dlugomat-900 dark:text-white">
+            Raporty
+          </h1>
+        </header>
+        <EmptyState
+          title="Brak konta partnerskiego"
+          description="Raporty wyników są dostępne po dołączeniu do programu partnerskiego."
+        />
+      </div>
+    );
+  }
+
+  const [{ data: commissionsData }, { data: referralsData }] = await Promise.all([
+    supabase
+      .from("affiliate_commissions")
+      .select("amount_grosze, status, created_at")
+      .eq("affiliate_id", account.id)
+      .limit(2000),
+    supabase
+      .from("affiliate_referrals")
+      .select("id, status")
+      .eq("affiliate_id", account.id)
+      .limit(2000),
+  ]);
+
+  const commissions = commissionsData ?? [];
+  const referrals = referralsData ?? [];
+
+  const totalEarned =
+    commissions
+      .filter((c) => c.status === "paid")
+      .reduce((acc, c) => acc + (c.amount_grosze ?? 0), 0) / 100;
+  const pendingEarned =
+    commissions
+      .filter((c) => c.status === "pending")
+      .reduce((acc, c) => acc + (c.amount_grosze ?? 0), 0) / 100;
+  const convertedCount = referrals.filter((r) => r.status === "converted").length;
+  const convRate = referrals.length > 0 ? Math.round((convertedCount / referrals.length) * 100) : 0;
+
+  // Build last 6 months of commissions.
+  const now = new Date();
+  const months: Month[] = [];
+  for (let i = 5; i >= 0; i -= 1) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    months.push({
+      key: `${d.getFullYear()}-${d.getMonth()}`,
+      label: `${MONTHS_PL[d.getMonth()]} ${d.getFullYear()}`,
+      commission_pln: 0,
+      count: 0,
+    });
+  }
+  const idxByKey = new Map(months.map((m, i) => [m.key, i]));
+  for (const c of commissions) {
+    const d = new Date(c.created_at);
+    if (Number.isNaN(d.getTime())) continue;
+    const key = `${d.getFullYear()}-${d.getMonth()}`;
+    const idx = idxByKey.get(key);
+    if (idx == null) continue;
+    months[idx].commission_pln += (c.amount_grosze ?? 0) / 100;
+    months[idx].count += 1;
+  }
+  const max = Math.max(1, ...months.map((m) => m.commission_pln));
+  const hasData = commissions.length > 0 || referrals.length > 0;
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-8">
@@ -58,117 +132,101 @@ export default function PartnerRaportyPage() {
             Raporty
           </h1>
           <p className="mt-1 max-w-2xl text-fluid-base text-ink-600 dark:text-ink-300">
-            Twoje wyniki w czasie. Dane synchronizowane z systemem
-            rozliczeń co 30 minut.
+            Twoje realne wyniki partnerskie: wypłacone i oczekujące prowizje oraz
+            konwersje poleconych użytkowników.
           </p>
         </div>
-        <Button variant="secondary">
-          <Download className="size-4" />
-          Pobierz raport CSV
-        </Button>
       </header>
 
-      <section
-        aria-label="Najważniejsze KPI"
-        className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
-      >
-        <KpiCard
-          label="Prowizja (bieżący mies.)"
-          value={pln(last.commission_pln)}
-          trend={commissionTrend}
+      {!hasData ? (
+        <EmptyState
+          title="Brak danych do raportu"
+          description="Nie zarejestrowano jeszcze żadnych prowizji ani poleceń. Udostępniaj swój link partnerski, aby zbierać wyniki."
         />
-        <KpiCard label="Nowi klienci" value={String(last.new_clients)} trend={(last.new_clients - prev.new_clients) * 10} />
-        <KpiCard label="Aktywni klienci" value={String(last.active_clients)} trend={5} />
-        <KpiCard label="Konwersja" value={`${last.conversion_pct}%`} trend={last.conversion_pct - prev.conversion_pct} />
-      </section>
-
-      <Card elevation="subtle">
-        <CardHeader>
-          <span
-            aria-hidden
-            className="grid size-9 place-items-center rounded-lg bg-dlugomat-100 text-dlugomat-700 dark:bg-dlugomat-850 dark:text-dlugomat-300"
+      ) : (
+        <>
+          <section
+            aria-label="Najważniejsze KPI"
+            className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
           >
-            <BarChart3 className="size-5" />
-          </span>
-          <CardTitle className="mt-2 text-fluid-xl">
-            Prowizje miesiąc do miesiąca
-          </CardTitle>
-          <CardDescription>Wzrost kompozytowy 18% miesięcznie</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ul className="flex items-end gap-3 sm:gap-4">
-            {MONTHS.map((m) => {
-              const h = (m.commission_pln / max) * 100;
-              return (
-                <li key={m.label} className="flex flex-1 flex-col items-center gap-2">
-                  <span className="text-fluid-xs tabular-nums text-ink-500">
-                    {pln(m.commission_pln)}
-                  </span>
-                  <div
-                    aria-hidden
-                    className="w-full overflow-hidden rounded-t-md bg-ink-100 dark:bg-dlugomat-900"
-                    style={{ height: 200 }}
-                  >
-                    <div
-                      className="ml-auto mr-auto h-full w-full rounded-t-md bg-gradient-to-t from-dlugomat-700 to-dlugomat-500"
-                      style={{ height: `${h}%`, marginTop: `${100 - h}%` }}
-                    />
-                  </div>
-                  <span className="text-fluid-xs font-semibold text-ink-700 dark:text-ink-200">
-                    {m.label}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        </CardContent>
-      </Card>
+            <KpiCard label="Prowizje wypłacone" value={pln(totalEarned)} />
+            <KpiCard label="Prowizje oczekujące" value={pln(pendingEarned)} />
+            <KpiCard label="Konwersje" value={String(convertedCount)} />
+            <KpiCard label="Wskaźnik konwersji" value={`${convRate}%`} />
+          </section>
 
-      <Card elevation="subtle" className="overflow-hidden">
-        <CardHeader>
-          <CardTitle className="text-fluid-lg">Dane miesięczne</CardTitle>
-        </CardHeader>
-        <CardContent className="overflow-x-auto p-0">
-          <table className="w-full text-fluid-sm">
-            <thead className="border-y border-ink-200 bg-ink-50/60 dark:border-dlugomat-800 dark:bg-dlugomat-900/40">
-              <tr className="text-left text-ink-600 dark:text-ink-300">
-                <th className="px-5 py-3 font-semibold">Miesiąc</th>
-                <th className="px-5 py-3 text-right font-semibold">Prowizja</th>
-                <th className="px-5 py-3 text-right font-semibold">Nowi</th>
-                <th className="px-5 py-3 text-right font-semibold">Aktywni</th>
-                <th className="px-5 py-3 text-right font-semibold">Konwersja</th>
-                <th className="px-5 py-3 text-right font-semibold">Churn</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-ink-100 dark:divide-dlugomat-800">
-              {MONTHS.map((m) => (
-                <tr key={m.label}>
-                  <td className="px-5 py-3 font-semibold">{m.label}</td>
-                  <td className="px-5 py-3 text-right tabular-nums">{pln(m.commission_pln)}</td>
-                  <td className="px-5 py-3 text-right tabular-nums">{m.new_clients}</td>
-                  <td className="px-5 py-3 text-right tabular-nums">{m.active_clients}</td>
-                  <td className="px-5 py-3 text-right tabular-nums">{m.conversion_pct}%</td>
-                  <td className="px-5 py-3 text-right tabular-nums">{m.churn_pct}%</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </CardContent>
-      </Card>
+          <Card elevation="subtle">
+            <CardHeader>
+              <span
+                aria-hidden
+                className="grid size-9 place-items-center rounded-lg bg-dlugomat-100 text-dlugomat-700 dark:bg-dlugomat-850 dark:text-dlugomat-300"
+              >
+                <BarChart3 className="size-5" />
+              </span>
+              <CardTitle className="mt-2 text-fluid-xl">Prowizje miesiąc do miesiąca</CardTitle>
+              <CardDescription>Ostatnie 6 miesięcy (kwoty naliczonych prowizji)</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ul className="flex items-end gap-3 sm:gap-4">
+                {months.map((m) => {
+                  const h = (m.commission_pln / max) * 100;
+                  return (
+                    <li key={m.key} className="flex flex-1 flex-col items-center gap-2">
+                      <span className="text-fluid-xs tabular-nums text-ink-500">
+                        {pln(m.commission_pln)}
+                      </span>
+                      <div
+                        aria-hidden
+                        className="w-full overflow-hidden rounded-t-md bg-ink-100 dark:bg-dlugomat-900"
+                        style={{ height: 200 }}
+                      >
+                        <div
+                          className="ml-auto mr-auto h-full w-full rounded-t-md bg-gradient-to-t from-dlugomat-700 to-dlugomat-500"
+                          style={{ height: `${h}%`, marginTop: `${100 - h}%` }}
+                        />
+                      </div>
+                      <span className="text-fluid-xs font-semibold text-ink-700 dark:text-ink-200">
+                        {m.label}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </CardContent>
+          </Card>
+
+          <Card elevation="subtle" className="overflow-hidden">
+            <CardHeader>
+              <CardTitle className="text-fluid-lg">Dane miesięczne</CardTitle>
+            </CardHeader>
+            <CardContent className="overflow-x-auto p-0">
+              <table className="w-full text-fluid-sm">
+                <thead className="border-y border-ink-200 bg-ink-50/60 dark:border-dlugomat-800 dark:bg-dlugomat-900/40">
+                  <tr className="text-left text-ink-600 dark:text-ink-300">
+                    <th className="px-5 py-3 font-semibold">Miesiąc</th>
+                    <th className="px-5 py-3 text-right font-semibold">Prowizja</th>
+                    <th className="px-5 py-3 text-right font-semibold">Liczba prowizji</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-ink-100 dark:divide-dlugomat-800">
+                  {months.map((m) => (
+                    <tr key={m.key}>
+                      <td className="px-5 py-3 font-semibold">{m.label}</td>
+                      <td className="px-5 py-3 text-right tabular-nums">{pln(m.commission_pln)}</td>
+                      <td className="px-5 py-3 text-right tabular-nums">{m.count}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </CardContent>
+          </Card>
+        </>
+      )}
     </div>
   );
 }
 
-function KpiCard({
-  label,
-  value,
-  trend,
-}: {
-  label: string;
-  value: string;
-  trend: number;
-}) {
-  const up = trend >= 0;
+function KpiCard({ label, value }: { label: string; value: string }) {
   return (
     <Card elevation="subtle">
       <CardContent className="flex flex-col gap-1 p-5">
@@ -177,15 +235,6 @@ function KpiCard({
         </span>
         <span className="text-fluid-2xl font-bold tabular-nums text-ink-900 dark:text-ink-50">
           {value}
-        </span>
-        <span
-          className={`flex items-center gap-1 text-fluid-xs font-semibold ${
-            up ? "text-accent-700" : "text-danger-600"
-          }`}
-        >
-          {up ? <ArrowUpRight className="size-3.5" /> : <ArrowDownRight className="size-3.5" />}
-          {up ? "+" : ""}
-          {trend.toFixed(1)}% MoM
         </span>
       </CardContent>
     </Card>
