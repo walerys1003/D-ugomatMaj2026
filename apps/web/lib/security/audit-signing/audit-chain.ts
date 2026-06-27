@@ -16,6 +16,7 @@
 
 import { createHash, createHmac } from "crypto";
 import { createSupabaseServerClient } from "@/lib/db/supabase-server";
+import type { Json } from "@/lib/db/types";
 
 export interface AuditChainEntry {
   id: string;
@@ -79,9 +80,7 @@ export async function appendAuditEntry(args: {
   payload?: Record<string, unknown>;
 }): Promise<AuditChainEntry> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
 
   // Try RPC variant which holds advisory lock; if not available, fall back
   // to optimistic concurrency: read last → insert with computed hash, retry on conflict.
@@ -115,7 +114,7 @@ export async function appendAuditEntry(args: {
         action: args.action,
         target_type: args.targetType,
         target_id: args.targetId ?? null,
-        payload,
+        payload: payload as Json,
         prev_hash: prevHash,
         curr_hash: currHash,
         hmac,
@@ -140,9 +139,7 @@ export async function verifyAuditChain(args?: {
   toSeq?: number;
 }): Promise<{ valid: boolean; brokenAt: AuditChainEntry | null; checked: number }> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   let q = sb
     .from("audit_chain")
     .select("*")
@@ -178,18 +175,14 @@ export async function verifyAuditChain(args?: {
 
 async function getEntryBySeq(seq: number): Promise<AuditChainEntry | null> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { data } = await sb.from("audit_chain").select("*").eq("seq", seq).maybeSingle();
   return (data ?? null) as AuditChainEntry | null;
 }
 
 export async function getLatestAuditEntries(limit = 100): Promise<AuditChainEntry[]> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { data } = await sb
     .from("audit_chain")
     .select("*")

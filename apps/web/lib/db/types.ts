@@ -1213,6 +1213,39 @@ export interface Database {
         >;
         Relationships: [];
       };
+      // -----------------------------------------------------------------
+      // Audyt 2026-06-27 (iter. 9): audit chain (hash-linked log). Źródło:
+      // 20260526000000_tier23_compliance_security.sql.
+      // -----------------------------------------------------------------
+      audit_chain: {
+        Row: {
+          id: string;
+          seq: number;
+          actor_id: string | null;
+          action: string;
+          target_type: string;
+          target_id: string | null;
+          payload: Json;
+          prev_hash: string;
+          curr_hash: string;
+          hmac: string;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["audit_chain"]["Row"]
+        > & {
+          seq: number;
+          action: string;
+          target_type: string;
+          prev_hash: string;
+          curr_hash: string;
+          hmac: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["audit_chain"]["Insert"]
+        >;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     // Audyt 2026-06-27: większość RPC nie jest jeszcze dotypowana (degraduje

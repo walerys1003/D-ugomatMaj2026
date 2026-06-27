@@ -18,6 +18,7 @@
  */
 import "server-only";
 import { createSupabaseAdminClient } from "@/lib/db/supabase-server";
+import type { Json } from "@/lib/db/types";
 
 export type CampaignKey =
   | "welcome"
@@ -207,9 +208,7 @@ export interface EnrollmentInput {
 
 export async function enrollInCampaign(input: EnrollmentInput): Promise<string> {
   const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const startAt = input.startAt ?? new Date().toISOString();
   const { data, error } = await sb
     .from("email_campaign_enrollments")
@@ -218,7 +217,7 @@ export async function enrollInCampaign(input: EnrollmentInput): Promise<string> 
         user_id: input.userId,
         campaign_key: input.campaignKey,
         start_at: startAt,
-        context: input.context ?? {},
+        context: (input.context ?? {}) as Json,
         status: "active",
       },
       { onConflict: "user_id,campaign_key,start_at", ignoreDuplicates: false },
@@ -231,9 +230,7 @@ export async function enrollInCampaign(input: EnrollmentInput): Promise<string> 
 
 export async function cancelEnrollment(userId: string, campaignKey: CampaignKey): Promise<void> {
   const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   await sb
     .from("email_campaign_enrollments")
     .update({ status: "cancelled", cancelled_at: new Date().toISOString() })
@@ -258,9 +255,7 @@ export interface DueEmail {
 
 export async function getDueEmails(now: Date = new Date(), limit: number = 100): Promise<DueEmail[]> {
   const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { data: enrollments } = await sb
     .from("email_campaign_enrollments")
     .select("id, user_id, campaign_key, start_at, context")
@@ -268,8 +263,9 @@ export async function getDueEmails(now: Date = new Date(), limit: number = 100):
     .limit(limit * 4);
 
   const due: DueEmail[] = [];
-  for (const e of (enrollments as any[]) ?? []) {
+  for (const e of enrollments ?? []) {
     const steps = campaignSteps[e.campaign_key as CampaignKey] ?? [];
+    const ctx = (e.context ?? {}) as Record<string, unknown>;
     const startMs = new Date(e.start_at).getTime();
     for (const step of steps) {
       const fireAt = startMs + step.offset_minutes * 60_000;
@@ -285,11 +281,11 @@ export async function getDueEmails(now: Date = new Date(), limit: number = 100):
       due.push({
         enrollmentId: e.id,
         userId: e.user_id,
-        campaignKey: e.campaign_key,
+        campaignKey: e.campaign_key as CampaignKey,
         stepId: step.step_id,
         templateKey: step.template_key,
-        subject: renderTemplate(step.subject_template, e.context ?? {}),
-        context: e.context ?? {},
+        subject: renderTemplate(step.subject_template, ctx),
+        context: ctx,
       });
       if (due.length >= limit) break;
     }
@@ -305,9 +301,7 @@ export async function logEmailSent(
   detail?: string,
 ): Promise<void> {
   const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   await sb.from("email_send_log").insert({
     enrollment_id: enrollmentId,
     step_id: stepId,

@@ -13,6 +13,7 @@
 
 import { createHash } from "crypto";
 import { createSupabaseServerClient } from "@/lib/db/supabase-server";
+import type { Json } from "@/lib/db/types";
 import { appendAuditEntry } from "../../security/audit-signing";
 
 export interface LegalHold {
@@ -82,9 +83,7 @@ export async function imposeLegalHold(args: {
     throw new Error("must_specify_targets");
   }
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { data, error } = await sb
     .from("legal_holds")
     .insert({
@@ -123,9 +122,7 @@ export async function releaseLegalHold(args: {
   releasedBy: string;
 }): Promise<void> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { error } = await sb
     .from("legal_holds")
     .update({
@@ -152,9 +149,7 @@ export async function isOnLegalHold(args: {
   resourceType: string;
 }): Promise<boolean> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   let q = sb
     .from("legal_holds")
     .select("id")
@@ -170,9 +165,7 @@ export async function isOnLegalHold(args: {
 
 export async function listActiveLegalHolds(): Promise<LegalHold[]> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { data } = await sb
     .from("legal_holds")
     .select("*")
@@ -206,15 +199,13 @@ export async function runEDiscoveryQuery(args: {
   requestedBy: string;
 }): Promise<EDiscoveryResult> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   // Create query record
   const { data: queryRow, error: qErr } = await sb
     .from("ediscovery_queries")
     .insert({
       user_id: args.filters.target_user_id ?? null,
-      filters: args.filters,
+      filters: args.filters as unknown as Json,
       requested_by: args.requestedBy,
       status: "running",
       result_count: 0,
@@ -227,10 +218,14 @@ export async function runEDiscoveryQuery(args: {
   const items: CustodyItem[] = [];
 
   // Cases
+  // Audyt 2026-06-27 (iter. 9): poprzednio selektowano NIEISTNIEJĄCE kolumny
+  // `signature` i `description`. Tabela cases ma `sygnatura` i `title` (brak
+  // description). Query zawsze błędował → sprawy NIGDY nie trafiały do wyników
+  // e-discovery (luka compliance). `as any` to maskował.
   if (!args.filters.document_id) {
     let cq = sb
       .from("cases")
-      .select("id, signature, title, description, created_at")
+      .select("id, sygnatura, title, created_at")
       .order("created_at", { ascending: false })
       .limit(500);
     if (args.filters.target_user_id) cq = cq.eq("user_id", args.filters.target_user_id);
@@ -238,10 +233,10 @@ export async function runEDiscoveryQuery(args: {
     if (args.filters.date_from) cq = cq.gte("created_at", args.filters.date_from);
     if (args.filters.date_to) cq = cq.lte("created_at", args.filters.date_to);
     if (args.filters.keyword) {
-      cq = cq.or(`title.ilike.%${args.filters.keyword}%,description.ilike.%${args.filters.keyword}%`);
+      cq = cq.or(`title.ilike.%${args.filters.keyword}%,sygnatura.ilike.%${args.filters.keyword}%`);
     }
     const { data: cases } = await cq;
-    for (const c of (cases ?? []) as Array<{ id: string; signature: string; title: string; description: string; created_at: string }>) {
+    for (const c of cases ?? []) {
       const content = JSON.stringify(c);
       const hash = hashContent(content);
       items.push({
@@ -250,24 +245,29 @@ export async function runEDiscoveryQuery(args: {
         content_hash: hash,
         signature: signItem(hash, "case", c.id),
         collected_at: new Date().toISOString(),
-        preview: `${c.signature ?? ""} ${c.title ?? ""}`.slice(0, 200),
+        preview: `${c.sygnatura ?? ""} ${c.title ?? ""}`.slice(0, 200),
       });
     }
   }
 
   // Documents
+  // Audyt 2026-06-27 (iter. 9): poprzednio selektowano NIEISTNIEJĄCE kolumny
+  // `name` i `mime_type` (oraz keyword po `name`). Tabela documents nie ma
+  // tekstowej nazwy ani mime_type — ma `type` (case_type) i `status`. Query
+  // zawsze błędował → dokumenty NIGDY nie trafiały do wyników e-discovery.
+  // `as any` to maskował. Preview budujemy z type+status; filtr keyword po
+  // `name` usunięto (brak kolumny tekstowej do przeszukania).
   let dq = sb
     .from("documents")
-    .select("id, case_id, name, mime_type, created_at")
+    .select("id, case_id, type, status, created_at")
     .order("created_at", { ascending: false })
     .limit(500);
   if (args.filters.case_id) dq = dq.eq("case_id", args.filters.case_id);
   if (args.filters.document_id) dq = dq.eq("id", args.filters.document_id);
   if (args.filters.date_from) dq = dq.gte("created_at", args.filters.date_from);
   if (args.filters.date_to) dq = dq.lte("created_at", args.filters.date_to);
-  if (args.filters.keyword) dq = dq.ilike("name", `%${args.filters.keyword}%`);
   const { data: docs } = await dq;
-  for (const d of (docs ?? []) as Array<{ id: string; case_id: string; name: string; mime_type: string; created_at: string }>) {
+  for (const d of docs ?? []) {
     const content = JSON.stringify(d);
     const hash = hashContent(content);
     items.push({
@@ -276,7 +276,7 @@ export async function runEDiscoveryQuery(args: {
       content_hash: hash,
       signature: signItem(hash, "document", d.id),
       collected_at: new Date().toISOString(),
-      preview: `${d.name ?? ""} (${d.mime_type ?? ""})`.slice(0, 200),
+      preview: `${d.type ?? ""} (${d.status ?? ""})`.slice(0, 200),
     });
   }
 
@@ -290,7 +290,7 @@ export async function runEDiscoveryQuery(args: {
   if (args.filters.date_from) aq = aq.gte("created_at", args.filters.date_from);
   if (args.filters.date_to) aq = aq.lte("created_at", args.filters.date_to);
   const { data: audits } = await aq;
-  for (const a of (audits ?? []) as Array<{ id: string; seq: number; action: string; target_type: string; target_id: string | null; payload: Record<string, unknown>; created_at: string }>) {
+  for (const a of audits ?? []) {
     const content = JSON.stringify(a);
     const hash = hashContent(content);
     items.push({
@@ -340,9 +340,7 @@ export async function runEDiscoveryQuery(args: {
 
 export async function listEDiscoveryQueries(args?: { limit?: number }): Promise<EDiscoveryQuery[]> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { data } = await sb
     .from("ediscovery_queries")
     .select("*")
