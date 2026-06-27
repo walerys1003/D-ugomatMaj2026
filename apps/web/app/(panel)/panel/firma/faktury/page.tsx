@@ -1,39 +1,75 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export const metadata: Metadata = {
   title: "Faktury i rozliczenia - panel firmy | Dlugomat",
-  description: "Faktury kosztowe Dlugomat, kancelarii, komornikow oraz rozliczenia wewnetrzne.",
+  description: "Twoje faktury i platnosci za uslugi Dlugomat.",
 };
 
-const summary = [
-  { label: "Do zaplaty", value: "84 320 PLN", tone: "warning" as const, note: "8 faktur" },
-  { label: "Zaplacone w maju", value: "212 480 PLN", tone: "success" as const, note: "24 faktury" },
-  { label: "Przeterminowane", value: "0 PLN", tone: "success" as const, note: "Wszystko zgodne" },
-  { label: "Limit miesiaca", value: "350 000 PLN", tone: "neutral" as const, note: "Wykorzystanie 61%" },
-];
-
-const invoices = [
-  { id: "FV/2026/05/0124", issuer: "Dlugomat sp. z o.o.", subject: "Plan Business - maj 2026", amount: 2899, due: "20.05.2026", status: "do zaplaty" },
-  { id: "FV/2026/05/0118", issuer: "Kancelaria Kruk", subject: "Obsluga 14 spraw - kwiecien", amount: 18400, due: "25.05.2026", status: "do zaplaty" },
-  { id: "FV/2026/05/0102", issuer: "Komornik Wisniewski", subject: "Zaliczki na egzekucje (3 sprawy)", amount: 4200, due: "30.05.2026", status: "do zaplaty" },
-  { id: "FV/2026/04/0987", issuer: "Kancelaria Nowak", subject: "Obsluga 9 spraw - marzec", amount: 14820, due: "30.04.2026", status: "zaplacona" },
-  { id: "FV/2026/04/0974", issuer: "Dlugomat sp. z o.o.", subject: "Plan Business - kwiecien", amount: 2899, due: "20.04.2026", status: "zaplacona" },
-  { id: "FV/2026/04/0951", issuer: "Sad Rejonowy Warszawa", subject: "Oplaty sadowe (4 sprawy)", amount: 4800, due: "15.04.2026", status: "zaplacona" },
-];
+export const dynamic = "force-dynamic";
 
 const statusTone: Record<string, "neutral" | "info" | "success" | "warning" | "danger"> = {
   "do zaplaty": "warning",
   zaplacona: "success",
   przeterminowana: "danger",
+  zwrocona: "neutral",
 };
 
-const currency = new Intl.NumberFormat("pl-PL", { style: "currency", currency: "PLN", maximumFractionDigits: 0 });
+function mapStatus(s: string): string {
+  const v = s.toLowerCase();
+  if (v.includes("paid") || v.includes("succ") || v.includes("complete")) return "zaplacona";
+  if (v.includes("refund")) return "zwrocona";
+  if (v.includes("fail") || v.includes("cancel")) return "przeterminowana";
+  return "do zaplaty";
+}
 
-export default function FirmaFakturyPage() {
+const currency = new Intl.NumberFormat("pl-PL", { style: "currency", currency: "PLN", maximumFractionDigits: 0 });
+const fmtDate = (iso: string | null) =>
+  iso ? new Intl.DateTimeFormat("pl-PL", { dateStyle: "short" }).format(new Date(iso)) : "—";
+
+export default async function FirmaFakturyPage() {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/logowanie?next=/panel/firma/faktury");
+
+  const { data: paymentsRaw } = await supabase
+    .from("payments")
+    .select(
+      "id, amount, status, product_name, invoice_company_name, fakturownia_invoice_number, fakturownia_invoice_url, created_at, paid_at",
+    )
+    .order("created_at", { ascending: false })
+    .limit(100);
+
+  const invoices = (paymentsRaw ?? []).map((p) => ({
+    id: p.fakturownia_invoice_number ?? p.id.slice(0, 12),
+    issuer: p.invoice_company_name ?? "Dlugomat sp. z o.o.",
+    subject: p.product_name,
+    amount: (p.amount ?? 0) / 100,
+    due: fmtDate(p.paid_at ?? p.created_at),
+    status: mapStatus(p.status),
+    pdfUrl: p.fakturownia_invoice_url,
+  }));
+
+  const paidSum = invoices.filter((i) => i.status === "zaplacona").reduce((s, i) => s + i.amount, 0);
+  const dueSum = invoices.filter((i) => i.status === "do zaplaty").reduce((s, i) => s + i.amount, 0);
+  const overdueSum = invoices
+    .filter((i) => i.status === "przeterminowana")
+    .reduce((s, i) => s + i.amount, 0);
+
+  const summary = [
+    { label: "Do zaplaty", value: currency.format(dueSum), tone: "warning" as const, note: `${invoices.filter((i) => i.status === "do zaplaty").length} faktur` },
+    { label: "Zaplacone", value: currency.format(paidSum), tone: "success" as const, note: `${invoices.filter((i) => i.status === "zaplacona").length} faktur` },
+    { label: "Nieudane/przeterm.", value: currency.format(overdueSum), tone: overdueSum > 0 ? "danger" as const : "success" as const, note: overdueSum > 0 ? "Wymaga uwagi" : "Wszystko zgodne" },
+    { label: "Wszystkie pozycje", value: String(invoices.length), tone: "neutral" as const, note: "ostatnie 100" },
+  ];
+
   return (
     <div className="space-y-8 px-6 py-8 lg:px-10">
       <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
@@ -102,23 +138,35 @@ export default function FirmaFakturyPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-dlugomat-100">
-              {invoices.map((iv) => (
-                <tr key={iv.id} className="text-dlugomat-700">
-                  <td className="px-6 py-3 font-mono text-xs text-dlugomat-900">{iv.id}</td>
-                  <td className="px-6 py-3">{iv.issuer}</td>
-                  <td className="px-6 py-3 text-xs">{iv.subject}</td>
-                  <td className="px-6 py-3 font-mono">{currency.format(iv.amount)}</td>
-                  <td className="px-6 py-3 text-xs">{iv.due}</td>
-                  <td className="px-6 py-3">
-                    <Badge tone={statusTone[iv.status] ?? "neutral"}>{iv.status}</Badge>
-                  </td>
-                  <td className="px-6 py-3 text-right">
-                    <button type="button" className="text-xs font-medium text-accent-600 hover:underline">
-                      PDF
-                    </button>
+              {invoices.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="px-6 py-8 text-center text-sm text-dlugomat-500">
+                    Brak faktur. Pozycje pojawia sie po pierwszej platnosci za uslugi Dlugomat.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                invoices.map((iv) => (
+                  <tr key={iv.id} className="text-dlugomat-700">
+                    <td className="px-6 py-3 font-mono text-xs text-dlugomat-900">{iv.id}</td>
+                    <td className="px-6 py-3">{iv.issuer}</td>
+                    <td className="px-6 py-3 text-xs">{iv.subject}</td>
+                    <td className="px-6 py-3 font-mono">{currency.format(iv.amount)}</td>
+                    <td className="px-6 py-3 text-xs">{iv.due}</td>
+                    <td className="px-6 py-3">
+                      <Badge tone={statusTone[iv.status] ?? "neutral"}>{iv.status}</Badge>
+                    </td>
+                    <td className="px-6 py-3 text-right">
+                      {iv.pdfUrl ? (
+                        <a href={iv.pdfUrl} target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-accent-600 hover:underline">
+                          PDF
+                        </a>
+                      ) : (
+                        <span className="text-xs text-dlugomat-400">—</span>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </Card>
