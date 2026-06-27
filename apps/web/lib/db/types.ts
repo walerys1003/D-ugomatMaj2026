@@ -1679,6 +1679,33 @@ export interface Database {
         >;
         Relationships: [];
       };
+      // -----------------------------------------------------------------
+      // Tier 21 — Presence tracker. Źródło:
+      // 20260524000000_tier21_realtime_bulk_audit.sql.
+      // -----------------------------------------------------------------
+      presence_state: {
+        Row: {
+          user_id: string;
+          display_name: string | null;
+          avatar_url: string | null;
+          status: "online" | "away" | "busy" | "offline";
+          topic: string | null;
+          device: "web" | "ios" | "android" | "desktop";
+          color: string;
+          last_seen_at: string;
+          expires_at: string;
+          metadata: Json;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["presence_state"]["Row"]
+        > & {
+          user_id: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["presence_state"]["Insert"]
+        >;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     // Audyt 2026-06-27: większość RPC nie jest jeszcze dotypowana (degraduje

@@ -15,6 +15,7 @@
 
 import { createHash } from "crypto";
 import { createSupabaseServerClient } from "@/lib/db/supabase-server";
+import type { Json } from "@/lib/db/types";
 
 export type PresenceStatus = "online" | "away" | "busy" | "offline";
 
@@ -53,9 +54,7 @@ export async function heartbeat(args: {
   metadata?: Record<string, unknown>;
 }): Promise<PresenceState> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const now = new Date();
   const row = {
     user_id: args.userId,
@@ -67,7 +66,7 @@ export async function heartbeat(args: {
     color: colorForUser(args.userId),
     last_seen_at: now.toISOString(),
     expires_at: new Date(now.getTime() + PRESENCE_TTL_MS).toISOString(),
-    metadata: args.metadata ?? {},
+    metadata: (args.metadata ?? {}) as Json,
   };
   const { data, error } = await sb
     .from("presence_state")
@@ -80,9 +79,7 @@ export async function heartbeat(args: {
 
 export async function setOffline(userId: string): Promise<void> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   await sb
     .from("presence_state")
     .update({
@@ -95,9 +92,7 @@ export async function setOffline(userId: string): Promise<void> {
 
 export async function listPresenceForTopic(topic: string): Promise<PresenceState[]> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const now = new Date().toISOString();
   const { data, error } = await sb
     .from("presence_state")
@@ -113,9 +108,7 @@ export async function listPresenceForTopic(topic: string): Promise<PresenceState
 
 export async function presenceCountByStatus(): Promise<Record<PresenceStatus, number>> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const now = new Date().toISOString();
   const { data, error } = await sb
     .from("presence_state")
@@ -131,9 +124,7 @@ export async function presenceCountByStatus(): Promise<Record<PresenceStatus, nu
 
 export async function sweepExpiredPresence(): Promise<number> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { data, error } = await sb
     .from("presence_state")
     .update({ status: "offline" })
