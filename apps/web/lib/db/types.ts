@@ -2065,6 +2065,107 @@ export interface Database {
         >;
         Relationships: [];
       };
+      // Tier22 (20260525000000). `embedding` to pgvector(1536) — modelujemy jako
+      // number[] (zapis) / unknown po stronie odczytu. metadata jsonb → Json.
+      agent_memory: {
+        Row: {
+          id: string;
+          user_id: string;
+          kind: "fact" | "preference" | "case_pattern" | "user_correction" | "summary";
+          content: string;
+          embedding: number[] | null;
+          importance: number;
+          source_run_id: string | null;
+          metadata: Json;
+          created_at: string;
+          last_accessed_at: string;
+          access_count: number;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["agent_memory"]["Row"]
+        > & {
+          user_id: string;
+          kind: "fact" | "preference" | "case_pattern" | "user_correction" | "summary";
+          content: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["agent_memory"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      // Audyt 2026-06-27 (iter 23): tabele Tier7 (20260512300000_tier7_marketplace_tenants_api.sql).
+      // UWAGA — kolizja `create table if not exists api_keys`: Tier7 (20260512300000)
+      // wygrywa nad Tier17 (20260520000000). public-api.ts używa kształtu Tier7
+      // (organization_id / key_prefix / rate_limit_per_minute) — zgodne ze zwycięzcą.
+      api_keys: {
+        Row: {
+          id: string;
+          organization_id: string;
+          name: string;
+          key_prefix: string;
+          key_hash: string;
+          scopes: string[];
+          rate_limit_per_minute: number;
+          revoked_at: string | null;
+          last_used_at: string | null;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["api_keys"]["Row"]
+        > & {
+          organization_id: string;
+          name: string;
+          key_prefix: string;
+          key_hash: string;
+          scopes: string[];
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["api_keys"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      webhook_subscriptions: {
+        Row: {
+          id: string;
+          organization_id: string;
+          url: string;
+          events: string[];
+          secret_hash: string;
+          active: boolean;
+          failure_count: number;
+          last_delivery_at: string | null;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["webhook_subscriptions"]["Row"]
+        > & {
+          organization_id: string;
+          url: string;
+          events: string[];
+          secret_hash: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["webhook_subscriptions"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      webhook_secrets: {
+        Row: {
+          subscription_id: string;
+          raw_secret: string;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["webhook_secrets"]["Row"]
+        > & {
+          subscription_id: string;
+          raw_secret: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["webhook_secrets"]["Insert"]
+        >;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     // Audyt 2026-06-27: większość RPC nie jest jeszcze dotypowana (degraduje

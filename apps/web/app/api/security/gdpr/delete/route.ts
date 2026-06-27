@@ -8,10 +8,7 @@ async function getSupabase() {
 }
 
 export async function POST(req: NextRequest) {
-  const supabase = await getSupabase();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = await getSupabase();
   const { data: { user } } = await sb.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
@@ -32,10 +29,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const supabase = await getSupabase();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = await getSupabase();
   const { data: { user } } = await sb.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
@@ -51,15 +45,16 @@ export async function DELETE(req: NextRequest) {
 
 // Admin-only — execute pending erasure after grace period.
 export async function PATCH(req: NextRequest) {
-  const supabase = await getSupabase();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = await getSupabase();
   const { data: { user } } = await sb.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const { data } = await sb.from("profiles").select("role").eq("id", user.id).maybeSingle();
-  if (data?.role !== "admin" && data?.role !== "owner") {
+  // REALNY BUG (audyt #6): `profiles.role` ma wartości tylko 'user'|'admin'|
+  // 'moderator' (typ UserRole / migracja init_profiles) — NIE ma 'owner'.
+  // Poprzedni warunek `&& role !== "owner"` był martwy (role nigdy nie jest
+  // "owner"), a `as any` to maskowało. Bramka admin = wyłącznie rola 'admin'.
+  if (data?.role !== "admin") {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
 

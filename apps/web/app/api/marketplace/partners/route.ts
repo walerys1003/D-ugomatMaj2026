@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/lib/db/types";
 import { applyToPartnerProgram, approvePartner, listPartners, promoteTier, PartnerStatus, PartnerTier } from "@/lib/marketplace/partner-program";
 
 async function getSupabase() {
@@ -6,16 +8,15 @@ async function getSupabase() {
   return createSupabaseServerClient();
 }
 
-async function isAdmin(supabase: any, userId: string): Promise<boolean> {
+async function isAdmin(supabase: SupabaseClient<Database>, userId: string): Promise<boolean> {
   const { data } = await supabase.from("profiles").select("role").eq("id", userId).maybeSingle();
-  return data?.role === "admin" || data?.role === "owner";
+  // REALNY BUG (audyt #6): `profiles.role` nie zawiera 'owner' (tylko user/
+  // admin/moderator) — gałąź `|| role === "owner"` była martwa. Bramka = 'admin'.
+  return data?.role === "admin";
 }
 
 export async function GET(req: NextRequest) {
   const supabase = await getSupabase();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
   const { data: { user } } = await supabase.auth.getUser();
   if (!user || !(await isAdmin(supabase, user.id))) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
@@ -31,9 +32,6 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const supabase = await getSupabase();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
@@ -58,9 +56,6 @@ export async function POST(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   const supabase = await getSupabase();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
   const { data: { user } } = await supabase.auth.getUser();
   if (!user || !(await isAdmin(supabase, user.id))) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });

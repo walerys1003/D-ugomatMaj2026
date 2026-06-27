@@ -12,21 +12,23 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
   const auth = await getAuthenticatedUser(req);
   if (!auth.ok) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
-  const supabase = getSupabaseAdmin();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
-  const { data: doc } = await sb
+  const sb = getSupabaseAdmin();
+  const { data: docRaw } = await sb
     .from("documents")
     .select("id, case_id, cases!inner(user_id)")
     .eq("id", id)
     .maybeSingle();
-  if (!doc || (doc as any).cases?.user_id !== auth.user.id) {
+  // Embedded-join (cases!inner) nie jest wnioskowany przez typed-select —
+  // modelujemy wynik jednym lokalnym, jawnym castem na granicy.
+  const doc = docRaw as unknown as
+    | { id: string; case_id: string; cases: { user_id: string } | null }
+    | null;
+  if (!doc || doc.cases?.user_id !== auth.user.id) {
     return NextResponse.json({ error: "not_found" }, { status: 404 });
   }
   try {
     const restored = await restoreDocumentVersion({
-      caseId: (doc as any).case_id,
+      caseId: doc.case_id,
       sourceVersionId: versionId,
       createdBy: auth.user.id,
     });

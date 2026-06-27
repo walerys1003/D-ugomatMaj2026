@@ -16,6 +16,7 @@
  */
 
 import { createSupabaseServerClient } from "@/lib/db/supabase-server";
+import type { Json } from "@/lib/db/types";
 import { embed } from "../../rag/embeddings";
 
 export type MemoryKind = "fact" | "preference" | "case_pattern" | "user_correction" | "summary";
@@ -44,10 +45,7 @@ export async function rememberFact(args: {
   sourceRunId?: string | null;
   metadata?: Record<string, unknown>;
 }): Promise<string> {
-  const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = await createSupabaseServerClient();
   const embRes = await embed(args.content);
   const { data, error } = await sb
     .from("agent_memory")
@@ -58,7 +56,7 @@ export async function rememberFact(args: {
       embedding: embRes.vector,
       importance: Math.max(0, Math.min(1, args.importance ?? 0.5)),
       source_run_id: args.sourceRunId ?? null,
-      metadata: args.metadata ?? {},
+      metadata: (args.metadata ?? {}) as Json,
     })
     .select("id")
     .single();
@@ -76,10 +74,7 @@ export async function recallMemory(args: {
   k?: number;
   kindFilter?: MemoryKind[];
 }): Promise<AgentMemoryEntry[]> {
-  const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = await createSupabaseServerClient();
   const k = args.k ?? 8;
   const embRes = await embed(args.query);
   // Używamy RPC search_agent_memory zdefiniowanego w migracji.
@@ -98,18 +93,20 @@ export async function recallMemory(args: {
       .order("importance", { ascending: false })
       .order("last_accessed_at", { ascending: false })
       .limit(k);
-    return (fallback ?? []) as AgentMemoryEntry[];
+    return (fallback ?? []) as unknown as AgentMemoryEntry[];
   }
 
   // Touch — bump access_count + last_accessed_at
   const ids = ((data ?? []) as Array<{ id: string }>).map((r) => r.id);
   if (ids.length > 0) {
-    await sb
-      .from("agent_memory")
-      .update({ last_accessed_at: new Date().toISOString() })
-      .in("id", ids)
-      .then(() => null)
-      .catch(() => null);
+    try {
+      await sb
+        .from("agent_memory")
+        .update({ last_accessed_at: new Date().toISOString() })
+        .in("id", ids);
+    } catch {
+      /* ignore — touch best-effort */
+    }
   }
   return (data ?? []) as AgentMemoryEntry[];
 }
@@ -163,10 +160,7 @@ export async function pruneMemory(args: {
   userId: string;
   dryRun?: boolean;
 }): Promise<number> {
-  const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = await createSupabaseServerClient();
   const cutoff = new Date(Date.now() - 90 * 86_400_000).toISOString();
   if (args.dryRun) {
     const { count } = await sb

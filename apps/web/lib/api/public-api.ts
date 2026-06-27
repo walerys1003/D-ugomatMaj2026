@@ -13,6 +13,9 @@
 import { randomBytes, createHash, createHmac, timingSafeEqual } from "node:crypto";
 import { getSupabaseAdmin } from "@/lib/db/supabase-admin";
 import { logger } from "@/lib/observability/logger";
+import type { Database } from "@/lib/db/types";
+
+type WebhookSubRow = Database["public"]["Tables"]["webhook_subscriptions"]["Row"];
 
 export type ApiKeyScope = "cases.read" | "cases.write" | "documents.read" | "documents.write" | "webhooks.manage";
 export type WebhookEvent =
@@ -70,10 +73,7 @@ export async function createApiKey(
   name: string,
   scopes: ApiKeyScope[],
 ): Promise<{ ok: true; key: string; prefix: string; id: string } | { ok: false; error: string }> {
-  const supabase = getSupabaseAdmin();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = getSupabaseAdmin();
   const { raw, prefix, hash } = generateApiKey();
   const { data, error } = await sb
     .from("api_keys")
@@ -93,10 +93,7 @@ export async function createApiKey(
 
 export async function verifyApiKey(rawKey: string): Promise<{ ok: true; key: ApiKey } | { ok: false; reason: string }> {
   if (!rawKey?.startsWith("dlk_")) return { ok: false, reason: "invalid_format" };
-  const supabase = getSupabaseAdmin();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = getSupabaseAdmin();
   const hash = createHash("sha256").update(rawKey).digest("hex");
   const { data, error } = await sb
     .from("api_keys")
@@ -110,7 +107,7 @@ export async function verifyApiKey(rawKey: string): Promise<{ ok: true; key: Api
     () => {},
     () => {},
   );
-  return { ok: true, key: data as ApiKey };
+  return { ok: true, key: data as unknown as ApiKey };
 }
 
 export function hasApiScope(key: { scopes: ApiKeyScope[] }, required: ApiKeyScope): boolean {
@@ -147,10 +144,7 @@ export function verifyWebhookSignature(payload: string, header: string, secret: 
 }
 
 export async function dispatchWebhook(event: WebhookEvent, organizationId: string, payload: Record<string, unknown>): Promise<void> {
-  const supabase = getSupabaseAdmin();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = getSupabaseAdmin();
   const { data: subs } = await sb
     .from("webhook_subscriptions")
     .select("*")
@@ -162,8 +156,8 @@ export async function dispatchWebhook(event: WebhookEvent, organizationId: strin
 
   await Promise.allSettled(
     subs
-      .filter((s: any) => s.events?.includes(event))
-      .map(async (s: any) => {
+      .filter((s: WebhookSubRow) => s.events?.includes(event))
+      .map(async (s: WebhookSubRow) => {
         try {
           // Get the raw secret for signing - in production, would store the raw secret encrypted
           const { data: secretRow } = await sb
