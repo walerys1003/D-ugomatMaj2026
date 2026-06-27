@@ -22,19 +22,25 @@
 
 @layer base {
   :root {
-    /* ---- Shield Navy (Primary) -------------------------------------- */
-    --dlugomat-950: 220 67% 8%; /* #060E1F  — modal overlay, deepest surface */
-    --dlugomat-900: 218 69% 14%; /* #0B1D3A  — sidebar, hero gradient START   */
-    --dlugomat-850: 219 67% 18%; /* #0F2750  — sidebar hover                  */
-    --dlugomat-800: 220 65% 22%; /* #132D5E  — hero gradient END, headings    */
-    --dlugomat-700: 220 65% 31%; /* #1B3F82  — active nav, urgent border-left */
-    --dlugomat-600: 217 65% 39%; /* #2354A6  — links, active icons            */
-    --dlugomat-500: 215 64% 48%; /* #2B69CA  — primary button, focus ring     */
-    --dlugomat-400: 214 63% 60%; /* #5A8FDB  — secondary text, inactive icons */
-    --dlugomat-300: 212 73% 73%; /* #89B5EC  — info badges, disabled fields   */
-    --dlugomat-200: 211 95% 86%; /* #B8DBFD  — info card backgrounds          */
-    --dlugomat-100: 211 100% 94%; /* #E0EFFF — section backgrounds, hover     */
-    --dlugomat-50: 213 100% 97%; /* #F0F7FF  — subtle page backgrounds        */
+    /* ---- Corporate Blue Light (Primary) — v2 remap 2026 -------------- *
+     * Brand refresh: royal-blue fintech scale (Revolut/N26/Stripe vibe).
+     * Spec hexy: #2E5BFF (blue), #1E40AF (blue-dark), #60A5FA (blue-light),
+     * #EEF2FF (blue-bg). Tokeny --dlugomat-* są sercem semantyki primary +
+     * tysięcy klas `bg-dlugomat-*`/`text-dlugomat-*`/`border-dlugomat-*`,
+     * więc remap tutaj przebarwia CAŁY produkt (224 strony) jednym ruchem.
+     * 700=primary button bg, 600=base accent, 500=focus ring. */
+    --dlugomat-950: 222 47% 11%; /* #0F172A  — dark CTA card, deepest surface */
+    --dlugomat-900: 222 44% 14%; /* #16213E  — sidebar, hero gradient START   */
+    --dlugomat-850: 221 43% 18%; /* #1E293B  — sidebar hover, gradient end-2  */
+    --dlugomat-800: 224 64% 26%; /* #16307A  — deep brand, headings on tint   */
+    --dlugomat-700: 224 70% 40%; /* #1E40AF  — primary button bg, blue-dark   */
+    --dlugomat-600: 225 83% 53%; /* #2455F0  — links, active icons            */
+    --dlugomat-500: 226 100% 59%; /* #2E5BFF — base accent, focus ring         */
+    --dlugomat-400: 217 91% 66%; /* #5588FB  — secondary accent, hover         */
+    --dlugomat-300: 213 94% 68%; /* #60A5FA  — blue-light, highlight           */
+    --dlugomat-200: 214 95% 84%; /* #B4D2FD  — info card backgrounds          */
+    --dlugomat-100: 226 100% 94%; /* #E0E7FF — section backgrounds, hover     */
+    --dlugomat-50: 226 100% 97%; /* #EEF2FF  — blue-bg tint, subtle page bg   */
 
     /* ---- Controlled Hope Green (Accent — success only) -------------- */
     --accent-700: 145 87% 25%; /* #087A3E */
@@ -68,35 +74,41 @@
        Codemod sed-em odłożony do v5 (refactor importów, nie design).
        Brand-touched konteksty wcześniej używające iron (focus complement,
        dark mode chrome) — przenieść do dedykowanych tokenów akcentu. */
-    --iron-950: 0 0% 4%;    /* was: 222 47% 6%  → ink-950 */
-    --iron-900: 0 0% 7%;    /* was: 222 39% 11% → ink-900 */
-    --iron-800: 0 0% 13%;   /* was: 217 33% 17% → ink-800 */
-    --iron-700: 0 0% 22%;   /* was: 215 25% 27% → ink-700 */
-    --iron-600: 0 0% 32%;   /* was: 215 16% 36% → ink-600 */
-    --iron-500: 0 0% 46%;   /* was: 215 14% 47% → ink-500 */
-    --iron-400: 0 0% 64%;   /* was: 214 13% 60% → ink-400 */
-    --iron-300: 0 0% 84%;   /* was: 213 16% 76% → ink-300 */
-    --iron-200: 0 0% 91%;   /* was: 214 22% 88% → ink-200 */
-    --iron-100: 0 0% 96.5%; /* was: 214 26% 94% → ink-100 */
-    --iron-50:  0 0% 98.5%; /* was: 210 33% 98% → ink-50  */
+    /* Corporate Blue Light v2: iron mirrors ink (slate scale). */
+    --iron-950: 222 47% 8%;   /* → ink-950 */
+    --iron-900: 222 47% 11%;  /* → ink-900 */
+    --iron-800: 217 33% 17%;  /* → ink-800 */
+    --iron-700: 217 33% 22%;  /* → ink-700 */
+    --iron-600: 215 25% 27%;  /* → ink-600 */
+    --iron-500: 215 16% 47%;  /* → ink-500 */
+    --iron-400: 215 20% 65%;  /* → ink-400 */
+    --iron-300: 213 27% 84%;  /* → ink-300 */
+    --iron-200: 214 32% 91%;  /* → ink-200 */
+    --iron-100: 210 40% 96%;  /* → ink-100 */
+    --iron-50:  210 40% 98%;  /* → ink-50  */
 
     /* ---- Ink (Tarcza v3 — TRUE NEUTRALS) ---------------------------- *
      * Wprowadzone w v3 Stoic. Iron miało tinted-blue cast (HSL 210-222),
      * przez co cały UI „pływał" w odcieniach navy. Ink to czysta achromatyczna
      * skala (HSL 0 0% X%) — używana dla body text, borderów i tła neutralnych
      * obszarów (80% ekranu). Iron pozostaje dla brand-touched akcentów. */
-    --ink-50: 0 0% 98.5%;   /* page bg, raised card on dark */
-    --ink-100: 0 0% 96.5%;  /* subtle bg, hover state */
-    --ink-150: 0 0% 94%;    /* divider on dark hover */
-    --ink-200: 0 0% 91%;    /* border default */
-    --ink-300: 0 0% 84%;    /* border emphasized, kbd outline */
-    --ink-400: 0 0% 64%;    /* placeholder, disabled text, decorative icons */
-    --ink-500: 0 0% 46%;    /* secondary text, eyebrows */
-    --ink-600: 0 0% 32%;    /* body text default */
-    --ink-700: 0 0% 22%;    /* strong body, labels, button text */
-    --ink-800: 0 0% 13%;    /* heading default */
-    --ink-900: 0 0% 7%;     /* strongest, hero h1, code blocks */
-    --ink-950: 0 0% 4%;     /* near-black, terminal bg */
+    /* Corporate Blue Light v2 remap: Slate scale (Tailwind slate) zamiast
+       czystej achromatycznej. Daje fintech-trust look spec-a:
+       #F8FAFC bg-soft, #F1F5F9 bg-gray, #E2E8F0 border, #CBD5E1 border-strong,
+       #94A3B8 dim, #64748B muted, #475569 body, #1E293B body-strong,
+       #0F172A heading. */
+    --ink-50: 210 40% 98%;   /* #F8FAFC — page bg-soft, raised card */
+    --ink-100: 210 40% 96%;  /* #F1F5F9 — bg-gray, hover state */
+    --ink-150: 214 32% 93.5%;/* divider */
+    --ink-200: 214 32% 91%;  /* #E2E8F0 — border default */
+    --ink-300: 213 27% 84%;  /* #CBD5E1 — border-strong, kbd outline */
+    --ink-400: 215 20% 65%;  /* #94A3B8 — placeholder, dim, decorative */
+    --ink-500: 215 16% 47%;  /* #64748B — secondary/muted text, eyebrows */
+    --ink-600: 215 25% 27%;  /* #475569 — body text default */
+    --ink-700: 217 33% 22%;  /* strong body, labels, button text */
+    --ink-800: 217 33% 17%;  /* #1E293B — body-strong, heading-2 */
+    --ink-900: 222 47% 11%;  /* #0F172A — heading, hero h1 */
+    --ink-950: 222 47% 8%;   /* near-black */
 
     /* ---- Shadow tints (Tarcza v3) ----------------------------------- *
      * Kierunkowe cienie z lekkim navy-tintem — kalibrowane do widoczności
@@ -121,7 +133,8 @@
        Wcześniej wskazywała na --iron-* (deprecated). Wartości identyczne
        (iron==ink po remapie ε/ζ), więc zero regresji wizualnej — ale teraz
        deprecated token nie jest już sercem semantyki (fix DS-3). */
-    --background: 0 0% 100%;
+    /* Corporate Blue Light: page bg = #F8FAFC (bg-soft), cards stay pure white. */
+    --background: 210 40% 98%;
     --foreground: var(--ink-900);
 
     --card: 0 0% 100%;
@@ -329,6 +342,219 @@
   .status-strip-success {
     @apply border-l-4 border-accent-500;
   }
+}
+
+/* =========================================================================
+ * DŁUGOMAT — Corporate Blue Light · shared premium-ui component layer (dlu-*)
+ * Reużywalne klasy z prototypu (01-DLUGOMAT-corporate-blue). Spójne tokeny
+ * (royal blue #2E5BFF/#1E40AF/#60A5FA, slate ink, blue-tint #EEF2FF) i mogą
+ * być stosowane na każdej stronie/podstronie/panelu/admin. Kolory pochodzą
+ * z CSS-vars dlugomat oraz ink, więc dark-mode działa automatycznie.
+ * ========================================================================= */
+@layer components {
+  /* ---- Eyebrow pill (sekcyjny nagłówek) -------------------------------- */
+  .dlu-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: hsl(var(--dlugomat-50));
+    color: hsl(var(--dlugomat-700));
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+  .dark .dlu-eyebrow {
+    background: hsl(var(--dlugomat-500) / 0.16);
+    color: hsl(var(--dlugomat-300));
+  }
+
+  /* ---- Section heading scale (spec typografia) ------------------------- */
+  .dlu-h2 {
+    font-size: clamp(2rem, 4.5vw, 3.25rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    color: hsl(var(--ink-900));
+  }
+  .dark .dlu-h2 { color: #fff; }
+  .dlu-h3 {
+    font-size: 1.625rem;
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: hsl(var(--ink-900));
+  }
+  .dark .dlu-h3 { color: #fff; }
+  .dlu-lede {
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    color: hsl(var(--ink-600));
+  }
+
+  /* ---- Buttons --------------------------------------------------------- */
+  .dlu-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.4rem;
+    border-radius: 0.625rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    white-space: nowrap;
+    transition: all 0.2s cubic-bezier(0.2, 0.7, 0.2, 1);
+    cursor: pointer;
+  }
+  .dlu-btn-lg { padding: 0.95rem 1.75rem; font-size: 0.95rem; border-radius: 0.75rem; }
+  .dlu-btn-block { width: 100%; }
+  .dlu-btn-primary {
+    background: hsl(var(--dlugomat-700));
+    color: #fff;
+    box-shadow: 0 4px 12px -2px hsl(var(--dlugomat-500) / 0.25);
+  }
+  .dlu-btn-primary:hover {
+    background: hsl(var(--dlugomat-500));
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px -4px hsl(var(--dlugomat-500) / 0.3);
+  }
+  .dlu-btn-ghost {
+    background: hsl(var(--card));
+    color: hsl(var(--ink-900));
+    border: 1px solid hsl(var(--ink-300));
+  }
+  .dlu-btn-ghost:hover { border-color: hsl(var(--dlugomat-500)); color: hsl(var(--dlugomat-700)); }
+
+  /* ---- Cards ----------------------------------------------------------- */
+  .dlu-card {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--ink-200));
+    border-radius: 1rem;
+    transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+  }
+  .dlu-card-hover:hover {
+    transform: translateY(-4px);
+    border-color: hsl(var(--dlugomat-500));
+    box-shadow: 0 24px 48px -12px hsl(var(--dlugomat-500) / 0.15);
+  }
+
+  /* ---- Icon squares (blue-tint) --------------------------------------- */
+  .dlu-icon-square {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 0.75rem;
+    background: hsl(var(--dlugomat-50));
+    color: hsl(var(--dlugomat-700));
+  }
+  .dark .dlu-icon-square { background: hsl(var(--dlugomat-500) / 0.16); color: hsl(var(--dlugomat-300)); }
+  .dlu-icon-grad {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 0.75rem;
+    background: linear-gradient(135deg, hsl(var(--dlugomat-500)) 0%, hsl(var(--dlugomat-700)) 100%);
+    color: #fff;
+    box-shadow: 0 8px 16px -4px hsl(var(--dlugomat-500) / 0.25);
+  }
+
+  /* ---- Checkmark circles ---------------------------------------------- */
+  .dlu-check {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.375rem;
+    height: 1.375rem;
+    flex-shrink: 0;
+    background: hsl(var(--dlugomat-500));
+    color: #fff;
+    border-radius: 50%;
+    font-size: 0.6875rem;
+    font-weight: 700;
+  }
+  .dlu-check-mini {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.125rem;
+    height: 1.125rem;
+    flex-shrink: 0;
+    background: hsl(var(--dlugomat-50));
+    color: hsl(var(--dlugomat-700));
+    border-radius: 50%;
+    font-size: 0.625rem;
+    font-weight: 700;
+  }
+
+  /* ---- Mono time/sygnatura pill --------------------------------------- */
+  .dlu-time-pill {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    color: hsl(var(--dlugomat-700));
+    background: hsl(var(--dlugomat-50));
+    padding: 0.3rem 0.7rem;
+    border-radius: 0.375rem;
+    letter-spacing: 0.04em;
+  }
+  .dark .dlu-time-pill { background: hsl(var(--dlugomat-500) / 0.16); color: hsl(var(--dlugomat-300)); }
+
+  /* ---- Decorative big step number ------------------------------------- */
+  .dlu-step-num {
+    font-size: 5rem;
+    font-weight: 900;
+    color: hsl(var(--dlugomat-50));
+    line-height: 1;
+    letter-spacing: -0.04em;
+    pointer-events: none;
+  }
+  .dark .dlu-step-num { color: hsl(var(--dlugomat-500) / 0.14); }
+
+  /* ---- Page hero band (subtle blue mesh for inner pages) -------------- */
+  .dlu-page-hero {
+    position: relative;
+    background:
+      radial-gradient(ellipse at 75% 0%, hsl(var(--dlugomat-500) / 0.10), transparent 60%),
+      linear-gradient(180deg, hsl(var(--dlugomat-50) / 0.6) 0%, hsl(var(--background)) 100%);
+    border-bottom: 1px solid hsl(var(--ink-200));
+  }
+  .dark .dlu-page-hero {
+    background:
+      radial-gradient(ellipse at 75% 0%, hsl(var(--dlugomat-500) / 0.14), transparent 60%),
+      linear-gradient(180deg, hsl(var(--dlugomat-900)) 0%, hsl(var(--background)) 100%);
+  }
+
+  /* ---- Dark CTA card (final-cta) -------------------------------------- */
+  .dlu-cta-dark {
+    background: linear-gradient(135deg, hsl(var(--dlugomat-950)) 0%, hsl(var(--dlugomat-850)) 100%);
+    border-radius: 2rem;
+    position: relative;
+    overflow: hidden;
+    color: #fff;
+  }
+  .dlu-cta-dark::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    right: -30%;
+    width: 80%;
+    height: 200%;
+    background: radial-gradient(circle, hsl(var(--dlugomat-500) / 0.3), transparent 60%);
+    pointer-events: none;
+  }
+
+  /* ---- Reveal-on-scroll ------------------------------------------------ */
+  .dlu-reveal { opacity: 1; transform: none; }
+  .dlu-reveal.revealed { opacity: 1 !important; transform: translateY(0) !important; }
 }
 
 @layer utilities {

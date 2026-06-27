@@ -43,8 +43,8 @@ export function Logo({ variant = "default", size = 28, className, ...props }: Lo
         <rect x="11" y="13" width="10" height="3" rx="1" fill="white" />
       </svg>
       {variant === "default" ? (
-        <span className="font-sans font-bold text-fluid-lg tracking-tight">
-          Długomat
+        <span className="font-sans text-fluid-lg font-extrabold tracking-tight">
+          Długomat<span className="font-semibold text-dlugomat-600 dark:text-dlugomat-300">.pl</span>
         </span>
       ) : null}
     </span>

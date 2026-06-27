@@ -19,55 +19,43 @@ const NAV_GROUPS = [
   {
     title: "Produkt",
     items: [
-      { href: "/moduly", label: "Wszystkie moduły" },
-      { href: "/jak-to-dziala", label: "Jak to działa" },
+      { href: "/funkcje-ai", label: "Funkcje AI" },
+      { href: "/jak-to-dziala", label: "Jak działa" },
       { href: "/cennik", label: "Cennik" },
-      { href: "/skaner-nakazu", label: "Skaner nakazu" },
-      { href: "/kalkulatory", label: "Kalkulatory KPC" },
-    ],
-  },
-  {
-    title: "Moduły",
-    items: [
-      { href: "/moduly/skaner-nakazu", label: "D1 Skaner Nakazu" },
-      { href: "/moduly/sprzeciw-epu", label: "D2 Sprzeciw EPU" },
-      { href: "/moduly/komornik", label: "D3 Skarga komornicza" },
-      { href: "/moduly/potracenia", label: "D4 Ochrona wynagrodzenia" },
-      { href: "/moduly/bik", label: "D5 Korekta BIK" },
-      { href: "/moduly/cesja", label: "D6 Weryfikacja cesji" },
-      { href: "/moduly/ugoda", label: "D7 Propozycja ugody" },
-      { href: "/moduly/upadlosc", label: "D8 Upadłość konsumencka" },
-    ],
-  },
-  {
-    title: "Wiedza",
-    items: [
+      { href: "/api-kancelarie", label: "API dla kancelarii" },
       { href: "/baza-wiedzy", label: "Baza wiedzy" },
-      { href: "/baza-wiedzy/sprzeciw-od-nakazu-zaplaty-epu", label: "Sprzeciw EPU" },
-      { href: "/baza-wiedzy/skarga-na-czynnosci-komornika", label: "Skarga komornicza" },
-      { href: "/baza-wiedzy/wniosek-o-korekte-bik", label: "Korekta BIK" },
-      { href: "/changelog", label: "Changelog" },
+      { href: "/moduly", label: "Wszystkie moduły" },
     ],
   },
   {
     title: "Firma",
     items: [
-      { href: "/o-nas", label: "O nas" },
+      { href: "/o-lexmate24", label: "O LexMate24" },
+      { href: "/misja", label: "Misja" },
+      { href: "/o-dlugomacie", label: "O Długomacie" },
+      { href: "/blog", label: "Blog" },
       { href: "/kontakt", label: "Kontakt" },
       { href: "/status", label: "Status systemu" },
-      { href: "/program-partnerski", label: "Program partnerski" },
-      { href: "/sign-in", label: "Zaloguj się" },
     ],
   },
   {
-    title: "Compliance",
+    title: "Zgodność",
     items: [
-      { href: "/regulamin", label: "Regulamin" },
       { href: "/polityka-prywatnosci", label: "Polityka prywatności" },
-      { href: "/rodo", label: "RODO i Twoje prawa" },
+      { href: "/regulamin", label: "Regulamin" },
+      { href: "/rodo", label: "RODO" },
+      { href: "/iso-27001", label: "ISO 27001" },
       { href: "/cookies", label: "Cookies" },
+      { href: "/dpa", label: "DPA" },
     ],
   },
+];
+
+/** Ekosystem LexMate24 — siostrzane produkty (pill links). */
+const ECOSYSTEM = [
+  { href: "https://mandatomat.pl", label: "Mandatomat" },
+  { href: "https://rozwodomat.pl", label: "Rozwodomat" },
+  { href: "https://alimentomat.pl", label: "Alimentomat" },
 ];
 
 const COMPLIANCE_FACTS = [
@@ -98,28 +86,46 @@ export function SiteFooter() {
   return (
     <footer className="border-t border-ink-150 bg-ink-50">
       <div className="container py-16 sm:py-20">
-        {/* TOP: Brand + 5 nav columns */}
-        <div className="grid gap-12 lg:grid-cols-[1.5fr_repeat(5,1fr)] lg:gap-8">
+        {/* TOP: Brand + 3 nav columns */}
+        <div className="grid gap-12 lg:grid-cols-[2fr_repeat(3,1fr)] lg:gap-8">
           {/* Brand column */}
           <div className="flex flex-col gap-5 lg:col-span-1">
             <Logo />
             <Text size="sm" tone="default" className="max-w-xs">
               Tarcza dla osób zadłużonych. AI legal-tech budowany w Polsce,
-              zgodny z KPC i RODO.
+              zgodny z KPC i RODO. Część ekosystemu LexMate24.
             </Text>
             <div className="flex flex-col gap-2 text-[13px] text-ink-500">
               <a
                 href="mailto:pomoc@dlugomat.pl"
-                className="hover:text-ink-900 transition-colors"
+                className="hover:text-dlugomat-700 transition-colors"
               >
                 pomoc@dlugomat.pl
               </a>
               <a
                 href="mailto:iod@dlugomat.pl"
-                className="hover:text-ink-900 transition-colors"
+                className="hover:text-dlugomat-700 transition-colors"
               >
                 iod@dlugomat.pl
               </a>
+            </div>
+
+            {/* Ekosystem LexMate24 — pill links */}
+            <div className="flex flex-wrap items-center gap-2 pt-1">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.1em] text-ink-500">
+                Ekosystem
+              </span>
+              {ECOSYSTEM.map((p) => (
+                <a
+                  key={p.href}
+                  href={p.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-md bg-ink-100 px-2.5 py-1 text-[13px] font-medium text-ink-800 transition-colors hover:bg-dlugomat-50 hover:text-dlugomat-700"
+                >
+                  {p.label}
+                </a>
+              ))}
             </div>
           </div>
 
@@ -134,7 +140,7 @@ export function SiteFooter() {
                   <li key={item.href}>
                     <Link
                       href={item.href}
-                      className="text-[14px] text-ink-700 transition-colors hover:text-ink-900 focus-visible:shadow-shield-focus focus-visible:outline-none rounded-sm"
+                      className="text-[14px] text-ink-700 transition-colors hover:text-dlugomat-700 focus-visible:shadow-shield-focus focus-visible:outline-none rounded-sm"
                     >
                       {item.label}
                     </Link>

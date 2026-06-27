@@ -111,6 +111,8 @@ interface ResourceItem {
 const RESOURCE_ITEMS: ResourceItem[] = [
   { href: "/baza-wiedzy", label: "Baza wiedzy", description: "20+ przewodników po pismach procesowych" },
   { href: "/jak-to-dziala", label: "Jak to działa", description: "Cztery kroki — bez prawnika" },
+  { href: "/funkcje-ai", label: "Funkcje AI", description: "Silnik AI, IRAC, cytowanie KPC/KC" },
+  { href: "/o-dlugomacie", label: "O Długomacie", description: "Misja, zespół, ekosystem LexMate24" },
   { href: "/precedensy", label: "Precedensy", description: "Wyroki SN i SO które mają wpływ" },
   { href: "/case-studies", label: "Case studies", description: "Konkretne sprawy, konkretne wygrane" },
   { href: "/kalkulatory", label: "Kalkulatory", description: "Odsetki, przedawnienie, koszty" },
@@ -179,24 +181,24 @@ export function SiteHeader() {
           </Link>
 
           <nav aria-label="Główna" className="hidden items-center gap-1 lg:flex">
+            <NavLink href="/dla-ciebie">Dla Ciebie</NavLink>
+            <NavLink href="/dla-firm">Dla Firm</NavLink>
+
             {/* Mega-menu trigger: Produkt */}
             <DropdownTrigger
-              label="Produkt"
+              label="Funkcje AI"
               isOpen={openDropdown === "product"}
               onToggle={() => setOpenDropdown((v) => (v === "product" ? null : "product"))}
             />
 
-            <NavLink href="/skaner-nakazu">Skaner</NavLink>
             <NavLink href="/cennik">Cennik</NavLink>
 
             {/* Mega-menu trigger: Zasoby */}
             <DropdownTrigger
-              label="Zasoby"
+              label="Baza wiedzy"
               isOpen={openDropdown === "resources"}
               onToggle={() => setOpenDropdown((v) => (v === "resources" ? null : "resources"))}
             />
-
-            <NavLink href="/dla-firm">Dla firm</NavLink>
           </nav>
         </div>
 
@@ -206,15 +208,15 @@ export function SiteHeader() {
 
           <Link
             href="/sign-in"
-            className="hidden h-8 items-center rounded-sm px-2.5 text-[13px] font-medium text-ink-600 transition-colors hover:text-ink-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink-900 focus-visible:ring-offset-2 sm:inline-flex"
+            className="hidden h-8 items-center rounded-sm px-2.5 text-[13px] font-medium text-ink-600 transition-colors hover:text-dlugomat-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dlugomat-500 focus-visible:ring-offset-2 sm:inline-flex"
           >
-            Zaloguj
+            Zaloguj się
           </Link>
           <Link
             href="/sign-up"
-            className="group hidden h-8 items-center gap-1.5 rounded-sm bg-ink-900 px-3 text-[13px] font-medium text-white shadow-[inset_0_1px_0_0_hsl(0_0%_100%/0.12)] transition-colors duration-100 hover:bg-ink-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink-900 focus-visible:ring-offset-2 sm:inline-flex"
+            className="group hidden h-9 items-center gap-1.5 rounded-[10px] bg-dlugomat-700 px-4 text-[13.5px] font-semibold text-white shadow-[0_4px_12px_-2px_hsl(var(--dlugomat-500)/0.35)] transition-all duration-150 hover:-translate-y-px hover:bg-dlugomat-500 hover:shadow-[0_8px_20px_-4px_hsl(var(--dlugomat-500)/0.4)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dlugomat-500 focus-visible:ring-offset-2 sm:inline-flex"
           >
-            Zacznij za darmo
+            Załóż konto
             <ArrowRight className="size-3.5 transition-transform duration-150 ease-out group-hover:translate-x-0.5" aria-hidden />
           </Link>
 
@@ -352,11 +354,17 @@ export function SiteHeader() {
 
             {/* Pozostałe */}
             <div className="flex flex-col gap-px">
+              <Link href="/dla-ciebie" onClick={() => setMobileOpen(false)} className="rounded-sm px-3 py-2.5 text-[15px] font-medium text-ink-900 hover:bg-ink-50 dark:text-white">
+                Dla Ciebie
+              </Link>
+              <Link href="/dla-firm" onClick={() => setMobileOpen(false)} className="rounded-sm px-3 py-2.5 text-[15px] font-medium text-ink-900 hover:bg-ink-50 dark:text-white">
+                Dla Firm
+              </Link>
               <Link href="/cennik" onClick={() => setMobileOpen(false)} className="rounded-sm px-3 py-2.5 text-[15px] font-medium text-ink-900 hover:bg-ink-50 dark:text-white">
                 Cennik
               </Link>
-              <Link href="/dla-firm" onClick={() => setMobileOpen(false)} className="rounded-sm px-3 py-2.5 text-[15px] font-medium text-ink-900 hover:bg-ink-50 dark:text-white">
-                Dla firm
+              <Link href="/zacznij" onClick={() => setMobileOpen(false)} className="rounded-sm px-3 py-2.5 text-[15px] font-medium text-ink-900 hover:bg-ink-50 dark:text-white">
+                Zacznij teraz
               </Link>
             </div>
 
@@ -372,9 +380,9 @@ export function SiteHeader() {
               <Link
                 href="/sign-up"
                 onClick={() => setMobileOpen(false)}
-                className="flex h-10 flex-1 items-center justify-center gap-1.5 rounded-sm bg-ink-900 px-3 text-[14px] font-medium text-white shadow-[inset_0_1px_0_0_hsl(0_0%_100%/0.12)] hover:bg-ink-800"
+                className="flex h-10 flex-1 items-center justify-center gap-1.5 rounded-[10px] bg-dlugomat-700 px-3 text-[14px] font-semibold text-white shadow-[0_4px_12px_-2px_hsl(var(--dlugomat-500)/0.35)] hover:bg-dlugomat-500"
               >
-                Zacznij za darmo
+                Załóż konto
                 <ArrowRight className="size-3.5" aria-hidden />
               </Link>
               <ThemeToggle />
@@ -392,7 +400,7 @@ function NavLink({ href, children }: { href: string; children: React.ReactNode }
   return (
     <Link
       href={href}
-      className="rounded-sm px-2.5 py-1.5 text-[13px] font-medium text-ink-600 transition-colors duration-100 hover:text-ink-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink-900 focus-visible:ring-offset-2 dark:text-ink-700 dark:hover:text-white"
+      className="rounded-sm px-2.5 py-1.5 text-[13px] font-medium text-ink-600 transition-colors duration-100 hover:text-dlugomat-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dlugomat-500 focus-visible:ring-offset-2 dark:text-ink-700 dark:hover:text-dlugomat-300"
     >
       {children}
     </Link>
