@@ -109,3 +109,47 @@ wewnętrznie niespójna (część kodu Tier 2, część Tier 18).
   w konsumentach starego schematu — wszystkie naprawione)
 - `next lint` → **0 errors** (376 warnings)
 - `as any`: **346 → 338**
+
+---
+
+## Iteracja 6 — #6 billing/subscriptions + REALNY BUG kolizji schematu subscriptions
+
+### 🐛 Wykryty realny bug (krytyczny, latentny) — analogiczny do deadlines
+Istnieją **DWIE** migracje `create table if not exists public.subscriptions`
+o **sprzecznych** schematach:
+- `20260513100000` (Tier 8): `plan_id` (`free/starter/pro/family/company`),
+  `cycle` (`monthly/annual`), `tenant_id` + `subscription_usage` + RPC
+  `fn_increment_subscription_usage`
+- `20260522000000` (Tier 19): `plan_code` (`free/lite/pro/business/enterprise`),
+  `org_id`, `paused_at/until`, `past_due_retries`, `pending_plan_change`,
+  `pending_effective_at`, `metadata`
+
+`if not exists` → wygrywa Tier 8. Ale **kod jest podzielony**:
+- `lib/billing/*` → Tier 8 (`plan_id/cycle`)
+- `lib/payments/subscription/*` + `panel/.../platnosci` → Tier 19 (`plan_code/org_id`)
+
+Połowa zapytań padałaby na żywej bazie. `as any` maskowało rozbieżność.
+(W iter. 2 wpisałem do typu tylko wariant Tier 19 — przez co strona Tier 8
+była nietypowana i wymagała `as any`.)
+
+### ✅ Naprawa (SUPERSET, niedestrukcyjny)
+- **Nowa migracja** `20260627040000_audit_reconcile_subscriptions_schema.sql` —
+  idempotentny superset tabeli (`ADD COLUMN IF NOT EXISTS` dla kolumn OBU
+  schematów) + best-effort mapping `plan_id↔plan_code` + indeksy + RLS.
+  Obie ścieżki kodu działają bez utraty danych.
+- `lib/db/types.ts` — `subscriptions` Row/Insert jako **superset**; dodano typ
+  `subscription_usage`; dotypowano RPC `fn_increment_subscription_usage`
+  (+ indeks `[fn: string]` dla pozostałych 19 RPC → kompatybilność).
+- `lib/billing/subscriptions.ts` — usunięto **4** `sb=supabase as any` + **2**
+  `(data as any)` (pozostawiono 3 legalne `(Stripe as any)` z dynamic-import).
+
+### 📊 Walidacja
+- `tsc --noEmit` → **EXIT 0** (typowanie ujawniło i naprawiono 2 błędy: RPC
+  args + kolizja typu RPC dla `match_legal_knowledge`)
+- `next lint` → **0 errors** (374 warnings)
+- `as any`: **338 → 332**
+
+### ⏳ Pozostaje (decyzja produktowa)
+Konsolidacja modelu planów (jeden zestaw: `plan_id` LUB `plan_code` z jasnym
+mapowaniem `starter↔lite`, `family/company↔business`) — osobny PR, bo wymaga
+ustalenia kanonicznej taksonomii planów i przepisania jednej z dwóch gałęzi kodu.
