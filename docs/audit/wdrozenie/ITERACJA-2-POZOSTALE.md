@@ -433,3 +433,47 @@ owner_user_id (NOT NULL w Tier7) → **createOrganization/ensureUniqueSlug PADAJ
 w runtime**. Wymaga decyzji: migracja dorównująca kolumny Tier13 albo przepisanie
 kodu na schemat Tier7. Pliki lib/enterprise/{scim,organizations,audit-trail}.ts
 pozostawione z `sb: any` do czasu tej decyzji (nie wymuszamy niepełnej zmiany).
+
+## Iteracja 35 — MFA / cases / security routes (#6)
+
+### ✅ Zaimplementowane
+- Dotypowano tabelę `evidence_uploads` (migracja 20260512200000_tier7_tables.sql).
+  `mfa_secrets` było już dotypowane wcześniej (uniknięto duplikatu).
+- Usunięto 11 castów `as any`. Po iteracji: **67 → 56**.
+- Typowane klienty: `/api/security/mfa/{verify,setup}`, `/api/push/send`
+  (`requireAdmin`), `/api/offline-queue/drain` (na poziomie route'a).
+- Martwe casty usunięte: `/api/security/gdpr/export`, `/api/security/mfa/disable`.
+
+### 🐛 REALNE BUGI (maskowane przez `as any`)
+1. **`/api/security/mfa/setup`** — upsert zapisywał kolumny `issuer`/`account`,
+   których NIE MA w schemacie `mfa_secrets` (migracja 20260520000000) → runtime
+   error PostgREST. Usunięto (issuer/account są częścią otpauth URL zwracanego
+   do klienta, nie trzeba ich utrwalać).
+2. **`/api/cases/[id]/win-probability`** — `case_type` nie istnieje (poprawnie
+   `type`); `facts`/`answers`/`deadline_at`/`amount`/`creditor_type`/
+   `documents_count` też nie istnieją → odpowiedzi z `wizard_state.answers`,
+   fakty z `metadata`.
+3. **`/api/cases/[id]/virtual-judge`** — `case_type`/`facts` nie istnieją →
+   `type` + `metadata`.
+4. **`/api/cases/[id]/evidence`** — `case_type` nie istnieje → `type`.
+5. **`/api/push/send`** — martwy warunek `role !== 'owner'` (brak 'owner'
+   w UserRole) → `role !== 'admin'`.
+6. **`/api/csp-report` + `/api/health/deep`** — tabela `audit_log` **NIE
+   ISTNIEJE** (żadna migracja jej nie tworzy; istnieją `admin_audit_log`,
+   `org_audit_log`, `audit_chain`; tier6 ma nawet indeks na nieistniejącej
+   `public.audit_log`). CSP-report wstawiał dodatkowo niepasujące kolumny
+   (event_type/actor_type/resource_type) → przepięto na `admin_audit_log`
+   z poprawnymi kolumnami (actor_id/action/target_type). Health-check RTT
+   również przepięto na `admin_audit_log` (wcześniej zawsze raportował 'down').
+
+### 📊 Walidacja
+- `tsc --noEmit` → EXIT 0
+- `next lint` → 0 errors
+- commit `cecaec1`
+
+### ⏸️ Odłożone (decyzje migracyjne — poza zakresem as-any)
+- `scheduled_reminders` i `legal_references` — **brak migracji tworzącej tabelę**.
+  `lib/letters/auto-deadline-tagger.ts`, `lib/legal/precedent-search.ts`,
+  `lib/ai/rag-scaffold.ts`, `lib/ai/rag/hybrid/hybrid-retriever.ts` odpytują
+  nieistniejące tabele → wymagają decyzji o migracji przed usunięciem `as any`.
+- `knowledge_articles` — istnieje tylko w tier7; do dotypowania w kolejnej iteracji.
