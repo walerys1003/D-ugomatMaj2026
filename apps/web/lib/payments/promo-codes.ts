@@ -125,17 +125,14 @@ export async function validatePromoCode(
     );
   }
 
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database missing recent promo_codes columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseAdminClient();
 
   const { data: promo, error } = await sb
     .from("promo_codes")
     .select(
-      "id,code,discount_pct,discount_grosze,max_uses,per_user_limit," +
-        "current_uses,valid_from,valid_to,applies_to_case_types," +
-        "applies_to_bundle_ids,min_amount_grosze,is_active",
+      // Audyt #6 — literał string (nie konkatenacja), by typed-select Supabase
+      // mógł statycznie sparsować kolumny i nie degradował do GenericStringError.
+      "id,code,discount_pct,discount_grosze,max_uses,per_user_limit,current_uses,valid_from,valid_to,applies_to_case_types,applies_to_bundle_ids,min_amount_grosze,is_active",
     )
     .eq("code", code)
     .maybeSingle();
@@ -273,10 +270,7 @@ export async function recordPromoRedemption(args: {
   discountGrosze: number;
   finalAmountGrosze: number;
 }): Promise<boolean> {
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database missing recent promo_codes columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseAdminClient();
 
   // Idempotentne INSERT — jeśli payment już ma redemption, on_conflict skip.
   const { error: insertErr } = await sb
