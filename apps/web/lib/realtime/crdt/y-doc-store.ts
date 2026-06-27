@@ -21,6 +21,7 @@
  */
 
 import { createSupabaseServerClient } from "@/lib/db/supabase-server";
+import type { Json } from "@/lib/db/types";
 
 export interface CrdtUpdate {
   id: string;
@@ -51,9 +52,7 @@ export async function appendUpdate(input: AppendUpdateInput): Promise<CrdtUpdate
     throw new Error(`crdt_update_too_large:${sizeBytes}`);
   }
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { data, error } = await sb
     .from("crdt_updates")
     .insert({
@@ -90,9 +89,7 @@ export async function getUpdates(args: {
   limit?: number;
 }): Promise<CrdtUpdate[]> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   let q = sb
     .from("crdt_updates")
     .select("*")
@@ -122,9 +119,7 @@ const COMPACT_THRESHOLD_BYTES = 256 * 1024;
 
 export async function getDocStats(docId: string): Promise<DocStats> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { data, error } = await sb
     .from("crdt_updates")
     .select("id,size_bytes,is_snapshot,created_at")
@@ -154,9 +149,14 @@ export async function getDocStats(docId: string): Promise<DocStats> {
  * tylko w `crdt_awareness` z auto-cleanup.
  */
 export interface AwarenessState {
-  docId: string;
-  userId: string;
-  clientId: string;
+  // Audyt 2026-06-27 (iter. 12): interfejs deklarował docId/userId/clientId
+  // (camelCase), ale `select("*")` z crdt_awareness zwraca kolumny snake_case
+  // (doc_id/user_id/client_id). Przy `as any` nikt tego nie wychwycił =>
+  // każdy odczyt .docId/.userId/.clientId dawał undefined. Wyrównane do
+  // realnego kształtu wiersza DB.
+  doc_id: string;
+  user_id: string;
+  client_id: string;
   state: Record<string, unknown>; // np. { cursor: {anchor, head}, name, color }
   updated_at: string;
   expires_at: string;
@@ -171,9 +171,7 @@ export async function updateAwareness(args: {
   state: Record<string, unknown>;
 }): Promise<void> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const now = new Date();
   await sb
     .from("crdt_awareness")
@@ -182,7 +180,7 @@ export async function updateAwareness(args: {
         doc_id: args.docId,
         user_id: args.userId,
         client_id: args.clientId,
-        state: args.state,
+        state: args.state as Json,
         updated_at: now.toISOString(),
         expires_at: new Date(now.getTime() + AWARENESS_TTL_MS).toISOString(),
       },
@@ -192,9 +190,7 @@ export async function updateAwareness(args: {
 
 export async function listAwareness(docId: string): Promise<AwarenessState[]> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const now = new Date().toISOString();
   const { data, error } = await sb
     .from("crdt_awareness")
@@ -202,14 +198,12 @@ export async function listAwareness(docId: string): Promise<AwarenessState[]> {
     .eq("doc_id", docId)
     .gt("expires_at", now);
   if (error) throw error;
-  return (data ?? []) as AwarenessState[];
+  return (data ?? []) as unknown as AwarenessState[];
 }
 
 export async function sweepExpiredAwareness(): Promise<number> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { data, error } = await sb
     .from("crdt_awareness")
     .delete()
@@ -225,9 +219,7 @@ export async function sweepExpiredAwareness(): Promise<number> {
  */
 export async function canEditDocument(docId: string, userId: string): Promise<boolean> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { data } = await sb
     .from("documents")
     .select("id")

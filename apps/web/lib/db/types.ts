@@ -1428,6 +1428,58 @@ export interface Database {
         >;
         Relationships: [];
       };
+      // -----------------------------------------------------------------
+      // Tier 20 — CRDT (Yjs-style) realtime collab. Źródło:
+      // 20260523000000_tier20_observability_flags_jobs_crdt.sql.
+      // -----------------------------------------------------------------
+      crdt_updates: {
+        Row: {
+          id: string;
+          doc_id: string;
+          user_id: string;
+          client_id: string;
+          update_base64: string;
+          size_bytes: number;
+          is_snapshot: boolean;
+          replaces_ids: string[] | null;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["crdt_updates"]["Row"]
+        > & {
+          doc_id: string;
+          user_id: string;
+          client_id: string;
+          update_base64: string;
+          size_bytes: number;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["crdt_updates"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      crdt_awareness: {
+        Row: {
+          doc_id: string;
+          client_id: string;
+          user_id: string;
+          state: Json;
+          updated_at: string;
+          expires_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["crdt_awareness"]["Row"]
+        > & {
+          doc_id: string;
+          client_id: string;
+          user_id: string;
+          expires_at: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["crdt_awareness"]["Insert"]
+        >;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     // Audyt 2026-06-27: większość RPC nie jest jeszcze dotypowana (degraduje
