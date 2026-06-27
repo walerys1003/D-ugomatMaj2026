@@ -2325,6 +2325,60 @@ export interface Database {
         >;
         Relationships: [];
       };
+      // Audyt 2026-06-27 (iter. 27): Tier10 (20260513300000_tier10_final_polish.sql).
+      error_reports: {
+        Row: {
+          id: string;
+          fingerprint: string;
+          message: string;
+          stack: string | null;
+          source: string | null;
+          url: string | null;
+          user_id: string | null;
+          metadata: Json;
+          count: number;
+          first_seen_at: string;
+          last_seen_at: string;
+          resolved: boolean;
+          resolved_by: string | null;
+          resolved_at: string | null;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["error_reports"]["Row"]
+        > & {
+          fingerprint: string;
+          message: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["error_reports"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      // Audyt 2026-06-27 (iter. 27): Tier21 (20260524000000_tier21_realtime_bulk_audit.sql).
+      realtime_events: {
+        Row: {
+          id: string;
+          topic: string;
+          kind:
+            | "case.updated" | "case.commented" | "doc.updated" | "doc.cursor"
+            | "deadline.fired" | "notification.delivered" | "presence.join" | "presence.leave"
+            | "ai.generation.progress" | "ocr.progress" | "bulk.progress" | "system.broadcast";
+          payload: Json;
+          user_id: string | null;
+          occurred_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["realtime_events"]["Row"]
+        > & {
+          topic: string;
+          kind: Database["public"]["Tables"]["realtime_events"]["Row"]["kind"];
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["realtime_events"]["Insert"]
+        >;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     // Audyt 2026-06-27: większość RPC nie jest jeszcze dotypowana (degraduje

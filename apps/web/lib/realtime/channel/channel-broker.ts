@@ -18,6 +18,7 @@
 
 import { randomUUID } from "crypto";
 import { createSupabaseServerClient } from "@/lib/db/supabase-server";
+import type { Json } from "@/lib/db/types";
 
 export type RealtimeEventKind =
   | "case.updated"
@@ -114,15 +115,12 @@ class ChannelBroker {
 
     if (args.persist !== false) {
       try {
-        const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+        const sb = await createSupabaseServerClient();
         await sb.from("realtime_events").insert({
           id: event.id,
           topic: event.topic,
           kind: event.kind,
-          payload: event.payload,
+          payload: event.payload as Json,
           user_id: event.user_id,
           occurred_at: event.occurred_at,
         });
@@ -247,10 +245,7 @@ export async function fetchEventReplay(args: {
   since?: string;
   limit?: number;
 }): Promise<RealtimeEvent[]> {
-  const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = await createSupabaseServerClient();
   let q = sb
     .from("realtime_events")
     .select("*")
@@ -260,5 +255,6 @@ export async function fetchEventReplay(args: {
   if (args.since) q = q.gt("occurred_at", args.since);
   const { data, error } = await q;
   if (error) throw error;
-  return (data ?? []) as RealtimeEvent[];
+  // payload jsonb (Json) -> Record<string, unknown> w domenie (boundary cast).
+  return (data ?? []) as unknown as RealtimeEvent[];
 }

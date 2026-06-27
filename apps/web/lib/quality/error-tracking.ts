@@ -10,6 +10,7 @@
  */
 import "server-only";
 import { createSupabaseAdminClient } from "@/lib/db/supabase-server";
+import type { Json } from "@/lib/db/types";
 
 export type ErrorSeverity = "debug" | "info" | "warning" | "error" | "critical";
 
@@ -51,20 +52,26 @@ export async function captureError(
 
   // 2. DB fallback (always — for analytics + offline replay if Sentry down)
   try {
-    const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+    const sb = createSupabaseAdminClient();
+    // Audyt 2026-06-27 (iter. 27) — REALNY BUG zamaskowany przez `as any`:
+    // poprzednio insert używał kolumn 'severity', 'route', 'case_id', 'tags',
+    // 'extra', które NIE ISTNIEJĄ w error_reports. Realne kolumny: 'url',
+    // 'source', 'metadata' (jsonb). Insert ZAWSZE failował (cicho połknięty
+    // przez catch) => fallback DB nie zapisywał błędów. Mapujemy nadmiarowe
+    // pola do 'metadata' i 'route' -> 'url'.
     await sb.from("error_reports").insert({
       message: message.slice(0, 1000),
       stack: stack?.slice(0, 8000) ?? null,
-      severity,
       user_id: ctx.user_id ?? null,
-      route: ctx.route ?? null,
-      case_id: ctx.case_id ?? null,
+      url: ctx.route ?? null,
+      source: "server",
       fingerprint: ctx.fingerprint ?? hashFingerprint(message),
-      tags: ctx.tags ?? null,
-      extra: ctx.extra ?? null,
+      metadata: {
+        severity,
+        case_id: ctx.case_id ?? null,
+        tags: ctx.tags ?? null,
+        extra: ctx.extra ?? null,
+      } as Json,
     });
   } catch (dbErr) {
     if (process.env.NODE_ENV !== "production") {
@@ -108,10 +115,7 @@ function hashFingerprint(message: string): string {
 export async function recentErrorSummary(): Promise<
   Array<{ fingerprint: string; count: number; sample_message: string; last_seen: string }>
 > {
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseAdminClient();
   const since = new Date(Date.now() - 86_400_000).toISOString();
   const { data } = await sb
     .from("error_reports")
