@@ -43,10 +43,7 @@ export interface CreateAffiliateInput {
 export async function createAffiliateAccount(
   input: CreateAffiliateInput,
 ): Promise<AffiliateAccount> {
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseAdminClient();
   const slug = await ensureUniqueSlug(input.preferredSlug ?? slugify(input.displayName));
 
   const { data, error } = await sb
@@ -69,10 +66,7 @@ export async function createAffiliateAccount(
 }
 
 export async function getAffiliateBySlug(slug: string): Promise<AffiliateAccount | null> {
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseAdminClient();
   const { data } = await sb
     .from("affiliate_accounts")
     .select("*")
@@ -86,10 +80,7 @@ export async function trackAffiliateClick(
   slug: string,
   meta: { ipHash?: string; userAgent?: string; referer?: string; landingPath?: string },
 ): Promise<void> {
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseAdminClient();
   const aff = await getAffiliateBySlug(slug);
   if (!aff) return;
   await sb.from("affiliate_clicks").insert({
@@ -111,10 +102,7 @@ export async function attributeSignup(
   affiliateSlug: string | null,
 ): Promise<void> {
   if (!affiliateSlug) return;
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseAdminClient();
   const aff = await getAffiliateBySlug(affiliateSlug);
   if (!aff) return;
 
@@ -144,12 +132,12 @@ export async function recordCommission(
   paymentGrosze: number,
   isFirstPayment: boolean,
 ): Promise<void> {
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
-  // Find active referral for this user
-  const { data: ref } = await sb
+  const sb = createSupabaseAdminClient();
+  // Find active referral for this user. Embedded resource
+  // (affiliate:affiliate_accounts) nie jest inferowany przez typed-select,
+  // więc modelujemy kształt złączenia lokalnym typem (jeden, udokumentowany
+  // rzut zamiast rozsianych `as any`).
+  const { data } = await sb
     .from("affiliate_referrals")
     .select("*, affiliate:affiliate_accounts(*)")
     .eq("user_id", userId)
@@ -158,8 +146,11 @@ export async function recordCommission(
     .limit(1)
     .maybeSingle();
 
-  if (!ref || !(ref as any).affiliate) return;
-  const aff = (ref as any).affiliate as AffiliateAccount;
+  const ref = data as
+    | { id: string; affiliate: AffiliateAccount | null }
+    | null;
+  if (!ref || !ref.affiliate) return;
+  const aff = ref.affiliate;
   const pct = isFirstPayment
     ? aff.commission_first_payment_pct
     : aff.commission_recurring_pct;
@@ -167,7 +158,7 @@ export async function recordCommission(
 
   await sb.from("affiliate_commissions").insert({
     affiliate_id: aff.id,
-    referral_id: (ref as any).id,
+    referral_id: ref.id,
     user_id: userId,
     payment_id: paymentId,
     amount_grosze: commission,
@@ -181,7 +172,7 @@ export async function recordCommission(
     await sb
       .from("affiliate_referrals")
       .update({ status: "converted", converted_at: new Date().toISOString() })
-      .eq("id", (ref as any).id);
+      .eq("id", ref.id);
   }
 }
 
@@ -195,10 +186,7 @@ export interface AffiliateStats {
 }
 
 export async function getAffiliateStats(affiliateId: string): Promise<AffiliateStats> {
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseAdminClient();
   const [{ count: clicks }, { count: signups }, { count: conv }, { data: comms }] =
     await Promise.all([
       sb
@@ -255,10 +243,7 @@ function slugify(input: string): string {
 }
 
 async function ensureUniqueSlug(base: string): Promise<string> {
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseAdminClient();
   let slug = base;
   for (let i = 0; i < 10; i += 1) {
     const { data } = await sb

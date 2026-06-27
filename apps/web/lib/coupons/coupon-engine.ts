@@ -82,10 +82,7 @@ export async function createSubscriptionCoupon(
       : undefined,
   });
 
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseAdminClient();
   const { data, error } = await sb
     .from("subscription_coupons")
     .insert({
@@ -110,10 +107,7 @@ export async function createSubscriptionCoupon(
 }
 
 export async function getCouponByCode(code: string): Promise<SubscriptionCoupon | null> {
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseAdminClient();
   const { data } = await sb
     .from("subscription_coupons")
     .select("*")
@@ -128,10 +122,7 @@ export async function recordCouponRedemption(
   userId: string,
   subscriptionId: string,
 ): Promise<void> {
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseAdminClient();
   await sb.from("subscription_coupon_redemptions").insert({
     coupon_id: couponId,
     user_id: userId,
@@ -141,10 +132,7 @@ export async function recordCouponRedemption(
 }
 
 export async function listActiveCampaigns(): Promise<SubscriptionCoupon[]> {
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseAdminClient();
   const { data } = await sb
     .from("subscription_coupons")
     .select("*")

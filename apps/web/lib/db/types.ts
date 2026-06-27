@@ -684,6 +684,187 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["promo_redemptions"]["Insert"]>;
         Relationships: [];
       };
+      // -----------------------------------------------------------------
+      // Audyt 2026-06-27 (iter. 7): rodziny affiliate_* + subscription_coupons
+      // Źródło: 20260513100000_tier8_pricing_affiliate_growth.sql (jedno źródło
+      // prawdy, brak kolizji). Dodane ręcznie, by usunąć `as any`.
+      // -----------------------------------------------------------------
+      affiliate_accounts: {
+        Row: {
+          id: string;
+          user_id: string;
+          slug: string;
+          display_name: string;
+          payout_email: string;
+          commission_first_payment_pct: number;
+          commission_recurring_pct: number;
+          commission_recurring_months: number;
+          status: "pending" | "active" | "suspended";
+          payout_method: string | null;
+          payout_details: Json | null;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["affiliate_accounts"]["Row"]
+        > & {
+          user_id: string;
+          slug: string;
+          display_name: string;
+          payout_email: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["affiliate_accounts"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      affiliate_clicks: {
+        Row: {
+          id: string;
+          affiliate_id: string;
+          slug: string;
+          ip_hash: string | null;
+          user_agent: string | null;
+          referer: string | null;
+          landing_path: string | null;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["affiliate_clicks"]["Row"]
+        > & {
+          affiliate_id: string;
+          slug: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["affiliate_clicks"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      affiliate_referrals: {
+        Row: {
+          id: string;
+          affiliate_id: string;
+          user_id: string;
+          status: "signed_up" | "converted" | "expired";
+          attributed_at: string;
+          attribution_expires_at: string;
+          converted_at: string | null;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["affiliate_referrals"]["Row"]
+        > & {
+          affiliate_id: string;
+          user_id: string;
+          attribution_expires_at: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["affiliate_referrals"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      affiliate_commissions: {
+        Row: {
+          id: string;
+          affiliate_id: string;
+          referral_id: string;
+          user_id: string;
+          payment_id: string | null;
+          amount_grosze: number;
+          commission_pct: number;
+          is_first_payment: boolean;
+          status: "pending" | "paid" | "cancelled" | "reversed";
+          payout_id: string | null;
+          paid_at: string | null;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["affiliate_commissions"]["Row"]
+        > & {
+          affiliate_id: string;
+          referral_id: string;
+          user_id: string;
+          amount_grosze: number;
+          commission_pct: number;
+          is_first_payment: boolean;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["affiliate_commissions"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      affiliate_payouts: {
+        Row: {
+          id: string;
+          affiliate_id: string;
+          amount_grosze: number;
+          period_end: string;
+          status: "pending" | "transferred" | "failed";
+          commission_count: number;
+          external_ref: string | null;
+          transferred_at: string | null;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["affiliate_payouts"]["Row"]
+        > & {
+          affiliate_id: string;
+          amount_grosze: number;
+          period_end: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["affiliate_payouts"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      subscription_coupons: {
+        Row: {
+          id: string;
+          code: string;
+          stripe_coupon_id: string;
+          stripe_promotion_code_id: string;
+          discount_pct: number | null;
+          discount_grosze: number | null;
+          duration: "once" | "repeating" | "forever";
+          duration_in_months: number | null;
+          max_redemptions: number | null;
+          current_redemptions: number;
+          applies_to_plans: string[] | null;
+          valid_until: string | null;
+          is_active: boolean;
+          campaign_label: string | null;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["subscription_coupons"]["Row"]
+        > & {
+          code: string;
+          stripe_coupon_id: string;
+          stripe_promotion_code_id: string;
+          duration: "once" | "repeating" | "forever";
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["subscription_coupons"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      subscription_coupon_redemptions: {
+        Row: {
+          id: string;
+          coupon_id: string;
+          user_id: string;
+          subscription_id: string | null;
+          redeemed_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["subscription_coupon_redemptions"]["Row"]
+        > & {
+          coupon_id: string;
+          user_id: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["subscription_coupon_redemptions"]["Insert"]
+        >;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     // Audyt 2026-06-27: większość RPC nie jest jeszcze dotypowana (degraduje
@@ -701,6 +882,15 @@ export interface Database {
           p_field: "cases_created" | "ai_generations";
           p_delta: number;
         };
+        Returns: undefined;
+      };
+      // RPC z 20260513100000_tier8_pricing_affiliate_growth.sql
+      fn_increment_coupon_redemption: {
+        Args: { p_coupon_id: string };
+        Returns: undefined;
+      };
+      fn_increment_referral_uses: {
+        Args: { p_code: string };
         Returns: undefined;
       };
       [fn: string]: {
