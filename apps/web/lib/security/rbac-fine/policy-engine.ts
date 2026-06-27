@@ -14,6 +14,7 @@
  */
 
 import { createSupabaseServerClient } from "@/lib/db/supabase-server";
+import type { Json } from "@/lib/db/types";
 
 export type PolicyEffect = "allow" | "deny";
 
@@ -269,9 +270,7 @@ export function clearDecisionCache(): void {
 // ---------------------------------------------------------------------
 export async function loadPoliciesForResource(resourceType: string): Promise<PolicyRule[]> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { data, error } = await sb
     .from("rbac_policies")
     .select("*")
@@ -279,29 +278,29 @@ export async function loadPoliciesForResource(resourceType: string): Promise<Pol
     .or(`resources.cs.{${resourceType}:*},resources.cs.{*}`)
     .order("priority", { ascending: false });
   if (error) return [];
-  return (data ?? []) as PolicyRule[];
+  return (data ?? []) as unknown as PolicyRule[];
 }
 
 export async function listAllPolicies(): Promise<PolicyRule[]> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { data } = await sb
     .from("rbac_policies")
     .select("*")
     .order("priority", { ascending: false });
-  return (data ?? []) as PolicyRule[];
+  return (data ?? []) as unknown as PolicyRule[];
 }
 
 export async function upsertPolicy(rule: Omit<PolicyRule, "id"> & { id?: string }): Promise<PolicyRule> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
+  // subjects/conditions to kolumny jsonb (Json) — rzutujemy strukturalne
+  // pola PolicyRule na Json przy zapisie.
   const payload = {
     ...rule,
     id: rule.id ?? undefined,
+    subjects: rule.subjects as unknown as Json,
+    conditions: rule.conditions as unknown as Json,
   };
   const { data, error } = await sb
     .from("rbac_policies")
@@ -310,14 +309,12 @@ export async function upsertPolicy(rule: Omit<PolicyRule, "id"> & { id?: string 
     .single();
   if (error) throw error;
   clearDecisionCache();
-  return data as PolicyRule;
+  return data as unknown as PolicyRule;
 }
 
 export async function deletePolicy(id: string): Promise<void> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { error } = await sb.from("rbac_policies").delete().eq("id", id);
   if (error) throw error;
   clearDecisionCache();

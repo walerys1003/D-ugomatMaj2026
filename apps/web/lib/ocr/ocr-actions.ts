@@ -21,6 +21,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { createSupabaseServerClient } from "@/lib/db/supabase-server";
+import type { Json, WizardState } from "@/lib/db/types";
 import { assertCsrfFromFormData } from "@/lib/security/csrf";
 import { findCachedOcrByHash } from "./ocr-cache";
 import { dispatchParser, sniffIntent } from "./parsers/dispatcher";
@@ -77,9 +78,7 @@ export async function submitOcrResultAction(
   const parsed = submitSchema.parse(input);
 
   const supabase = createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { data: userResult, error: userErr } = await sb.auth.getUser();
   if (userErr || !userResult.user) {
     throw new Error("Sesja wygasła — zaloguj się ponownie.");
@@ -123,7 +122,7 @@ export async function submitOcrResultAction(
         file_hash: parsed.fileHash,
         intent,
         parsed: parsedDoc,
-      } as unknown as Record<string, unknown>,
+      } as unknown as Json,
       confidence: parsed.confidence,
       provider: "tesseract",
       processing_time_ms: parsed.durationMs,
@@ -203,9 +202,7 @@ export async function runServerOcrAction(
   }
 
   const supabase = createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { data: userResult, error: userErr } = await sb.auth.getUser();
   if (userErr || !userResult.user) {
     throw new Error("Sesja wygasła — zaloguj się ponownie.");
@@ -258,7 +255,7 @@ export async function runServerOcrAction(
         file_hash: parsed.fileHash,
         intent,
         parsed: parsedDoc,
-      } as unknown as Record<string, unknown>,
+      } as unknown as Json,
       confidence: raw.confidence,
       provider: "textract",
       processing_time_ms: raw.durationMs,
@@ -310,9 +307,7 @@ export async function createOcrUploadUrlAction(input: {
   const parsed = uploadUrlSchema.parse(input);
 
   const supabase = createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { data: userResult, error: userErr } = await sb.auth.getUser();
   if (userErr || !userResult.user) {
     throw new Error("Sesja wygasła — zaloguj się ponownie.");
@@ -365,9 +360,7 @@ export async function createCaseFromOcrAction(input: {
   const parsed = createCaseFromOcrSchema.parse(input);
 
   const supabase = createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { data: userResult, error: userErr } = await sb.auth.getUser();
   if (userErr || !userResult.user) {
     throw new Error("Sesja wygasła — zaloguj się ponownie.");
@@ -422,12 +415,12 @@ export async function createCaseFromOcrAction(input: {
         currentStep: 0,
         answers,
         completedSteps: [],
-      } as unknown as Record<string, unknown>,
+      } as unknown as WizardState,
       metadata: {
         prefilled_from_ocr: parsed.ocrResultId,
         ocr_provider: ocr.provider,
         ocr_confidence: ocr.confidence,
-      } as unknown as Record<string, unknown>,
+      } as unknown as Json,
     })
     .select("id")
     .single();

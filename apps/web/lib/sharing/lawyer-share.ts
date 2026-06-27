@@ -65,9 +65,7 @@ export async function createLawyerShare(
   const expires = new Date(Date.now() + ttlDays * 86_400_000);
 
   const supabase = getSupabaseAdmin();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
 
   // Verify the case belongs to the user
   const { data: caseRow, error: caseErr } = await sb
@@ -113,9 +111,7 @@ export async function verifyLawyerShare(
   | { ok: false; reason: "not_found" | "expired" | "revoked" }
 > {
   const supabase = getSupabaseAdmin();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const hash = hashToken(rawToken);
   const { data, error } = await sb
     .from("lawyer_share_tokens")
@@ -138,9 +134,7 @@ export async function verifyLawyerShare(
 
 export async function revokeLawyerShare(userId: string, shareId: string): Promise<{ ok: boolean }> {
   const supabase = getSupabaseAdmin();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { error } = await sb
     .from("lawyer_share_tokens")
     .update({ revoked_at: new Date().toISOString() })
@@ -151,9 +145,7 @@ export async function revokeLawyerShare(userId: string, shareId: string): Promis
 
 export async function listUserShares(userId: string, caseId?: string): Promise<ShareTokenRecord[]> {
   const supabase = getSupabaseAdmin();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   let q = sb
     .from("lawyer_share_tokens")
     .select("id, user_id, case_id, scopes, lawyer_email, lawyer_name, allow_download, expires_at, revoked_at, created_at, last_used_at, used_count")

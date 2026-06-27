@@ -1735,6 +1735,100 @@ export interface Database {
         >;
         Relationships: [];
       };
+      // -----------------------------------------------------------------
+      // Tier 7 — Share-with-lawyer tokens. Źródło: 20260512200000_tier7_tables.
+      // -----------------------------------------------------------------
+      lawyer_share_tokens: {
+        Row: {
+          id: string;
+          token_hash: string;
+          user_id: string;
+          case_id: string;
+          scopes: string[];
+          lawyer_email: string | null;
+          lawyer_name: string | null;
+          allow_download: boolean;
+          expires_at: string;
+          revoked_at: string | null;
+          used_count: number;
+          last_used_at: string | null;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["lawyer_share_tokens"]["Row"]
+        > & {
+          token_hash: string;
+          user_id: string;
+          case_id: string;
+          scopes: string[];
+          expires_at: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["lawyer_share_tokens"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      // -----------------------------------------------------------------
+      // Tier 23 — Fine-grained RBAC policies. Źródło:
+      // 20260526000000_tier23_compliance_security.sql.
+      // -----------------------------------------------------------------
+      rbac_policies: {
+        Row: {
+          id: string;
+          name: string;
+          effect: "allow" | "deny";
+          actions: string[];
+          resources: string[];
+          subjects: Json;
+          conditions: Json;
+          priority: number;
+          enabled: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["rbac_policies"]["Row"]
+        > & {
+          name: string;
+          effect: "allow" | "deny";
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["rbac_policies"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      // -----------------------------------------------------------------
+      // Tier 7 — AI "radca podpowiada" suggestions. Źródło:
+      // 20260512100000_tier7_d9_d16_modules.sql.
+      // -----------------------------------------------------------------
+      ai_suggestions: {
+        Row: {
+          id: string;
+          case_id: string;
+          step_id: string;
+          suggestion: string;
+          category: "argument" | "evidence" | "legal_basis" | "strategy" | "warning";
+          severity: "info" | "tip" | "warning" | "critical";
+          applied: boolean;
+          dismissed: boolean;
+          model_id: string | null;
+          cost_pln: number | null;
+          created_at: string;
+          applied_at: string | null;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["ai_suggestions"]["Row"]
+        > & {
+          case_id: string;
+          step_id: string;
+          suggestion: string;
+          category: "argument" | "evidence" | "legal_basis" | "strategy" | "warning";
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["ai_suggestions"]["Insert"]
+        >;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     // Audyt 2026-06-27: większość RPC nie jest jeszcze dotypowana (degraduje

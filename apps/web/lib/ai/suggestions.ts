@@ -114,9 +114,7 @@ const RATE_LIMIT_PER_CASE_PER_HOUR = 3;
  */
 async function isWithinRateLimit(caseId: string): Promise<boolean> {
   const supabase = createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const oneHourAgo = new Date(Date.now() - 3600_000).toISOString();
   const { count, error } = await sb
     .from("ai_suggestions")
@@ -199,7 +197,7 @@ Pisz po polsku, prawniczo, ale bez formalizmu.`.trim();
     // Wyciągnij JSON z możliwego markdown ```
     const cleaned = result.text.replace(/^```(?:json)?\s*/, "").replace(/\s*```\s*$/, "");
     parsed = JSON.parse(cleaned) as AnthropicSuggestionsResponse;
-  } catch (e) {
+  } catch {
     logger.warn("ai_suggestions.parse_failed", {
       caseId: params.caseId,
       sample: result.text.slice(0, 200),
@@ -231,9 +229,7 @@ Pisz po polsku, prawniczo, ale bez formalizmu.`.trim();
   // Persist
   if (suggestions.length > 0) {
     const supabase = createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
     const { error: insErr } = await sb.from("ai_suggestions").insert(suggestions);
     if (insErr) {
       logger.warn("ai_suggestions.insert_failed", {
@@ -248,9 +244,7 @@ Pisz po polsku, prawniczo, ale bez formalizmu.`.trim();
 
 export async function dismissSuggestion(suggestionId: string): Promise<boolean> {
   const supabase = createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { error } = await sb
     .from("ai_suggestions")
     .update({ dismissed: true })
@@ -260,9 +254,7 @@ export async function dismissSuggestion(suggestionId: string): Promise<boolean> 
 
 export async function applySuggestion(suggestionId: string): Promise<boolean> {
   const supabase = createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { error } = await sb
     .from("ai_suggestions")
     .update({ applied: true, applied_at: new Date().toISOString() })
