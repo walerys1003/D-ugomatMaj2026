@@ -77,12 +77,11 @@ export function AudienceSwitch() {
               key={a.href}
               href={a.href}
               className={cn(
-                "group flex flex-col gap-3 rounded-lg border border-ink-200 bg-card p-5 shadow-sm transition",
-                "hover:-translate-y-0.5 hover:border-dlugomat-300 hover:shadow-md",
+                "dlu-card dlu-card-hover group flex flex-col gap-3 p-5",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               )}
             >
-              <span className="flex size-10 items-center justify-center rounded-md bg-dlugomat-100 text-dlugomat-700 dark:bg-dlugomat-700/20 dark:text-dlugomat-300">
+              <span className="dlu-icon-square">
                 <Icon className="size-5" aria-hidden />
               </span>
               <h3 className="text-[15px] font-semibold leading-snug text-ink-900 dark:text-white">
