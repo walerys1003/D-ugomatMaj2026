@@ -19,6 +19,7 @@
 import "server-only";
 import { createSupabaseAdminClient } from "@/lib/db/supabase-server";
 import { getPlan, getStripePriceId, type BillingPlanId, type BillingCycle } from "./plans";
+import { getStripeClient } from "./stripe-client";
 
 export interface SubscriptionRecord {
   id: string;
@@ -66,13 +67,11 @@ export async function createSubscriptionCheckout(
   }
   const priceId = getStripePriceId(input.planId, input.cycle);
 
-  // Lazy import — stripe SDK is heavy
-  const StripeMod = await import("stripe").catch(() => null);
-  if (!StripeMod) {
+  // Lazy import — stripe SDK is heavy (typowany loader, bez `as any`)
+  const stripe = await getStripeClient(secretKey);
+  if (!stripe) {
     throw new Error("stripe SDK nie jest zainstalowany.");
   }
-  const Stripe = StripeMod.default ?? StripeMod;
-  const stripe = new (Stripe as any)(secretKey, { apiVersion: "2024-06-20" });
 
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
@@ -165,20 +164,16 @@ export async function getEffectivePlan(userId: string): Promise<BillingPlanId> {
 export async function cancelSubscription(stripeSubscriptionId: string): Promise<void> {
   const secretKey = process.env.STRIPE_SECRET_KEY;
   if (!secretKey) throw new Error("STRIPE_SECRET_KEY missing");
-  const StripeMod = await import("stripe").catch(() => null);
-  if (!StripeMod) throw new Error("stripe SDK missing");
-  const Stripe = StripeMod.default ?? StripeMod;
-  const stripe = new (Stripe as any)(secretKey, { apiVersion: "2024-06-20" });
+  const stripe = await getStripeClient(secretKey);
+  if (!stripe) throw new Error("stripe SDK missing");
   await stripe.subscriptions.update(stripeSubscriptionId, { cancel_at_period_end: true });
 }
 
 export async function resumeSubscription(stripeSubscriptionId: string): Promise<void> {
   const secretKey = process.env.STRIPE_SECRET_KEY;
   if (!secretKey) throw new Error("STRIPE_SECRET_KEY missing");
-  const StripeMod = await import("stripe").catch(() => null);
-  if (!StripeMod) throw new Error("stripe SDK missing");
-  const Stripe = StripeMod.default ?? StripeMod;
-  const stripe = new (Stripe as any)(secretKey, { apiVersion: "2024-06-20" });
+  const stripe = await getStripeClient(secretKey);
+  if (!stripe) throw new Error("stripe SDK missing");
   await stripe.subscriptions.update(stripeSubscriptionId, { cancel_at_period_end: false });
 }
 

@@ -10,6 +10,25 @@
  *   - Device: viewport, connection type, save-data, prefers-reduced-motion
  */
 
+/**
+ * Audyt 2026-06-27 (iter. 39): lokalne typy dla globali spoza standardowego
+ * lib.dom (PostHog wstrzykiwany przez snippet + Network Information API), aby
+ * uniknąć `(window as any)` / `(navigator as any)`.
+ */
+interface PostHogLike {
+  capture: (event: string, properties?: Record<string, unknown>) => void;
+}
+interface NetworkInformationLike {
+  effectiveType?: string;
+  saveData?: boolean;
+}
+function getPostHog(): PostHogLike | undefined {
+  return (window as Window & { posthog?: PostHogLike }).posthog;
+}
+function getNetworkInformation(): NetworkInformationLike | undefined {
+  return (navigator as Navigator & { connection?: NetworkInformationLike }).connection;
+}
+
 export interface RumSample {
   metric_name: "LCP" | "FID" | "CLS" | "INP" | "FCP" | "TTFB" | "hydration" | "route_change" | "api_call";
   value: number; // ms (lub raw value dla CLS)
@@ -73,9 +92,10 @@ export function initRumCollector(opts: {
         };
 
         // PostHog event (jeśli włączony)
-        if (opts.posthog && (window as any).posthog) {
+        const posthog = getPostHog();
+        if (opts.posthog && posthog) {
           try {
-            (window as any).posthog.capture("$web_vitals", sample);
+            posthog.capture("$web_vitals", sample as unknown as Record<string, unknown>);
           } catch {
             /* tolerable */
           }
@@ -119,11 +139,9 @@ function getDeviceClass(): "mobile" | "tablet" | "desktop" {
 }
 
 function getConnectionType(): string | undefined {
-  const conn = (navigator as any).connection;
-  return conn?.effectiveType;
+  return getNetworkInformation()?.effectiveType;
 }
 
 function getSaveData(): boolean {
-  const conn = (navigator as any).connection;
-  return !!conn?.saveData;
+  return !!getNetworkInformation()?.saveData;
 }

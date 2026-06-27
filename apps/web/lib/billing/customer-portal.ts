@@ -10,6 +10,7 @@
  * Wymaga `STRIPE_PORTAL_CONFIGURATION_ID` (skonfigurowany w Stripe Dashboard).
  */
 import "server-only";
+import { getStripeClient } from "@/lib/billing/stripe-client";
 
 export async function createCustomerPortalSession(
   stripeCustomerId: string,
@@ -17,10 +18,8 @@ export async function createCustomerPortalSession(
 ): Promise<{ url: string }> {
   const secretKey = process.env.STRIPE_SECRET_KEY;
   if (!secretKey) throw new Error("STRIPE_SECRET_KEY missing");
-  const StripeMod = await import("stripe").catch(() => null);
-  if (!StripeMod) throw new Error("stripe SDK missing");
-  const Stripe = StripeMod.default ?? StripeMod;
-  const stripe = new (Stripe as any)(secretKey, { apiVersion: "2024-06-20" });
+  const stripe = await getStripeClient(secretKey);
+  if (!stripe) throw new Error("stripe SDK missing");
 
   const portalConfig = process.env.STRIPE_PORTAL_CONFIGURATION_ID;
   const session = await stripe.billingPortal.sessions.create({

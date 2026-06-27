@@ -13,6 +13,7 @@ import "server-only";
 import type { BillingPlanId, BillingCycle } from "./plans";
 import { getStripePriceId } from "./plans";
 import { getActiveSubscription } from "./subscriptions";
+import { getStripeClient } from "./stripe-client";
 
 export interface UpgradePreview {
   currentPlan: BillingPlanId;
@@ -34,17 +35,22 @@ export async function previewPlanChange(
 
   const secretKey = process.env.STRIPE_SECRET_KEY;
   if (!secretKey) throw new Error("STRIPE_SECRET_KEY missing");
-  const StripeMod = await import("stripe").catch(() => null);
-  if (!StripeMod) throw new Error("stripe SDK missing");
-  const Stripe = StripeMod.default ?? StripeMod;
-  const stripe = new (Stripe as any)(secretKey, { apiVersion: "2024-06-20" });
+  const stripe = await getStripeClient(secretKey);
+  if (!stripe) throw new Error("stripe SDK missing");
 
   const priceId = getStripePriceId(targetPlan, targetCycle);
   const stripeSub = await stripe.subscriptions.retrieve(sub.stripe_subscription_id);
 
+  // `customer` może być stringiem albo rozwiniętym obiektem Customer — Stripe
+  // API oczekuje tu identyfikatora. Wyciągamy id (wcześniej maskowane `as any`).
+  const customerId =
+    typeof stripeSub.customer === "string"
+      ? stripeSub.customer
+      : stripeSub.customer.id;
+
   // Stripe Invoice Preview — co user zapłaci natychmiast
   const upcoming = await stripe.invoices.retrieveUpcoming({
-    customer: stripeSub.customer,
+    customer: customerId,
     subscription: sub.stripe_subscription_id,
     subscription_items: [
       {
@@ -81,10 +87,8 @@ export async function executePlanChange(
 
   const secretKey = process.env.STRIPE_SECRET_KEY;
   if (!secretKey) throw new Error("STRIPE_SECRET_KEY missing");
-  const StripeMod = await import("stripe").catch(() => null);
-  if (!StripeMod) throw new Error("stripe SDK missing");
-  const Stripe = StripeMod.default ?? StripeMod;
-  const stripe = new (Stripe as any)(secretKey, { apiVersion: "2024-06-20" });
+  const stripe = await getStripeClient(secretKey);
+  if (!stripe) throw new Error("stripe SDK missing");
 
   const priceId = getStripePriceId(targetPlan, targetCycle);
   const stripeSub = await stripe.subscriptions.retrieve(sub.stripe_subscription_id);

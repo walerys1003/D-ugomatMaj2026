@@ -72,14 +72,21 @@ export async function deliverPush(
 ): Promise<{ ok: boolean; statusCode?: number; error?: string }> {
   try {
     // Lazy import — avoids requiring web-push at build time.
-    const webpush = await import("web-push").catch(() => null);
-    if (!webpush) {
+    // @types/web-push eksportuje nazwane funkcje; runtime (CJS) udostępnia je
+    // też pod `.default`. Typujemy moduł i wybieramy właściwy kształt bez `as any`.
+    const mod = await import("web-push").catch(() => null);
+    if (!mod) {
       return { ok: false, error: "web-push module not installed" };
     }
-    (webpush as any).default.setVapidDetails(cfg.vapidSubject, cfg.vapidPublicKey, cfg.vapidPrivateKey);
-    await (webpush as any).default.sendNotification(subscription, JSON.stringify(payload));
+    type WebPush = typeof import("web-push");
+    // Interop ESM/CJS: niektóre bundlery zawijają moduł w `.default`.
+    const webpush: WebPush =
+      (mod as unknown as { default?: WebPush }).default ?? mod;
+    webpush.setVapidDetails(cfg.vapidSubject, cfg.vapidPublicKey, cfg.vapidPrivateKey);
+    await webpush.sendNotification(subscription, JSON.stringify(payload));
     return { ok: true };
-  } catch (e: any) {
-    return { ok: false, statusCode: e?.statusCode, error: e?.message ?? "unknown" };
+  } catch (e) {
+    const err = e as { statusCode?: number; message?: string };
+    return { ok: false, statusCode: err?.statusCode, error: err?.message ?? "unknown" };
   }
 }

@@ -46,7 +46,7 @@ export async function fetchMObywatelProfile(accessToken: string): Promise<MObywa
       logger.warn("mobywatel.userinfo_failed", { status: resp.status });
       return null;
     }
-    const data = (await resp.json()) as any;
+    const data: unknown = await resp.json();
     return normalizeMObywatel(data);
   } catch (err) {
     logger.warn("mobywatel.fetch_failed", { error: (err as Error).message });
@@ -54,8 +54,31 @@ export async function fetchMObywatelProfile(accessToken: string): Promise<MObywa
   }
 }
 
-function normalizeMObywatel(raw: any): MObywatelProfile | null {
-  if (!raw?.pesel) return null;
+/** Surowa odpowiedź OIDC z mObywatel (pola opcjonalne, snake_case lub PL). */
+interface MObywatelRaw {
+  pesel?: string;
+  given_name?: string;
+  imie?: string;
+  family_name?: string;
+  nazwisko?: string;
+  birthdate?: string;
+  data_urodzenia?: string;
+  address?: {
+    street_name?: string;
+    house_number?: string;
+    flat_number?: string;
+    postal_code?: string;
+    locality?: string;
+    region?: string;
+    county?: string;
+    municipality?: string;
+  };
+  id_document?: { number?: string; valid_to?: string };
+}
+
+function normalizeMObywatel(input: unknown): MObywatelProfile | null {
+  const raw = (input ?? {}) as MObywatelRaw;
+  if (!raw.pesel) return null;
   return {
     pesel: raw.pesel,
     imie: raw.given_name ?? raw.imie ?? "",
@@ -74,7 +97,7 @@ function normalizeMObywatel(raw: any): MObywatelProfile | null {
         }
       : undefined,
     dowod_osobisty: raw.id_document
-      ? { seria_numer: raw.id_document.number, data_waznosci: raw.id_document.valid_to }
+      ? { seria_numer: raw.id_document.number ?? "", data_waznosci: raw.id_document.valid_to ?? "" }
       : undefined,
     verified_at: new Date().toISOString(),
   };

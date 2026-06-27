@@ -364,9 +364,11 @@ export function generateTypeScriptSdk(): string {
       args.push(
         `query?: { ${queryArgs.map((q) => `${q.name}?: ${q.type}`).join("; ")} }`,
       );
+      // Generujemy w SDK rzutowanie na Record<string, string> (zamiast `as any`)
+      // — URLSearchParams akceptuje taki kształt, a query ma wartości skalarne.
       pathExpr =
         pathExpr +
-        " + (query ? `?${new URLSearchParams(query as any).toString()}` : '')";
+        " + (query ? `?${new URLSearchParams(query as Record<string, string>).toString()}` : '')";
     }
     if (op.requestBody) args.push(`body: ${tsTypeFromSchema(op.requestBody.schemaName)}`);
     const returnType =

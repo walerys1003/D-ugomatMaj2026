@@ -2862,6 +2862,51 @@ export interface Database {
         >;
         Relationships: [];
       };
+      // Audyt 2026-06-27 (iter. 39): e-filing sądowy. Źródło:
+      // 20260527000000_tier24_court_efiling_sdk.sql.
+      court_filings: {
+        Row: {
+          id: string;
+          user_id: string;
+          case_id: string | null;
+          system: "epu" | "prs" | "krz" | "pi";
+          court_code: string;
+          pleading_type: string;
+          status:
+            | "draft"
+            | "queued"
+            | "submitted"
+            | "accepted"
+            | "rejected"
+            | "responded"
+            | "failed";
+          external_ref: string | null;
+          upp_id: string | null;
+          upp_url: string | null;
+          parties: Json;
+          document_hashes: Json;
+          metadata: Json;
+          idempotency_key: string | null;
+          attempts: number;
+          error: string | null;
+          created_at: string;
+          submitted_at: string | null;
+          accepted_at: string | null;
+          updated_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["court_filings"]["Row"]
+        > & {
+          user_id: string;
+          system: "epu" | "prs" | "krz" | "pi";
+          court_code: string;
+          pleading_type: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["court_filings"]["Insert"]
+        >;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     // Audyt 2026-06-27: większość RPC nie jest jeszcze dotypowana (degraduje

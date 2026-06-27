@@ -518,3 +518,52 @@ pozostawione z `sb: any` do czasu tej decyzji (nie wymuszamy niepełnej zmiany).
   sdk-generator, mobywatel-autofill, logger/global-error (globalThis).
 - Decyzje migracyjne (brak tabel): scheduled_reminders, legal_references;
   kolizja organizations; CHECK security_events.
+
+---
+
+## Iteracja 38–39 (2026-06-27) — #6: DOMKNIĘCIE — 0 castów `as any`
+
+Audyt #6 **ZAKOŃCZONY**. Wszystkie usuwalne casty `as any` w `lib/` i `app/`
+zostały usunięte. Liczba rzeczywistych castów w kodzie wykonywalnym: **0**
+(86 wystąpień frazy "as any" to wyłącznie komentarze dokumentujące zmiany).
+
+### Iteracja 38 — DB/UI/enterprise
+- **Nowe typy tabel**: `knowledge_articles`, `organizations` (tier13),
+  `org_memberships`, `org_invitations`, `org_audit_log`, `scheduled_reminders`,
+  `legal_references`, `court_filings`; `profiles` rozszerzone o
+  `provisioned_via`/`external_id`/`active`/`last_seen_at`.
+- **Nowa migracja** `20260627040000_audit_missing_tables.sql`:
+  `scheduled_reminders` i `legal_references` (kod ich używał, lecz tabele
+  nie istniały — latentny bug).
+- **REALNE BUGI**:
+  - `legal-hold`: `ediscovery_queries` pytane o `query`/`items_count`/`created_at`
+    (realne: `filters`/`result_count`/`requested_at`).
+  - `bezpieczenstwo`: `webauthn_credentials` pytane o `device_name` (realna: `label`).
+  - `scim`: zapis/odczyt nieistniejących `suspended`/`suspended_at` (realna: `active`).
+  - `auto-deadline-tagger`: insert do `deadlines` z `description`/`due_at`/`source`
+    (realne: `start_date`/`end_date`/`effective_end_date`).
+  - `citation-verifier`: `legal_references` pytane o
+    `source_url`/`citation_text`/`slug`/`kind`/`normalized`
+    (realne: `url`/`citation`/`ref_type`).
+- **KOLIZJA SCHEMATÓW** udokumentowana: `organizations` tier7 vs tier13.
+
+### Iteracja 39 — SDK/klient (wcześniej „poza zakresem")
+- **Stripe** (8 castów): wspólny typowany loader `lib/billing/stripe-client.ts`
+  (`getStripeClient`) zastępuje `new (Stripe as any)(...)` w
+  subscriptions/upgrade-flow/customer-portal/coupon-engine/lazy-loaders.
+  - REALNY BUG: `upgrade-flow` przekazywał `stripeSub.customer`
+    (`string | Customer | DeletedCustomer`) tam, gdzie API oczekuje `string`.
+- **web-push** (2): typowany interop ESM/CJS przez `typeof import("web-push")`.
+- **pdf-lib** (3): typowany destructuring eksportów (`typeof import("pdf-lib")`).
+- **court-efiling** (3): dotypowano `court_filings` + mapper `toRecord()`.
+- **rum-collector** (4): lokalne typy `PostHogLike`/`NetworkInformationLike`
+  zamiast `(window/navigator as any)`.
+- **mobywatel-autofill** (1): `unknown` + interfejs `MObywatelRaw`.
+- **sdk-generator** (1): generowany SDK rzutuje na `Record<string,string>`.
+- **logger** (1): `globalThis.crypto: Crypto` (typ standardowy).
+- **global-error** (1): lokalne typowanie wstrzykiwanego `globalThis.Sentry`.
+
+### 📊 Walidacja końcowa
+- `tsc --noEmit` → **EXIT 0**
+- `next lint` → **0 errors**
+- casty `as any` (kod wykonywalny) → **0**

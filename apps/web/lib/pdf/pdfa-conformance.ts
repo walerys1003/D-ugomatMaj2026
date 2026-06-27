@@ -81,18 +81,18 @@ function escapeXml(s: string): string {
 
 export async function generatePdfA2b(input: PdfaGenerateInput): Promise<PdfaGenerateResult> {
   const notes: string[] = [];
-  let PDFDocument: any;
-  let StandardFonts: any;
-  let rgb: any;
+  type PdfLib = typeof import("pdf-lib");
+  let PDFDocument: PdfLib["PDFDocument"];
+  let StandardFonts: PdfLib["StandardFonts"];
+  let rgb: PdfLib["rgb"];
   try {
     const lib = await import("pdf-lib").catch(() => null);
     if (!lib) {
       notes.push("pdf-lib not installed — returning empty buffer");
       return { pdf_bytes: new Uint8Array(0), compliant: false, notes };
     }
-    PDFDocument = (lib as any).PDFDocument;
-    StandardFonts = (lib as any).StandardFonts;
-    rgb = (lib as any).rgb;
+    // Typowany dostęp do eksportów pdf-lib (bez `as any`).
+    ({ PDFDocument, StandardFonts, rgb } = lib);
   } catch (err) {
     notes.push(`pdf-lib import failed: ${(err as Error).message}`);
     return { pdf_bytes: new Uint8Array(0), compliant: false, notes };

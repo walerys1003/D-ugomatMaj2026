@@ -17,9 +17,13 @@ export default function GlobalError({
 }) {
   React.useEffect(() => {
     try {
-      const Sentry = (globalThis as any).Sentry;
-      if (Sentry?.captureException) {
-        Sentry.captureException(error);
+      // Sentry jest wstrzykiwany globalnie przez SDK (poza standardowym lib) —
+      // typujemy go lokalnie zamiast `(globalThis as any)`.
+      const sentry = (globalThis as typeof globalThis & {
+        Sentry?: { captureException?: (e: unknown) => void };
+      }).Sentry;
+      if (sentry?.captureException) {
+        sentry.captureException(error);
       }
     } catch {
       /* tolerable */

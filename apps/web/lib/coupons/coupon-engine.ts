@@ -15,6 +15,7 @@
  */
 import "server-only";
 import { createSupabaseAdminClient } from "@/lib/db/supabase-server";
+import { getStripeClient } from "@/lib/billing/stripe-client";
 
 export interface SubscriptionCoupon {
   id: string;
@@ -51,10 +52,8 @@ export async function createSubscriptionCoupon(
 ): Promise<SubscriptionCoupon> {
   const secretKey = process.env.STRIPE_SECRET_KEY;
   if (!secretKey) throw new Error("STRIPE_SECRET_KEY missing");
-  const StripeMod = await import("stripe").catch(() => null);
-  if (!StripeMod) throw new Error("stripe SDK missing");
-  const Stripe = StripeMod.default ?? StripeMod;
-  const stripe = new (Stripe as any)(secretKey, { apiVersion: "2024-06-20" });
+  const stripe = await getStripeClient(secretKey);
+  if (!stripe) throw new Error("stripe SDK missing");
 
   const couponPayload: Record<string, unknown> = {
     duration: input.duration,

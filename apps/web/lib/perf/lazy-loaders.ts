@@ -7,6 +7,7 @@
  *   const data = await generatePdf(opts);
  */
 import "server-only";
+import { getStripeClient, type StripeClient } from "@/lib/billing/stripe-client";
 
 /**
  * Tesseract.js — OCR (3MB+ z modelami). Ładowane tylko gdy user faktycznie
@@ -35,13 +36,12 @@ export async function loadFramerMotion() {
 
 /**
  * Stripe SDK — server-side. Singleton.
+ * Audyt 2026-06-27 (iter. 39): używamy wspólnego, typowanego loadera zamiast
+ * `apiVersion: "..." as any`. apiVersion zgodny z typem SDK (2024-06-20).
  */
-let stripeInstance: any = null;
-export async function loadStripe() {
+let stripeInstance: StripeClient | null = null;
+export async function loadStripe(): Promise<StripeClient | null> {
   if (stripeInstance) return stripeInstance;
-  const Stripe = (await import("stripe")).default;
-  stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY ?? "", {
-    apiVersion: "2024-11-20.acacia" as any,
-  });
+  stripeInstance = await getStripeClient(process.env.STRIPE_SECRET_KEY ?? "");
   return stripeInstance;
 }

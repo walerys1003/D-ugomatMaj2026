@@ -192,11 +192,11 @@ export const logger = createLogger({ app: "dlugomat-web" });
 
 /** Generates a short, log-friendly correlation id (UUID-ish 16 chars). */
 export function generateCorrelationId(): string {
-  // crypto.randomUUID is available in Node 18+ and edge runtime.
+  // crypto.randomUUID jest dostępne w Node 18+ i edge runtime (Web Crypto).
+  // globalThis.crypto jest typowane jako Crypto w lib.dom/node — bez `as any`.
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const c = (globalThis as any).crypto;
-    if (c?.randomUUID) return (c.randomUUID() as string).replace(/-/g, "").slice(0, 16);
+    const c: Crypto | undefined = globalThis.crypto;
+    if (c?.randomUUID) return c.randomUUID().replace(/-/g, "").slice(0, 16);
   } catch {
     // fallthrough
   }
