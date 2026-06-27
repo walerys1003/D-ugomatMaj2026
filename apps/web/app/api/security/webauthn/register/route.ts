@@ -20,10 +20,7 @@ function rpConfig(req: NextRequest) {
 
 // GET — issue registration challenge
 export async function GET(req: NextRequest) {
-  const supabase = await getSupabase();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = await getSupabase();
   const { data: { user } } = await sb.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
@@ -47,10 +44,7 @@ export async function GET(req: NextRequest) {
 
 // POST — finalize registration with attestation response from client
 export async function POST(req: NextRequest) {
-  const supabase = await getSupabase();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = await getSupabase();
   const { data: { user } } = await sb.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
@@ -59,7 +53,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "missing_fields" }, { status: 400 });
   }
 
-  const { rpId, origin } = rpConfig(req);
+  const { origin } = rpConfig(req);
 
   // Get + consume the challenge.
   const { data: challengeRow } = await sb
@@ -73,14 +67,18 @@ export async function POST(req: NextRequest) {
   const verification = verifyClientDataChallenge(body.clientDataJSON, challengeRow.challenge, [origin]);
   if (!verification.ok) return NextResponse.json({ error: verification.reason }, { status: 400 });
 
+  // Audyt 2026-06-27 (iter. 26) — REALNY BUG zamaskowany przez `as any`:
+  // poprzednio insert używał kolumn `rp_id` (NIE ISTNIEJE) oraz `device_name`
+  // (realna kolumna to `label`). Insert ZAWSZE failował => rejestracja
+  // passkey nie działała. rpId nie jest persystowany (weryfikacja origin/rp
+  // odbywa się przy logowaniu z nagłówka host).
   await sb.from("webauthn_credentials").insert({
     user_id: user.id,
     credential_id: body.credentialId,
     fingerprint: credentialFingerprint(body.credentialId),
     public_key: body.publicKey,
-    rp_id: rpId,
     transports: body.transports ?? [],
-    device_name: body.deviceName ?? null,
+    label: body.deviceName ?? null,
     sign_count: 0,
   });
 

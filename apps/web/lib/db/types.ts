@@ -2275,6 +2275,56 @@ export interface Database {
         >;
         Relationships: [];
       };
+      // Audyt 2026-06-27 (iter. 26): Tier17 security (20260520000000_tier17_security_advanced.sql).
+      webauthn_challenges: {
+        Row: {
+          id: string;
+          user_id: string;
+          kind: "registration" | "authentication";
+          challenge: string;
+          expires_at: string;
+          consumed_at: string | null;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["webauthn_challenges"]["Row"]
+        > & {
+          user_id: string;
+          kind: "registration" | "authentication";
+          challenge: string;
+          expires_at: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["webauthn_challenges"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      webauthn_credentials: {
+        Row: {
+          id: string;
+          user_id: string;
+          credential_id: string;
+          public_key: string;
+          sign_count: number;
+          transports: string[];
+          aaguid: string | null;
+          fingerprint: string | null;
+          label: string | null;
+          last_used_at: string | null;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["webauthn_credentials"]["Row"]
+        > & {
+          user_id: string;
+          credential_id: string;
+          public_key: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["webauthn_credentials"]["Insert"]
+        >;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     // Audyt 2026-06-27: większość RPC nie jest jeszcze dotypowana (degraduje

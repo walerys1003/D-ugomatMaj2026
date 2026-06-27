@@ -15,23 +15,23 @@ function rpConfig(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-  const supabase = await getSupabase();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = await getSupabase();
   const { data: { user } } = await sb.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const { rpId } = rpConfig(req);
+  // Audyt 2026-06-27 (iter. 26) — REALNY BUG zamaskowany przez `as any`:
+  // poprzednio filtrowano `.is("revoked_at", null)`, ale kolumna `revoked_at`
+  // NIE ISTNIEJE w webauthn_credentials => query failował => lista poswiadczeń
+  // zawsze pusta. Usunięto nieistniejący filtr.
   const { data: creds } = await sb
     .from("webauthn_credentials")
     .select("credential_id")
-    .eq("user_id", user.id)
-    .is("revoked_at", null);
+    .eq("user_id", user.id);
 
   const options = buildAssertionOptions({
     rpId,
-    allowCredentials: (creds ?? []).map((c: any) => c.credential_id),
+    allowCredentials: (creds ?? []).map((c) => c.credential_id),
   });
 
   await sb.from("webauthn_challenges").upsert(
@@ -43,10 +43,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const supabase = await getSupabase();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = await getSupabase();
   const { data: { user } } = await sb.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
@@ -68,12 +65,13 @@ export async function POST(req: NextRequest) {
   if (!verification.ok) return NextResponse.json({ error: verification.reason }, { status: 400 });
 
   // Verify the credential is registered to this user.
+  // Audyt 2026-06-27 (iter. 26) — REALNY BUG: filtr `.is("revoked_at", null)`
+  // dotyczył nieistniejącej kolumny => weryfikacja zawsze "credential_not_found".
   const { data: cred } = await sb
     .from("webauthn_credentials")
     .select("id, sign_count")
     .eq("user_id", user.id)
     .eq("credential_id", body.credentialId)
-    .is("revoked_at", null)
     .maybeSingle();
   if (!cred) return NextResponse.json({ error: "credential_not_found" }, { status: 401 });
 
