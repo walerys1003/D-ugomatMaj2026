@@ -282,41 +282,39 @@ export interface Database {
         Relationships: [];
       };
       // -----------------------------------------------------------------
+      // Audyt 2026-06-27: schemat ujednolicony do wersji Tier 18 (zgodnej z
+      // lib/deadlines/deadline-tracker.ts) — migracja
+      // 20260627030000_audit_reconcile_deadlines_schema.sql. `kind` to text
+      // CHECK po stronie DB, więc tu modelujemy go jako string.
       deadlines: {
         Row: {
           id: string;
-          case_id: string;
           user_id: string;
-          kind: DeadlineKind;
-          description: string;
+          case_id: string | null;
+          kind: string;
+          title: string;
           start_date: string;
-          deadline_date: string;
-          notif_d7_sent: boolean;
-          notif_d5_sent: boolean;
-          notif_d3_sent: boolean;
-          notif_d1_sent: boolean;
-          notif_d0_morning_sent: boolean;
-          notif_d0_evening_sent: boolean;
-          is_completed: boolean;
+          end_date: string;
+          effective_end_date: string;
+          legal_basis: string | null;
+          snoozed_until: string | null;
           completed_at: string | null;
+          reminders_sent: string[];
           created_at: string;
         };
         Insert: {
           id?: string;
-          case_id: string;
           user_id: string;
-          kind: DeadlineKind;
-          description: string;
+          case_id?: string | null;
+          kind: string;
+          title: string;
           start_date: string;
-          deadline_date: string;
-          notif_d7_sent?: boolean;
-          notif_d5_sent?: boolean;
-          notif_d3_sent?: boolean;
-          notif_d1_sent?: boolean;
-          notif_d0_morning_sent?: boolean;
-          notif_d0_evening_sent?: boolean;
-          is_completed?: boolean;
+          end_date: string;
+          effective_end_date: string;
+          legal_basis?: string | null;
+          snoozed_until?: string | null;
           completed_at?: string | null;
+          reminders_sent?: string[];
           created_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["deadlines"]["Insert"]>;

@@ -54,7 +54,7 @@ export default async function PanelHomePage() {
     (c) => c.status !== "completed" && c.status !== "downloaded"
   );
   const upcomingDeadlines = deadlines.filter((d) => {
-    const days = daysUntil(d.deadline_date);
+    const days = daysUntil(d.effective_end_date);
     return days >= 0 && days <= 7;
   });
   const generatingCount = cases.filter((c) => c.status === "analysis" || c.status === "generated")
@@ -167,7 +167,7 @@ export default async function PanelHomePage() {
           ) : (
             <ul className="flex flex-col gap-1.5">
               {deadlines.slice(0, 5).map((d) => {
-                const days = daysUntil(d.deadline_date);
+                const days = daysUntil(d.effective_end_date);
                 const tone =
                   days <= 0 ? "danger" : days <= 3 ? "danger" : days <= 7 ? "warning" : "info";
                 return (
@@ -178,10 +178,10 @@ export default async function PanelHomePage() {
                     >
                       <div className="min-w-0 flex-1">
                         <Text size="sm" tone="strong" weight="medium" as="div" className="truncate">
-                          {d.description}
+                          {d.title}
                         </Text>
                         <Text size="xs" tone="muted" as="div">
-                          {formatDatePL(new Date(d.deadline_date))}
+                          {formatDatePL(new Date(d.effective_end_date))}
                         </Text>
                       </div>
                       <Badge tone={tone} className="shrink-0 tabular-nums">

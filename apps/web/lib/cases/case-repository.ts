@@ -53,11 +53,14 @@ export async function getCaseById(id: string): Promise<CaseRow | null> {
 
 export async function listDeadlinesForCurrentUser(): Promise<DeadlineRow[]> {
   const supabase = createSupabaseServerClient();
+  // Audyt 2026-06-27: schemat Tier 18 — aktywne terminy to completed_at IS NULL,
+  // sortowane po effective_end_date (poprzednio: is_completed/deadline_date — stary,
+  // niezgodny schemat, maskowany przez `as any` w innych miejscach).
   const { data, error } = await supabase
     .from("deadlines")
     .select("*")
-    .eq("is_completed", false)
-    .order("deadline_date", { ascending: true });
+    .is("completed_at", null)
+    .order("effective_end_date", { ascending: true });
 
   if (error) {
     throw new Error(`Failed to list deadlines: ${error.message}`);
@@ -153,9 +156,11 @@ export async function softDeleteCase(id: string): Promise<void> {
 export interface CreateDeadlineInput {
   caseId: string;
   kind: DeadlineKind;
-  description: string;
+  /** Tytuł terminu (poprzednio `description` — stary schemat). */
+  title: string;
   startDate: Date;
   days: number;
+  legalBasis?: string | null;
 }
 
 /**
@@ -176,17 +181,19 @@ export async function createDeadline(input: CreateDeadlineInput): Promise<Deadli
   const deadline = new Date(start);
   deadline.setDate(deadline.getDate() + input.days);
 
-  const fmt = (d: Date) => d.toISOString().slice(0, 10);
-
+  // Audyt 2026-06-27: schemat Tier 18 — title/end_date/effective_end_date
+  // zamiast description/deadline_date.
   const { data, error } = await supabase
     .from("deadlines")
     .insert({
       case_id: input.caseId,
       user_id: userResult.user.id,
       kind: input.kind,
-      description: input.description,
-      start_date: fmt(start),
-      deadline_date: fmt(deadline),
+      title: input.title,
+      start_date: start.toISOString(),
+      end_date: deadline.toISOString(),
+      effective_end_date: deadline.toISOString(),
+      legal_basis: input.legalBasis ?? null,
     })
     .select("*")
     .single();
@@ -199,10 +206,11 @@ export async function createDeadline(input: CreateDeadlineInput): Promise<Deadli
 
 export async function markDeadlineCompleted(deadlineId: string): Promise<void> {
   const supabase = createSupabaseServerClient();
+  // Audyt 2026-06-27: schemat Tier 18 — completed_at jest jedynym znacznikiem
+  // ukończenia (kolumna is_completed nie istnieje w docelowym schemacie).
   const { error } = await supabase
     .from("deadlines")
     .update({
-      is_completed: true,
       completed_at: new Date().toISOString(),
     })
     .eq("id", deadlineId);

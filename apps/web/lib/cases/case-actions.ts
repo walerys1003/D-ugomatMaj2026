@@ -104,7 +104,7 @@ export async function startCaseAction(formData: FormData): Promise<void> {
     await createDeadline({
       caseId: created.id,
       kind: meta.deadline.kind,
-      description: `Termin: ${meta.shortTitle}`,
+      title: `Termin: ${meta.shortTitle}`,
       startDate: new Date(),
       days: meta.deadline.days,
     });
