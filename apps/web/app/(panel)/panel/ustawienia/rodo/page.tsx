@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
-import { Download, Shield, ShieldAlert } from "lucide-react";
+import { redirect } from "next/navigation";
+import { Download, History, Shield, ShieldAlert } from "lucide-react";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 import { DeleteAccountForm } from "./delete-form";
 
@@ -16,6 +19,8 @@ export const metadata: Metadata = {
   title: "Twoje dane (RODO) · Długomat",
   robots: { index: false, follow: false },
 };
+
+export const dynamic = "force-dynamic";
 
 /**
  * RODO dashboard — implementuje dwa kluczowe prawa:
@@ -25,7 +30,28 @@ export const metadata: Metadata = {
  * Dodatkowo eksponuje informacje o przetwarzaniu (transparentność —
  * art. 13 RODO) z linkiem do polityki prywatności.
  */
-export default function RodoSettingsPage() {
+export default async function RodoSettingsPage() {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/logowanie?next=/panel/ustawienia/rodo");
+
+  const { data: consents } = await supabase
+    .from("consent_ledger")
+    .select("id, purpose, granted, version, source, recorded_at")
+    .order("recorded_at", { ascending: false })
+    .limit(20);
+
+  const consentRows = consents ?? [];
+  const dateFmt = new Intl.DateTimeFormat("pl-PL", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-8">
       <header className="flex flex-col gap-2">
@@ -91,6 +117,50 @@ export default function RodoSettingsPage() {
           <Button asChild variant="ghost">
             <a href="/polityka-prywatnosci">Otwórz politykę prywatności →</a>
           </Button>
+        </CardContent>
+      </Card>
+
+      {/* Historia zgód — art. 7 ust. 1 RODO (rozliczalność) */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-start gap-3">
+            <History className="mt-1 h-5 w-5 text-shield-600" aria-hidden />
+            <div className="flex-1">
+              <CardTitle>Historia Twoich zgód</CardTitle>
+              <CardDescription>
+                Rejestr wyrażonych i wycofanych zgód na przetwarzanie danych
+                (zasada rozliczalności — art. 7 ust. 1 RODO).
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {consentRows.length === 0 ? (
+            <p className="text-fluid-sm text-ink-500">
+              Brak zarejestrowanych zgód. Zgody pojawią się tutaj po zaakceptowaniu
+              odpowiednich celów przetwarzania.
+            </p>
+          ) : (
+            <ul className="divide-y divide-ink-100">
+              {consentRows.map((c) => (
+                <li key={c.id} className="flex items-center justify-between gap-3 py-3">
+                  <div className="min-w-0">
+                    <p className="truncate text-fluid-sm font-medium text-ink-900">
+                      {c.purpose}
+                    </p>
+                    <p className="text-xs text-ink-500">
+                      {dateFmt.format(new Date(c.recorded_at))}
+                      {c.version ? ` · wersja ${c.version}` : ""}
+                      {c.source ? ` · ${c.source}` : ""}
+                    </p>
+                  </div>
+                  <Badge tone={c.granted ? "success" : "neutral"} withDot>
+                    {c.granted ? "Udzielona" : "Wycofana"}
+                  </Badge>
+                </li>
+              ))}
+            </ul>
+          )}
         </CardContent>
       </Card>
 
