@@ -1,49 +1,72 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export const metadata: Metadata = { title: "Wypłaty | Partner | Długomat" };
 
-interface Payout {
-  id: string;
-  period_start: string;
-  period_end: string;
-  amount_pln: number;
-  status: "scheduled" | "processing" | "paid" | "failed";
-  paid_at?: string;
-  invoice_number?: string;
-  pdf_url?: string;
-}
+export const dynamic = "force-dynamic";
 
-async function fetchPayouts(): Promise<Payout[]> {
-  try {
-    const res = await fetch("/api/partner/payouts", { cache: "no-store" });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return data.payouts ?? [];
-  } catch {
-    return [];
-  }
-}
+type PayoutStatus = "pending" | "transferred" | "failed";
 
-const STATUS_BADGE: Record<Payout["status"], string> = {
-  scheduled: "bg-ink-100 text-ink-700 border-ink-200",
-  processing: "bg-warn-50 text-warn-700 border-warn-200",
-  paid: "bg-accent-50 text-accent-700 border-accent-200",
+const STATUS_BADGE: Record<PayoutStatus, string> = {
+  pending: "bg-warn-50 text-warn-700 border-warn-200",
+  transferred: "bg-accent-50 text-accent-700 border-accent-200",
   failed: "bg-danger-50 text-danger-700 border-danger-200",
 };
 
-const STATUS_LABEL: Record<Payout["status"], string> = {
-  scheduled: "Zaplanowana",
-  processing: "W trakcie",
-  paid: "Wypłacona",
+const STATUS_LABEL: Record<PayoutStatus, string> = {
+  pending: "Oczekuje",
+  transferred: "Wypłacona",
   failed: "Niepowodzenie",
 };
 
 export default async function WyplatyPage() {
-  const payouts = await fetchPayouts();
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/logowanie?next=/panel/partner/wyplaty");
+
+  // Konto afiliacyjne biezacego uzytkownika (RLS filtruje po user_id).
+  const { data: account } = await supabase
+    .from("affiliate_accounts")
+    .select("id")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  let payouts: {
+    id: string;
+    amount_pln: number;
+    period_end: string;
+    status: PayoutStatus;
+    commission_count: number;
+    external_ref: string | null;
+    transferred_at: string | null;
+    created_at: string;
+  }[] = [];
+
+  if (account) {
+    const { data } = await supabase
+      .from("affiliate_payouts")
+      .select("id, amount_grosze, period_end, status, commission_count, external_ref, transferred_at, created_at")
+      .eq("affiliate_id", account.id)
+      .order("created_at", { ascending: false });
+    payouts = (data ?? []).map((p) => ({
+      id: p.id,
+      amount_pln: (p.amount_grosze ?? 0) / 100,
+      period_end: p.period_end,
+      status: p.status as PayoutStatus,
+      commission_count: p.commission_count,
+      external_ref: p.external_ref,
+      transferred_at: p.transferred_at,
+      created_at: p.created_at,
+    }));
+  }
+
   const totalPaid = payouts
-    .filter((p) => p.status === "paid")
+    .filter((p) => p.status === "transferred")
     .reduce((sum, p) => sum + p.amount_pln, 0);
 
   return (
@@ -65,29 +88,38 @@ export default async function WyplatyPage() {
           <CardTitle>Wypłaty</CardTitle>
         </CardHeader>
         <CardContent>
-          {payouts.length === 0 ? (
-            <p className="text-sm text-ink-500">Brak wypłat — pierwsza po zakończeniu okresu rozliczeniowego.</p>
+          {!account ? (
+            <p className="text-sm text-ink-500">
+              Nie masz jeszcze konta partnerskiego. Dołącz do programu, aby otrzymywać wypłaty.
+            </p>
+          ) : payouts.length === 0 ? (
+            <p className="text-sm text-ink-500">
+              Brak wypłat — pierwsza po zakończeniu okresu rozliczeniowego.
+            </p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-left border-b border-ink-200 dark:border-ink-800 text-xs uppercase tracking-wider text-ink-500">
-                    <th className="py-2 pr-3">Okres</th>
+                    <th className="py-2 pr-3">Okres do</th>
                     <th className="py-2 pr-3">Kwota</th>
+                    <th className="py-2 pr-3">Prowizje</th>
                     <th className="py-2 pr-3">Status</th>
                     <th className="py-2 pr-3">Wypłacono</th>
-                    <th className="py-2 pr-3">Faktura</th>
+                    <th className="py-2 pr-3">Referencja</th>
                   </tr>
                 </thead>
                 <tbody>
                   {payouts.map((p) => (
                     <tr key={p.id} className="border-b border-ink-100 dark:border-ink-900">
                       <td className="py-2.5 pr-3 text-ink-600 dark:text-ink-400">
-                        {new Date(p.period_start).toLocaleDateString("pl-PL")} —{" "}
                         {new Date(p.period_end).toLocaleDateString("pl-PL")}
                       </td>
                       <td className="py-2.5 pr-3 font-medium text-ink-900 dark:text-ink-50">
                         {p.amount_pln.toLocaleString("pl-PL")} zł
+                      </td>
+                      <td className="py-2.5 pr-3 text-ink-600 dark:text-ink-400">
+                        {p.commission_count}
                       </td>
                       <td className="py-2.5 pr-3">
                         <span
@@ -97,19 +129,12 @@ export default async function WyplatyPage() {
                         </span>
                       </td>
                       <td className="py-2.5 pr-3 text-ink-600 dark:text-ink-400">
-                        {p.paid_at ? new Date(p.paid_at).toLocaleDateString("pl-PL") : "—"}
+                        {p.transferred_at
+                          ? new Date(p.transferred_at).toLocaleDateString("pl-PL")
+                          : "—"}
                       </td>
-                      <td className="py-2.5 pr-3">
-                        {p.pdf_url ? (
-                          <a
-                            href={p.pdf_url}
-                            className="text-xs text-accent-700 hover:text-accent-800"
-                          >
-                            {p.invoice_number ?? "Pobierz"}
-                          </a>
-                        ) : (
-                          <span className="text-ink-400">—</span>
-                        )}
+                      <td className="py-2.5 pr-3 text-ink-600 dark:text-ink-400">
+                        {p.external_ref ?? "—"}
                       </td>
                     </tr>
                   ))}

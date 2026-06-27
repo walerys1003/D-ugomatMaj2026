@@ -1,41 +1,87 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export const metadata: Metadata = { title: "Panel partnera | Długomat" };
 
+export const dynamic = "force-dynamic";
+
 interface PartnerOverview {
   partner_name: string;
-  tier: "starter" | "growth" | "enterprise";
   revenue_share_percent: number;
   mtd_commission_pln: number;
   ytd_commission_pln: number;
   active_referrals: number;
   pending_leads: number;
   conversion_rate_percent: number;
-  next_payout_date: string;
   next_payout_amount: number;
 }
 
-async function fetchOverview(): Promise<PartnerOverview | null> {
-  try {
-    const res = await fetch("/api/partner/overview", { cache: "no-store" });
-    if (!res.ok) return null;
-    return (await res.json()) as PartnerOverview;
-  } catch {
-    return null;
-  }
-}
-
-const TIER_LABEL: Record<PartnerOverview["tier"], string> = {
-  starter: "Starter",
-  growth: "Growth",
-  enterprise: "Enterprise White-Label",
-};
-
 export default async function PartnerPage() {
-  const o = await fetchOverview();
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/logowanie?next=/panel/partner");
+
+  const { data: account } = await supabase
+    .from("affiliate_accounts")
+    .select("id, display_name, commission_first_payment_pct, status")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  let o: PartnerOverview | null = null;
+  if (account) {
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+    const startOfYear = new Date(now.getFullYear(), 0, 1).toISOString();
+
+    const [commAll, referrals, pendingPayouts] = await Promise.all([
+      supabase
+        .from("affiliate_commissions")
+        .select("amount_grosze, status, created_at")
+        .eq("affiliate_id", account.id),
+      supabase
+        .from("affiliate_referrals")
+        .select("status")
+        .eq("affiliate_id", account.id),
+      supabase
+        .from("affiliate_payouts")
+        .select("amount_grosze, status")
+        .eq("affiliate_id", account.id)
+        .eq("status", "pending"),
+    ]);
+
+    const comms = commAll.data ?? [];
+    const refs = referrals.data ?? [];
+    const mtd =
+      comms
+        .filter((c) => c.created_at >= startOfMonth)
+        .reduce((s, c) => s + (c.amount_grosze ?? 0), 0) / 100;
+    const ytd =
+      comms
+        .filter((c) => c.created_at >= startOfYear)
+        .reduce((s, c) => s + (c.amount_grosze ?? 0), 0) / 100;
+    const activeReferrals = refs.filter((r) => r.status === "converted").length;
+    const totalRefs = refs.length;
+    const conversion = totalRefs > 0 ? Math.round((activeReferrals / totalRefs) * 100) : 0;
+    const nextPayout =
+      (pendingPayouts.data ?? []).reduce((s, p) => s + (p.amount_grosze ?? 0), 0) / 100;
+
+    o = {
+      partner_name: account.display_name,
+      revenue_share_percent: account.commission_first_payment_pct,
+      mtd_commission_pln: mtd,
+      ytd_commission_pln: ytd,
+      active_referrals: activeReferrals,
+      pending_leads: refs.filter((r) => r.status === "signed_up").length,
+      conversion_rate_percent: conversion,
+      next_payout_amount: nextPayout,
+    };
+  }
 
   if (!o) {
     return (
@@ -66,7 +112,7 @@ export default async function PartnerPage() {
           {o.partner_name}
         </h1>
         <p className="text-sm text-ink-500 mt-1">
-          Poziom {TIER_LABEL[o.tier]} · {o.revenue_share_percent}% revenue share
+          {o.revenue_share_percent}% prowizji od pierwszej płatności
         </p>
       </div>
 
@@ -88,7 +134,7 @@ export default async function PartnerPage() {
                 {o.next_payout_amount.toLocaleString("pl-PL")} zł
               </div>
               <div className="text-sm text-ink-500 mt-1">
-                Termin: {new Date(o.next_payout_date).toLocaleDateString("pl-PL")}
+                Suma oczekujących wypłat
               </div>
             </div>
             <Link href="/panel/partner/wyplaty">
