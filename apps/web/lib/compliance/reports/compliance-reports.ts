@@ -19,6 +19,7 @@
  */
 
 import { createSupabaseServerClient } from "@/lib/db/supabase-server";
+import type { Json } from "@/lib/db/types";
 import { verifyAuditChain } from "../../security/audit-signing";
 
 export interface RoPaEntry {
@@ -136,36 +137,42 @@ export async function generateDpia(args: {
   periodEnd?: string;
 }): Promise<DpiaReport> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const periodStart = args.periodStart ?? new Date(Date.now() - 90 * 86400000).toISOString();
   const periodEnd = args.periodEnd ?? new Date().toISOString();
 
   // Consent summary
+  // Audyt 2026-06-27 (iter. 11): poprzednio select `revoked_at` i filtr po
+  // `granted_at` — kolumny NIE ISTNIEJĄ. Tabela consent_ledger ma `granted`
+  // (boolean) i `recorded_at`. Query zawsze błędował -> podsumowanie zgód
+  // w raporcie DPIA było puste. `as any` to maskował.
   const { data: consents } = await sb
     .from("consent_ledger")
-    .select("purpose, revoked_at")
-    .gte("granted_at", periodStart)
-    .lte("granted_at", periodEnd);
+    .select("purpose, granted")
+    .gte("recorded_at", periodStart)
+    .lte("recorded_at", periodEnd);
 
   const consentByPurpose: Record<string, number> = {};
   let revoked = 0;
-  for (const c of (consents ?? []) as Array<{ purpose: string; revoked_at: string | null }>) {
+  for (const c of consents ?? []) {
     consentByPurpose[c.purpose] = (consentByPurpose[c.purpose] ?? 0) + 1;
-    if (c.revoked_at) revoked++;
+    // "revoked" = zgoda cofnięta = granted === false.
+    if (!c.granted) revoked++;
   }
 
   // Erasure summary
+  // Audyt 2026-06-27 (iter. 11): poprzednio select `deadline_at`/`completed_at`
+  // — kolumny NIE ISTNIEJĄ. Tabela erasure_requests ma `scheduled_for` i
+  // `executed_at`. Query zawsze błędował -> podsumowanie usunięć było puste.
   const { data: erasures } = await sb
     .from("erasure_requests")
-    .select("status, deadline_at, completed_at");
+    .select("status, scheduled_for, executed_at");
   const erasureSummary = { pending: 0, completed: 0, overdue: 0 };
-  for (const e of (erasures ?? []) as Array<{ status: string; deadline_at: string; completed_at: string | null }>) {
-    if (e.completed_at) erasureSummary.completed++;
+  for (const e of erasures ?? []) {
+    if (e.executed_at) erasureSummary.completed++;
     else {
       erasureSummary.pending++;
-      if (new Date(e.deadline_at) < new Date()) erasureSummary.overdue++;
+      if (new Date(e.scheduled_for) < new Date()) erasureSummary.overdue++;
     }
   }
 
@@ -232,9 +239,7 @@ export async function generateSoc2Evidence(args: {
   periodEnd?: string;
 }): Promise<Record<string, unknown>> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const periodStart = args.periodStart ?? new Date(Date.now() - 90 * 86400000).toISOString();
   const periodEnd = args.periodEnd ?? new Date().toISOString();
 
@@ -247,12 +252,16 @@ export async function generateSoc2Evidence(args: {
     .from("mfa_secrets")
     .select("user_id", { count: "exact", head: true });
 
-  // Availability: uptime z SLO metrics (jeśli istnieje)
+  // Availability: uptime z metryk.
+  // Audyt 2026-06-27 (iter. 11): tabela `slo_metrics` NIE ISTNIEJE w żadnej
+  // migracji — query zawsze błędował, a fallback (?? []) cicho zwracał 0
+  // rekordów => sekcja availability raportu SOC2 zawsze była pusta. Realnym
+  // źródłem metryk jest `metric_snapshots` (metric/value/captured_at).
   const { data: sloRows } = await sb
-    .from("slo_metrics")
-    .select("name, value, recorded_at")
-    .gte("recorded_at", periodStart)
-    .lte("recorded_at", periodEnd)
+    .from("metric_snapshots")
+    .select("metric, value, captured_at")
+    .gte("captured_at", periodStart)
+    .lte("captured_at", periodEnd)
     .limit(1000);
 
   // Confidentiality: audit chain integrity
@@ -304,15 +313,13 @@ export async function saveComplianceReport(args: {
   format?: ComplianceReport["format"];
 }): Promise<ComplianceReport> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { data, error } = await sb
     .from("compliance_evidence")
     .insert({
       kind: args.kind,
       organization_id: args.organizationId ?? null,
-      data: args.data,
+      data: args.data as Json,
       period_start: args.periodStart,
       period_end: args.periodEnd,
       format: args.format ?? "json",
@@ -330,16 +337,20 @@ export async function listComplianceReports(args: {
   limit?: number;
 }): Promise<ComplianceReport[]> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   let q = sb
     .from("compliance_evidence")
     .select("*")
     .order("generated_at", { ascending: false })
     .limit(args.limit ?? 50);
   if (args.kind) q = q.eq("kind", args.kind);
-  if (args.organizationId !== undefined) q = q.eq("organization_id", args.organizationId);
+  // Audyt 2026-06-27 (iter. 11): null org wymaga `.is(...)` (PostgREST
+  // `col=eq.null` nie matchuje NULL), w przeciwnym razie `.eq(...)`.
+  if (args.organizationId !== undefined) {
+    q = args.organizationId
+      ? q.eq("organization_id", args.organizationId)
+      : q.is("organization_id", null);
+  }
   const { data } = await q;
   return (data ?? []) as ComplianceReport[];
 }

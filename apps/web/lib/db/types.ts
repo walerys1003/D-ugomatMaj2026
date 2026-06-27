@@ -1276,6 +1276,131 @@ export interface Database {
         >;
         Relationships: [];
       };
+      // -----------------------------------------------------------------
+      // Audyt 2026-06-27 (iter. 11): GDPR/security. Źródło:
+      // 20260520000000_tier17_security_advanced.sql.
+      // -----------------------------------------------------------------
+      consent_ledger: {
+        Row: {
+          id: string;
+          user_id: string;
+          purpose: string;
+          granted: boolean;
+          version: string;
+          ip: string | null;
+          user_agent: string | null;
+          locale: string | null;
+          source: string | null;
+          recorded_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["consent_ledger"]["Row"]
+        > & {
+          user_id: string;
+          purpose: string;
+          granted: boolean;
+          version: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["consent_ledger"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      erasure_requests: {
+        Row: {
+          id: string;
+          user_id: string;
+          status: "pending" | "cancelled" | "executed" | "failed";
+          reason: string | null;
+          requested_at: string;
+          scheduled_for: string;
+          executed_at: string | null;
+          cancelled_at: string | null;
+          failure_note: string | null;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["erasure_requests"]["Row"]
+        > & {
+          user_id: string;
+          scheduled_for: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["erasure_requests"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      mfa_secrets: {
+        Row: {
+          user_id: string;
+          secret_encrypted: string;
+          backup_codes: Json;
+          verified: boolean;
+          last_verified_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["mfa_secrets"]["Row"]
+        > & {
+          user_id: string;
+          secret_encrypted: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["mfa_secrets"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      // -----------------------------------------------------------------
+      // Audyt 2026-06-27 (iter. 11): analytics. Źródło:
+      // 20260517000000_tier14_analytics_bi.sql.
+      // -----------------------------------------------------------------
+      metric_snapshots: {
+        Row: {
+          id: number;
+          metric: string;
+          value: number;
+          dimensions: Json;
+          captured_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["metric_snapshots"]["Row"]
+        > & {
+          metric: string;
+          value: number;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["metric_snapshots"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      // -----------------------------------------------------------------
+      // Audyt 2026-06-27 (iter. 11): compliance evidence. Źródło:
+      // 20260526000000_tier23_compliance_security.sql.
+      // -----------------------------------------------------------------
+      compliance_evidence: {
+        Row: {
+          id: string;
+          kind: "dpia" | "ropa" | "soc2" | "iso27001" | "audit_integrity";
+          organization_id: string | null;
+          generated_at: string;
+          period_start: string;
+          period_end: string;
+          data: Json;
+          format: "json" | "markdown" | "pdf";
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["compliance_evidence"]["Row"]
+        > & {
+          kind: "dpia" | "ropa" | "soc2" | "iso27001" | "audit_integrity";
+          period_start: string;
+          period_end: string;
+          data: Json;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["compliance_evidence"]["Insert"]
+        >;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     // Audyt 2026-06-27: większość RPC nie jest jeszcze dotypowana (degraduje
