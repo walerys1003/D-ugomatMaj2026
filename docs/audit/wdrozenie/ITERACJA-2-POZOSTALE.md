@@ -35,3 +35,35 @@
 ### ⏳ Nadal wymaga dostępu do żywej DB / decyzji
 - **#16 referral v1/v2** — analiza wykazała, że **OBA systemy są żywe w kodzie**: `referral_codes` (v1, 5 użyć) i `referral_codes_v2`/`referral_credits_v2`/`referral_redemptions_v2` (v2) + osobny `affiliate_*`. Konsolidacja wymaga migracji danych + przepisania call-site'ów v1→v2 z walidacją na danych prod. Zbyt ryzykowne „na ślepo" — plan: (1) audyt danych, (2) backfill v1→v2, (3) codemod call-sitów, (4) DROP v1. Osobny PR z dostępem do DB.
 - **#6 reszta** — `npm run gen:types` (wymaga połączenia z Supabase).
+
+---
+
+## Iteracja 4 — domknięcie #6 (payments) + scaffold #16
+
+### ✅ Zaimplementowane
+- **#6 (payments — KOMPLET)** Usunięto **ostatnie 2** rzutowania `const sb = supabase as any`
+  w `lib/payments/promo-codes.ts` (`validatePromoCode` + `recordPromoRedemption`).
+  Tabele `promo_codes`/`promo_redemptions` są już w typowanej `Database`.
+  - **REALNY BUG (latentny):** `.select()` budowane przez **konkatenację stringów**
+    degradowało się do `GenericStringError` w Supabase → typed-select tracił inferencję
+    kolumn (TS2339). Zamieniono na pojedynczy **literał string** → statyczne parsowanie
+    kolumn działa.
+  - To domyka **wszystkie 15** rzutowań `as any` w warstwie płatności
+    (subscription-lifecycle 10 + stripe webhook 4 + promo-codes 2 — iteracje 2+4).
+- **#16 (scaffold NIEDESTRUKCYJNY)** Migracja `20260627020000_audit_referral_consolidation_plan.sql`
+  tworzy widok diagnostyczny `referral_systems_overlap` (read-only,
+  `referral_codes` v1 FULL OUTER JOIN `referral_codes_v2` v2) do oceny nakładania
+  systemów **na żywych danych** przed cutover. Udokumentowany 4-krokowy plan cutover.
+  **Brak merge/DROP danych** — semantyka v1 (reward_pct/revenue, afiliacja)
+  ≠ v2 (uses/credit). Pełny cutover = osobny PR z dostępem do DB + decyzja właściciela.
+
+### 📊 Stan walidacji (iteracja 4)
+- `tsc --noEmit` → **EXIT 0**
+- `next lint` → **EXIT 0** (376 warnings, 0 errors)
+
+### ⏳ Nadal otwarte (poza zasięgiem sandboksa)
+- **#6 reszta** — pełna regeneracja typów `npm run gen:types` (wymaga łączności z Supabase).
+  Pozostałe ~358 `as any` (admin-actions/queries, affiliate, family-company, …) dotyczą
+  tabel spoza lokalnej `Database` — wymagają albo gen:types, albo ręcznego typowania
+  każdej tabeli z migracji.
+- **#16 cutover**, **#15 org↔tenant merge danych** — wymagają DB + decyzji produktowej.
