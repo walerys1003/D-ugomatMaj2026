@@ -76,7 +76,11 @@ export function exportToJsonLines(exp: DataExportResult): string {
   const lines: string[] = [];
   lines.push(JSON.stringify({ _meta: exp.metadata, generatedAt: exp.generatedAt, userId: exp.userId }));
   for (const [table, rows] of Object.entries(exp.tables)) {
-    for (const row of rows as any[]) lines.push(JSON.stringify({ _table: table, ...row }));
+    // Audyt 2026-06-27 (iter. 36): `rows` jest już `unknown[]` (z DataExportResult)
+    // — wystarczy zawęzić element do obiektu zamiast `as any[]`.
+    for (const row of rows) {
+      lines.push(JSON.stringify({ _table: table, ...(row as Record<string, unknown>) }));
+    }
   }
   return lines.join("\n");
 }

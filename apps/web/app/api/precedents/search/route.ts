@@ -1,6 +1,12 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { searchPrecedents } from "@/lib/legal/precedent-search";
+import { searchPrecedents, type PrecedentCourt } from "@/lib/legal/precedent-search";
 import { logger } from "@/lib/observability/logger";
+
+// Audyt 2026-06-27 (iter. 36): walidacja parametru `court` zamiast `as any`.
+const VALID_COURTS: readonly PrecedentCourt[] = ["sn", "tsue", "tk", "all"];
+function parseCourt(v: string | null): PrecedentCourt {
+  return VALID_COURTS.includes(v as PrecedentCourt) ? (v as PrecedentCourt) : "all";
+}
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -14,7 +20,7 @@ export async function GET(req: NextRequest) {
   try {
     const result = await searchPrecedents({
       query,
-      court: (url.searchParams.get("court") as any) ?? "all",
+      court: parseCourt(url.searchParams.get("court")),
       year_from: url.searchParams.get("year_from") ? Number(url.searchParams.get("year_from")) : undefined,
       year_to: url.searchParams.get("year_to") ? Number(url.searchParams.get("year_to")) : undefined,
       legal_area: url.searchParams.get("legal_area") ?? undefined,

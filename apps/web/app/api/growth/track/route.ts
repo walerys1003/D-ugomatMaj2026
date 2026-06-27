@@ -4,7 +4,7 @@
  */
 import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/db/supabase-server";
-import { recordConversionEvent, type ConversionEvent } from "@/lib/growth/conversion-tracking";
+import { recordConversionEvent, type ConversionEvent, type RecordEventInput } from "@/lib/growth/conversion-tracking";
 
 export const dynamic = "force-dynamic";
 
@@ -32,7 +32,7 @@ export async function POST(req: Request) {
     anon_id?: string;
     case_id?: string;
     amount_grosze?: number;
-    attribution?: Record<string, string>;
+    attribution?: RecordEventInput["attribution"];
     meta?: Record<string, unknown>;
   };
   if (!body.event || !ALLOWED_EVENTS.includes(body.event)) {
@@ -47,7 +47,7 @@ export async function POST(req: Request) {
     anonId: body.anon_id ?? null,
     caseId: body.case_id ?? null,
     amountGrosze: body.amount_grosze ?? null,
-    attribution: body.attribution as any,
+    attribution: body.attribution,
     meta: body.meta,
   }).catch(() => undefined);
 

@@ -2585,6 +2585,90 @@ export interface Database {
         >;
         Relationships: [];
       };
+      // Audyt 2026-06-27 (iter. 36): webhooki wychodzące
+      // (migracja 20260515000000_tier12_workflows_integrations.sql).
+      webhook_endpoints: {
+        Row: {
+          id: string;
+          user_id: string;
+          url: string;
+          secret: string;
+          events: Json;
+          enabled: boolean;
+          failure_count: number;
+          last_success_at: string | null;
+          last_failure_at: string | null;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["webhook_endpoints"]["Row"]
+        > & {
+          id: string;
+          user_id: string;
+          url: string;
+          secret: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["webhook_endpoints"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      webhook_deliveries: {
+        Row: {
+          id: string;
+          endpoint_id: string;
+          event: string;
+          payload: Json;
+          status: string;
+          attempts: number;
+          next_attempt_at: string | null;
+          last_response_status: number | null;
+          last_response_body: string | null;
+          delivered_at: string | null;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["webhook_deliveries"]["Row"]
+        > & {
+          id: string;
+          endpoint_id: string;
+          event: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["webhook_deliveries"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      // Audyt 2026-06-27 (iter. 36): log synchronizacji CRM
+      // (migracja 20260527000000_tier24_court_efiling_sdk.sql).
+      crm_sync_log: {
+        Row: {
+          id: string;
+          user_id: string;
+          provider: string;
+          entity_type: string;
+          entity_ref: string | null;
+          external_id: string | null;
+          status: string;
+          payload: Json | null;
+          response: Json | null;
+          error: string | null;
+          attempts: number;
+          created_at: string;
+          synced_at: string | null;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["crm_sync_log"]["Row"]
+        > & {
+          user_id: string;
+          provider: string;
+          entity_type: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["crm_sync_log"]["Insert"]
+        >;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     // Audyt 2026-06-27: większość RPC nie jest jeszcze dotypowana (degraduje

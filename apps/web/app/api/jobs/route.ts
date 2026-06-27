@@ -1,7 +1,13 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getAuthenticatedUser } from "@/lib/auth/server-auth";
-import { enqueueGenerationJob, listUserJobs } from "@/lib/queue/generation-queue";
+import { enqueueGenerationJob, listUserJobs, type JobStatus } from "@/lib/queue/generation-queue";
 import { logger } from "@/lib/observability/logger";
+
+// Audyt 2026-06-27 (iter. 36): walidacja statusu zamiast `as any`.
+const VALID_JOB_STATUS: readonly JobStatus[] = ["queued", "running", "completed", "failed", "cancelled"];
+function parseJobStatus(v: string | null): JobStatus | undefined {
+  return VALID_JOB_STATUS.includes(v as JobStatus) ? (v as JobStatus) : undefined;
+}
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -40,7 +46,7 @@ export async function GET(req: NextRequest) {
   const auth = await getAuthenticatedUser(req);
   if (!auth.ok) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   const url = new URL(req.url);
-  const status = url.searchParams.get("status") as any;
+  const status = parseJobStatus(url.searchParams.get("status"));
   const limit = parseInt(url.searchParams.get("limit") ?? "50", 10);
   const jobs = await listUserJobs(auth.user.id, { status, limit });
   return NextResponse.json({ jobs });

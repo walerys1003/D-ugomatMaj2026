@@ -139,8 +139,19 @@ export async function processDueDeliveries(batchSize = 25): Promise<{ delivered:
   let delivered = 0;
   let failed = 0;
   let dead = 0;
-  for (const d of (due as any[]) ?? []) {
-    const endpoint = d.endpoint as WebhookEndpoint;
+  // Audyt 2026-06-27 (iter. 36): zamiast `as any[]` definiujemy lokalny typ
+  // wiersza z osadzonym joinem `endpoint` (PostgREST embed nie jest statycznie
+  // dotypowany przy `select("*, endpoint:...")`).
+  type DueDelivery = {
+    id: string;
+    event: string;
+    payload: unknown;
+    attempts?: number | null;
+    created_at?: string | null;
+    endpoint?: WebhookEndpoint | null;
+  };
+  for (const d of ((due ?? []) as DueDelivery[])) {
+    const endpoint = d.endpoint ?? null;
     if (!endpoint || !endpoint.enabled) continue;
     const body = JSON.stringify({ id: d.id, event: d.event, data: d.payload, created_at: d.created_at ?? now });
     const ts = Math.floor(Date.now() / 1000);

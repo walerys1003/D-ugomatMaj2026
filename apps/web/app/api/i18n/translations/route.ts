@@ -4,11 +4,13 @@
  */
 import { NextResponse } from "next/server";
 import { SUPPORTED_LOCALES, DEFAULT_LOCALE, type Locale } from "@/lib/i18n/locales";
-import { t } from "@/lib/i18n/translations";
+import { t, type TranslationKey } from "@/lib/i18n/translations";
 
 export const dynamic = "force-dynamic";
 
-const ALL_KEYS = [
+// Audyt 2026-06-27 (iter. 36): typujemy listę kluczy jako TranslationKey[],
+// dzięki czemu `t(key, ...)` nie wymaga `as any`.
+const ALL_KEYS: readonly TranslationKey[] = [
   "nav.home", "nav.pricing", "nav.modules", "nav.how_it_works",
   "nav.knowledge_base", "nav.login", "nav.signup", "nav.dashboard", "nav.logout",
   "cta.start_free", "cta.generate_letter", "cta.see_pricing", "cta.contact_us",
@@ -31,7 +33,7 @@ export async function GET(req: Request) {
 
   const dict: Record<string, string> = {};
   for (const key of ALL_KEYS) {
-    dict[key] = t(key as any, locale);
+    dict[key] = t(key, locale);
   }
 
   return new NextResponse(JSON.stringify({ locale, translations: dict }), {

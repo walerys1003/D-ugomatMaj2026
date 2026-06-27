@@ -43,16 +43,16 @@ export interface UsageSummary {
 
 export async function getUserUsageSummary(userId: string, days = 30): Promise<UsageSummary> {
   const since = new Date(Date.now() - days * 24 * 3600 * 1000).toISOString();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createSupabaseServerClient();
+  // Audyt 2026-06-27 (iter. 36): tabela `ai_usage_log` jest dotypowana —
+  // usuwamy `as any` (zarówno klient, jak i iterację po wierszach).
+  const sb = await createSupabaseServerClient();
   const { data } = await sb.from("ai_usage_log").select("*").eq("user_id", userId).gte("created_at", since);
   const rows = data ?? [];
   const per: Record<string, { calls: number; cost_grosze: number }> = {};
   let totIn = 0;
   let totOut = 0;
   let totCost = 0;
-  for (const r of rows as any[]) {
+  for (const r of rows) {
     per[r.model_id] ??= { calls: 0, cost_grosze: 0 };
     per[r.model_id].calls++;
     per[r.model_id].cost_grosze += r.cost_grosze ?? 0;

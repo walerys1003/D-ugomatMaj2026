@@ -79,10 +79,10 @@ export async function exportUserDataAction(input: {
     throw e;
   }
 
-  const supabase = createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  // Audyt 2026-06-27 (iter. 36): wszystkie odpytywane tabele (profiles, cases,
+  // documents, deadlines, ocr_results, payments, notifications, case_events,
+  // validation_runs, document_versions) są dotypowane — usuwamy `as any`.
+  const sb = createSupabaseServerClient();
 
   // RLS sam ogranicza do user_id, ale dla pewności każde zapytanie
   // używa explicit `.eq('user_id', userId)` (defense in depth).
@@ -109,7 +109,7 @@ export async function exportUserDataAction(input: {
   ]);
 
   // document_versions wymaga JOIN przez documents
-  const documentIds = (documentsRes.data ?? []).map((d: any) => (d as { id: string }).id);
+  const documentIds = (documentsRes.data ?? []).map((d) => d.id);
   const { data: documentVersions } =
     documentIds.length > 0
       ? await sb
@@ -121,7 +121,7 @@ export async function exportUserDataAction(input: {
   // -------------------------------------------------------------------
   // Maskowanie wrażliwych pól
   // -------------------------------------------------------------------
-  const cases = (casesRes.data ?? []).map((c: any) => {
+  const cases = (casesRes.data ?? []).map((c) => {
     const row = c as Record<string, unknown> & {
       pozwany_pesel_enc: string | null;
     };
@@ -133,7 +133,7 @@ export async function exportUserDataAction(input: {
     };
   });
 
-  const ocrResults = (ocrRes.data ?? []).map((o: any) => {
+  const ocrResults = (ocrRes.data ?? []).map((o) => {
     const row = o as Record<string, unknown> & { raw_text: string | null };
     return {
       ...row,
@@ -182,7 +182,7 @@ export async function exportUserDataAction(input: {
   // Nie blokujemy odpowiedzi, jeśli logowanie zawiedzie.
   try {
     if (cases[0]) {
-      const firstCaseId = (cases[0] as { id: string }).id;
+      const firstCaseId = (cases[0] as unknown as { id: string }).id;
       await sb.from("case_events").insert({
         case_id: firstCaseId,
         user_id: userId,

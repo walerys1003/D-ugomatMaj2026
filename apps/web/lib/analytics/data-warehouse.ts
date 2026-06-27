@@ -19,8 +19,11 @@ export async function exportTableNdjson(table: WarehouseTable, opts?: { since?: 
   const since = opts?.since ?? new Date(Date.now() - 86400_000).toISOString();
   const limit = Math.min(opts?.limit ?? 10000, 50000);
   const sourceTable = mapTable(table);
+  // Audyt 2026-06-27 (iter. 36): `sourceTable` to dynamiczna nazwa tabeli
+  // (mapTable), więc wynik jest luźno typowany — zawężamy do Record zamiast
+  // `as any[]`.
   const { data } = await sb.from(sourceTable).select("*").gte("created_at", since).limit(limit);
-  const lines = ((data as any[]) ?? []).map((r) => JSON.stringify(flatten(r)));
+  const lines = ((data as Record<string, unknown>[] | null) ?? []).map((r) => JSON.stringify(flatten(r)));
   const ndjson = lines.join("\n");
   return {
     table,

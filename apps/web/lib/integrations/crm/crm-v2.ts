@@ -108,9 +108,11 @@ export async function listSyncLog(
   userId: string,
   opts: { provider?: CrmProvider; status?: SyncStatus; limit?: number } = {},
 ): Promise<SyncLogEntry[]> {
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createSupabaseServerClient();
+  // Audyt 2026-06-27 (iter. 36): tabela `crm_sync_log` jest dotypowana —
+  // używamy typowanego klienta. Wynik mapujemy przez `unknown` na
+  // SyncLogEntry[] (kolumny provider/status/entity_type są w DB `string`,
+  // ale ograniczone CHECK-ami do wartości unii domenowej).
+  const sb = await createSupabaseServerClient();
   let q = sb
     .from("crm_sync_log")
     .select("*")
@@ -120,7 +122,7 @@ export async function listSyncLog(
   if (opts.status) q = q.eq("status", opts.status);
   q = q.limit(opts.limit ?? 50);
   const { data } = await q;
-  return (data as any) ?? [];
+  return (data ?? []) as unknown as SyncLogEntry[];
 }
 
 /**

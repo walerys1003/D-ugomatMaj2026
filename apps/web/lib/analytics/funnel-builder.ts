@@ -2,6 +2,7 @@
  * Tier 14 — Multi-step funnel builder.
  */
 import { createSupabaseServerClient } from "@/lib/db/supabase-server";
+import type { Json } from "@/lib/db/types";
 
 export interface FunnelStep {
   event: string;
@@ -22,8 +23,10 @@ export async function computeFunnel(steps: FunnelStep[], opts?: { sinceDays?: nu
   if (opts?.orgId) q = q.eq("org_id", opts.orgId);
   const { data: events } = await q;
 
-  const byUser = new Map<string, { event: string; at: number; props: any }[]>();
-  for (const e of (events as any[]) ?? []) {
+  // Audyt 2026-06-27 (iter. 36): `analytics_events` jest dotypowane —
+  // usuwamy `as any[]`.
+  const byUser = new Map<string, { event: string; at: number; props: Json }[]>();
+  for (const e of events ?? []) {
     if (!e.user_id) continue;
     const arr = byUser.get(e.user_id) ?? [];
     arr.push({ event: e.event, at: new Date(e.occurred_at).getTime(), props: e.properties });
