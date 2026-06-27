@@ -180,6 +180,11 @@ export interface Database {
           archived_at: string | null;
           purge_at: string | null;
           tags: string[];
+          // Audyt 2026-06-27 (iter. 24): kolumny multi-tenant (migracja
+          // 20260516000000_tier13_enterprise_multitenant.sql). UWAGA: kolumna to
+          // `org_id`, NIE `organization_id`.
+          org_id: string | null;
+          workspace_id: string | null;
         };
         Insert: {
           id?: string;
@@ -189,6 +194,8 @@ export interface Database {
           archived_at?: string | null;
           purge_at?: string | null;
           tags?: string[];
+          org_id?: string | null;
+          workspace_id?: string | null;
           title?: string;
           sygnatura?: string | null;
           sad?: string | null;

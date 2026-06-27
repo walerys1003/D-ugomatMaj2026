@@ -29,9 +29,9 @@ export async function installPlugin(supabase: any, params: InstallParams): Promi
   if (!v.ok) throw new Error(`invalid manifest: ${v.errors.join(", ")}`);
 
   // Plugin must request a superset of granted permissions; granted ⊆ requested.
-  const requested = new Set(params.manifest.permissions);
+  const requested = new Set<string>(params.manifest.permissions);
   for (const g of params.grantedPermissions) {
-    if (!requested.has(g as any)) throw new Error(`granted permission not in manifest: ${g}`);
+    if (!requested.has(g)) throw new Error(`granted permission not in manifest: ${g}`);
   }
 
   const row = {
@@ -43,9 +43,9 @@ export async function installPlugin(supabase: any, params: InstallParams): Promi
     status: "active" as const,
     granted_permissions: params.grantedPermissions,
     config: params.config ?? {},
-    risk_score: permissionsRiskScore(params.manifest.permissions as any),
+    risk_score: permissionsRiskScore(params.manifest.permissions),
     installed_by: params.installedBy,
-    sandbox_profile: defaultSandboxProfile(params.manifest.permissions as any),
+    sandbox_profile: defaultSandboxProfile(params.manifest.permissions),
   };
 
   const { data, error } = await supabase.from("plugin_installations").insert(row).select("*").single();
@@ -80,8 +80,8 @@ export async function updatePlugin(
     .update({
       version: newManifest.version,
       status: "active",
-      risk_score: permissionsRiskScore(newManifest.permissions as any),
-      sandbox_profile: defaultSandboxProfile(newManifest.permissions as any),
+      risk_score: permissionsRiskScore(newManifest.permissions),
+      sandbox_profile: defaultSandboxProfile(newManifest.permissions),
       updated_at: new Date().toISOString(),
     })
     .eq("id", installationId)

@@ -31,37 +31,36 @@ export async function POST(req: NextRequest) {
   if (!verified.ok) return NextResponse.json({ error: verified.reason }, { status: 401 });
   if (!hasApiScope(verified.key, "webhooks.manage")) return NextResponse.json({ error: "insufficient_scope" }, { status: 403 });
 
-  let body: any = {};
+  let body: Record<string, unknown> = {};
   try {
-    body = await req.json();
+    body = (await req.json()) as Record<string, unknown>;
   } catch {
     return NextResponse.json({ error: "invalid_json" }, { status: 400 });
   }
-  if (!body.url || typeof body.url !== "string") return NextResponse.json({ error: "url_required" }, { status: 400 });
+  const url = typeof body.url === "string" ? body.url : "";
+  if (!url) return NextResponse.json({ error: "url_required" }, { status: 400 });
   try {
-    const u = new URL(body.url);
+    const u = new URL(url);
     if (u.protocol !== "https:") return NextResponse.json({ error: "https_required" }, { status: 400 });
   } catch {
     return NextResponse.json({ error: "invalid_url" }, { status: 400 });
   }
-  if (!Array.isArray(body.events) || body.events.length === 0) {
+  const events = Array.isArray(body.events) ? (body.events as string[]) : [];
+  if (events.length === 0) {
     return NextResponse.json({ error: "events_required" }, { status: 400 });
   }
-  for (const e of body.events) {
+  for (const e of events) {
     if (!VALID_EVENTS.includes(e)) return NextResponse.json({ error: `invalid_event:${e}` }, { status: 400 });
   }
 
-  const supabase = getSupabaseAdmin();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = getSupabaseAdmin();
   const { raw, hash } = generateWebhookSecret();
   const { data, error } = await sb
     .from("webhook_subscriptions")
     .insert({
       organization_id: verified.key.organization_id,
-      url: body.url,
-      events: body.events,
+      url,
+      events,
       secret_hash: hash,
       active: true,
       failure_count: 0,
@@ -83,10 +82,7 @@ export async function GET(req: NextRequest) {
   if (!verified.ok) return NextResponse.json({ error: verified.reason }, { status: 401 });
   if (!hasApiScope(verified.key, "webhooks.manage")) return NextResponse.json({ error: "insufficient_scope" }, { status: 403 });
 
-  const supabase = getSupabaseAdmin();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = getSupabaseAdmin();
   const { data } = await sb
     .from("webhook_subscriptions")
     .select("id, url, events, active, failure_count, last_delivery_at, created_at")
