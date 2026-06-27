@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Eye, EyeOff, Key, Plus, ShieldAlert, Trash2 } from "lucide-react";
+import { redirect } from "next/navigation";
+import { EyeOff, Key, Plus, ShieldAlert } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,54 +11,57 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
+import { getActiveOrgForUser } from "@/lib/orgs/server";
 
 export const metadata: Metadata = {
   title: "Klucze API · Organizacja · Długomat",
 };
+
+export const dynamic = "force-dynamic";
 
 type ApiKey = {
   id: string;
   name: string;
   prefix: string;
   scopes: string[];
-  created_by: string;
   created_at: string;
-  last_used_at?: string;
-  last_ip?: string;
+  last_used_at: string | null;
+  revoked_at: string | null;
+  rate_limit: number;
 };
 
-const KEYS: ApiKey[] = [
-  {
-    id: "k_001",
-    name: "Production · CRM sync",
-    prefix: "dlg_live_4f2a",
-    scopes: ["cases:read", "cases:write", "letters:read"],
-    created_by: "anna.k@kowalska.pl",
-    created_at: "2025-11-12",
-    last_used_at: "2026-05-11T08:42:00Z",
-    last_ip: "52.213.10.42",
-  },
-  {
-    id: "k_002",
-    name: "Staging · QA",
-    prefix: "dlg_test_b39c",
-    scopes: ["cases:read", "letters:read", "letters:write"],
-    created_by: "qa@kowalska.pl",
-    created_at: "2026-02-20",
-    last_used_at: "2026-05-10T22:14:00Z",
-    last_ip: "94.45.108.10",
-  },
-  {
-    id: "k_003",
-    name: "Analytics · BigQuery export",
-    prefix: "dlg_live_71e8",
-    scopes: ["analytics:read"],
-    created_by: "data@kowalska.pl",
-    created_at: "2026-03-04",
-  },
-];
+export default async function ApiKluczePage() {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/logowanie?next=/panel/organizacja/api-klucze");
 
-export default function ApiKluczePage() {
+  const org = await getActiveOrgForUser(user.id);
+
+  let KEYS: ApiKey[] = [];
+  if (org) {
+    const { data: rows } = await supabase
+      .from("api_keys")
+      .select(
+        "id, name, key_prefix, scopes, rate_limit_per_minute, revoked_at, last_used_at, created_at",
+      )
+      .eq("organization_id", org.id)
+      .order("created_at", { ascending: false });
+    KEYS = (rows ?? []).map((k) => ({
+      id: k.id,
+      name: k.name,
+      prefix: k.key_prefix,
+      scopes: Array.isArray(k.scopes) ? k.scopes : [],
+      created_at: k.created_at,
+      last_used_at: k.last_used_at,
+      revoked_at: k.revoked_at,
+      rate_limit: k.rate_limit_per_minute,
+    }));
+  }
+
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-8">
       <header className="flex flex-wrap items-end justify-between gap-3">
@@ -101,6 +105,17 @@ export default function ApiKluczePage() {
         </CardHeader>
       </Card>
 
+      {!org ? (
+        <EmptyState
+          title="Brak organizacji"
+          description="Klucze API sa dostepne w ramach planu organizacyjnego. Nie nalezysz jeszcze do zadnej organizacji."
+        />
+      ) : KEYS.length === 0 ? (
+        <EmptyState
+          title="Brak kluczy API"
+          description="Nie utworzono jeszcze zadnego klucza API dla tej organizacji."
+        />
+      ) : (
       <Card elevation="subtle" className="overflow-hidden">
         <CardContent className="p-0">
           <table className="w-full text-fluid-sm">
@@ -110,7 +125,6 @@ export default function ApiKluczePage() {
                 <th className="px-5 py-3 font-semibold">Klucz</th>
                 <th className="px-5 py-3 font-semibold">Uprawnienia</th>
                 <th className="px-5 py-3 font-semibold">Ostatnio użyty</th>
-                <th className="px-5 py-3" />
               </tr>
             </thead>
             <tbody className="divide-y divide-ink-100 dark:divide-dlugomat-800">
@@ -125,9 +139,12 @@ export default function ApiKluczePage() {
                       <span className="font-semibold text-ink-900 dark:text-ink-50">
                         {k.name}
                       </span>
+                      {k.revoked_at ? (
+                        <Badge tone="danger">odwołany</Badge>
+                      ) : null}
                     </span>
                     <span className="block text-fluid-xs text-ink-500">
-                      Utworzony przez {k.created_by} · {k.created_at}
+                      Utworzony {new Date(k.created_at).toLocaleDateString("pl-PL")} · limit {k.rate_limit}/min
                     </span>
                   </td>
                   <td className="px-5 py-3">
@@ -149,26 +166,9 @@ export default function ApiKluczePage() {
                     </div>
                   </td>
                   <td className="px-5 py-3 text-fluid-xs text-ink-500">
-                    {k.last_used_at ? (
-                      <>
-                        {new Date(k.last_used_at).toLocaleString("pl-PL")}
-                        <br />
-                        <span className="font-mono">{k.last_ip}</span>
-                      </>
-                    ) : (
-                      "—"
-                    )}
-                  </td>
-                  <td className="px-5 py-3">
-                    <div className="flex gap-1">
-                      <Button size="sm" variant="ghost">
-                        <Eye className="size-4" />
-                        Pokaż
-                      </Button>
-                      <Button size="sm" variant="ghost" aria-label={`Usuń ${k.name}`}>
-                        <Trash2 className="size-4 text-danger-600" />
-                      </Button>
-                    </div>
+                    {k.last_used_at
+                      ? new Date(k.last_used_at).toLocaleString("pl-PL")
+                      : "—"}
                   </td>
                 </tr>
               ))}
@@ -176,6 +176,7 @@ export default function ApiKluczePage() {
           </table>
         </CardContent>
       </Card>
+      )}
     </div>
   );
 }

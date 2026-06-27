@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Download, FileText, ShieldCheck } from "lucide-react";
+import { redirect } from "next/navigation";
+import { FileText, ShieldCheck } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,73 +11,50 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export const metadata: Metadata = {
   title: "Zgody RODO · Organizacja · Długomat",
 };
+
+export const dynamic = "force-dynamic";
 
 type Consent = {
   id: string;
   scope: string;
   description: string;
   granted: boolean;
-  signed_by?: string;
-  signed_at?: string;
-  required: boolean;
+  signed_at: string;
+  source: string | null;
+  version: string | null;
 };
 
-const CONSENTS: Consent[] = [
-  {
-    id: "rodo_processing",
-    scope: "Przetwarzanie danych klientów",
-    description:
-      "Wymagana zgoda na przetwarzanie danych osobowych dłużników w celu generowania pism procesowych. Bez tej zgody platforma nie może świadczyć usługi.",
-    granted: true,
-    signed_by: "Anna Kowalska (Administrator)",
-    signed_at: "2025-09-18",
-    required: true,
-  },
-  {
-    id: "rodo_dpa",
-    scope: "Umowa powierzenia (DPA)",
-    description:
-      "Standardowa Umowa powierzenia przetwarzania danych zgodna z RODO art. 28.",
-    granted: true,
-    signed_by: "Anna Kowalska (Administrator)",
-    signed_at: "2025-09-18",
-    required: true,
-  },
-  {
-    id: "rodo_subprocessors",
-    scope: "Lista subprocesorów",
-    description:
-      "Lista podmiotów przetwarzających dane w naszym imieniu (AWS, Sentry, Stripe). Aktualizacja co najmniej raz na kwartał.",
-    granted: true,
-    signed_by: "Anna Kowalska (Administrator)",
-    signed_at: "2026-04-01",
-    required: true,
-  },
-  {
-    id: "rodo_marketing",
-    scope: "Marketing produktowy",
-    description:
-      "Możemy informować Cię o nowych funkcjach, case study i webinarach. W każdej chwili wycofasz zgodę.",
-    granted: true,
-    signed_by: "Anna Kowalska (Administrator)",
-    signed_at: "2025-09-18",
-    required: false,
-  },
-  {
-    id: "rodo_research",
-    scope: "Anonimowe statystyki branżowe",
-    description:
-      "Wykorzystanie zanonimizowanych metryk (np. czas generacji pism) do publikacji benchmarków rynkowych.",
-    granted: false,
-    required: false,
-  },
-];
+export default async function ZgodyRodoPage() {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/logowanie?next=/panel/organizacja/zgody-rodo");
 
-export default function ZgodyRodoPage() {
+  const { data: rows } = await supabase
+    .from("consent_ledger")
+    .select("id, purpose, granted, version, source, recorded_at")
+    .order("recorded_at", { ascending: false })
+    .limit(50);
+
+  const CONSENTS: Consent[] = (rows ?? []).map((c) => ({
+    id: c.id,
+    scope: c.purpose,
+    description: `Cel przetwarzania: ${c.purpose}.`,
+    granted: !!c.granted,
+    signed_at: c.recorded_at,
+    source: c.source,
+    version: c.version,
+  }));
+
+  const allGranted = CONSENTS.length > 0 && CONSENTS.every((c) => c.granted);
+
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-8">
       <header className="flex flex-col gap-2">
@@ -92,28 +70,35 @@ export default function ZgodyRodoPage() {
         </p>
       </header>
 
-      <Card elevation="subtle" urgency="success">
-        <CardHeader>
-          <div className="flex items-start gap-3">
-            <span
-              aria-hidden
-              className="grid size-9 shrink-0 place-items-center rounded-lg bg-accent-100 text-accent-700 dark:bg-accent-700/20 dark:text-accent-300"
-            >
-              <ShieldCheck className="size-5" />
-            </span>
-            <div>
-              <CardTitle className="text-fluid-base">
-                Wszystkie wymagane zgody udzielone
-              </CardTitle>
-              <CardDescription>
-                Twoja organizacja jest zgodna z RODO. Możesz w pełni korzystać
-                z platformy. Ostatni audyt: 1.04.2026.
-              </CardDescription>
+      {allGranted ? (
+        <Card elevation="subtle" urgency="success">
+          <CardHeader>
+            <div className="flex items-start gap-3">
+              <span
+                aria-hidden
+                className="grid size-9 shrink-0 place-items-center rounded-lg bg-accent-100 text-accent-700 dark:bg-accent-700/20 dark:text-accent-300"
+              >
+                <ShieldCheck className="size-5" />
+              </span>
+              <div>
+                <CardTitle className="text-fluid-base">
+                  Wszystkie zarejestrowane zgody udzielone
+                </CardTitle>
+                <CardDescription>
+                  Wszystkie zgody w rejestrze maja status „udzielona”.
+                </CardDescription>
+              </div>
             </div>
-          </div>
-        </CardHeader>
-      </Card>
+          </CardHeader>
+        </Card>
+      ) : null}
 
+      {CONSENTS.length === 0 ? (
+        <EmptyState
+          title="Brak zarejestrowanych zgód"
+          description="W rejestrze zgód nie ma jeszcze żadnych wpisów. Zgody pojawia sie po zaakceptowaniu celów przetwarzania."
+        />
+      ) : (
       <div className="flex flex-col gap-3">
         {CONSENTS.map((c) => (
           <Card key={c.id} elevation="subtle">
@@ -124,13 +109,11 @@ export default function ZgodyRodoPage() {
                     <CardTitle className="text-fluid-base">
                       {c.scope}
                     </CardTitle>
-                    {c.required ? (
-                      <Badge tone="info">Wymagana</Badge>
-                    ) : (
-                      <Badge tone="neutral">Opcjonalna</Badge>
-                    )}
+                    {c.version ? (
+                      <Badge tone="neutral">wersja {c.version}</Badge>
+                    ) : null}
                     <Badge tone={c.granted ? "success" : "warning"} withDot>
-                      {c.granted ? "Udzielona" : "Nie udzielona"}
+                      {c.granted ? "Udzielona" : "Wycofana"}
                     </Badge>
                   </div>
                   <CardDescription>{c.description}</CardDescription>
@@ -140,28 +123,15 @@ export default function ZgodyRodoPage() {
             <CardContent>
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <span className="text-fluid-xs text-ink-500">
-                  {c.granted
-                    ? `Udzielona przez ${c.signed_by} · ${c.signed_at}`
-                    : "Możesz udzielić zgody w każdej chwili."}
+                  {new Date(c.signed_at).toLocaleString("pl-PL")}
+                  {c.source ? ` · źródło: ${c.source}` : ""}
                 </span>
-                <div className="flex gap-2">
-                  {c.granted ? (
-                    <Button size="sm" variant="ghost">
-                      <Download className="size-4" />
-                      Pobierz dowód
-                    </Button>
-                  ) : null}
-                  {c.required ? null : (
-                    <Button size="sm" variant={c.granted ? "secondary" : "success"}>
-                      {c.granted ? "Wycofaj" : "Udziel zgody"}
-                    </Button>
-                  )}
-                </div>
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
+      )}
 
       <Card elevation="subtle">
         <CardHeader>
