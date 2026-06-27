@@ -6,7 +6,7 @@
  *  PATCH /api/integrations/court?id=...   — refresh status from gateway
  */
 import { NextRequest, NextResponse } from "next/server";
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 import {
   createDraft,
   submitFiling,
@@ -22,7 +22,7 @@ import {
 export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
-  const sb = await createServerSupabase();
+  const sb = await createSupabaseServerClient();
   const {
     data: { user },
   } = await sb.auth.getUser();
@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-  const sb = await createServerSupabase();
+  const sb = await createSupabaseServerClient();
   const {
     data: { user },
   } = await sb.auth.getUser();
@@ -100,7 +100,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  const sb = await createServerSupabase();
+  const sb = await createSupabaseServerClient();
   const {
     data: { user },
   } = await sb.auth.getUser();

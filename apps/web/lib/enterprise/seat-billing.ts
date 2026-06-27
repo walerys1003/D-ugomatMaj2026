@@ -1,7 +1,7 @@
 /**
  * Tier 13 — Seat-based billing for enterprise plans (per-active-user/month).
  */
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export type EnterprisePlanKey = "team" | "business" | "enterprise";
 
@@ -34,7 +34,7 @@ export const SEAT_PRICING: Record<EnterprisePlanKey, SeatPricing> = {
 };
 
 export async function computeMonthlySeatCharge(orgId: string): Promise<{ active_seats: number; per_seat: number; total_grosze: number; plan: EnterprisePlanKey }> {
-  const sb = await createServerSupabase();
+  const sb = await createSupabaseServerClient();
   const { data: org } = await sb.from("organizations").select("plan, seats_purchased").eq("id", orgId).maybeSingle();
   if (!org) throw new Error("org_not_found");
   const plan = (org.plan as EnterprisePlanKey) ?? "team";

@@ -5,7 +5,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 import { ImpersonationClient } from "@/components/admin/impersonate/impersonation-client";
 
 export const metadata: Metadata = {
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function ImpersonatePage() {
-  const sb = await createServerSupabase();
+  const sb = await createSupabaseServerClient();
   const {
     data: { user },
   } = await sb.auth.getUser();

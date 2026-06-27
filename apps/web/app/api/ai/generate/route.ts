@@ -32,7 +32,7 @@ import {
   rateLimitDistributed,
 } from "@/lib/security/rate-limit";
 import {
-  runGenerationPipeline,
+  runGenerationPipelineStreaming,
   AiUnavailableError,
 } from "@/lib/ai/generation-pipeline";
 import type { CaseRow } from "@/lib/db/types";
@@ -230,21 +230,26 @@ export async function POST(req: NextRequest): Promise<Response> {
       try {
         writeEvent("status", { phase: "starting", caseId });
 
-        // Tier 3 zad. 108/109/110 — pipeline z budget guardrail (userId+caseId).
-        // Pipeline jest blokujący (Sonnet → Haiku → optional Opus), ale w środku
-        // przepuszczamy markdown przez "soft-stream" — dzielimy go na linijki
-        // i emitujemy event 'delta' co każdy zakończony akapit, by UX miał
-        // realistyczną animację bez konieczności prawdziwego SSE z backendu.
-        // Prawdziwy per-token SSE jest dostępny w `completeStreaming()` w
-        // apipod-client.ts — Tier 4 podepnie go tu po dopracowaniu UX
-        // (obecnie 6-fragmentowy soft-stream jest deterministyczny i tańszy
-        // — nie wymaga drugiego wywołania backendu).
-        const result = await runGenerationPipeline({
-          caseType: caseRow.type,
-          variables,
-          userId,
-          caseId,
-        });
+        // Audyt #17 — PRAWDZIWY streaming. Faza generatora (Sonnet) jest
+        // streamowana per-token przez `completeStreaming`: każdy fragment od
+        // razu trafia do klienta eventem 'delta'. Walidacja (Haiku) i ew.
+        // eskalacja (Opus) wykonują się PO streamie. Gdy backend nie wspiera
+        // SSE, completeStreaming sam degraduje do non-streaming (fallback
+        // zachowany). Budget guardrail (userId+caseId) działa jak dotąd.
+        writeEvent("status", { phase: "streaming", caseId });
+        const result = await runGenerationPipelineStreaming(
+          {
+            caseType: caseRow.type,
+            variables,
+            userId,
+            caseId,
+          },
+          {
+            onDelta: (text) => {
+              writeEvent("delta", { text });
+            },
+          },
+        );
 
         writeEvent("meta", {
           modelId: result.modelId,
@@ -252,17 +257,6 @@ export async function POST(req: NextRequest): Promise<Response> {
           promptHash: result.promptHash,
           finalRole: result.finalRole,
         });
-
-        // Soft-stream — emituje delty co akapit (po podwójnym \n) z mikrostopem
-        // 35 ms, by UI mogło je animować w terminal-style typewriter.
-        const md = result.markdown;
-        const paragraphs = md.split(/\n\n+/);
-        for (const para of paragraphs) {
-          if (para.trim().length === 0) continue;
-          writeEvent("delta", { text: para + "\n\n" });
-          // mikrostop nie blokuje pipeline'u (await tu jest tylko dla UX)
-          await new Promise((r) => setTimeout(r, 35));
-        }
 
         if (result.validation) {
           writeEvent("validation", {

@@ -2,7 +2,7 @@
  * Tier 12 — E-signing abstraction (Autenti / SimplySign / DocuSign / built-in qualified signature placeholder).
  */
 import { randomUUID } from "crypto";
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export type ESignProvider = "autenti" | "simplysign" | "docusign" | "internal";
 export type ESignStatus = "draft" | "sent" | "viewed" | "signed" | "declined" | "expired";
@@ -113,7 +113,7 @@ export async function createSignatureRequest(input: {
   };
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   await sb.from("signature_requests").insert({
     ...req,
     signing_url: sent.signing_url ?? null,
@@ -125,7 +125,7 @@ export async function createSignatureRequest(input: {
 export async function refreshSignatureStatus(requestId: string): Promise<ESignStatus> {
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   const { data } = await sb.from("signature_requests").select("*").eq("id", requestId).maybeSingle();
   if (!data) throw new Error("not_found");
   const adapter = getAdapter(data.provider as ESignProvider);

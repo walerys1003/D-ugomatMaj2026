@@ -11,7 +11,7 @@
  * Rate limit: 1 eksport / 24h / user (art. 12 ust. 5 RODO — żądania nieuzasadnione/nadmierne).
  */
 import { NextResponse } from "next/server";
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -21,7 +21,7 @@ const COOLDOWN_HOURS = 24;
 export async function POST(_req: Request) {
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   const { data: auth } = await sb.auth.getUser();
   if (!auth?.user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   const userId = auth.user.id;
@@ -66,7 +66,7 @@ export async function POST(_req: Request) {
 export async function GET(req: Request) {
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   const { data: auth } = await sb.auth.getUser();
   if (!auth?.user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 

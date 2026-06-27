@@ -3,7 +3,7 @@
  * Tracks every sensitive action with actor, IP, user-agent, and tamper-evident hash chain.
  */
 import { createHash } from "crypto";
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export interface OrgAuditEntry {
   org_id: string;
@@ -19,7 +19,7 @@ export interface OrgAuditEntry {
 export async function recordOrgAuditEntry(entry: OrgAuditEntry): Promise<void> {
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   // Compute hash chain: sha256(prev_hash + JSON(entry))
   const { data: last } = await sb
     .from("org_audit_log")
@@ -51,7 +51,7 @@ export async function recordOrgAuditEntry(entry: OrgAuditEntry): Promise<void> {
 export async function verifyAuditChain(orgId: string): Promise<{ ok: boolean; broken_at?: string }> {
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   const { data } = await sb
     .from("org_audit_log")
     .select("*")

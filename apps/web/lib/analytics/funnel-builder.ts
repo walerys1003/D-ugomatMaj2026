@@ -1,7 +1,7 @@
 /**
  * Tier 14 — Multi-step funnel builder.
  */
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export interface FunnelStep {
   event: string;
@@ -16,7 +16,7 @@ export interface FunnelResult {
 }
 
 export async function computeFunnel(steps: FunnelStep[], opts?: { sinceDays?: number; orgId?: string }): Promise<FunnelResult> {
-  const sb = await createServerSupabase();
+  const sb = await createSupabaseServerClient();
   const since = new Date(Date.now() - (opts?.sinceDays ?? 30) * 86400_000).toISOString();
   let q = sb.from("analytics_events").select("user_id, event, occurred_at, properties").gte("occurred_at", since);
   if (opts?.orgId) q = q.eq("org_id", opts.orgId);

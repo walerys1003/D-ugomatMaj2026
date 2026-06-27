@@ -10,7 +10,7 @@
  */
 import Link from "next/link";
 import { requireFullAdmin } from "@/lib/admin/rbac";
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 interface TopConsumer {
   identity: string;
@@ -52,7 +52,7 @@ function PercentBar({ value, danger }: { value: number; danger?: boolean }) {
 
 export default async function RateLimitsAdminPage() {
   await requireFullAdmin();
-  const sb = await createServerSupabase();
+  const sb = await createSupabaseServerClient();
 
   // Top consumers
   const { data: topRaw } = await sb

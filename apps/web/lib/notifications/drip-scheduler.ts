@@ -10,7 +10,7 @@
  *  - `new_user_no_case`          → D+7 success story
  *  - `cancelled_or_inactive_14d` → D+14 winback (kupon)
  */
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 import { renderDripDay3Tips } from "./email-templates/drip-day3-tips";
 import { renderDripDay7SuccessStory } from "./email-templates/drip-day7-success-story";
 import { renderDripDay14Winback } from "./email-templates/drip-day14-winback";
@@ -72,7 +72,7 @@ export async function runDripScheduler(): Promise<DripRunSummary> {
 
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
 
   // 1) D+3 tips — userzy zarejestrowani 3..4 dni temu, którzy nie mają żadnej `case`
   const d3From = new Date(Date.now() - 4 * 86400_000).toISOString();

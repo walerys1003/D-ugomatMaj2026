@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 import { randomUUID } from "crypto";
 
 export const runtime = "nodejs";
@@ -7,7 +7,7 @@ export const runtime = "nodejs";
 export async function GET() {
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   const { data: { user } } = await sb.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
   const { data } = await sb.from("workflows").select("*").eq("user_id", user.id).order("created_at", { ascending: false });
@@ -17,7 +17,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   const { data: { user } } = await sb.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
   const body = await req.json().catch(() => null);

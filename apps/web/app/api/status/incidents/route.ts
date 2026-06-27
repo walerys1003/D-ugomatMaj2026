@@ -8,7 +8,7 @@
  * Brak danych userów. Tylko publiczna agregata.
  */
 import { NextResponse } from "next/server";
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export const runtime = "nodejs";
 export const revalidate = 60;
@@ -89,7 +89,7 @@ export async function GET(req: Request) {
   const fmt = url.searchParams.get("fmt");
   const baseUrl = (process.env.NEXT_PUBLIC_APP_URL ?? "https://dlugomat.pl").replace(/\/+$/, "");
 
-  const sb = await createServerSupabase();
+  const sb = await createSupabaseServerClient();
   const { data } = await sb
     .from("status_incidents")
     .select(

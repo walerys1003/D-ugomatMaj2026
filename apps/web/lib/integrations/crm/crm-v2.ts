@@ -8,7 +8,7 @@
  *  - lifecycle stage automation
  */
 import { randomUUID } from "crypto";
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 import {
   upsertHubspotContact,
   upsertPipedrivePerson,
@@ -43,7 +43,7 @@ export async function syncContact(opts: {
 }): Promise<SyncLogEntry> {
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   const id = randomUUID();
   const baseRow = {
     id,
@@ -110,7 +110,7 @@ export async function listSyncLog(
 ): Promise<SyncLogEntry[]> {
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   let q = sb
     .from("crm_sync_log")
     .select("*")

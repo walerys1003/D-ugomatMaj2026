@@ -3,8 +3,8 @@ import { upsertPushSubscription, deactivateSubscription } from "@/lib/push/subsc
 import { createHash } from "crypto";
 
 async function getSupabase() {
-  const { createServerSupabase } = await import("@/lib/db/supabase-server");
-  return createServerSupabase();
+  const { createSupabaseServerClient } = await import("@/lib/db/supabase-server");
+  return createSupabaseServerClient();
 }
 
 export async function POST(req: NextRequest) {

@@ -8,7 +8,7 @@
  * score <= 6 (detractor) z komentarzem.
  */
 import { NextResponse } from "next/server";
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 import { recordNpsResponse } from "@/lib/analytics/nps-survey";
 
 export const runtime = "nodejs";
@@ -37,7 +37,7 @@ export async function POST(req: Request) {
 
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   const { data: auth } = await sb.auth.getUser();
   if (!auth?.user) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });

@@ -2,7 +2,7 @@
  * Tier 12 — In-app workflow engine: trigger → conditions → actions.
  * Users can build automations like "When deadline.approaching AND days_left <= 3 → send SMS + Slack".
  */
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 import { sendSms } from "@/lib/integrations/sms-whatsapp";
 import { postSlackMessage, postTeamsMessage } from "@/lib/integrations/notify/slack-teams";
 import { emitEvent, WebhookEvent } from "@/lib/integrations/webhooks-v2";
@@ -75,7 +75,7 @@ export function evaluateConditions(conditions: Condition[], payload: Record<stri
 }
 
 export async function executeWorkflows(trigger: WorkflowTrigger, payload: Record<string, unknown> & { user_id?: string }): Promise<{ executed: number }> {
-  const sb = await createServerSupabase();
+  const sb = await createSupabaseServerClient();
   const q = sb.from("workflows").select("*").eq("enabled", true).eq("trigger", trigger);
   if (payload.user_id) q.eq("user_id", payload.user_id);
   const { data: workflows } = await q;

@@ -10,6 +10,7 @@
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "typecheck": "tsc --noEmit",
+    "gen:types": "supabase gen types typescript --project-id \"$SUPABASE_PROJECT_ID\" --schema public > lib/db/types.ts",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,md,json,css}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,md,json,css}\"",
     "test": "vitest run",

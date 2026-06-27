@@ -11,7 +11,7 @@
  */
 import Link from "next/link";
 import { requireFullAdmin } from "@/lib/admin/rbac";
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 import { notFound } from "next/navigation";
 
 interface PromptVersion {
@@ -87,7 +87,7 @@ function MetricCell({ label, value, suffix = "" }: { label: string; value: numbe
 export default async function PromptVersionsPage({ params }: { params: Promise<{ id: string }> }) {
   await requireFullAdmin();
   const { id } = await params;
-  const sb = await createServerSupabase();
+  const sb = await createSupabaseServerClient();
 
   const { data: prompt } = await sb
     .from("ai_prompts")

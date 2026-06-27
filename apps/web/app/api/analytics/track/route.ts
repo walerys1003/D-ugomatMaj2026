@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { trackEvent, trackBatch } from "@/lib/analytics/event-stream";
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
-  const sb = await createServerSupabase();
+  const sb = await createSupabaseServerClient();
   const { data: { user } } = await sb.auth.getUser();
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: "invalid_body" }, { status: 400 });

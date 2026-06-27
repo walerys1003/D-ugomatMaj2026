@@ -12,7 +12,7 @@
  */
 import { NextResponse } from "next/server";
 import { requireFullAdmin } from "@/lib/admin/rbac";
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -25,7 +25,7 @@ export async function POST(
   const { id, versionId } = await ctx.params;
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
 
   // Pobierz nową wersję
   const { data: newVersion, error: fetchErr } = await sb

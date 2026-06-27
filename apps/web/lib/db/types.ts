@@ -401,6 +401,85 @@ export interface Database {
         Relationships: [];
       };
       // -----------------------------------------------------------------
+      // Audyt #6 — typy dodane ręcznie z kanonicznych migracji, aby usunąć
+      // `as any` w warstwie płatności. Źródło prawdy:
+      //   subscriptions → 20260522000000_tier19_rag_payments_ux.sql
+      //   refunds       → 20260510190000_refunds.sql
+      // Docelowo zastąpione przez `npm run gen:types` (patrz docs/audit).
+      subscriptions: {
+        Row: {
+          id: string;
+          user_id: string;
+          org_id: string | null;
+          plan_code: "free" | "lite" | "pro" | "business" | "enterprise";
+          status:
+            | "trialing"
+            | "active"
+            | "past_due"
+            | "paused"
+            | "canceled"
+            | "incomplete"
+            | "incomplete_expired";
+          trial_end: string | null;
+          current_period_start: string;
+          current_period_end: string;
+          cancel_at_period_end: boolean;
+          paused_at: string | null;
+          paused_until: string | null;
+          past_due_retries: number;
+          stripe_subscription_id: string | null;
+          stripe_customer_id: string | null;
+          pending_plan_change: string | null;
+          pending_effective_at: string | null;
+          metadata: Json;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["subscriptions"]["Row"]> & {
+          user_id: string;
+          plan_code: "free" | "lite" | "pro" | "business" | "enterprise";
+          status:
+            | "trialing"
+            | "active"
+            | "past_due"
+            | "paused"
+            | "canceled"
+            | "incomplete"
+            | "incomplete_expired";
+          current_period_start: string;
+          current_period_end: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["subscriptions"]["Insert"]>;
+        Relationships: [];
+      };
+      // -----------------------------------------------------------------
+      refunds: {
+        Row: {
+          id: string;
+          payment_id: string;
+          user_id: string;
+          stripe_refund_id: string | null;
+          stripe_payment_intent_id: string;
+          amount: number;
+          currency: string;
+          reason: string | null;
+          internal_note: string | null;
+          status: "pending" | "succeeded" | "failed" | "canceled";
+          initiated_by_admin_id: string | null;
+          created_at: string;
+          updated_at: string;
+          succeeded_at: string | null;
+        };
+        Insert: Partial<Database["public"]["Tables"]["refunds"]["Row"]> & {
+          payment_id: string;
+          user_id: string;
+          stripe_payment_intent_id: string;
+          amount: number;
+        };
+        Update: Partial<Database["public"]["Tables"]["refunds"]["Insert"]>;
+        Relationships: [];
+      };
+      // -----------------------------------------------------------------
       notifications: {
         Row: {
           id: string;

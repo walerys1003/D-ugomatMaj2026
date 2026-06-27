@@ -2,7 +2,7 @@
  * Tier 14 — Data warehouse export (BigQuery / Snowflake / S3) staging.
  * Generates Parquet-friendly NDJSON for batch loaders.
  */
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export type WarehouseTable = "events" | "users" | "subscriptions" | "cases" | "documents" | "payments" | "ai_usage";
 
@@ -15,7 +15,7 @@ export interface ExportBatch {
 }
 
 export async function exportTableNdjson(table: WarehouseTable, opts?: { since?: string; limit?: number }): Promise<ExportBatch> {
-  const sb = await createServerSupabase();
+  const sb = await createSupabaseServerClient();
   const since = opts?.since ?? new Date(Date.now() - 86400_000).toISOString();
   const limit = Math.min(opts?.limit ?? 10000, 50000);
   const sourceTable = mapTable(table);

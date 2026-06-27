@@ -2,7 +2,7 @@
  * Tier 10 — Admin dashboard metrics aggregator.
  * Pulls KPI counters from Supabase for the ops console.
  */
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export interface AdminMetrics {
   users_total: number;
@@ -18,7 +18,7 @@ export interface AdminMetrics {
 }
 
 export async function getAdminMetrics(): Promise<AdminMetrics> {
-  const sb = await createServerSupabase();
+  const sb = await createSupabaseServerClient();
   const since30 = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString();
   const out: AdminMetrics = {
     users_total: 0,

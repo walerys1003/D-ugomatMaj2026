@@ -9,7 +9,7 @@
  * Wymagane env:
  *   MICROSOFT_CLIENT_ID, MICROSOFT_CLIENT_SECRET, MICROSOFT_TENANT (default: 'common')
  */
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export interface MsCalCredentials {
   user_id: string;
@@ -48,7 +48,7 @@ export async function refreshAccessToken(creds: MsCalCredentials): Promise<MsCal
   };
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   await sb
     .from("oauth_credentials")
     .update({
@@ -205,7 +205,7 @@ export async function sendMail(
 export async function getCredentialsForUser(userId: string): Promise<MsCalCredentials | null> {
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   const { data } = await sb
     .from("oauth_credentials")
     .select("*")

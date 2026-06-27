@@ -1,18 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createOrganization, listUserOrganizations } from "@/lib/enterprise/organizations";
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export const runtime = "nodejs";
 
 export async function GET() {
-  const sb = await createServerSupabase();
+  const sb = await createSupabaseServerClient();
   const { data: { user } } = await sb.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
   return NextResponse.json({ organizations: await listUserOrganizations(user.id) });
 }
 
 export async function POST(req: NextRequest) {
-  const sb = await createServerSupabase();
+  const sb = await createSupabaseServerClient();
   const { data: { user } } = await sb.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
   const body = await req.json().catch(() => null);

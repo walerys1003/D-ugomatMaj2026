@@ -34,9 +34,12 @@ export default async function PaymentsSettingsPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/auth/sign-in?next=/panel/ustawienia/platnosci");
 
+  // Audyt #6 — kolumny zgodne z kanonicznym schematem `subscriptions`
+  // (20260522000000_tier19_rag_payments_ux.sql). Wcześniej zapytanie używało
+  // nieistniejących `plan_key`/`cycle`/`amount_grosze` (maskowane przez `as any`).
   const { data: subscription } = await supabase
     .from("subscriptions")
-    .select("plan_key, cycle, amount_grosze, status, current_period_end, cancel_at_period_end")
+    .select("plan_code, status, current_period_end, cancel_at_period_end")
     .eq("user_id", user.id)
     .in("status", ["active", "trialing", "past_due"])
     .maybeSingle();
@@ -74,7 +77,7 @@ export default async function PaymentsSettingsPage() {
             </CardTitle>
             <CardDescription>
               {subscription
-                ? `Plan ${subscription.plan_key} (${subscription.cycle === "annual" ? "rocznie" : "miesięcznie"})`
+                ? `Plan ${subscription.plan_code}`
                 : "Brak aktywnej subskrypcji."}
             </CardDescription>
           </div>
@@ -96,17 +99,11 @@ export default async function PaymentsSettingsPage() {
         <CardContent>
           {subscription ? (
             <div className="flex flex-col gap-3">
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
                 <div className="flex flex-col">
-                  <span className="text-fluid-xs text-ink-500">Cena</span>
-                  <span className="text-fluid-lg font-semibold">
-                    {formatPLN(subscription.amount_grosze ?? 0)}
-                  </span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-fluid-xs text-ink-500">Cykl</span>
-                  <span className="text-fluid-lg font-semibold">
-                    {subscription.cycle === "annual" ? "Roczny" : "Miesięczny"}
+                  <span className="text-fluid-xs text-ink-500">Plan</span>
+                  <span className="text-fluid-lg font-semibold uppercase">
+                    {subscription.plan_code}
                   </span>
                 </div>
                 <div className="flex flex-col">

@@ -2,14 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { inviteMember, setMemberRole, removeMember, OrgRole } from "@/lib/enterprise/organizations";
 import { hasPermission } from "@/lib/enterprise/rbac";
 import { recordOrgAuditEntry } from "@/lib/enterprise/audit-trail";
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export const runtime = "nodejs";
 
 async function getRole(orgId: string, userId: string): Promise<OrgRole | null> {
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   const { data } = await sb.from("org_memberships").select("role").eq("org_id", orgId).eq("user_id", userId).maybeSingle();
   return (data?.role as OrgRole) ?? null;
 }
@@ -17,7 +17,7 @@ async function getRole(orgId: string, userId: string): Promise<OrgRole | null> {
 export async function GET(_req: NextRequest, ctx: { params: { orgId: string } }) {
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   const { data: { user } } = await sb.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
   const role = await getRole(ctx.params.orgId, user.id);
@@ -32,7 +32,7 @@ export async function GET(_req: NextRequest, ctx: { params: { orgId: string } })
 export async function POST(req: NextRequest, ctx: { params: { orgId: string } }) {
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   const { data: { user } } = await sb.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
   const role = await getRole(ctx.params.orgId, user.id);
@@ -54,7 +54,7 @@ export async function POST(req: NextRequest, ctx: { params: { orgId: string } })
 export async function PATCH(req: NextRequest, ctx: { params: { orgId: string } }) {
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   const { data: { user } } = await sb.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
   const role = await getRole(ctx.params.orgId, user.id);
@@ -76,7 +76,7 @@ export async function PATCH(req: NextRequest, ctx: { params: { orgId: string } }
 export async function DELETE(req: NextRequest, ctx: { params: { orgId: string } }) {
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   const { data: { user } } = await sb.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
   const role = await getRole(ctx.params.orgId, user.id);

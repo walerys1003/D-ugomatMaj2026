@@ -6,7 +6,7 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -20,7 +20,7 @@ const ListQuery = z.object({
 });
 
 async function resolveUserId(req: NextRequest): Promise<string | null> {
-  const sb = await createServerSupabase();
+  const sb = await createSupabaseServerClient();
   const { data: { user } } = await sb.auth.getUser();
   if (user) return user.id;
 
@@ -65,7 +65,7 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const sb = await createServerSupabase();
+  const sb = await createSupabaseServerClient();
   // Loose-typed builder — `documents` table missing `module` in generated Database type
   type LooseBuilder = {
     eq: (col: string, val: unknown) => LooseBuilder;

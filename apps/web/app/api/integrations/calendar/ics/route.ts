@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import { buildIcs } from "@/lib/integrations/calendar/ics-export";
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const sb = await createServerSupabase();
+  const sb = await createSupabaseServerClient();
   const { data: { user } } = await sb.auth.getUser();
   if (!user) return new NextResponse("unauthorized", { status: 401 });
   const { data: deadlines } = await sb

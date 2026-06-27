@@ -9,7 +9,7 @@
  * Aktualizacja: ISR 60s. Brak danych userów — tylko agregaty.
  */
 import Link from "next/link";
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export const revalidate = 60;
 export const dynamic = "force-static";
@@ -117,7 +117,7 @@ function formatDuration(startedAt: string, resolvedAt: string | null): string {
 }
 
 export default async function StatusHistoryPage() {
-  const sb = await createServerSupabase();
+  const sb = await createSupabaseServerClient();
 
   const { data: incidentsRaw } = await sb
     .from("status_incidents")

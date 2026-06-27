@@ -7,7 +7,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 import { LegalHoldClient } from "@/components/admin/compliance/legal-hold-client";
 
 export const metadata: Metadata = {
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function LegalHoldPage() {
-  const sb = await createServerSupabase();
+  const sb = await createSupabaseServerClient();
   const {
     data: { user },
   } = await sb.auth.getUser();

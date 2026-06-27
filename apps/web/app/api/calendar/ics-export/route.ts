@@ -7,14 +7,14 @@
  * Wewnątrz korzysta z istniejącego `lib/calendar/ics-export.signFeedToken`.
  */
 import { NextRequest, NextResponse } from "next/server";
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 import { signFeedToken } from "@/lib/calendar/ics-export";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
-  const sb = await createServerSupabase();
+  const sb = await createSupabaseServerClient();
   const {
     data: { user },
   } = await sb.auth.getUser();

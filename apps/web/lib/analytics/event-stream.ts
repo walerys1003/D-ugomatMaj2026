@@ -2,7 +2,7 @@
  * Tier 14 — Event stream ingestion (product analytics layer).
  * Tracks raw user/system events for downstream BI queries.
  */
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 import { createHash } from "crypto";
 
 export interface AnalyticsEvent {
@@ -19,7 +19,7 @@ export interface AnalyticsEvent {
 export async function trackEvent(e: AnalyticsEvent): Promise<{ id: string }> {
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   const occurred = e.occurred_at ?? new Date().toISOString();
   const id = createHash("sha256")
     .update(`${e.user_id ?? ""}|${e.event}|${occurred}|${JSON.stringify(e.properties ?? {})}`)
@@ -44,7 +44,7 @@ export async function trackBatch(events: AnalyticsEvent[]): Promise<{ inserted: 
   if (events.length === 0) return { inserted: 0 };
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   const rows = events.map((e) => {
     const occurred = e.occurred_at ?? new Date().toISOString();
     const id = createHash("sha256")

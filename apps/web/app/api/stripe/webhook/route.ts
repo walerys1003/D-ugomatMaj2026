@@ -192,10 +192,7 @@ async function handleCheckoutCompleted(event: {
     return;
   }
 
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseAdminClient();
 
   // Idempotency: jeśli już 'completed' — skip
   const { data: existing, error: selErr } = await sb
@@ -358,10 +355,7 @@ async function handleCheckoutExpired(event: {
   const paymentId = session.metadata?.payment_id;
   if (!paymentId) return;
 
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseAdminClient();
   await sb
     .from("payments")
     .update({
@@ -392,10 +386,7 @@ async function handleChargeRefunded(event: {
   };
   if (!charge.payment_intent) return;
 
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseAdminClient();
 
   // Pobierz powiązaną płatność (potrzebujemy payment_id + user_id do `refunds`)
   const { data: payment } = await sb
@@ -417,15 +408,27 @@ async function handleChargeRefunded(event: {
         .eq("stripe_refund_id", r.id)
         .maybeSingle();
 
+      // Audyt #6 — mapowanie statusu Stripe (pending|succeeded|failed|
+      // canceled|requires_action) na nasz enum refunds.status. Nieznane
+      // statusy traktujemy jako 'pending' (bezpieczny default).
+      const mappedStatus: "pending" | "succeeded" | "failed" | "canceled" =
+        r.status === "succeeded"
+          ? "succeeded"
+          : r.status === "failed"
+            ? "failed"
+            : r.status === "canceled"
+              ? "canceled"
+              : "pending";
+
       if (existing) {
         // Update statusu (np. pending → succeeded)
-        if (existing.status !== r.status) {
+        if (existing.status !== mappedStatus) {
           await sb
             .from("refunds")
             .update({
-              status: r.status === "succeeded" ? "succeeded" : r.status,
+              status: mappedStatus,
               succeeded_at:
-                r.status === "succeeded" ? new Date().toISOString() : null,
+                mappedStatus === "succeeded" ? new Date().toISOString() : null,
             })
             .eq("id", existing.id);
         }
@@ -439,9 +442,9 @@ async function handleChargeRefunded(event: {
           amount: r.amount,
           currency: r.currency.toLowerCase(),
           reason: r.reason,
-          status: r.status === "succeeded" ? "succeeded" : "pending",
+          status: mappedStatus,
           succeeded_at:
-            r.status === "succeeded" ? new Date().toISOString() : null,
+            mappedStatus === "succeeded" ? new Date().toISOString() : null,
         });
       }
     }
@@ -516,10 +519,7 @@ async function handlePaymentFailed(event: {
     obj.charges?.data?.[0]?.failure_message ||
     "payment_failed";
 
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseAdminClient();
 
   const { data: payment, error: selErr } = await sb
     .from("payments")

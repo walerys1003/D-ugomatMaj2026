@@ -1,7 +1,7 @@
 /**
  * Tier 14 — SaaS revenue metrics: MRR, ARR, churn, LTV, ARPU, expansion.
  */
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export interface RevenueMetrics {
   mrr_grosze: number;
@@ -17,7 +17,7 @@ export interface RevenueMetrics {
 }
 
 export async function computeRevenueMetrics(): Promise<RevenueMetrics> {
-  const sb = await createServerSupabase();
+  const sb = await createSupabaseServerClient();
   const since30 = new Date(Date.now() - 30 * 86400_000).toISOString();
   const since60 = new Date(Date.now() - 60 * 86400_000).toISOString();
 

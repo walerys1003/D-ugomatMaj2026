@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { OAUTH_PROVIDERS, exchangeCode, OAuthProviderId } from "@/lib/integrations/oauth/oauth-providers";
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export const runtime = "nodejs";
 
@@ -17,7 +17,7 @@ export async function GET(req: NextRequest, ctx: { params: { provider: string } 
   const tokens = await exchangeCode(cfg, { code, baseUrl: base });
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   const { data: { user } } = await sb.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
   await sb.from("oauth_credentials").upsert(

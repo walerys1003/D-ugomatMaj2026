@@ -53,8 +53,8 @@ export async function POST(req: NextRequest) {
 
   // Best-effort persistence — never block the response with DB errors.
   try {
-    const { createServerSupabase } = await import("@/lib/db/supabase-server");
-    const sb = await createServerSupabase();
+    const { createSupabaseServerClient } = await import("@/lib/db/supabase-server");
+    const sb = await createSupabaseServerClient();
     // b2b_leads is not yet in the typed Database — use loose cast.
     type LooseSb = { from: (t: string) => { insert: (r: Record<string, unknown>) => Promise<unknown> } };
     await (sb as unknown as LooseSb).from("b2b_leads").insert({

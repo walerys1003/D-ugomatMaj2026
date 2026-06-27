@@ -9,7 +9,7 @@
  */
 import "server-only";
 import { createHmac, randomBytes, timingSafeEqual } from "crypto";
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 /** Maksymalna różnica czasowa: 5 minut (sekundy). */
 export const TIMESTAMP_TOLERANCE_SECONDS = 300;
@@ -100,7 +100,7 @@ export async function verifyIncomingWebhook(
   try {
     // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
     const { error } = await sb.from("webhook_nonces").insert({
       nonce: headers.nonce,
       timestamp_unix: ts,
@@ -128,7 +128,7 @@ export async function verifyIncomingWebhook(
 export async function cleanupExpiredNonces(): Promise<{ deleted: number }> {
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   const cutoff = new Date(Date.now() - NONCE_TTL_SECONDS * 1000).toISOString();
   const { count, error } = await sb
     .from("webhook_nonces")

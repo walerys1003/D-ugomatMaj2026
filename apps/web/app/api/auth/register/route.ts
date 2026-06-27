@@ -12,7 +12,7 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
   }
   const data = parsed.data;
 
-  const sb = await createServerSupabase();
+  const sb = await createSupabaseServerClient();
   const origin = new URL(req.url).origin;
 
   // Supabase signUp from server side. The user will receive a

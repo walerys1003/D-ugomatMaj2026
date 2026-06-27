@@ -2,7 +2,7 @@
  * Tier 10 — RODO/GDPR-compliant user data export (Art. 15 — right of access).
  * Bundles profile, cases, documents references, payments, subscriptions into JSON.
  */
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export interface UserDataExport {
   user_id: string;
@@ -17,7 +17,7 @@ export interface UserDataExport {
 }
 
 export async function exportUserData(userId: string): Promise<UserDataExport> {
-  const sb = await createServerSupabase();
+  const sb = await createSupabaseServerClient();
   const [profile, cases, documents, payments, subs, aff, refs] = await Promise.all([
     sb.from("profiles").select("*").eq("id", userId).maybeSingle(),
     sb.from("cases").select("*").eq("user_id", userId),
@@ -44,7 +44,7 @@ export async function exportUserData(userId: string): Promise<UserDataExport> {
  * RODO Art. 17 — right to erasure. Soft-deletes by anonymizing identifiable fields.
  */
 export async function eraseUserData(userId: string): Promise<void> {
-  const sb = await createServerSupabase();
+  const sb = await createSupabaseServerClient();
   const anon = `deleted-${userId.slice(0, 8)}@anon.local`;
   await sb
     .from("profiles")

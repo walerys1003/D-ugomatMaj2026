@@ -2,7 +2,7 @@
  * Tier 10 — Admin auth gate used by /api/admin/* routes.
  * Checks profile.role='admin' for the authenticated Supabase user.
  */
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export type RequireAdminResult =
   | { ok: true; userId: string }
@@ -10,7 +10,7 @@ export type RequireAdminResult =
 
 export async function requireAdmin(): Promise<RequireAdminResult> {
   try {
-    const sb = await createServerSupabase();
+    const sb = await createSupabaseServerClient();
     const {
       data: { user },
     } = await sb.auth.getUser();

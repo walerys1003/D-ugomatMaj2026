@@ -14,7 +14,7 @@
  *  - upp (urzędowe potwierdzenie przedłożenia, podpisane PDF/XML)
  */
 import { randomUUID, createHash } from "crypto";
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export type CourtSystem = "epu" | "prs" | "krz" | "pi";
 
@@ -101,7 +101,7 @@ function hashDocs(docs: CourtAttachment[]): CourtAttachment[] {
 export async function createDraft(input: CourtFilingInput): Promise<CourtFilingRecord> {
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   const id = randomUUID();
   const docs = hashDocs(input.documents);
   const row = {
@@ -136,7 +136,7 @@ export async function submitFiling(
 ): Promise<CourtFilingRecord> {
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   const now = new Date().toISOString();
   await sb.from("court_filings").update({ status: "queued", attempts: 0 }).eq("id", filingId);
 
@@ -199,7 +199,7 @@ export async function submitFiling(
 export async function getFiling(filingId: string): Promise<CourtFilingRecord | null> {
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   const { data } = await sb.from("court_filings").select("*").eq("id", filingId).maybeSingle();
   return (data as any) ?? null;
 }
@@ -212,7 +212,7 @@ export async function listFilings(opts: {
 }): Promise<CourtFilingRecord[]> {
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   let q = sb.from("court_filings").select("*").order("created_at", { ascending: false });
   if (opts.user_id) q = q.eq("user_id", opts.user_id);
   if (opts.case_id) q = q.eq("case_id", opts.case_id);
@@ -228,7 +228,7 @@ export async function listFilings(opts: {
 export async function refreshStatus(filingId: string): Promise<CourtFilingRecord | null> {
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   const filing = await getFiling(filingId);
   if (!filing || !filing.external_ref) return filing;
   const r = await fetch(
@@ -267,7 +267,7 @@ function mapStatus(s: string): CourtFilingStatus {
 export async function submitOneShot(input: CourtFilingInput): Promise<CourtFilingRecord> {
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   const fp = createHash("sha256")
     .update(JSON.stringify({ u: input.user_id, c: input.case_id, p: input.pleading_type, d: hashDocs(input.documents).map((d) => d.sha256) }))
     .digest("hex")

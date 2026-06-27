@@ -1,7 +1,7 @@
 /**
  * Tier 12 — Google Calendar sync via OAuth2 + Calendar API v3.
  */
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export interface GoogleCalCredentials {
   user_id: string;
@@ -34,7 +34,7 @@ export async function refreshAccessToken(creds: GoogleCalCredentials): Promise<G
   };
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   await sb.from("oauth_credentials").update({ access_token: next.access_token, expires_at: next.expires_at }).eq("user_id", creds.user_id).eq("provider", "google");
   return next;
 }

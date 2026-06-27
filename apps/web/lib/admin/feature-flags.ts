@@ -1,7 +1,7 @@
 /**
  * Tier 10 — Feature flags with DB persistence, percentage rollout, and user overrides.
  */
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 import { createHash } from "crypto";
 
 export interface FeatureFlag {
@@ -22,7 +22,7 @@ export async function getFlag(key: string): Promise<FeatureFlag | null> {
   try {
     // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
     const { data } = await sb.from("feature_flags").select("*").eq("key", key).maybeSingle();
     if (!data) return null;
     const flag: FeatureFlag = {
@@ -58,7 +58,7 @@ export async function isFlagEnabled(key: string, userId?: string | null): Promis
 export async function upsertFlag(flag: FeatureFlag, actorId: string): Promise<void> {
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   await sb.from("feature_flags").upsert(
     {
       key: flag.key,
@@ -77,7 +77,7 @@ export async function upsertFlag(flag: FeatureFlag, actorId: string): Promise<vo
 export async function listFlags(): Promise<FeatureFlag[]> {
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   const { data } = await sb.from("feature_flags").select("*").order("key");
   return (data ?? []).map((d: any) => ({
     key: d.key,

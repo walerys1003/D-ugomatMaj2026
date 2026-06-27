@@ -3,7 +3,7 @@
  * HMAC-SHA256 signature in X-Dlugomat-Signature header, X-Dlugomat-Timestamp for replay protection.
  */
 import { createHash, createHmac, randomUUID } from "crypto";
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export type WebhookEvent =
   | "case.created"
@@ -80,7 +80,7 @@ export async function registerEndpoint(input: {
 }): Promise<WebhookEndpoint> {
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   const endpoint: Omit<WebhookEndpoint, never> = {
     id: randomUUID(),
     user_id: input.user_id,
@@ -100,7 +100,7 @@ export async function registerEndpoint(input: {
 export async function emitEvent(event: WebhookEvent, userId: string, payload: Record<string, unknown>): Promise<number> {
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   const { data: endpoints } = await sb
     .from("webhook_endpoints")
     .select("*")
@@ -126,7 +126,7 @@ export async function emitEvent(event: WebhookEvent, userId: string, payload: Re
 export async function processDueDeliveries(batchSize = 25): Promise<{ delivered: number; failed: number; dead: number }> {
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   const now = new Date().toISOString();
   const { data: due } = await sb
     .from("webhook_deliveries")

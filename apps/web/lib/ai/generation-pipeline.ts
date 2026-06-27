@@ -19,8 +19,10 @@ import "server-only";
 import {
   AiUnavailableError,
   complete,
+  completeStreaming,
   type CompletionResponse,
 } from "./apipod-client";
+import { models } from "./models";
 import { formatRagContext, retrieveContext, type RagContext } from "./rag-retriever";
 import {
   loadActivePromptTemplate,
@@ -218,6 +220,154 @@ export async function runGenerationPipeline(
     tokensOutput: generation.tokensOutput,
     costUsd: generation.costUsd,
     durationMs: generation.durationMs,
+    validation,
+    ragSource: rag.source,
+    promptHash: hashPrompt(template, input.variables),
+    finalRole,
+  };
+}
+
+// -----------------------------------------------------------------------------
+// Audyt #17 — Prawdziwy streaming generacji (per-token SSE)
+//
+// `runGenerationPipeline` jest blokujący: czeka na pełny output Sonneta,
+// potem (opcjonalnie) Haiku + Opus, a UI dostaje "soft-stream" (dzielenie
+// gotowego tekstu na akapity). User widzi heartbeat przez kilkadziesiąt
+// sekund → percepcja zawieszenia.
+//
+// Ta wersja streamuje FAZĘ GENERATORA prawdziwie (per-token przez
+// `completeStreaming`), wołając `onDelta` na każdy fragment. Walidacja
+// (Haiku) i ewentualna eskalacja (Opus) wykonują się PO zakończeniu
+// streamu — wynik walidacji emitujemy jako osobny event. Gdy backend nie
+// wspiera SSE, `completeStreaming` sam degraduje do non-streaming (fallback
+// zachowany). Budżet i RAG działają identycznie jak w wersji blokującej.
+// -----------------------------------------------------------------------------
+export interface StreamingPipelineCallbacks {
+  /** Wołane na każdy fragment tekstu z generatora (prawdziwy per-token). */
+  onDelta: (text: string) => void | Promise<void>;
+}
+
+export async function runGenerationPipelineStreaming(
+  input: GenerationInput,
+  callbacks: StreamingPipelineCallbacks,
+): Promise<GenerationResult> {
+  const startedAt = Date.now();
+
+  // 0) Budget guardrail — identycznie jak w wersji blokującej.
+  if (input.userId) {
+    try {
+      await assertWithinBudget({ userId: input.userId, caseId: input.caseId });
+    } catch (err) {
+      if (err instanceof BudgetExceededError) {
+        throw new AiUnavailableError(err.message, err);
+      }
+      throw err;
+    }
+  }
+
+  // 1-4) Template + walidacja zmiennych + RAG + kompozycja promptu.
+  const template = await loadActivePromptTemplate(input.caseType);
+  const check = validateRequiredVariables(template, input.variables);
+  if (!check.ok) {
+    throw new AiUnavailableError(
+      `Brakujące pola: ${check.missing.join(", ")}. Wróć do kreatora i uzupełnij.`,
+    );
+  }
+  const ragQuery =
+    input.ragQuery ??
+    `${input.caseType} ${Object.values(input.variables).slice(0, 6).join(" ")}`;
+  const rag = await retrieveContext(ragQuery, { k: 5, tags: input.ragTags });
+  const userPrompt = renderPrompt(template.user_prompt_template, input.variables);
+  const ragBlock = formatRagContext(rag);
+  const finalUserPrompt = ragBlock
+    ? `${ragBlock}\n\n---\n\n${userPrompt}`
+    : userPrompt;
+
+  // 5) Generator — PRAWDZIWY streaming. Zbieramy pełny tekst do walidacji,
+  // ale każdy fragment od razu trafia do klienta przez onDelta.
+  let fullText = "";
+  let tokensInput = 0;
+  let tokensOutput = 0;
+  let costUsd = 0;
+  let streamErrored = false;
+
+  for await (const chunk of completeStreaming({
+    role: "generator",
+    systemPrompt: template.system_prompt,
+    messages: [{ role: "user", content: finalUserPrompt }],
+    temperature: Number(template.temperature),
+    maxTokens: template.max_tokens,
+  })) {
+    if (chunk.type === "delta" && chunk.delta) {
+      fullText += chunk.delta;
+      await callbacks.onDelta(chunk.delta);
+    } else if (chunk.type === "done") {
+      tokensInput = chunk.tokensInput ?? tokensInput;
+      tokensOutput = chunk.tokensOutput ?? tokensOutput;
+      costUsd = chunk.costUsd ?? costUsd;
+    } else if (chunk.type === "error") {
+      streamErrored = true;
+    }
+  }
+
+  if (streamErrored && fullText.trim().length === 0) {
+    throw new AiUnavailableError(
+      "Streaming generacji nie powiódł się i brak treści fallbacku.",
+    );
+  }
+
+  const modelId = models.generator.id;
+  let validation: ValidationResult | null = null;
+  let finalRole: "generator" | "escalator" = "generator";
+
+  // 6) Walidacja PO streamie (Haiku). Wynik emitujemy osobnym eventem w route.
+  if (!input.skipValidation) {
+    validation = await runValidator(fullText, input.variables);
+
+    // 7) Eskalacja do Opus przy score < 70 — tu już bez streamingu (rzadka
+    // ścieżka; poprawiony tekst zastępuje treść). UI dostanie sygnał przez
+    // event 'validation', a finalRole='escalator'.
+    if (validation.score < 70) {
+      const escalated = await complete({
+        role: "escalator",
+        systemPrompt:
+          template.system_prompt +
+          "\n\nUWAGA: Poprzednia wersja pisma uzyskała niski wynik walidacji. " +
+          "Popraw treść z uwzględnieniem zgłoszonych zastrzeżeń: " +
+          validation.issues.map((i) => `- ${i.message}`).join("\n"),
+        messages: [
+          { role: "user", content: finalUserPrompt },
+          { role: "assistant", content: fullText },
+          {
+            role: "user",
+            content:
+              "Zwróć poprawioną wersję pisma. Zachowaj format Markdown. " +
+              "Nie dodawaj komentarzy do edycji — tylko gotowe pismo.",
+          },
+        ],
+        temperature: Number(template.temperature),
+        maxTokens: template.max_tokens,
+      });
+      fullText = escalated.text;
+      tokensInput += escalated.tokensInput;
+      tokensOutput += escalated.tokensOutput;
+      costUsd += escalated.costUsd;
+      finalRole = "escalator";
+      try {
+        validation = await runValidator(escalated.text, input.variables);
+      } catch {
+        /* ignore — i tak zwracamy lepszą wersję niż pierwsza */
+      }
+    }
+  }
+
+  return {
+    markdown: postProcessMarkdown(fullText),
+    modelId,
+    tokensInput,
+    tokensOutput,
+    costUsd,
+    durationMs: Date.now() - startedAt,
     validation,
     ragSource: rag.source,
     promptHash: hashPrompt(template, input.variables),

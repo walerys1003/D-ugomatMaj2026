@@ -3,7 +3,7 @@
  * Keyed by sha256(model_id + system + user). Optional similarity-based fuzzy match.
  */
 import { createHash } from "crypto";
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export interface CachedResponse {
   key: string;
@@ -21,7 +21,7 @@ export function cacheKey(modelId: string, system: string, user: string): string 
 export async function getCached(key: string): Promise<CachedResponse | null> {
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   const { data } = await sb.from("ai_response_cache").select("*").eq("key", key).maybeSingle();
   if (!data) return null;
   // Bump hit count async
@@ -39,7 +39,7 @@ export async function getCached(key: string): Promise<CachedResponse | null> {
 export async function setCached(opts: { key: string; modelId: string; text: string; expectedCostGrosze: number }): Promise<void> {
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   await sb.from("ai_response_cache").upsert(
     {
       key: opts.key,
@@ -57,7 +57,7 @@ export async function pruneOldCache(olderThanDays = 30): Promise<number> {
   const cutoff = new Date(Date.now() - olderThanDays * 24 * 3600 * 1000).toISOString();
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   const { count } = await sb
     .from("ai_response_cache")
     .delete({ count: "exact" })

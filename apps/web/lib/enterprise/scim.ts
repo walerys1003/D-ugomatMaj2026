@@ -1,7 +1,7 @@
 /**
  * Tier 13 — SCIM 2.0 provisioning endpoints (RFC 7644 subset: Users + Groups).
  */
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export interface ScimUser {
   id: string;
@@ -15,7 +15,7 @@ export interface ScimUser {
 export async function createScimUser(orgId: string, payload: any): Promise<ScimUser> {
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   const email = (payload.emails?.find((e: any) => e.primary)?.value ?? payload.emails?.[0]?.value ?? payload.userName)?.toLowerCase();
   if (!email) throw new Error("missing_email");
   const { data: profile } = await sb
@@ -43,7 +43,7 @@ export async function createScimUser(orgId: string, payload: any): Promise<ScimU
 export async function listScimUsers(orgId: string, opts?: { startIndex?: number; count?: number; filter?: string }): Promise<{ Resources: ScimUser[]; totalResults: number; itemsPerPage: number; startIndex: number }> {
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   const start = opts?.startIndex ?? 1;
   const count = Math.min(opts?.count ?? 50, 200);
   const { data, count: total } = await sb
@@ -58,7 +58,7 @@ export async function listScimUsers(orgId: string, opts?: { startIndex?: number;
 export async function deactivateScimUser(orgId: string, userId: string): Promise<void> {
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   await sb.from("profiles").update({ active: false, suspended: true, suspended_at: new Date().toISOString() }).eq("id", userId);
   await sb.from("org_memberships").delete().eq("org_id", orgId).eq("user_id", userId);
 }

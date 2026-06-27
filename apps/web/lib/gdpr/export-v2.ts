@@ -26,7 +26,7 @@
  *     └── ai_interactions.json  (prompts + outputs, redacted PII)
  */
 import { createHash } from "crypto";
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export const EXPORT_SCHEMA_VERSION = "2.0.0";
 
@@ -93,7 +93,7 @@ export async function buildExportContent(opts: {
   generatedBy: ExportManifest["generated_by"];
 }): Promise<RawExportContent> {
   const { userId, generatedBy } = opts;
-  const sb = await createServerSupabase();
+  const sb = await createSupabaseServerClient();
   const files = new Map<string, string | Buffer>();
 
   // --- profile ---

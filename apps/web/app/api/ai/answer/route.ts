@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { answerWithRag } from "@/lib/ai/rag/retriever";
 import { checkOutput } from "@/lib/ai/reasoning/hallucination-guard";
 import { recordAiUsage } from "@/lib/ai/usage-tracker";
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 import { redactPii } from "@/lib/ai/safety/content-filter";
 
 export const runtime = "nodejs";
@@ -10,7 +10,7 @@ export const runtime = "nodejs";
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
   if (!body?.question) return NextResponse.json({ error: "missing question" }, { status: 400 });
-  const sb = await createServerSupabase();
+  const sb = await createSupabaseServerClient();
   const { data: { user } } = await sb.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
   const safeQuestion = redactPii(String(body.question)).text;

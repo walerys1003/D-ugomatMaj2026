@@ -2,7 +2,7 @@
  * Tier 11 — Vector store backed by Postgres + pgvector.
  * Falls back to in-memory cosine search when pgvector is unavailable (dev).
  */
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 import { embed, cosineSim } from "./embeddings";
 
 export interface VectorDoc {
@@ -22,7 +22,7 @@ export interface RetrievedDoc extends VectorDoc {
 export async function upsertVectorDoc(doc: VectorDoc & { vector: number[] }): Promise<void> {
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   await sb.from("rag_documents").upsert(
     {
       id: doc.id,
@@ -44,7 +44,7 @@ export async function searchSimilar(query: string, opts?: { corpus?: string; top
   const qVec = (await embed(query)).vector;
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createServerSupabase();
+  const sb: any = await createSupabaseServerClient();
   // Try pgvector RPC first
   try {
     const { data, error } = await sb.rpc("rag_search", {

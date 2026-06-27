@@ -12,7 +12,7 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -36,7 +36,7 @@ const CreateBody = z.object({
  * Resolve userId from session cookie OR from `Authorization: Bearer <api_key>`.
  */
 async function resolveUserId(req: NextRequest): Promise<{ userId: string | null; via: "session" | "api_key" | "none" }> {
-  const sb = await createServerSupabase();
+  const sb = await createSupabaseServerClient();
   const { data: { user } } = await sb.auth.getUser();
   if (user) return { userId: user.id, via: "session" };
 
@@ -84,7 +84,7 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const sb = await createServerSupabase();
+  const sb = await createSupabaseServerClient();
   // Loose-typed builder — Database type does not include `module` / `creditor_name` columns
   // on the `cases` table yet, so we cast through a permissive shape.
   type LooseBuilder = {
@@ -147,7 +147,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const sb = await createServerSupabase();
+  const sb = await createSupabaseServerClient();
   const now = new Date().toISOString();
   const row = {
     user_id: userId,

@@ -63,14 +63,11 @@ export async function startTrial(args: {
   trialDays?: number;
 }): Promise<Subscription> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
   const trialDays = args.trialDays ?? 14;
   const now = new Date();
   const trialEnd = new Date(now.getTime() + trialDays * 24 * 60 * 60 * 1000);
 
-  const { data, error } = await sb
+  const { data, error } = await supabase
     .from("subscriptions")
     .insert({
       user_id: args.userId,
@@ -96,10 +93,7 @@ export async function activateSubscription(
   periodEnd: Date,
 ): Promise<void> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
-  const { error } = await sb
+  const { error } = await supabase
     .from("subscriptions")
     .update({
       status: "active",
@@ -114,10 +108,7 @@ export async function activateSubscription(
 
 export async function markPastDue(subscriptionId: string): Promise<{ shouldCancel: boolean }> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
-  const { data: row, error } = await sb
+  const { data: row, error } = await supabase
     .from("subscriptions")
     .select("past_due_retries")
     .eq("id", subscriptionId)
@@ -129,7 +120,7 @@ export async function markPastDue(subscriptionId: string): Promise<{ shouldCance
     await cancelSubscription(subscriptionId, { reason: "max_retries_exceeded" });
     return { shouldCancel: true };
   }
-  const { error: updErr } = await sb
+  const { error: updErr } = await supabase
     .from("subscriptions")
     .update({
       status: "past_due",
@@ -146,14 +137,11 @@ export async function pauseSubscription(
   resumeAt: Date,
 ): Promise<void> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
   const now = new Date();
   const maxResume = new Date(now.getTime() + PAUSE_MAX_DAYS * 24 * 60 * 60 * 1000);
   const effective = resumeAt > maxResume ? maxResume : resumeAt;
 
-  const { error } = await sb
+  const { error } = await supabase
     .from("subscriptions")
     .update({
       status: "paused",
@@ -167,10 +155,7 @@ export async function pauseSubscription(
 
 export async function resumeSubscription(subscriptionId: string): Promise<void> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
-  const { error } = await sb
+  const { error } = await supabase
     .from("subscriptions")
     .update({
       status: "active",
@@ -188,10 +173,7 @@ export async function scheduleDowngrade(
   effectiveAt: Date,
 ): Promise<void> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
-  const { error } = await sb
+  const { error } = await supabase
     .from("subscriptions")
     .update({
       pending_plan_change: newPlan,
@@ -207,10 +189,7 @@ export async function applyImmediateUpgrade(
   newPlan: PlanCode,
 ): Promise<void> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
-  const { error } = await sb
+  const { error } = await supabase
     .from("subscriptions")
     .update({
       plan_code: newPlan,
@@ -227,13 +206,10 @@ export async function cancelSubscription(
   opts: { atPeriodEnd?: boolean; reason?: string } = {},
 ): Promise<void> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
   const update = opts.atPeriodEnd
     ? { cancel_at_period_end: true }
     : { status: "canceled" as const, cancel_at_period_end: false };
-  const { error } = await sb
+  const { error } = await supabase
     .from("subscriptions")
     .update({
       ...update,
@@ -246,10 +222,7 @@ export async function cancelSubscription(
 
 export async function getActiveSubscription(userId: string): Promise<Subscription | null> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
-  const { data, error } = await sb
+  const { data, error } = await supabase
     .from("subscriptions")
     .select("*")
     .eq("user_id", userId)

@@ -1,7 +1,7 @@
 /**
  * Tier 14 — Cohort retention analysis (signup week × week N retention).
  */
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export interface CohortRow {
   cohort_week: string; // YYYY-WW
@@ -10,7 +10,7 @@ export interface CohortRow {
 }
 
 export async function computeWeeklyCohorts(weeksBack = 12): Promise<CohortRow[]> {
-  const sb = await createServerSupabase();
+  const sb = await createSupabaseServerClient();
   const since = new Date(Date.now() - weeksBack * 7 * 86400_000).toISOString();
   const { data: profiles } = await sb.from("profiles").select("id, created_at").gte("created_at", since);
   const { data: events } = await sb

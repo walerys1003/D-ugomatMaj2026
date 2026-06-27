@@ -3,7 +3,7 @@
  * Rozszerza dashboard-metrics o serie czasowe, alerty i metryki systemowe.
  */
 import "server-only";
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export interface RealtimeKpis {
   // KPI z ostatniej godziny (real-time)
@@ -25,7 +25,7 @@ export interface RealtimeKpis {
 }
 
 export async function getRealtimeKpis(): Promise<RealtimeKpis> {
-  const sb = await createServerSupabase();
+  const sb = await createSupabaseServerClient();
   const now = Date.now();
   const since1h = new Date(now - 3600 * 1000).toISOString();
   const since2h = new Date(now - 2 * 3600 * 1000).toISOString();

@@ -6,7 +6,7 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -21,7 +21,7 @@ const SsoConfigSchema = z.object({
   attribute_mappings: z.record(z.string(), z.string()).optional(),
 });
 
-async function resolveOrg(sb: Awaited<ReturnType<typeof createServerSupabase>>, userId: string) {
+async function resolveOrg(sb: Awaited<ReturnType<typeof createSupabaseServerClient>>, userId: string) {
   const { data } = await sb
     .from("org_memberships")
     .select("org_id, role")
@@ -32,7 +32,7 @@ async function resolveOrg(sb: Awaited<ReturnType<typeof createServerSupabase>>, 
 }
 
 export async function GET() {
-  const sb = await createServerSupabase();
+  const sb = await createSupabaseServerClient();
   const { data: { user } } = await sb.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
 
@@ -59,7 +59,7 @@ export async function GET() {
 }
 
 export async function PUT(req: NextRequest) {
-  const sb = await createServerSupabase();
+  const sb = await createSupabaseServerClient();
   const { data: { user } } = await sb.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
 

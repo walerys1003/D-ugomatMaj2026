@@ -6,13 +6,13 @@
  *  POST   /api/integrations/webhooks?action=process   — flush dispatch queue (cron)
  */
 import { NextRequest, NextResponse } from "next/server";
-import { createServerSupabase } from "@/lib/db/supabase-server";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 import { emitEvent, processDueDeliveries, type WebhookEvent } from "@/lib/integrations/webhooks-v2";
 
 export const runtime = "nodejs";
 
 export async function GET(req: NextRequest) {
-  const sb = await createServerSupabase();
+  const sb = await createSupabaseServerClient();
   const {
     data: { user },
   } = await sb.auth.getUser();
@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const action = req.nextUrl.searchParams.get("action") ?? "emit";
-  const sb = await createServerSupabase();
+  const sb = await createSupabaseServerClient();
   const {
     data: { user },
   } = await sb.auth.getUser();
