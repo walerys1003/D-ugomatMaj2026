@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Info, Save, ShieldCheck, User } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,13 +11,43 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export const metadata: Metadata = {
   title: "Edycja profilu — Dlugomat",
   description: "Aktualizacja danych osobowych i kontaktowych konta.",
 };
 
-export default function EditProfilePage() {
+export const dynamic = "force-dynamic";
+
+function str(v: unknown, fallback = ""): string {
+  return typeof v === "string" ? v : fallback;
+}
+
+export default async function EditProfilePage() {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/logowanie?next=/panel/profil/edycja");
+
+  const { data: row } = await supabase
+    .from("profiles")
+    .select("email, full_name, phone, settings")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  const settings = (row?.settings ?? {}) as Record<string, unknown>;
+  const fullName = str(row?.full_name, user.user_metadata?.full_name ?? "");
+  const [firstName, ...rest] = fullName.split(" ");
+  const lastName = rest.join(" ");
+  const email = str(row?.email, user.email ?? "");
+  const phone = str(row?.phone, user.phone ?? "");
+  const street = str(settings.street);
+  const postalCode = str(settings.postal_code);
+  const city = str(settings.city);
+  const emailVerified = Boolean(user.email_confirmed_at);
+
   return (
     <div className="mx-auto max-w-4xl px-6 py-10">
       <div className="mb-8">
@@ -58,7 +89,7 @@ export default function EditProfilePage() {
                 <input
                   id="firstName"
                   type="text"
-                  defaultValue="Anna"
+                  defaultValue={firstName}
                   className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus-visible:shadow-shield-focus"
                 />
               </div>
@@ -72,39 +103,7 @@ export default function EditProfilePage() {
                 <input
                   id="lastName"
                   type="text"
-                  defaultValue="Nowak"
-                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus-visible:shadow-shield-focus"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="pesel"
-                  className="mb-2 block text-sm font-medium text-slate-900"
-                >
-                  PESEL
-                </label>
-                <input
-                  id="pesel"
-                  type="text"
-                  defaultValue="••••••12345"
-                  readOnly
-                  className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 font-mono text-sm text-slate-500"
-                />
-                <p className="mt-1 text-xs text-slate-500">
-                  Zmiana PESEL wymaga kontaktu z biurem obslugi
-                </p>
-              </div>
-              <div>
-                <label
-                  htmlFor="birthDate"
-                  className="mb-2 block text-sm font-medium text-slate-900"
-                >
-                  Data urodzenia
-                </label>
-                <input
-                  id="birthDate"
-                  type="date"
-                  defaultValue="1985-04-12"
+                  defaultValue={lastName}
                   className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus-visible:shadow-shield-focus"
                 />
               </div>
@@ -131,7 +130,8 @@ export default function EditProfilePage() {
                 <input
                   id="street"
                   type="text"
-                  defaultValue="ul. Marszalkowska 142/15"
+                  defaultValue={street}
+                  placeholder="ul. Przykladowa 1/2"
                   className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus-visible:shadow-shield-focus"
                 />
               </div>
@@ -145,7 +145,8 @@ export default function EditProfilePage() {
                 <input
                   id="postalCode"
                   type="text"
-                  defaultValue="00-061"
+                  defaultValue={postalCode}
+                  placeholder="00-000"
                   className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus-visible:shadow-shield-focus"
                 />
               </div>
@@ -159,7 +160,8 @@ export default function EditProfilePage() {
                 <input
                   id="city"
                   type="text"
-                  defaultValue="Warszawa"
+                  defaultValue={city}
+                  placeholder="Warszawa"
                   className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus-visible:shadow-shield-focus"
                 />
               </div>
@@ -187,12 +189,14 @@ export default function EditProfilePage() {
                   <input
                     id="email"
                     type="email"
-                    defaultValue="anna.nowak@example.pl"
+                    defaultValue={email}
                     className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus-visible:shadow-shield-focus"
                   />
-                  <Badge tone="success" withDot className="absolute right-2 top-2">
-                    Potwierdzony
-                  </Badge>
+                  {emailVerified && (
+                    <Badge tone="success" withDot className="absolute right-2 top-2">
+                      Potwierdzony
+                    </Badge>
+                  )}
                 </div>
               </div>
               <div>
@@ -205,7 +209,8 @@ export default function EditProfilePage() {
                 <input
                   id="phone"
                   type="tel"
-                  defaultValue="+48 600 100 200"
+                  defaultValue={phone}
+                  placeholder="+48 600 000 000"
                   className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus-visible:shadow-shield-focus"
                 />
                 <p className="mt-1 text-xs text-slate-500">

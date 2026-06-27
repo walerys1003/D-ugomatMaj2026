@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import {
   Building2,
   Camera,
@@ -21,11 +22,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export const metadata: Metadata = {
   title: "Mój profil — Długomat",
   description: "Zarządzanie danymi profilu, kontaktu i komunikacji.",
 };
+
+export const dynamic = "force-dynamic";
 
 interface Profile {
   full_name: string;
@@ -43,26 +47,56 @@ interface Profile {
   created_at: string;
 }
 
-const PROFILE: Profile = {
-  full_name: "Anna Kowalska",
-  email: "anna.kowalska@example.pl",
-  phone: "+48 600 123 456",
-  city: "Warszawa",
-  voivodeship: "mazowieckie",
-  company_name: null,
-  nip: null,
-  email_verified: true,
-  phone_verified: true,
-  mfa_enabled: true,
-  preferred_lang: "pl",
-  preferred_contact: "email",
-  created_at: "2024-11-12",
-};
-
 const inputCls =
   "w-full rounded-md border border-ink-300 bg-white px-3 py-2 text-sm text-dlugomat-900 focus:border-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus";
 
-export default function ProfilPage() {
+function str(v: unknown, fallback = ""): string {
+  return typeof v === "string" ? v : fallback;
+}
+
+export default async function ProfilPage() {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/logowanie?next=/panel/profil");
+
+  const { data: row } = await supabase
+    .from("profiles")
+    .select(
+      "email, full_name, phone, locale, settings, created_at",
+    )
+    .eq("id", user.id)
+    .maybeSingle();
+
+  const settings = (row?.settings ?? {}) as Record<string, unknown>;
+  const fmtDate = (iso: string | null | undefined) =>
+    iso
+      ? new Intl.DateTimeFormat("pl-PL", { dateStyle: "long" }).format(new Date(iso))
+      : "—";
+
+  // MFA: AAL2 oznacza aktywne MFA na sesji.
+  const factors = user.factors ?? [];
+  const mfaEnabled = factors.length > 0;
+
+  const PROFILE: Profile = {
+    full_name: str(row?.full_name, user.user_metadata?.full_name ?? ""),
+    email: str(row?.email, user.email ?? ""),
+    phone: str(row?.phone, user.phone ?? ""),
+    city: str(settings.city),
+    voivodeship: str(settings.voivodeship, "mazowieckie"),
+    company_name: str(settings.company_name) || null,
+    nip: str(settings.nip) || null,
+    email_verified: Boolean(user.email_confirmed_at),
+    phone_verified: Boolean(user.phone_confirmed_at),
+    mfa_enabled: mfaEnabled,
+    preferred_lang: row?.locale === "en" ? "en" : "pl",
+    preferred_contact:
+      (str(settings.preferred_contact, "email") as Profile["preferred_contact"]) ||
+      "email",
+    created_at: fmtDate(row?.created_at),
+  };
+
   return (
     <div className="space-y-8">
       <header className="space-y-2">
