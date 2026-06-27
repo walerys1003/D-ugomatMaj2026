@@ -21,12 +21,28 @@ export default async function RbacPage() {
   } = await sb.auth.getUser();
   if (!user) redirect("/sign-in?next=/admin/rbac");
 
-  const { data: policies } = await sb
+  // Audyt 2026-06-27 (iter. 37): zapytanie zwraca realne kolumny tabeli
+  // `rbac_policies` (actions[]/resources[]/subjects/conditions), a komponent
+  // kliencki oczekuje kształtu Policy (resource_pattern/action_pattern/roles/
+  // condition). Mapujemy zamiast `as any`.
+  const { data: policiesRaw } = await sb
     .from("rbac_policies")
     .select("*")
     .order("priority", { ascending: false })
     .order("created_at", { ascending: false })
     .limit(200);
+  const policies = (policiesRaw ?? []).map((p) => ({
+    id: p.id,
+    name: p.name,
+    effect: p.effect,
+    resource_pattern: (p.resources ?? []).join(", "),
+    action_pattern: (p.actions ?? []).join(", "),
+    roles: Array.isArray(p.subjects) ? (p.subjects as string[]) : [],
+    condition: (p.conditions ?? null) as Record<string, unknown> | null,
+    priority: p.priority,
+    enabled: p.enabled,
+    created_at: p.created_at,
+  }));
 
   return (
     <main className="container py-8 space-y-6">
@@ -42,7 +58,7 @@ export default async function RbacPage() {
         </Link>
       </header>
 
-      <RbacPoliciesClient initialPolicies={(policies ?? []) as any} />
+      <RbacPoliciesClient initialPolicies={policies} />
     </main>
   );
 }

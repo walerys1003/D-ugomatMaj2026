@@ -21,11 +21,25 @@ export default async function SecretsPage() {
   } = await sb.auth.getUser();
   if (!user) redirect("/sign-in?next=/admin/secrets");
 
-  // Lista bez wartości (tylko metadane)
-  const { data: secrets } = await sb
+  // Audyt 2026-06-27 (iter. 37): REALNY BUG — poprzednie zapytanie wybierało
+  // kolumny `name`, `rotation_period_days`, `last_rotated_at`, `updated_at`,
+  // które NIE ISTNIEJĄ w tabeli `secret_vault` (migracja 20260526000000).
+  // Realne kolumny: `key`, `rotation_due_at`, `last_accessed_at`. `as any`
+  // maskował błąd → strona padała w runtime. Wybieramy realne kolumny i
+  // mapujemy je na kształt SecretMeta oczekiwany przez klienta.
+  const { data: secretsRaw } = await sb
     .from("secret_vault")
-    .select("id, name, description, rotation_period_days, last_rotated_at, created_at, updated_at")
-    .order("name");
+    .select("id, key, description, rotation_due_at, last_accessed_at, created_at")
+    .order("key");
+  const secrets = (secretsRaw ?? []).map((s) => ({
+    id: s.id,
+    name: s.key,
+    description: s.description,
+    rotation_period_days: null,
+    last_rotated_at: s.rotation_due_at,
+    created_at: s.created_at,
+    updated_at: s.created_at,
+  }));
 
   return (
     <main className="container py-8 space-y-6">
@@ -42,7 +56,7 @@ export default async function SecretsPage() {
         </Link>
       </header>
 
-      <SecretsClient initialSecrets={(secrets ?? []) as any} />
+      <SecretsClient initialSecrets={secrets} />
     </main>
   );
 }
