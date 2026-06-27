@@ -43,9 +43,7 @@ export async function registerOrUpdateDevice(
   input: RegisterDeviceInput,
 ): Promise<MobileDevice> {
   const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { data, error } = await sb
     .from("mobile_devices")
     .upsert(
@@ -72,9 +70,7 @@ export async function updatePushToken(
   pushToken: string | null,
 ): Promise<void> {
   const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   await sb
     .from("mobile_devices")
     .update({ push_token: pushToken, last_seen_at: new Date().toISOString() })
@@ -83,9 +79,7 @@ export async function updatePushToken(
 
 export async function listUserDevices(userId: string): Promise<MobileDevice[]> {
   const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { data } = await sb
     .from("mobile_devices")
     .select("*")
@@ -96,9 +90,7 @@ export async function listUserDevices(userId: string): Promise<MobileDevice[]> {
 
 export async function unregisterDevice(deviceId: string): Promise<void> {
   const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   await sb.from("mobile_devices").delete().eq("device_id", deviceId);
 }
 
@@ -107,9 +99,7 @@ export async function unregisterDevice(deviceId: string): Promise<void> {
  */
 export async function pruneInactiveDevices(): Promise<number> {
   const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const cutoff = new Date(Date.now() - 90 * 86_400_000).toISOString();
   const { count } = await sb
     .from("mobile_devices")

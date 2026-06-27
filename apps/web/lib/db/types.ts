@@ -1706,6 +1706,35 @@ export interface Database {
         >;
         Relationships: [];
       };
+      // -----------------------------------------------------------------
+      // Tier 9 — Mobile device registration. Źródło:
+      // 20260513200000_tier9_mobile_cee.sql.
+      // -----------------------------------------------------------------
+      mobile_devices: {
+        Row: {
+          id: string;
+          device_id: string;
+          user_id: string | null;
+          platform: "ios" | "android";
+          push_token: string | null;
+          app_version: string;
+          os_version: string | null;
+          locale: string | null;
+          last_seen_at: string;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["mobile_devices"]["Row"]
+        > & {
+          device_id: string;
+          platform: "ios" | "android";
+          app_version: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["mobile_devices"]["Insert"]
+        >;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     // Audyt 2026-06-27: większość RPC nie jest jeszcze dotypowana (degraduje
