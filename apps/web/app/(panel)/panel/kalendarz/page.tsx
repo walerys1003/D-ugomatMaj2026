@@ -1,35 +1,24 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
+import { listUserDeadlines } from "@/lib/deadlines";
+import { DEADLINE_RULES, type DeadlineKind } from "@/lib/deadlines/deadline-engine";
 
 export const metadata: Metadata = { title: "Kalendarz terminów | Długomat" };
+export const dynamic = "force-dynamic";
 
 interface DeadlineEvent {
   id: string;
-  case_id: string;
-  case_title: string;
-  kind:
-    | "court_hearing"
-    | "appeal_deadline"
-    | "objection_deadline"
-    | "payment_due"
-    | "limitation_warning"
-    | "custom";
+  case_id: string | null;
+  kind: DeadlineKind;
   title: string;
   due_at: string;
   severity: "critical" | "high" | "normal" | "low";
   days_until: number;
 }
-
-const KIND_LABELS: Record<DeadlineEvent["kind"], string> = {
-  court_hearing: "Rozprawa sądowa",
-  appeal_deadline: "Apelacja",
-  objection_deadline: "Sprzeciw / odpowiedź",
-  payment_due: "Termin płatności",
-  limitation_warning: "Zbliżające się przedawnienie",
-  custom: "Termin własny",
-};
 
 const SEVERITY_STYLE: Record<DeadlineEvent["severity"], string> = {
   critical: "border-l-4 border-danger-600 bg-danger-50/50 dark:bg-danger-700/10",
@@ -38,15 +27,39 @@ const SEVERITY_STYLE: Record<DeadlineEvent["severity"], string> = {
   low: "border-l-4 border-ink-200 dark:border-ink-800",
 };
 
+function kindLabel(kind: DeadlineKind): string {
+  return DEADLINE_RULES[kind]?.label ?? "Termin";
+}
+
+function severityFromDays(days: number): DeadlineEvent["severity"] {
+  if (days < 0 || days <= 1) return "critical";
+  if (days <= 3) return "high";
+  if (days <= 7) return "normal";
+  return "low";
+}
+
 async function fetchDeadlines(): Promise<DeadlineEvent[]> {
-  try {
-    const res = await fetch("/api/deadlines", { cache: "no-store" });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return data.events ?? [];
-  } catch {
-    return [];
-  }
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/logowanie?next=/panel/kalendarz");
+
+  const records = await listUserDeadlines(user.id).catch(() => []);
+  const now = Date.now();
+  return records.map((r) => {
+    const dueIso = r.snoozed_until ?? r.effective_end_date;
+    const days = Math.ceil((new Date(dueIso).getTime() - now) / 86400_000);
+    return {
+      id: r.id,
+      case_id: r.case_id,
+      kind: r.kind,
+      title: r.title,
+      due_at: dueIso,
+      days_until: days,
+      severity: severityFromDays(days),
+    };
+  });
 }
 
 function groupByWeek(events: DeadlineEvent[]): Map<string, DeadlineEvent[]> {
@@ -112,7 +125,7 @@ export default async function KalendarzPage() {
       {weeks.size === 0 && overdue.length === 0 && (
         <Card elevation="subtle">
           <CardContent className="pt-6 text-sm text-ink-500">
-            Brak nadchodzących terminów. Brak deadline'ów to dobra wiadomość.
+            Brak nadchodzących terminów. Brak deadline&apos;ów to dobra wiadomość.
           </CardContent>
         </Card>
       )}
@@ -145,14 +158,16 @@ function EventRow({ event }: { event: DeadlineEvent }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
             <span className="text-xs px-2 py-0.5 rounded-full bg-ink-100 dark:bg-ink-800 text-ink-600 dark:text-ink-400">
-              {KIND_LABELS[event.kind]}
+              {kindLabel(event.kind)}
             </span>
-            <Link
-              href={`/panel/sprawa/${event.case_id}`}
-              className="text-xs text-accent-700 hover:text-accent-800 truncate"
-            >
-              {event.case_title}
-            </Link>
+            {event.case_id && (
+              <Link
+                href={`/panel/sprawa/${event.case_id}`}
+                className="text-xs text-accent-700 hover:text-accent-800 truncate"
+              >
+                Otwórz sprawę
+              </Link>
+            )}
           </div>
           <div className="text-sm font-medium text-ink-900 dark:text-ink-50">
             {event.title}

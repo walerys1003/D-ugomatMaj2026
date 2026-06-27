@@ -1,22 +1,25 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export const metadata: Metadata = { title: "Wsparcie | Długomat" };
+export const dynamic = "force-dynamic";
 
 interface SupportTicket {
   id: string;
   subject: string;
-  category: "billing" | "technical" | "legal" | "feature_request" | "other";
-  status: "open" | "in_progress" | "waiting_user" | "resolved" | "closed";
-  priority: "low" | "normal" | "high" | "urgent";
+  category: string;
+  status: string;
+  priority: string;
   created_at: string;
   updated_at: string;
-  unread_replies: number;
+  unread_replies?: number;
 }
 
-const STATUS_BADGE: Record<SupportTicket["status"], string> = {
+const STATUS_BADGE: Record<string, string> = {
   open: "bg-warn-50 text-warn-700 border-warn-200",
   in_progress: "bg-accent-50 text-accent-700 border-accent-200",
   waiting_user: "bg-warn-50 text-warn-700 border-warn-200",
@@ -24,7 +27,7 @@ const STATUS_BADGE: Record<SupportTicket["status"], string> = {
   closed: "bg-ink-100 text-ink-600 border-ink-200",
 };
 
-const STATUS_LABEL: Record<SupportTicket["status"], string> = {
+const STATUS_LABEL: Record<string, string> = {
   open: "Nowe",
   in_progress: "W trakcie",
   waiting_user: "Oczekuje na Ciebie",
@@ -32,23 +35,32 @@ const STATUS_LABEL: Record<SupportTicket["status"], string> = {
   closed: "Zamknięte",
 };
 
-const CATEGORY_LABEL: Record<SupportTicket["category"], string> = {
+const CATEGORY_LABEL: Record<string, string> = {
   billing: "Rozliczenia",
   technical: "Techniczne",
+  bug: "Błąd",
+  question: "Pytanie",
   legal: "Prawne",
+  feature: "Sugestia",
   feature_request: "Sugestia",
   other: "Inne",
 };
 
 async function fetchTickets(): Promise<SupportTicket[]> {
-  try {
-    const res = await fetch("/api/support/tickets", { cache: "no-store" });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return data.tickets ?? [];
-  } catch {
-    return [];
-  }
+  const sb = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await sb.auth.getUser();
+  if (!user) redirect("/logowanie?next=/panel/wsparcie");
+
+  const { data, error } = await sb
+    .from("support_tickets")
+    .select("id, subject, status, category, priority, created_at, updated_at")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false })
+    .limit(100);
+  if (error) return [];
+  return (data ?? []) as SupportTicket[];
 }
 
 const FAQ_ITEMS = [
@@ -114,20 +126,20 @@ export default async function WsparciePage() {
                       <div className="flex flex-wrap items-baseline justify-between gap-2 mb-1">
                         <div className="font-medium text-ink-900 dark:text-ink-50 flex items-center gap-2">
                           {t.subject}
-                          {t.unread_replies > 0 && (
+                          {(t.unread_replies ?? 0) > 0 && (
                             <span className="text-xs px-1.5 py-0.5 rounded-full bg-accent-600 text-ink-50">
                               {t.unread_replies}
                             </span>
                           )}
                         </div>
                         <span
-                          className={`text-xs px-2 py-0.5 rounded-full border ${STATUS_BADGE[t.status]}`}
+                          className={`text-xs px-2 py-0.5 rounded-full border ${STATUS_BADGE[t.status] ?? STATUS_BADGE.open}`}
                         >
-                          {STATUS_LABEL[t.status]}
+                          {STATUS_LABEL[t.status] ?? t.status}
                         </span>
                       </div>
                       <div className="text-xs text-ink-500">
-                        {CATEGORY_LABEL[t.category]} ·{" "}
+                        {CATEGORY_LABEL[t.category] ?? t.category} ·{" "}
                         {new Date(t.updated_at).toLocaleDateString("pl-PL")}
                       </div>
                     </Link>

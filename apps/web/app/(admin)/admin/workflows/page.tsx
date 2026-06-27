@@ -1,44 +1,24 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
+import { requireAdmin } from "@/lib/auth/require-admin";
 
 export const metadata: Metadata = { title: "Workflows | Admin | Długomat" };
+export const dynamic = "force-dynamic";
 
-interface Workflow {
+interface WorkflowRow {
   id: string;
   name: string;
-  description: string;
-  trigger:
-    | "schedule"
-    | "event"
-    | "manual"
-    | "webhook"
-    | "user_action"
-    | "metric_threshold";
-  status: "active" | "paused" | "draft" | "errored";
-  last_run_at?: string;
-  last_run_status?: "success" | "partial" | "failed";
-  runs_24h: number;
-  success_rate_24h_percent: number;
-  next_run_at?: string;
+  enabled: boolean;
+  trigger: string;
+  actions: unknown[];
+  created_at: string;
 }
 
-const STATUS_BADGE: Record<Workflow["status"], string> = {
-  active: "bg-accent-50 text-accent-700 border-accent-200",
-  paused: "bg-ink-100 text-ink-700 border-ink-200",
-  draft: "bg-ink-100 text-ink-600 border-ink-200",
-  errored: "bg-danger-50 text-danger-700 border-danger-200",
-};
-
-const STATUS_LABEL: Record<Workflow["status"], string> = {
-  active: "Aktywny",
-  paused: "Wstrzymany",
-  draft: "Szkic",
-  errored: "Błąd",
-};
-
-const TRIGGER_LABEL: Record<Workflow["trigger"], string> = {
+const TRIGGER_LABEL: Record<string, string> = {
   schedule: "Harmonogram",
   event: "Zdarzenie",
   manual: "Ręczny",
@@ -47,20 +27,20 @@ const TRIGGER_LABEL: Record<Workflow["trigger"], string> = {
   metric_threshold: "Próg metryki",
 };
 
-async function fetchWorkflows(): Promise<Workflow[]> {
-  try {
-    const res = await fetch("/api/admin/workflows", { cache: "no-store" });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return data.workflows ?? [];
-  } catch {
-    return [];
-  }
-}
-
 export default async function WorkflowsPage() {
-  const workflows = await fetchWorkflows();
-  const errored = workflows.filter((w) => w.status === "errored");
+  const gate = await requireAdmin();
+  if (!gate.ok) redirect("/logowanie?next=/admin/workflows");
+
+  // W10-3: loose cast — typed Database stale for recent schema columns
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sb: any = await createSupabaseServerClient();
+  const { data } = await sb
+    .from("workflows")
+    .select("id, name, enabled, trigger, actions, created_at")
+    .order("created_at", { ascending: false })
+    .limit(200);
+  const workflows: WorkflowRow[] = data ?? [];
+  const active = workflows.filter((w) => w.enabled);
 
   return (
     <main className="container mx-auto px-4 py-8 max-w-7xl space-y-6">
@@ -73,8 +53,7 @@ export default async function WorkflowsPage() {
             Workflows
           </h1>
           <p className="text-sm text-ink-500 mt-1">
-            {workflows.length} workflow · {workflows.filter((w) => w.status === "active").length}{" "}
-            aktywnych · {errored.length} w błędzie
+            {workflows.length} workflow · {active.length} aktywnych
           </p>
         </div>
         <Link href="/admin/workflows/nowy">
@@ -82,30 +61,17 @@ export default async function WorkflowsPage() {
         </Link>
       </div>
 
-      {errored.length > 0 && (
-        <Card elevation="pop" urgency="critical">
-          <CardHeader>
-            <CardTitle className="text-danger-700">
-              W błędzie ({errored.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2">
-              {errored.map((w) => (
-                <WorkflowRow key={w.id} workflow={w} />
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-      )}
-
       <Card elevation="subtle">
         <CardHeader>
           <CardTitle>Wszystkie workflow</CardTitle>
         </CardHeader>
         <CardContent>
           {workflows.length === 0 ? (
-            <p className="text-sm text-ink-500">Brak zdefiniowanych workflow.</p>
+            <p className="text-sm text-ink-500">
+              Brak zdefiniowanych workflow. Utwórz pierwszy przez{" "}
+              <code className="font-mono">POST /api/workflows</code> lub przycisk
+              powyżej.
+            </p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -114,9 +80,8 @@ export default async function WorkflowsPage() {
                     <th className="py-2 pr-3">Workflow</th>
                     <th className="py-2 pr-3">Trigger</th>
                     <th className="py-2 pr-3">Status</th>
-                    <th className="py-2 pr-3 text-right">Uruchomienia 24h</th>
-                    <th className="py-2 pr-3 text-right">Sukces 24h</th>
-                    <th className="py-2 pr-3">Następne</th>
+                    <th className="py-2 pr-3 text-right">Akcje</th>
+                    <th className="py-2 pr-3">Utworzono</th>
                     <th className="py-2 pr-3"></th>
                   </tr>
                 </thead>
@@ -125,38 +90,26 @@ export default async function WorkflowsPage() {
                     <tr key={w.id} className="border-b border-ink-100 dark:border-ink-900">
                       <td className="py-3 pr-3">
                         <div className="font-medium text-ink-900 dark:text-ink-50">{w.name}</div>
-                        <div className="text-xs text-ink-500 line-clamp-1">{w.description}</div>
                       </td>
                       <td className="py-3 pr-3 text-ink-700 dark:text-ink-300 text-xs">
-                        {TRIGGER_LABEL[w.trigger]}
+                        {TRIGGER_LABEL[w.trigger] ?? w.trigger}
                       </td>
                       <td className="py-3 pr-3">
                         <span
-                          className={`text-xs px-2 py-0.5 rounded-full border ${STATUS_BADGE[w.status]}`}
+                          className={`text-xs px-2 py-0.5 rounded-full border ${
+                            w.enabled
+                              ? "bg-accent-50 text-accent-700 border-accent-200"
+                              : "bg-ink-100 text-ink-600 border-ink-200"
+                          }`}
                         >
-                          {STATUS_LABEL[w.status]}
+                          {w.enabled ? "Aktywny" : "Wstrzymany"}
                         </span>
                       </td>
                       <td className="py-3 pr-3 text-right font-mono text-xs">
-                        {w.runs_24h.toLocaleString("pl-PL")}
-                      </td>
-                      <td className="py-3 pr-3 text-right">
-                        <span
-                          className={
-                            w.success_rate_24h_percent >= 99
-                              ? "text-accent-700"
-                              : w.success_rate_24h_percent >= 95
-                                ? "text-warn-700"
-                                : "text-danger-700"
-                          }
-                        >
-                          {w.success_rate_24h_percent.toFixed(1)}%
-                        </span>
+                        {Array.isArray(w.actions) ? w.actions.length : 0}
                       </td>
                       <td className="py-3 pr-3 text-xs text-ink-500">
-                        {w.next_run_at
-                          ? new Date(w.next_run_at).toLocaleString("pl-PL")
-                          : "—"}
+                        {new Date(w.created_at).toLocaleDateString("pl-PL")}
                       </td>
                       <td className="py-3 pr-3 text-right">
                         <Link
@@ -175,27 +128,5 @@ export default async function WorkflowsPage() {
         </CardContent>
       </Card>
     </main>
-  );
-}
-
-function WorkflowRow({ workflow }: { workflow: Workflow }) {
-  return (
-    <li className="rounded-md border border-danger-200 dark:border-danger-700/40 bg-danger-50/30 dark:bg-danger-700/5 p-3 flex flex-wrap items-center justify-between gap-2">
-      <div>
-        <div className="font-medium text-ink-900 dark:text-ink-50">{workflow.name}</div>
-        <div className="text-xs text-ink-500">
-          Ostatnie: {workflow.last_run_at
-            ? new Date(workflow.last_run_at).toLocaleString("pl-PL")
-            : "nigdy"}
-          {workflow.last_run_status && ` (${workflow.last_run_status})`}
-        </div>
-      </div>
-      <Link
-        href={`/admin/workflows/${workflow.id}`}
-        className="text-xs text-accent-700 hover:text-accent-800"
-      >
-        Zbadaj →
-      </Link>
-    </li>
   );
 }

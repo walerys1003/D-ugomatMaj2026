@@ -1,43 +1,21 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Sparkline } from "@/components/analytics/sparkline";
+import { computeRevenueMetrics } from "@/lib/analytics/revenue-metrics";
+import { requireAdmin } from "@/lib/auth/require-admin";
 
 export const metadata: Metadata = { title: "Revenue | Admin Analytics | Długomat" };
+export const dynamic = "force-dynamic";
 
-interface RevenueOverview {
-  mrr_pln: number;
-  mrr_change_percent: number;
-  arr_pln: number;
-  net_revenue_retention_percent: number;
-  active_subscriptions: number;
-  new_mrr_30d: number;
-  expansion_mrr_30d: number;
-  churned_mrr_30d: number;
-  by_plan: Array<{ plan: string; mrr_pln: number; subs: number }>;
-  mrr_trend_90d: number[];
-  arr_trend_90d: number[];
-}
-
-async function fetchRevenue(): Promise<RevenueOverview | null> {
-  try {
-    const res = await fetch("/api/admin/analytics/revenue", { cache: "no-store" });
-    if (!res.ok) return null;
-    return (await res.json()) as RevenueOverview;
-  } catch {
-    return null;
-  }
-}
+const PLN = (grosze: number) =>
+  (grosze / 100).toLocaleString("pl-PL", { maximumFractionDigits: 0 });
 
 export default async function RevenuePage() {
-  const data = await fetchRevenue();
-  if (!data) {
-    return (
-      <main className="container mx-auto px-4 py-12 max-w-6xl">
-        <p className="text-ink-600">Brak danych.</p>
-      </main>
-    );
-  }
+  const gate = await requireAdmin();
+  if (!gate.ok) redirect("/logowanie?next=/admin/analytics/revenue");
+
+  const data = await computeRevenueMetrics();
 
   return (
     <main className="container mx-auto px-4 py-8 max-w-7xl space-y-6">
@@ -49,23 +27,17 @@ export default async function RevenuePage() {
           Revenue
         </h1>
         <p className="text-sm text-ink-500 mt-1">
-          MRR · ARR · NRR · ruch przychodów w czasie
+          MRR · ARR · NRR · churn — liczone na żywo z tabeli subskrypcji.
         </p>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <BigStat label="MRR" value={`${PLN(data.mrr_grosze)} zł`} />
+        <BigStat label="ARR" value={`${PLN(data.arr_grosze)} zł`} />
         <BigStat
-          label="MRR"
-          value={`${data.mrr_pln.toLocaleString("pl-PL")} zł`}
-          delta={data.mrr_change_percent}
-          spark={data.mrr_trend_90d}
+          label="NRR"
+          value={`${Math.round(data.net_revenue_retention * 100)}%`}
         />
-        <BigStat
-          label="ARR"
-          value={`${(data.arr_pln / 1000).toFixed(0)}k zł`}
-          spark={data.arr_trend_90d}
-        />
-        <BigStat label="NRR" value={`${data.net_revenue_retention_percent}%`} />
         <BigStat
           label="Aktywne subskrypcje"
           value={data.active_subscriptions.toLocaleString("pl-PL")}
@@ -74,24 +46,25 @@ export default async function RevenuePage() {
 
       <Card elevation="subtle">
         <CardHeader>
-          <CardTitle>Ruch MRR (ostatnie 30 dni)</CardTitle>
+          <CardTitle>Ruch subskrypcji (ostatnie 30 dni)</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid sm:grid-cols-3 gap-3">
             <MovementCard
-              label="New"
-              value={data.new_mrr_30d}
+              label="Nowe subskrypcje"
+              value={data.new_subscriptions_30d}
               color="text-accent-700"
             />
             <MovementCard
-              label="Expansion"
-              value={data.expansion_mrr_30d}
-              color="text-accent-700"
-            />
-            <MovementCard
-              label="Churn"
-              value={-data.churned_mrr_30d}
+              label="Churn (subskrypcje)"
+              value={-data.churned_subscriptions_30d}
               color="text-danger-700"
+            />
+            <MovementCard
+              label="Churn rate"
+              value={Math.round(data.gross_churn_rate * 100)}
+              color="text-danger-700"
+              suffix="%"
             />
           </div>
         </CardContent>
@@ -99,58 +72,38 @@ export default async function RevenuePage() {
 
       <Card elevation="subtle">
         <CardHeader>
-          <CardTitle>MRR według planu</CardTitle>
+          <CardTitle>Pozostałe wskaźniki</CardTitle>
         </CardHeader>
         <CardContent>
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left border-b border-ink-200 dark:border-ink-800 text-xs uppercase tracking-wider text-ink-500">
-                <th className="py-2 pr-3">Plan</th>
-                <th className="py-2 pr-3 text-right">Subskrypcje</th>
-                <th className="py-2 pr-3 text-right">MRR</th>
-                <th className="py-2 pr-3 text-right">Udział</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.by_plan.map((row) => {
-                const share = (row.mrr_pln / data.mrr_pln) * 100;
-                return (
-                  <tr
-                    key={row.plan}
-                    className="border-b border-ink-100 dark:border-ink-900"
-                  >
-                    <td className="py-2 pr-3 capitalize font-medium text-ink-900 dark:text-ink-50">
-                      {row.plan}
-                    </td>
-                    <td className="py-2 pr-3 text-right">{row.subs}</td>
-                    <td className="py-2 pr-3 text-right font-medium">
-                      {row.mrr_pln.toLocaleString("pl-PL")} zł
-                    </td>
-                    <td className="py-2 pr-3 text-right text-ink-500">
-                      {share.toFixed(1)}%
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <dl className="grid sm:grid-cols-3 gap-4 text-sm">
+            <div>
+              <dt className="text-xs uppercase tracking-wider text-ink-500">ARPU</dt>
+              <dd className="font-display text-xl font-semibold text-ink-900 dark:text-ink-50">
+                {PLN(data.arpu_grosze)} zł
+              </dd>
+            </div>
+            <div>
+              <dt className="text-xs uppercase tracking-wider text-ink-500">LTV (szac.)</dt>
+              <dd className="font-display text-xl font-semibold text-ink-900 dark:text-ink-50">
+                {PLN(data.ltv_grosze)} zł
+              </dd>
+            </div>
+            <div>
+              <dt className="text-xs uppercase tracking-wider text-ink-500">
+                Wyliczono
+              </dt>
+              <dd className="text-ink-700 dark:text-ink-300">
+                {new Date(data.computed_at).toLocaleString("pl-PL")}
+              </dd>
+            </div>
+          </dl>
         </CardContent>
       </Card>
     </main>
   );
 }
 
-function BigStat({
-  label,
-  value,
-  delta,
-  spark,
-}: {
-  label: string;
-  value: string;
-  delta?: number;
-  spark?: number[];
-}) {
+function BigStat({ label, value }: { label: string; value: string }) {
   return (
     <Card elevation="pop">
       <CardContent className="pt-5">
@@ -158,20 +111,6 @@ function BigStat({
         <div className="font-display text-2xl font-semibold text-ink-900 dark:text-ink-50">
           {value}
         </div>
-        {typeof delta === "number" && (
-          <div
-            className={`text-xs mt-1 ${
-              delta >= 0 ? "text-accent-700" : "text-danger-700"
-            }`}
-          >
-            {delta >= 0 ? "▲" : "▼"} {Math.abs(delta).toFixed(1)}%
-          </div>
-        )}
-        {spark && (
-          <div className="mt-2 text-accent-600">
-            <Sparkline data={spark} width={140} height={32} />
-          </div>
-        )}
       </CardContent>
     </Card>
   );
@@ -181,17 +120,20 @@ function MovementCard({
   label,
   value,
   color,
+  suffix = "",
 }: {
   label: string;
   value: number;
   color: string;
+  suffix?: string;
 }) {
   return (
     <div className="rounded-lg border border-ink-200 dark:border-ink-800 px-4 py-3">
       <div className="text-xs uppercase tracking-wider text-ink-500 mb-1">{label}</div>
       <div className={`font-display text-xl font-semibold ${color}`}>
         {value >= 0 ? "+" : ""}
-        {value.toLocaleString("pl-PL")} zł
+        {value.toLocaleString("pl-PL")}
+        {suffix}
       </div>
     </div>
   );
