@@ -1,14 +1,19 @@
 import * as React from "react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Star, FileText, Scale, BookOpen, Search, Filter, ChevronRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export const metadata = {
   title: "Ulubione - Dlugomat",
   description: "Twoje zapisane pisma, orzeczenia i dokumenty - szybki dostep do najwazniejszych zasobow.",
 };
+
+export const dynamic = "force-dynamic";
 
 type FavoriteKind = "pismo" | "orzeczenie" | "dokument" | "wzor";
 
@@ -22,80 +27,10 @@ type Favorite = {
   href: string;
 };
 
-const FAVORITES: Favorite[] = [
-  {
-    id: "fav-001",
-    kind: "orzeczenie",
-    title: "Wyrok SN III CZP 84/22",
-    subtitle: "Kredyt frankowy - nieważność umowy",
-    addedAt: "2026-05-09",
-    tags: ["kredyty CHF", "naliczanie odsetek"],
-    href: "/panel/baza-orzecznicza/r-001",
-  },
-  {
-    id: "fav-002",
-    kind: "pismo",
-    title: "Sprzeciw od nakazu zaplaty",
-    subtitle: "Wersja przygotowana 5 maja 2026",
-    addedAt: "2026-05-05",
-    tags: ["sprzeciw", "EPU"],
-    href: "/panel/moje-pisma/l-001",
-  },
-  {
-    id: "fav-003",
-    kind: "wzor",
-    title: "Wniosek o rozłożenie na raty",
-    subtitle: "Wzor standardowy - art. 320 KPC",
-    addedAt: "2026-05-03",
-    tags: ["wzor", "raty"],
-    href: "/panel/wsparcie/baza-wiedzy/w-101",
-  },
-  {
-    id: "fav-004",
-    kind: "dokument",
-    title: "Umowa pozyczki Provident 2023",
-    subtitle: "Skan oryginalu z adnotacjami",
-    addedAt: "2026-04-28",
-    tags: ["umowa", "provident"],
-    href: "/panel/dokumenty/doc-201",
-  },
-  {
-    id: "fav-005",
-    kind: "orzeczenie",
-    title: "Uchwala SN III CZP 11/20",
-    subtitle: "Niedozwolone klauzule w umowach pożyczki",
-    addedAt: "2026-04-22",
-    tags: ["klauzule abuzywne"],
-    href: "/panel/baza-orzecznicza/r-002",
-  },
-  {
-    id: "fav-006",
-    kind: "pismo",
-    title: "Wniosek o upadlosc konsumencka",
-    subtitle: "Szkic - 80% wypelniony",
-    addedAt: "2026-04-18",
-    tags: ["upadlosc", "szkic"],
-    href: "/panel/moje-pisma/l-002",
-  },
-  {
-    id: "fav-007",
-    kind: "wzor",
-    title: "Pelnomocnictwo procesowe",
-    subtitle: "Wzor adwokacki",
-    addedAt: "2026-04-15",
-    tags: ["pelnomocnictwo"],
-    href: "/panel/wsparcie/baza-wiedzy/w-102",
-  },
-  {
-    id: "fav-008",
-    kind: "dokument",
-    title: "Postanowienie sadu I C 234/26",
-    subtitle: "Postanowienie o zabezpieczeniu",
-    addedAt: "2026-04-10",
-    tags: ["sad", "zabezpieczenie"],
-    href: "/panel/dokumenty/doc-301",
-  },
-];
+function normalizeKind(raw: string): FavoriteKind {
+  if (raw === "pismo" || raw === "orzeczenie" || raw === "wzor") return raw;
+  return "dokument";
+}
 
 const KIND_LABEL: Record<FavoriteKind, string> = {
   pismo: "Pismo",
@@ -118,14 +53,6 @@ const KIND_ICON = {
   wzor: BookOpen,
 };
 
-const COUNTS: Record<string, number> = {
-  all: FAVORITES.length,
-  pismo: FAVORITES.filter((f) => f.kind === "pismo").length,
-  orzeczenie: FAVORITES.filter((f) => f.kind === "orzeczenie").length,
-  dokument: FAVORITES.filter((f) => f.kind === "dokument").length,
-  wzor: FAVORITES.filter((f) => f.kind === "wzor").length,
-};
-
 const TABS: { id: string; label: string }[] = [
   { id: "all", label: "Wszystkie" },
   { id: "pismo", label: "Pisma" },
@@ -134,8 +61,36 @@ const TABS: { id: string; label: string }[] = [
   { id: "wzor", label: "Wzory" },
 ];
 
-export default function UlubionePage() {
+export default async function UlubionePage() {
   const dateFmt = new Intl.DateTimeFormat("pl-PL", { day: "numeric", month: "long", year: "numeric" });
+
+  const supabase = createSupabaseServerClient();
+  const { data: u } = await supabase.auth.getUser();
+  if (!u.user) redirect("/logowanie?next=/panel/ulubione");
+
+  const { data: rows } = await supabase
+    .from("favorites")
+    .select("id, kind, title, subtitle, href, tags, created_at")
+    .order("created_at", { ascending: false })
+    .limit(200);
+
+  const FAVORITES: Favorite[] = (rows ?? []).map((f) => ({
+    id: f.id,
+    kind: normalizeKind(f.kind),
+    title: f.title,
+    subtitle: f.subtitle ?? "",
+    addedAt: f.created_at.slice(0, 10),
+    tags: f.tags ?? [],
+    href: f.href,
+  }));
+
+  const COUNTS: Record<string, number> = {
+    all: FAVORITES.length,
+    pismo: FAVORITES.filter((f) => f.kind === "pismo").length,
+    orzeczenie: FAVORITES.filter((f) => f.kind === "orzeczenie").length,
+    dokument: FAVORITES.filter((f) => f.kind === "dokument").length,
+    wzor: FAVORITES.filter((f) => f.kind === "wzor").length,
+  };
 
   return (
     <div className="min-h-screen bg-dlugomat-50">
@@ -197,6 +152,12 @@ export default function UlubionePage() {
           </CardContent>
         </Card>
 
+        {FAVORITES.length === 0 ? (
+          <EmptyState
+            title="Brak ulubionych"
+            description="Oznacz gwiazdką pisma, orzeczenia, dokumenty lub wzory, aby mieć do nich szybki dostęp w jednym miejscu."
+          />
+        ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {FAVORITES.map((fav) => {
             const Icon = KIND_ICON[fav.kind];
@@ -246,10 +207,7 @@ export default function UlubionePage() {
             );
           })}
         </div>
-
-        <div className="mt-8 text-center">
-          <Button variant="ghost">Pokaz wiecej (24 starszych)</Button>
-        </div>
+        )}
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Award, Crown, Medal, TrendingUp, Trophy } from "lucide-react";
+import { redirect } from "next/navigation";
+import { Award, TrendingUp } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import {
@@ -10,42 +11,31 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
+import { listReferralStats } from "@/lib/referrals/referral-actions";
 
 export const metadata: Metadata = {
   title: "Ranking poleceń — Długomat",
-  description: "Najlepsi ambasadorzy programu poleceń — ranking miesięczny.",
+  description: "Twoja pozycja i postępy w programie poleceń.",
 };
 
-interface RankEntry {
-  rank: number;
-  alias: string;
-  region: string;
-  invites: number;
-  conversions: number;
-  earned_pln: number;
-  tier: "Brąz" | "Srebro" | "Złoto" | "Platyna";
-  is_you?: boolean;
-}
+export const dynamic = "force-dynamic";
 
-const RANKING: RankEntry[] = [
-  { rank: 1, alias: "MK_Warszawa", region: "Mazowieckie", invites: 47, conversions: 28, earned_pln: 4200, tier: "Platyna" },
-  { rank: 2, alias: "TomaszP", region: "Małopolskie", invites: 38, conversions: 22, earned_pln: 3300, tier: "Platyna" },
-  { rank: 3, alias: "AnnaK_Gdańsk", region: "Pomorskie", invites: 31, conversions: 19, earned_pln: 2850, tier: "Złoto" },
-  { rank: 4, alias: "PiotrW", region: "Śląskie", invites: 26, conversions: 16, earned_pln: 2400, tier: "Złoto" },
-  { rank: 5, alias: "Ty (anna.kowalska)", region: "Mazowieckie", invites: 22, conversions: 13, earned_pln: 1950, tier: "Złoto", is_you: true },
-  { rank: 6, alias: "MarekL", region: "Wielkopolskie", invites: 19, conversions: 11, earned_pln: 1650, tier: "Srebro" },
-  { rank: 7, alias: "EwaS", region: "Dolnośląskie", invites: 17, conversions: 9, earned_pln: 1350, tier: "Srebro" },
-  { rank: 8, alias: "KasiaN", region: "Łódzkie", invites: 14, conversions: 8, earned_pln: 1200, tier: "Srebro" },
-  { rank: 9, alias: "AdamR", region: "Lubelskie", invites: 12, conversions: 6, earned_pln: 900, tier: "Brąz" },
-  { rank: 10, alias: "BartekO", region: "Zachodniopomorskie", invites: 10, conversions: 5, earned_pln: 750, tier: "Brąz" },
-];
+type Tier = "Brąz" | "Srebro" | "Złoto" | "Platyna";
 
-const TIER_TONE: Record<RankEntry["tier"], "info" | "neutral" | "warning" | "success"> = {
+const TIER_TONE: Record<Tier, "info" | "neutral" | "warning" | "success"> = {
   Brąz: "neutral",
   Srebro: "info",
   Złoto: "warning",
   Platyna: "success",
 };
+
+function tierFor(conversions: number): Tier {
+  if (conversions >= 20) return "Platyna";
+  if (conversions >= 10) return "Złoto";
+  if (conversions >= 4) return "Srebro";
+  return "Brąz";
+}
 
 function fmtPLN(n: number): string {
   return new Intl.NumberFormat("pl-PL", {
@@ -55,28 +45,39 @@ function fmtPLN(n: number): string {
   }).format(n);
 }
 
-function RankIcon({ rank }: { rank: number }) {
-  if (rank === 1) return <Crown className="h-5 w-5 text-warn" aria-hidden />;
-  if (rank === 2) return <Trophy className="h-5 w-5 text-ink-400" aria-hidden />;
-  if (rank === 3) return <Medal className="h-5 w-5 text-ink-500" aria-hidden />;
-  return null;
-}
+export default async function PoleceniaRankingPage() {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/logowanie?next=/panel/polecenia/ranking");
 
-export default function PoleceniaRankingPage() {
-  const you = RANKING.find((r) => r.is_you);
+  const stats = await listReferralStats(user.id);
+
+  const invites = stats.code?.total_signups ?? 0;
+  const conversions = stats.recentConversions.filter(
+    (c) => c.status === "approved" || c.status === "paid",
+  ).length;
+  const clicks = stats.code?.total_clicks ?? 0;
+  const earnedPln =
+    (stats.totals.pending_grosze +
+      stats.totals.approved_grosze +
+      stats.totals.paid_grosze) /
+    100;
+  const tier = tierFor(conversions);
 
   return (
     <div className="space-y-8">
       <header className="space-y-2">
         <p className="text-xs uppercase tracking-[0.18em] text-ink-500">
-          Polecenia · ranking miesięczny
+          Polecenia · Twoje postępy
         </p>
         <h1 className="font-display text-fluid-h1 text-dlugomat-950">
-          Top 10 ambasadorów · maj 2026
+          Twoja pozycja w programie
         </h1>
         <p className="max-w-2xl text-ink-600">
-          Ranking obejmuje wszystkich uczestników programu poleceń. Aliasy chronią
-          tożsamość — Twoje dane widoczne są tylko dla Ciebie.
+          Im więcej skutecznych poleceń, tym wyższy tier i większe prowizje.
+          Dane poniżej dotyczą wyłącznie Twojego konta.
         </p>
       </header>
 
@@ -88,113 +89,83 @@ export default function PoleceniaRankingPage() {
           Moje polecenia
         </Link>
         <span className="rounded bg-white px-3 py-1.5 font-semibold text-dlugomat-900 shadow-sm">
-          Ranking
+          Postępy
         </span>
       </nav>
 
-      {you ? (
-        <Card urgency="success">
-          <CardContent className="flex flex-wrap items-center gap-4 p-5">
-            <Award className="h-8 w-8 text-accent-700" aria-hidden />
-            <div className="flex-1 min-w-[180px]">
-              <p className="text-xs uppercase tracking-wide text-ink-500">Twoje miejsce</p>
-              <p className="font-display text-fluid-h3 text-dlugomat-950">
-                #{you.rank} · {you.alias}
-              </p>
-            </div>
-            <div className="text-right">
-              <p className="text-xs uppercase tracking-wide text-ink-500">Zarobione</p>
-              <p className="font-display text-2xl text-accent-700">{fmtPLN(you.earned_pln)}</p>
-            </div>
-          </CardContent>
-        </Card>
-      ) : null}
+      <Card urgency="success">
+        <CardContent className="flex flex-wrap items-center gap-4 p-5">
+          <Award className="h-8 w-8 text-accent-700" aria-hidden />
+          <div className="flex-1 min-w-[180px]">
+            <p className="text-xs uppercase tracking-wide text-ink-500">Twój tier</p>
+            <p className="font-display text-fluid-h3 text-dlugomat-950">
+              <Badge tone={TIER_TONE[tier]}>{tier}</Badge>
+            </p>
+          </div>
+          <div className="text-right">
+            <p className="text-xs uppercase tracking-wide text-ink-500">Zarobione łącznie</p>
+            <p className="font-display text-2xl text-accent-700">{fmtPLN(earnedPln)}</p>
+          </div>
+        </CardContent>
+      </Card>
 
-      <section className="grid gap-4 sm:grid-cols-3" aria-label="Top 3 podium">
-        {RANKING.slice(0, 3).map((r) => (
-          <Card
-            key={r.rank}
-            urgency={r.rank === 1 ? "success" : r.rank === 2 ? "normal" : "normal"}
-            elevation={r.rank === 1 ? "pop" : "subtle"}
-          >
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardDescription>
-                  <RankIcon rank={r.rank} />
-                  <span className="ml-1">Miejsce #{r.rank}</span>
-                </CardDescription>
-                <Badge tone={TIER_TONE[r.tier]}>{r.tier}</Badge>
-              </div>
-              <CardTitle className="font-display text-fluid-h4 text-dlugomat-950">
-                {r.alias}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 text-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-ink-600">Polecenia</span>
-                <span className="font-semibold text-dlugomat-900">{r.invites}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-ink-600">Konwersje</span>
-                <span className="font-semibold text-dlugomat-900">{r.conversions}</span>
-              </div>
-              <div className="flex items-center justify-between border-t border-ink-100 pt-2">
-                <span className="text-ink-600">Zarobione</span>
-                <span className="font-display text-lg text-accent-700">
-                  {fmtPLN(r.earned_pln)}
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+      <section className="grid gap-4 sm:grid-cols-3" aria-label="Statystyki">
+        <Card elevation="subtle">
+          <CardHeader>
+            <CardDescription>Kliknięcia</CardDescription>
+            <CardTitle className="font-display text-fluid-h4 text-dlugomat-950">{clicks}</CardTitle>
+          </CardHeader>
+        </Card>
+        <Card elevation="subtle">
+          <CardHeader>
+            <CardDescription>Rejestracje</CardDescription>
+            <CardTitle className="font-display text-fluid-h4 text-dlugomat-950">{invites}</CardTitle>
+          </CardHeader>
+        </Card>
+        <Card elevation="subtle">
+          <CardHeader>
+            <CardDescription>
+              <TrendingUp className="mr-1 inline h-3 w-3 text-accent-600" aria-hidden />
+              Konwersje
+            </CardDescription>
+            <CardTitle className="font-display text-fluid-h4 text-dlugomat-950">{conversions}</CardTitle>
+          </CardHeader>
+        </Card>
       </section>
 
       <Card>
         <CardHeader>
-          <CardTitle>Pełny ranking</CardTitle>
-          <CardDescription>Aktualizowany codziennie o 06:00 CET</CardDescription>
+          <CardTitle>Progi tierów</CardTitle>
+          <CardDescription>Liczona jest liczba skutecznych konwersji</CardDescription>
         </CardHeader>
         <CardContent className="px-0">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-ink-200 text-sm">
               <thead className="bg-ink-50 text-xs uppercase tracking-wide text-ink-600">
                 <tr>
-                  <th className="px-4 py-2 text-left w-12">#</th>
-                  <th className="px-4 py-2 text-left">Alias</th>
-                  <th className="px-4 py-2 text-left">Region</th>
-                  <th className="px-4 py-2 text-right">Polecenia</th>
-                  <th className="px-4 py-2 text-right">Konwersje</th>
-                  <th className="px-4 py-2 text-right">Zarobione</th>
                   <th className="px-4 py-2 text-left">Tier</th>
+                  <th className="px-4 py-2 text-right">Wymagane konwersje</th>
+                  <th className="px-4 py-2 text-left">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-ink-100 bg-white">
-                {RANKING.map((r) => (
-                  <tr
-                    key={r.rank}
-                    className={r.is_you ? "bg-accent-50/60" : ""}
-                  >
+                {([
+                  ["Brąz", 0],
+                  ["Srebro", 4],
+                  ["Złoto", 10],
+                  ["Platyna", 20],
+                ] as Array<[Tier, number]>).map(([t, need]) => (
+                  <tr key={t} className={t === tier ? "bg-accent-50/60" : ""}>
                     <td className="px-4 py-2">
-                      <div className="flex items-center gap-1">
-                        <span className="font-semibold text-dlugomat-900">#{r.rank}</span>
-                        <RankIcon rank={r.rank} />
-                      </div>
+                      <Badge tone={TIER_TONE[t]}>{t}</Badge>
                     </td>
-                    <td className="px-4 py-2 font-medium text-dlugomat-900">
-                      {r.alias}
-                      {r.is_you ? <Badge tone="success" withDot className="ml-2">to Ty</Badge> : null}
-                    </td>
-                    <td className="px-4 py-2 text-ink-600">{r.region}</td>
-                    <td className="px-4 py-2 text-right text-dlugomat-900">{r.invites}</td>
-                    <td className="px-4 py-2 text-right text-dlugomat-900">
-                      <TrendingUp className="mr-1 inline h-3 w-3 text-accent-600" aria-hidden />
-                      {r.conversions}
-                    </td>
-                    <td className="px-4 py-2 text-right font-semibold text-accent-700">
-                      {fmtPLN(r.earned_pln)}
-                    </td>
+                    <td className="px-4 py-2 text-right text-dlugomat-900">{need}+</td>
                     <td className="px-4 py-2">
-                      <Badge tone={TIER_TONE[r.tier]}>{r.tier}</Badge>
+                      {conversions >= need ? (
+                        <Badge tone="success" withDot>Osiągnięty</Badge>
+                      ) : (
+                        <span className="text-ink-500">Brakuje {need - conversions}</span>
+                      )}
                     </td>
                   </tr>
                 ))}

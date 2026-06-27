@@ -18,100 +18,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
+import { redirect } from "next/navigation";
+import {
+  getAccountActivity,
+  type ActivityEvent,
+} from "@/lib/activity/activity-repository";
 
 export const metadata: Metadata = {
   title: "Aktywność konta — Długomat",
   description: "Pełna historia zdarzeń w Twoim koncie: logowania, dokumenty, zmiany.",
 };
 
-interface ActivityEvent {
-  id: string;
-  ts: string;
-  type:
-    | "login"
-    | "logout"
-    | "doc_upload"
-    | "case_update"
-    | "settings_changed"
-    | "ai_query"
-    | "password_changed"
-    | "mfa_enabled";
-  description: string;
-  ip?: string;
-  device?: string;
-  risk: "low" | "normal" | "elevated";
-}
-
-const EVENTS: ActivityEvent[] = [
-  {
-    id: "ev_001",
-    ts: "2026-05-11T08:14:00Z",
-    type: "login",
-    description: "Logowanie z weryfikacją MFA",
-    ip: "89.64.21.12",
-    device: "Chrome 124 / Windows 11",
-    risk: "low",
-  },
-  {
-    id: "ev_002",
-    ts: "2026-05-10T22:08:00Z",
-    type: "doc_upload",
-    description: "Dodano dokument: raport_BIK_2026-05.pdf (2.4 MB)",
-    risk: "low",
-  },
-  {
-    id: "ev_003",
-    ts: "2026-05-10T19:42:00Z",
-    type: "ai_query",
-    description: 'Zapytanie do AI asystenta: "Wniosek o korektę BIK"',
-    risk: "low",
-  },
-  {
-    id: "ev_004",
-    ts: "2026-05-10T16:24:00Z",
-    type: "case_update",
-    description: 'Zmiana statusu sprawy case_004: "W trakcie" → "Oczekuje na odpowiedź"',
-    risk: "low",
-  },
-  {
-    id: "ev_005",
-    ts: "2026-05-09T11:48:00Z",
-    type: "settings_changed",
-    description: "Zmiana preferencji powiadomień e-mail",
-    risk: "normal",
-  },
-  {
-    id: "ev_006",
-    ts: "2026-05-08T22:14:00Z",
-    type: "login",
-    description: "Logowanie z nowego urządzenia (rozpoznano)",
-    ip: "5.172.43.21",
-    device: "Safari 17 / iOS 17.4",
-    risk: "elevated",
-  },
-  {
-    id: "ev_007",
-    ts: "2026-05-07T09:32:00Z",
-    type: "password_changed",
-    description: "Zmiana hasła",
-    ip: "89.64.21.12",
-    risk: "normal",
-  },
-  {
-    id: "ev_008",
-    ts: "2026-05-04T14:18:00Z",
-    type: "mfa_enabled",
-    description: "Włączono uwierzytelnianie dwuskładnikowe (TOTP)",
-    risk: "low",
-  },
-  {
-    id: "ev_009",
-    ts: "2026-05-03T11:08:00Z",
-    type: "logout",
-    description: "Wylogowanie (zamknięcie przeglądarki)",
-    risk: "low",
-  },
-];
+export const dynamic = "force-dynamic";
 
 const TYPE_ICON = {
   login: LogIn,
@@ -122,6 +42,7 @@ const TYPE_ICON = {
   ai_query: MessageSquare,
   password_changed: Key,
   mfa_enabled: Shield,
+  other: FileText,
 } as const;
 
 const TYPE_LABEL: Record<ActivityEvent["type"], string> = {
@@ -133,6 +54,7 @@ const TYPE_LABEL: Record<ActivityEvent["type"], string> = {
   ai_query: "AI asystent",
   password_changed: "Hasło",
   mfa_enabled: "MFA",
+  other: "Zdarzenie",
 };
 
 const RISK_TONE: Record<ActivityEvent["risk"], "success" | "info" | "warning"> = {
@@ -148,7 +70,12 @@ function fmtDate(iso: string): string {
   }).format(new Date(iso));
 }
 
-export default function AktywnoscPage() {
+export default async function AktywnoscPage() {
+  const supabase = createSupabaseServerClient();
+  const { data: u } = await supabase.auth.getUser();
+  if (!u.user) redirect("/logowanie?next=/panel/aktywnosc");
+
+  const EVENTS = await getAccountActivity(90);
   const total = EVENTS.length;
   const elevated = EVENTS.filter((e) => e.risk === "elevated").length;
   const logins = EVENTS.filter((e) => e.type === "login").length;
@@ -201,6 +128,12 @@ export default function AktywnoscPage() {
           <CardDescription>Sortowanie: czas malejąco</CardDescription>
         </CardHeader>
         <CardContent>
+          {EVENTS.length === 0 ? (
+            <EmptyState
+              title="Brak zarejestrowanych zdarzeń"
+              description="Gdy zaczniesz korzystać z konta, pojawi się tu historia logowań i działań."
+            />
+          ) : (
           <ol className="relative border-l border-ink-200 pl-6 space-y-5">
             {EVENTS.map((ev) => {
               const Icon = TYPE_ICON[ev.type];
@@ -242,6 +175,7 @@ export default function AktywnoscPage() {
               );
             })}
           </ol>
+          )}
         </CardContent>
       </Card>
     </div>

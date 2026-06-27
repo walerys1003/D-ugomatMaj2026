@@ -1,14 +1,19 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { ArrowLeft, Plus, Search, Tag, Pin, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export const metadata: Metadata = {
   title: "Notatki — panel",
   robots: { index: false, follow: false },
 };
+
+export const dynamic = "force-dynamic";
 
 interface Note {
   id: string;
@@ -20,64 +25,39 @@ interface Note {
   pinned: boolean;
 }
 
-const NOTES: ReadonlyArray<Note> = [
-  {
-    id: "n1",
-    title: "Rozmowa z prawnikiem Kowalskim",
-    excerpt: "Doradza sprzeciw oparty o art. 506 KPC. Termin 7 dni od doreczenia. Wziac wyciag z BIK i potwierdzenie wplaty z 2019.",
-    case_id: "C-2026-0142",
-    tags: ["EPU", "Sprzeciw", "Bank"],
-    updated_at: "2026-05-09 14:23",
-    pinned: true,
-  },
-  {
-    id: "n2",
-    title: "Lista dokumentow do zlozenia",
-    excerpt: "1. Sprzeciw od nakazu, 2. Wyciag z BIK, 3. Potwierdzenie ostatniej wplaty, 4. Korespondencja mailowa z bankiem.",
-    case_id: "C-2026-0142",
-    tags: ["Dokumenty", "Lista"],
-    updated_at: "2026-05-08 19:10",
-    pinned: true,
-  },
-  {
-    id: "n3",
-    title: "Argumentacja — przedawnienie roszczenia",
-    excerpt: "Faktura z 2018-03-15. Termin przedawnienia uplynal 2021-12-31 (art. 118 KC). Brak przerwy biegu — list wezwawczy z 2024 nie liczy sie.",
-    case_id: "C-2026-0139",
-    tags: ["Przedawnienie", "KC"],
-    updated_at: "2026-05-07 11:45",
-    pinned: false,
-  },
-  {
-    id: "n4",
-    title: "Telefon do komornika Skiba",
-    excerpt: "Pyta o propozycje ugody. Akceptuje splate 60% w 6 ratach. Czeka na pismo do 15 maja.",
-    case_id: "C-2025-0987",
-    tags: ["Komornik", "Ugoda"],
-    updated_at: "2026-05-05 16:30",
-    pinned: false,
-  },
-  {
-    id: "n5",
-    title: "Plan dzialania na maj",
-    excerpt: "Tydzien 1: sprzeciw EPU. Tydzien 2: zarzuty Provident. Tydzien 3: ugoda komornicza. Tydzien 4: wniosek o rozlozenie na raty.",
-    case_id: null,
-    tags: ["Plan", "Maj"],
-    updated_at: "2026-05-02 09:00",
-    pinned: false,
-  },
-  {
-    id: "n6",
-    title: "Cytat z art. 5 KC",
-    excerpt: "Nie mozna czynic ze swego prawa uzytku, ktory by byl sprzeczny ze spoleczno-gospodarczym przeznaczeniem tego prawa lub z zasadami wspolzycia spolecznego.",
-    case_id: null,
-    tags: ["KC", "Cytat"],
-    updated_at: "2026-04-29 22:15",
-    pinned: false,
-  },
-];
+function fmtUpdated(iso: string): string {
+  try {
+    return new Intl.DateTimeFormat("pl-PL", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    }).format(new Date(iso));
+  } catch {
+    return iso;
+  }
+}
 
-export default function NotatkiPage() {
+export default async function NotatkiPage() {
+  const supabase = createSupabaseServerClient();
+  const { data: u } = await supabase.auth.getUser();
+  if (!u.user) redirect("/logowanie?next=/panel/notatki");
+
+  const { data: rows } = await supabase
+    .from("notes")
+    .select("id, title, body, case_id, tags, pinned, updated_at")
+    .order("pinned", { ascending: false })
+    .order("updated_at", { ascending: false })
+    .limit(200);
+
+  const NOTES: Note[] = (rows ?? []).map((n) => ({
+    id: n.id,
+    title: n.title || "(bez tytułu)",
+    excerpt: n.body ?? "",
+    case_id: n.case_id,
+    tags: n.tags ?? [],
+    updated_at: fmtUpdated(n.updated_at),
+    pinned: n.pinned,
+  }));
+
   const pinned = NOTES.filter((n) => n.pinned);
   const others = NOTES.filter((n) => !n.pinned);
 
@@ -118,6 +98,13 @@ export default function NotatkiPage() {
         </Button>
       </div>
 
+      {NOTES.length === 0 && (
+        <EmptyState
+          title="Nie masz jeszcze notatek"
+          description="Notatki pomogą Ci śledzić ustalenia z prawnikiem, terminy i argumentację. Utwórz pierwszą notatkę przyciskiem powyżej."
+        />
+      )}
+
       {pinned.length > 0 && (
         <section aria-labelledby="pinned-heading">
           <h2 id="pinned-heading" className="mb-3 flex items-center gap-2 text-sm font-medium text-ink-700">
@@ -132,14 +119,16 @@ export default function NotatkiPage() {
         </section>
       )}
 
-      <section aria-labelledby="others-heading">
-        <h2 id="others-heading" className="mb-3 text-sm font-medium text-ink-700">Pozostale</h2>
-        <div className="grid gap-4 md:grid-cols-2">
-          {others.map((n) => (
-            <NoteCard key={n.id} note={n} />
-          ))}
-        </div>
-      </section>
+      {others.length > 0 && (
+        <section aria-labelledby="others-heading">
+          <h2 id="others-heading" className="mb-3 text-sm font-medium text-ink-700">Pozostale</h2>
+          <div className="grid gap-4 md:grid-cols-2">
+            {others.map((n) => (
+              <NoteCard key={n.id} note={n} />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

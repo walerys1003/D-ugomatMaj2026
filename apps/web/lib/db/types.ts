@@ -2862,6 +2862,87 @@ export interface Database {
         >;
         Relationships: [];
       };
+      // Audyt 2026-06-27 (iter. panel-coverage): tabele modułów panelu
+      // użytkownika. Źródło: 20260627060000_user_panel_tables.sql.
+      notes: {
+        Row: {
+          id: string;
+          user_id: string;
+          case_id: string | null;
+          title: string;
+          body: string;
+          tags: string[];
+          pinned: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["notes"]["Row"]> & {
+          user_id: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["notes"]["Insert"]>;
+        Relationships: [];
+      };
+      favorites: {
+        Row: {
+          id: string;
+          user_id: string;
+          kind: string;
+          ref_id: string;
+          title: string;
+          subtitle: string | null;
+          href: string;
+          tags: string[];
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["favorites"]["Row"]> & {
+          user_id: string;
+          ref_id: string;
+          title: string;
+          href: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["favorites"]["Insert"]>;
+        Relationships: [];
+      };
+      message_threads: {
+        Row: {
+          id: string;
+          user_id: string;
+          case_id: string | null;
+          subject: string;
+          counterpart_role: string;
+          counterpart_name: string;
+          last_message_at: string;
+          unread_count: number;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["message_threads"]["Row"]
+        > & {
+          user_id: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["message_threads"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      messages: {
+        Row: {
+          id: string;
+          thread_id: string;
+          user_id: string;
+          sender: string;
+          body: string;
+          read_at: string | null;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["messages"]["Row"]> & {
+          thread_id: string;
+          user_id: string;
+          body: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["messages"]["Insert"]>;
+        Relationships: [];
+      };
       // Audyt 2026-06-27 (iter. 39): e-filing sądowy. Źródło:
       // 20260527000000_tier24_court_efiling_sdk.sql.
       court_filings: {
@@ -2977,6 +3058,13 @@ export type PromoCodeRow       = T["promo_codes"]["Row"];
 export type PromoCodeInsert    = T["promo_codes"]["Insert"];
 export type PromoRedemptionRow = T["promo_redemptions"]["Row"];
 export type PromoRedemptionInsert = T["promo_redemptions"]["Insert"];
+export type NoteRow            = T["notes"]["Row"];
+export type NoteInsert         = T["notes"]["Insert"];
+export type FavoriteRow        = T["favorites"]["Row"];
+export type FavoriteInsert     = T["favorites"]["Insert"];
+export type MessageThreadRow   = T["message_threads"]["Row"];
+export type MessageRow         = T["messages"]["Row"];
+export type MessageInsert      = T["messages"]["Insert"];
 
 // -----------------------------------------------------------------------------
 // Re-exports from sibling domain modules.

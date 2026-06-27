@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { CheckCircle2, Clock, Download, Share2, Wallet, XCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,11 +11,29 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
+import { listReferralStats } from "@/lib/referrals/referral-actions";
 
 export const metadata: Metadata = {
   title: "Historia polecen — Dlugomat",
   description: "Pelna historia zaproszen, prowizji i wyplat.",
 };
+
+export const dynamic = "force-dynamic";
+
+function mapConvStatus(status: string): Referral["status"] {
+  switch (status) {
+    case "paid":
+    case "approved":
+      return "converted";
+    case "pending":
+      return "registered";
+    case "rejected":
+      return "expired";
+    default:
+      return "invited";
+  }
+}
 
 type Referral = {
   id: string;
@@ -32,74 +51,6 @@ type Payout = {
   method: "transfer" | "voucher";
   status: "paid" | "pending" | "rejected";
 };
-
-const REFERRALS: Referral[] = [
-  {
-    id: "r-1",
-    email: "anna.k@example.pl",
-    invitedAt: "2026-03-12",
-    status: "converted",
-    reward: 150,
-    paidOut: true,
-  },
-  {
-    id: "r-2",
-    email: "marek.w@example.pl",
-    invitedAt: "2026-03-22",
-    status: "converted",
-    reward: 150,
-    paidOut: true,
-  },
-  {
-    id: "r-3",
-    email: "j.dabrowski@example.pl",
-    invitedAt: "2026-04-05",
-    status: "registered",
-    reward: 0,
-    paidOut: false,
-  },
-  {
-    id: "r-4",
-    email: "k.lewandowska@example.pl",
-    invitedAt: "2026-04-18",
-    status: "converted",
-    reward: 150,
-    paidOut: false,
-  },
-  {
-    id: "r-5",
-    email: "p.szymczak@example.pl",
-    invitedAt: "2026-04-22",
-    status: "invited",
-    reward: 0,
-    paidOut: false,
-  },
-  {
-    id: "r-6",
-    email: "m.kowalski@example.pl",
-    invitedAt: "2026-02-08",
-    status: "expired",
-    reward: 0,
-    paidOut: false,
-  },
-];
-
-const PAYOUTS: Payout[] = [
-  {
-    id: "p-1",
-    date: "2026-04-05",
-    amount: 300,
-    method: "transfer",
-    status: "paid",
-  },
-  {
-    id: "p-2",
-    date: "2026-05-01",
-    amount: 150,
-    method: "transfer",
-    status: "pending",
-  },
-];
 
 const STATUS_LABEL: Record<Referral["status"], string> = {
   invited: "Zaproszony",
@@ -140,12 +91,32 @@ const fmtDate = (iso: string) =>
     year: "numeric",
   }).format(new Date(iso));
 
-export default function ReferralHistoryPage() {
-  const earned = REFERRALS.reduce((sum, r) => sum + r.reward, 0);
-  const paid = REFERRALS.filter((r) => r.paidOut).reduce(
-    (sum, r) => sum + r.reward,
-    0,
-  );
+export default async function ReferralHistoryPage() {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/logowanie?next=/panel/polecenia/historia");
+
+  const stats = await listReferralStats(user.id);
+
+  const REFERRALS: Referral[] = stats.recentConversions.map((c) => ({
+    id: c.id,
+    email: `Konwersja ${c.code}`,
+    invitedAt: c.created_at,
+    status: mapConvStatus(c.status),
+    reward: c.reward_grosze / 100,
+    paidOut: c.status === "paid",
+  }));
+
+  const PAYOUTS: Payout[] = [];
+
+  const earned =
+    (stats.totals.pending_grosze +
+      stats.totals.approved_grosze +
+      stats.totals.paid_grosze) /
+    100;
+  const paid = stats.totals.paid_grosze / 100;
   const pending = earned - paid;
   const converted = REFERRALS.filter((r) => r.status === "converted").length;
 
@@ -278,6 +249,13 @@ export default function ReferralHistoryPage() {
                   </td>
                 </tr>
               ))}
+              {REFERRALS.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="px-6 py-8 text-center text-sm text-slate-500">
+                    Brak zaproszen. Udostepnij swoj link, aby zaczac zarabiac.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </CardContent>
@@ -320,6 +298,13 @@ export default function ReferralHistoryPage() {
                   </td>
                 </tr>
               ))}
+              {PAYOUTS.length === 0 && (
+                <tr>
+                  <td colSpan={4} className="px-6 py-8 text-center text-sm text-slate-500">
+                    Brak wyplat. Wyplaty pojawia sie po zatwierdzeniu prowizji.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </CardContent>

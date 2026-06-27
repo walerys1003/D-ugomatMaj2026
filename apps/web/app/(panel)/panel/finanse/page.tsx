@@ -1,14 +1,19 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { ArrowLeft, ArrowDownRight, ArrowUpRight, Wallet, FileText, Download } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export const metadata: Metadata = {
   title: "Finanse — panel",
   robots: { index: false, follow: false },
 };
+
+export const dynamic = "force-dynamic";
 
 const fmtPLN = new Intl.NumberFormat("pl-PL", {
   style: "currency",
@@ -21,8 +26,9 @@ interface Transaction {
   date: string;
   desc: string;
   category: "pismo" | "splata" | "zwrot" | "konsultacja";
-  amount: number;
+  amount: number; // w PLN (już przeliczone z groszy)
   invoice_no: string | null;
+  invoice_url: string | null;
   status: "rozliczone" | "oczekuje" | "anulowane";
 }
 
@@ -46,17 +52,51 @@ const STATUS_TONE: Record<Transaction["status"], "success" | "warning" | "danger
   anulowane: "danger",
 };
 
-const TX: ReadonlyArray<Transaction> = [
-  { id: "t1", date: "2026-05-09", desc: "Sprzeciw EPU — Bank PKO", category: "pismo", amount: -149, invoice_no: "FV/2026/05/0142", status: "rozliczone" },
-  { id: "t2", date: "2026-05-05", desc: "Rata 3/12 — wierzyciel Provident", category: "splata", amount: -780, invoice_no: null, status: "rozliczone" },
-  { id: "t3", date: "2026-05-02", desc: "Konsultacja z prawnikiem", category: "konsultacja", amount: -99, invoice_no: "FV/2026/05/0089", status: "rozliczone" },
-  { id: "t4", date: "2026-04-28", desc: "Zwrot oplaty sadowej", category: "zwrot", amount: 200, invoice_no: null, status: "rozliczone" },
-  { id: "t5", date: "2026-04-22", desc: "Pakiet komorniczy (4 pisma)", category: "pismo", amount: -199, invoice_no: "FV/2026/04/0411", status: "rozliczone" },
-  { id: "t6", date: "2026-04-14", desc: "Rata 2/12 — wierzyciel Provident", category: "splata", amount: -780, invoice_no: null, status: "rozliczone" },
-  { id: "t7", date: "2026-05-14", desc: "Rata 4/12 — wierzyciel Provident", category: "splata", amount: -780, invoice_no: null, status: "oczekuje" },
-];
+function categorizeProduct(productType: string): Transaction["category"] {
+  const p = productType.toLowerCase();
+  if (p.includes("consult") || p.includes("konsult")) return "konsultacja";
+  if (p.includes("refund") || p.includes("zwrot")) return "zwrot";
+  if (p.includes("plan") || p.includes("rata") || p.includes("splat"))
+    return "splata";
+  return "pismo";
+}
 
-export default function FinansePage() {
+function mapPaymentStatus(status: string): Transaction["status"] {
+  if (status === "completed" || status === "paid") return "rozliczone";
+  if (status === "pending") return "oczekuje";
+  return "anulowane";
+}
+
+export default async function FinansePage() {
+  const supabase = createSupabaseServerClient();
+  const { data: u } = await supabase.auth.getUser();
+  if (!u.user) redirect("/logowanie?next=/panel/finanse");
+
+  const { data: payments } = await supabase
+    .from("payments")
+    .select(
+      "id, created_at, paid_at, amount, product_type, product_name, status, fakturownia_invoice_number, fakturownia_invoice_url, refunded_at",
+    )
+    .order("created_at", { ascending: false })
+    .limit(100);
+
+  const TX: Transaction[] = (payments ?? []).map((p) => {
+    const isRefund = p.refunded_at != null;
+    const category = isRefund ? "zwrot" : categorizeProduct(p.product_type);
+    // amount jest w groszach; zwroty pokazujemy jako dodatnie, opłaty jako ujemne.
+    const pln = (p.amount ?? 0) / 100;
+    return {
+      id: p.id,
+      date: (p.paid_at ?? p.created_at).slice(0, 10),
+      desc: p.product_name ?? "Płatność",
+      category,
+      amount: category === "zwrot" ? Math.abs(pln) : -Math.abs(pln),
+      invoice_no: p.fakturownia_invoice_number,
+      invoice_url: p.fakturownia_invoice_url,
+      status: mapPaymentStatus(p.status),
+    };
+  });
+
   const totalSpent = TX.filter((t) => t.amount < 0 && t.status === "rozliczone").reduce((s, t) => s + Math.abs(t.amount), 0);
   const totalReturned = TX.filter((t) => t.amount > 0 && t.status === "rozliczone").reduce((s, t) => s + t.amount, 0);
   const pendingTotal = TX.filter((t) => t.status === "oczekuje").reduce((s, t) => s + Math.abs(t.amount), 0);
@@ -137,6 +177,14 @@ export default function FinansePage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
+          {TX.length === 0 ? (
+            <div className="p-6">
+              <EmptyState
+                title="Brak transakcji"
+                description="Gdy opłacisz pierwsze pismo lub usługę, pojawi się tu historia płatności i faktury VAT."
+              />
+            </div>
+          ) : (
           <table className="w-full text-sm">
             <thead className="border-b border-ink-100 bg-ink-50/50 text-xs uppercase tracking-wide text-ink-600">
               <tr>
@@ -159,7 +207,20 @@ export default function FinansePage() {
                   <td className={`px-5 py-3 text-right font-mono ${t.amount > 0 ? "text-accent-700" : "text-dlugomat-900"}`}>
                     {t.amount > 0 ? "+" : ""}{fmtPLN.format(t.amount)}
                   </td>
-                  <td className="px-5 py-3 font-mono text-xs text-ink-600">{t.invoice_no ?? "—"}</td>
+                  <td className="px-5 py-3 font-mono text-xs text-ink-600">
+                    {t.invoice_url && t.invoice_no ? (
+                      <a
+                        href={t.invoice_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-dlugomat-700 underline-offset-2 hover:underline"
+                      >
+                        {t.invoice_no}
+                      </a>
+                    ) : (
+                      t.invoice_no ?? "—"
+                    )}
+                  </td>
                   <td className="px-5 py-3">
                     <Badge tone={STATUS_TONE[t.status]} withDot>{t.status}</Badge>
                   </td>
@@ -167,6 +228,7 @@ export default function FinansePage() {
               ))}
             </tbody>
           </table>
+          )}
         </CardContent>
       </Card>
     </div>
