@@ -153,3 +153,27 @@ była nietypowana i wymagała `as any`.)
 Konsolidacja modelu planów (jeden zestaw: `plan_id` LUB `plan_code` z jasnym
 mapowaniem `starter↔lite`, `family/company↔business`) — osobny PR, bo wymaga
 ustalenia kanonicznej taksonomii planów i przepisania jednej z dwóch gałęzi kodu.
+
+## Iteracja 7 (równolegle, #6 as-any) — ZAKOŃCZONA
+
+Rodziny przerobione równolegle (per grupa tabel DB):
+
+- **A. affiliate_*** — wpisano 5 typów tabel + 2 RPC; usunięto 10 castów. (commit a82e471)
+- **B. coupons** — wpisano 2 typy tabel; usunięto 4 casty. (commit a82e471)
+- **C. bulk-ops** — REALNY BUG: 5 brakujących kolumn (cases.archived_at/purge_at/tags,
+  documents.tags, deadlines.assignee_id) + bug case_type→type w kodzie.
+  Migracja 20260627050000 (additive), typy, usunięto 12 castów. (commit 676dae0)
+- **D. admin-queries** — usunięto 11 castów sb; ujawniło 4 REALNE BUGI nieistniejących kolumn:
+  payments.completed_at→paid_at (×2), legal_knowledge.case_type→category
+  (getKnowledgeStats zwracało zera), promo_codes.uses_count→current_uses,
+  promo_redemptions.code→promo_code_id (mapa codeById). (commit 7811bbc)
+
+Stan: tsc 0 błędów, lint 0 błędów (tylko ostrzeżenia).
+Postęp `as any`: 366 → ~295.
+
+Potwierdzony wzorzec: usuwanie castów rodzina-po-rodzinie ujawnia realne latentne bugi,
+które `as any` maskował (zapytania do nieistniejących kolumn, kolizje schematów migracji).
+
+### Pozostałe rodziny (do dalszych iteracji)
+workflow-engine (~8), job-queue (~7), ediscovery (~6), drip-campaigns (~5) i in. (~295 łącznie).
+Pełna regeneracja typów (`npm run gen:types`) wymaga połączenia z Supabase (poza sandboxem).
