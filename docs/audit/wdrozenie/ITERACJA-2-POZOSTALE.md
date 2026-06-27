@@ -177,3 +177,39 @@ które `as any` maskował (zapytania do nieistniejących kolumn, kolizje schemat
 ### Pozostałe rodziny (do dalszych iteracji)
 workflow-engine (~8), job-queue (~7), ediscovery (~6), drip-campaigns (~5) i in. (~295 łącznie).
 Pełna regeneracja typów (`npm run gen:types`) wymaga połączenia z Supabase (poza sandboxem).
+
+## Iteracje 8–10 (równolegle, #6 as-any) — ZAKOŃCZONE
+
+Dotypowano w lib/db/types.ts kolejne tabele (źródła z migracji):
+  - Tier 8: referral_codes_v2, referral_redemptions_v2, referral_credits_v2,
+            email_campaign_enrollments, email_send_log
+  - Tier 7: generation_jobs
+  - Tier 22: automation_workflows, automation_runs
+  - Tier 20: job_queue
+  - Tier 23: legal_holds, ediscovery_queries, audit_chain, secret_vault
+
+Rodziny przerobione:
+  - referrals/program-v2 (−8), queue/generation-queue (−8),
+    automation/workflow-engine (−7) — commit 4f97bc6
+  - jobs/job-queue (−7) — commit b35725c
+  - compliance/ediscovery (−6), email/drip-campaigns (−5),
+    security/audit-signing/audit-chain (−5) — commit 37fecfd
+  - security/secret-vault/vault (−6) — commit c0c3bdd
+
+REALNE BUGI ujawnione (maskowane przez as any):
+  1. workflow-engine create_deadline: insert nieistniejących kolumn
+     rule_id/due_at/note (schemat Tier 2) -> Tier 18 kind/title/...; akcja
+     crashowała w runtime.
+  2. ediscovery CASES: select nieistniejących signature/description ->
+     sygnatura/title; sprawy NIGDY nie trafiały do wyników e-discovery.
+  3. ediscovery DOCUMENTS: select nieistniejących name/mime_type ->
+     type/status; dokumenty NIGDY nie trafiały do wyników e-discovery.
+  4. secret-vault: .eq('organization_id', null) nie matchuje NULL w PostgREST;
+     sekrety osobiste NIGDY nie były znajdowane -> .is(...). Dotyczy 4 funkcji.
+
+Stan: tsc 0 błędów, lint 0 błędów. Postęp as any: 310 -> 262.
+
+### Pozostałe rodziny (do dalszych iteracji)
+compliance-reports (5; uwaga: slo_metrics nie istnieje w migracjach — do
+weryfikacji), realtime/crdt/y-doc-store (7), api/documents/[id]/revise (7),
+marketplace/* , tenants/family-company, security/impersonation i in. (~262).
