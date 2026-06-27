@@ -1,113 +1,87 @@
-import * as React from "react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import {
   ArrowLeft,
   CalendarDays,
   Clock,
-  MapPin,
-  Users,
   FileText,
   Bell,
   AlertTriangle,
   CheckCircle2,
+  Scale,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export const metadata = {
   title: "Szczegoly wydarzenia - Dlugomat",
-  description: "Pelne informacje o wydarzeniu w kalendarzu sprawy: termin, miejsce, uczestnicy, dokumenty.",
+  description: "Pelne informacje o terminie sprawy: data, podstawa prawna, powiazane dokumenty.",
 };
 
-type EventKind = "rozprawa" | "termin" | "splata" | "spotkanie" | "deadline";
+export const dynamic = "force-dynamic";
 
-type CalendarEvent = {
-  id: string;
-  kind: EventKind;
-  title: string;
-  description: string;
-  caseRef: string;
-  start: string;
-  end: string;
-  location: string;
-  participants: { name: string; role: string }[];
-  documents: { id: string; name: string }[];
-  reminders: { offsetMinutes: number; channel: "email" | "sms" | "push" }[];
-  urgency: "low" | "medium" | "high";
-  notes: string;
-};
+type Urgency = "low" | "medium" | "high";
 
-const EVENTS: Record<string, CalendarEvent> = {
-  "ev-001": {
-    id: "ev-001",
-    kind: "rozprawa",
-    title: "Rozprawa w sprawie I C 234/26",
-    description:
-      "Pierwsza rozprawa w sprawie o zaplate przeciwko Provident Polska. Stawiennictwo obowiazkowe, przygotuj komplet dokumentow.",
-    caseRef: "I C 234/26",
-    start: "2026-05-22T10:30:00",
-    end: "2026-05-22T12:00:00",
-    location: "Sad Rejonowy dla Warszawy-Mokotowa, sala 218, ul. Ogrodowa 51A",
-    participants: [
-      { name: "mec. Anna Kowalska", role: "Pelnomocnik" },
-      { name: "Marek Nowak", role: "Strona pozwana (Ty)" },
-      { name: "Pawel Zielinski", role: "Pelnomocnik powoda" },
-    ],
-    documents: [
-      { id: "doc-101", name: "Pozew o zaplate.pdf" },
-      { id: "doc-102", name: "Odpowiedz na pozew.pdf" },
-      { id: "doc-103", name: "Wnioski dowodowe.pdf" },
-    ],
-    reminders: [
-      { offsetMinutes: 1440, channel: "email" },
-      { offsetMinutes: 120, channel: "sms" },
-      { offsetMinutes: 30, channel: "push" },
-    ],
-    urgency: "high",
-    notes:
-      "Zabierz dowod osobisty oraz oryginaly umow. Stawiennictwo obowiazkowe pod rygorem skutkow prawnych okreslonych w art. 339 KPC.",
-  },
-};
-
-const KIND_LABEL: Record<EventKind, string> = {
-  rozprawa: "Rozprawa",
-  termin: "Termin sadowy",
-  splata: "Termin splaty",
-  spotkanie: "Spotkanie",
-  deadline: "Termin zawity",
-};
-
-const KIND_TONE: Record<EventKind, "info" | "warning" | "danger" | "success" | "neutral"> = {
-  rozprawa: "warning",
-  termin: "info",
-  splata: "success",
-  spotkanie: "neutral",
-  deadline: "danger",
-};
-
-const URGENCY_CARD: Record<CalendarEvent["urgency"], "warning" | "critical" | "normal"> = {
+const URGENCY_CARD: Record<Urgency, "warning" | "critical" | "normal"> = {
   low: "normal",
   medium: "warning",
   high: "critical",
 };
 
-const CHANNEL_LABEL = {
-  email: "Email",
-  sms: "SMS",
-  push: "Powiadomienie push",
-};
+/** Pilnosc na podstawie liczby dni do efektywnego terminu. */
+function urgencyFor(effectiveEnd: string, completedAt: string | null): Urgency {
+  if (completedAt) return "low";
+  const ms = new Date(effectiveEnd).getTime() - Date.now();
+  const days = ms / (1000 * 60 * 60 * 24);
+  if (days <= 3) return "high";
+  if (days <= 14) return "medium";
+  return "low";
+}
 
 type Params = Promise<{ id: string }>;
 
 export default async function SzczegolyWydarzeniaPage({ params }: { params: Params }) {
   const { id } = await params;
-  const event = EVENTS[id] ?? EVENTS["ev-001"];
+
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect(`/logowanie?next=/panel/kalendarz/${id}`);
+
+  const { data: event } = await supabase
+    .from("deadlines")
+    .select(
+      "id, case_id, kind, title, start_date, end_date, effective_end_date, legal_basis, completed_at, reminders_sent",
+    )
+    .eq("id", id)
+    .single();
+
   if (!event) notFound();
 
-  const startDate = new Date(event.start);
-  const endDate = new Date(event.end);
+  // Powiazana sprawa + dokumenty (jesli istnieje powiazanie).
+  let caseLabel: string | null = null;
+  let documents: { id: string; name: string }[] = [];
+  if (event.case_id) {
+    const [{ data: c }, { data: docs }] = await Promise.all([
+      supabase.from("cases").select("id, title").eq("id", event.case_id).single(),
+      supabase
+        .from("documents")
+        .select("id, type, status")
+        .eq("case_id", event.case_id)
+        .limit(10),
+    ]);
+    caseLabel = c?.title ?? event.case_id;
+    documents = (docs ?? []).map((d) => ({
+      id: d.id,
+      name: `Dokument: ${d.type} (${d.status})`,
+    }));
+  }
+
+  const startDate = new Date(event.start_date);
+  const endDate = new Date(event.effective_end_date ?? event.end_date);
   const dateFmt = new Intl.DateTimeFormat("pl-PL", {
     weekday: "long",
     day: "numeric",
@@ -116,11 +90,9 @@ export default async function SzczegolyWydarzeniaPage({ params }: { params: Para
   });
   const timeFmt = new Intl.DateTimeFormat("pl-PL", { hour: "2-digit", minute: "2-digit" });
 
-  const formatOffset = (mins: number) => {
-    if (mins >= 1440) return `${Math.round(mins / 1440)} dni przed`;
-    if (mins >= 60) return `${Math.round(mins / 60)}h przed`;
-    return `${mins} min przed`;
-  };
+  const urgency = urgencyFor(event.effective_end_date ?? event.end_date, event.completed_at);
+  const remindersSent = Array.isArray(event.reminders_sent) ? event.reminders_sent : [];
+  const isDone = !!event.completed_at;
 
   return (
     <div className="min-h-screen bg-dlugomat-50">
@@ -136,23 +108,29 @@ export default async function SzczegolyWydarzeniaPage({ params }: { params: Para
         </div>
 
         <header className="mb-8">
-          <div className="flex items-center gap-3 mb-3">
+          <div className="flex items-center gap-3 mb-3 flex-wrap">
             <CalendarDays className="h-6 w-6 text-accent-600" aria-hidden />
-            <Badge tone={KIND_TONE[event.kind]}>{KIND_LABEL[event.kind]}</Badge>
-            <Badge tone="neutral">Sprawa {event.caseRef}</Badge>
+            <Badge tone="info">{event.kind}</Badge>
+            {caseLabel ? <Badge tone="neutral">Sprawa {caseLabel}</Badge> : null}
+            {isDone ? (
+              <Badge tone="success" withDot>
+                Zakonczony
+              </Badge>
+            ) : null}
           </div>
           <h1 className="font-display text-3xl text-dlugomat-950 mb-2">{event.title}</h1>
-          <p className="text-dlugomat-700 max-w-2xl">{event.description}</p>
         </header>
 
-        {event.urgency === "high" && (
-          <Card urgency={URGENCY_CARD[event.urgency]} className="mb-6">
+        {urgency === "high" && !isDone && (
+          <Card urgency={URGENCY_CARD[urgency]} className="mb-6">
             <CardContent className="pt-6">
               <div className="flex gap-3">
                 <AlertTriangle className="h-5 w-5 text-danger shrink-0 mt-0.5" aria-hidden />
                 <div>
-                  <p className="font-medium text-dlugomat-950 mb-1">Wydarzenie krytyczne</p>
-                  <p className="text-sm text-dlugomat-800">{event.notes}</p>
+                  <p className="font-medium text-dlugomat-950 mb-1">Termin krytyczny</p>
+                  <p className="text-sm text-dlugomat-800">
+                    Do uplywu terminu pozostalo mniej niz 3 dni. Podejmij dzialanie jak najszybciej.
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -164,10 +142,10 @@ export default async function SzczegolyWydarzeniaPage({ params }: { params: Para
             <CardContent className="pt-6">
               <div className="text-xs uppercase tracking-wide text-dlugomat-600 mb-2 flex items-center gap-1.5">
                 <CalendarDays className="h-3.5 w-3.5" aria-hidden />
-                Data
+                Termin
               </div>
               <div className="font-display text-xl text-dlugomat-950 capitalize">
-                {dateFmt.format(startDate)}
+                {dateFmt.format(endDate)}
               </div>
             </CardContent>
           </Card>
@@ -175,20 +153,22 @@ export default async function SzczegolyWydarzeniaPage({ params }: { params: Para
             <CardContent className="pt-6">
               <div className="text-xs uppercase tracking-wide text-dlugomat-600 mb-2 flex items-center gap-1.5">
                 <Clock className="h-3.5 w-3.5" aria-hidden />
-                Godziny
+                Rozpoczecie
               </div>
-              <div className="font-display text-xl text-dlugomat-950">
-                {timeFmt.format(startDate)} - {timeFmt.format(endDate)}
+              <div className="font-display text-xl text-dlugomat-950 capitalize">
+                {dateFmt.format(startDate)} {timeFmt.format(startDate)}
               </div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="pt-6">
               <div className="text-xs uppercase tracking-wide text-dlugomat-600 mb-2 flex items-center gap-1.5">
-                <MapPin className="h-3.5 w-3.5" aria-hidden />
-                Miejsce
+                <Scale className="h-3.5 w-3.5" aria-hidden />
+                Podstawa prawna
               </div>
-              <div className="text-sm text-dlugomat-950 leading-snug">{event.location}</div>
+              <div className="text-sm text-dlugomat-950 leading-snug">
+                {event.legal_basis ?? "—"}
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -198,54 +178,34 @@ export default async function SzczegolyWydarzeniaPage({ params }: { params: Para
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5 text-accent-600" aria-hidden />
-                  Uczestnicy
-                </CardTitle>
-                <CardDescription>{event.participants.length} osob</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3">
-                  {event.participants.map((p) => (
-                    <li
-                      key={p.name}
-                      className="flex items-center justify-between gap-3 p-3 rounded-md border border-ink-200 bg-white"
-                    >
-                      <div>
-                        <div className="font-medium text-dlugomat-950 text-sm">{p.name}</div>
-                        <div className="text-xs text-dlugomat-600">{p.role}</div>
-                      </div>
-                      <Badge tone="neutral">{p.role.split(" ")[0]}</Badge>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
                   <FileText className="h-5 w-5 text-accent-600" aria-hidden />
                   Powiazane dokumenty
                 </CardTitle>
-                <CardDescription>{event.documents.length} dokumentow do przygotowania</CardDescription>
+                <CardDescription>
+                  {documents.length} {documents.length === 1 ? "dokument" : "dokumentow"}
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <ul className="space-y-2">
-                  {event.documents.map((doc) => (
-                    <li key={doc.id}>
-                      <Link
-                        href={`/panel/dokumenty/${doc.id}`}
-                        className="flex items-center justify-between gap-3 p-3 rounded-md border border-ink-200 bg-white hover:bg-dlugomat-50 focus-visible:shadow-shield-focus"
-                      >
-                        <div className="flex items-center gap-3">
-                          <FileText className="h-4 w-4 text-dlugomat-600" aria-hidden />
-                          <span className="text-sm text-dlugomat-900">{doc.name}</span>
-                        </div>
-                        <span className="text-xs text-accent-700">Otworz</span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
+                {documents.length > 0 ? (
+                  <ul className="space-y-2">
+                    {documents.map((doc) => (
+                      <li key={doc.id}>
+                        <Link
+                          href={`/panel/dokumenty/${doc.id}`}
+                          className="flex items-center justify-between gap-3 p-3 rounded-md border border-ink-200 bg-white hover:bg-dlugomat-50 focus-visible:shadow-shield-focus"
+                        >
+                          <div className="flex items-center gap-3">
+                            <FileText className="h-4 w-4 text-dlugomat-600" aria-hidden />
+                            <span className="text-sm text-dlugomat-900">{doc.name}</span>
+                          </div>
+                          <span className="text-xs text-accent-700">Otworz</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-dlugomat-500">Brak powiazanych dokumentow.</p>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -255,45 +215,48 @@ export default async function SzczegolyWydarzeniaPage({ params }: { params: Para
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
                   <Bell className="h-4 w-4 text-accent-600" aria-hidden />
-                  Przypomnienia
+                  Wyslane przypomnienia
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <ul className="space-y-2 text-sm">
-                  {event.reminders.map((r, idx) => (
-                    <li key={idx} className="flex items-center justify-between">
-                      <span className="text-dlugomat-800">{formatOffset(r.offsetMinutes)}</span>
-                      <Badge tone="info">{CHANNEL_LABEL[r.channel]}</Badge>
-                    </li>
-                  ))}
-                </ul>
+                {remindersSent.length > 0 ? (
+                  <ul className="space-y-2 text-sm">
+                    {remindersSent.map((r, idx) => (
+                      <li key={idx} className="flex items-center justify-between">
+                        <span className="text-dlugomat-800">{r}</span>
+                        <Badge tone="info">wyslano</Badge>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-dlugomat-500">Nie wyslano jeszcze przypomnien.</p>
+                )}
               </CardContent>
             </Card>
 
             <Card>
               <CardContent className="pt-6 space-y-2">
-                <Button variant="primary" block>
-                  Dodaj do kalendarza
-                </Button>
-                <Button variant="secondary" block>
-                  Wyslij na email
-                </Button>
-                <Button variant="ghost" block>
-                  Edytuj przypomnienia
+                {event.case_id ? (
+                  <Button variant="primary" block asChild>
+                    <Link href={`/panel/sprawy/${event.case_id}`}>Otworz sprawe</Link>
+                  </Button>
+                ) : null}
+                <Button variant="ghost" block asChild>
+                  <Link href="/panel/kalendarz">Wroc do kalendarza</Link>
                 </Button>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-start gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" aria-hidden />
-                  <p className="text-sm text-dlugomat-800">
-                    Synchronizacja z Google/Outlook aktywna. Wydarzenie pojawi sie automatycznie w Twoim kalendarzu.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            {isDone ? (
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" aria-hidden />
+                    <p className="text-sm text-dlugomat-800">Termin zostal oznaczony jako zakonczony.</p>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : null}
           </aside>
         </div>
       </div>
