@@ -42,9 +42,11 @@ export function enqueuePendingEvent(kind: PendingEvent["kind"], payload: Record<
   if (typeof navigator !== "undefined" && "serviceWorker" in navigator) {
     navigator.serviceWorker.ready
       .then((reg) => {
-        if ("sync" in reg) {
-          return (reg as any).sync.register("dlugomat-pending-events");
-        }
+        // Background Sync API (reg.sync) nie jest w domyślnych typach lib.dom.
+        const syncMgr = (reg as ServiceWorkerRegistration & {
+          sync?: { register(tag: string): Promise<void> };
+        }).sync;
+        if (syncMgr) return syncMgr.register("dlugomat-pending-events");
       })
       .catch(() => {});
   }
@@ -75,8 +77,8 @@ function readQueue(storage: Storage): PendingEvent[] {
 }
 
 function cryptoRandomId(): string {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return (crypto as any).randomUUID();
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
   }
   return Math.random().toString(36).slice(2) + Date.now().toString(36);
 }

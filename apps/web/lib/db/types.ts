@@ -2379,6 +2379,82 @@ export interface Database {
         >;
         Relationships: [];
       };
+      offline_queue: {
+        Row: {
+          id: string;
+          user_id: string;
+          op:
+            | "case.create" | "case.update" | "document.draft"
+            | "message.send" | "deadline.snooze";
+          payload: Json;
+          status: "pending" | "done" | "failed";
+          result: Json | null;
+          error: string | null;
+          created_at: string;
+          processed_at: string | null;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["offline_queue"]["Row"]
+        > & {
+          user_id: string;
+          op: Database["public"]["Tables"]["offline_queue"]["Row"]["op"];
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["offline_queue"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      agent_runs: {
+        Row: {
+          id: string;
+          user_id: string;
+          goal: string;
+          status:
+            | "running" | "completed" | "failed"
+            | "canceled" | "budget_exceeded";
+          final_answer: string | null;
+          total_cost_grosze: number;
+          started_at: string;
+          finished_at: string | null;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["agent_runs"]["Row"]
+        > & {
+          user_id: string;
+          goal: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["agent_runs"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      agent_steps: {
+        Row: {
+          id: string;
+          run_id: string;
+          index: number;
+          role: "thought" | "action" | "observation" | "final";
+          content: string;
+          action_name: string | null;
+          action_args: Json | null;
+          observation: string | null;
+          cost_grosze: number;
+          latency_ms: number;
+          at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["agent_steps"]["Row"]
+        > & {
+          run_id: string;
+          index: number;
+          role: Database["public"]["Tables"]["agent_steps"]["Row"]["role"];
+          content: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["agent_steps"]["Insert"]
+        >;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     // Audyt 2026-06-27: większość RPC nie jest jeszcze dotypowana (degraduje

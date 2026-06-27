@@ -81,15 +81,19 @@ export async function withRetry<T>(
 export function classifyAnthropic(err: unknown): "retry" | "fail" {
   if (!err) return "fail";
   // Heuristic: try to read .status / .statusCode / .response.status
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const any = err as any;
-  const status = any?.status ?? any?.statusCode ?? any?.response?.status;
+  const e = err as {
+    status?: number;
+    statusCode?: number;
+    response?: { status?: number };
+    message?: string;
+  };
+  const status = e.status ?? e.statusCode ?? e.response?.status;
   if (typeof status === "number") {
     if (status === 429) return "retry";
     if (status >= 500) return "retry";
     return "fail";
   }
-  const msg = String(any?.message ?? "").toLowerCase();
+  const msg = String(e.message ?? "").toLowerCase();
   if (
     msg.includes("econnreset") ||
     msg.includes("etimedout") ||
@@ -104,10 +108,9 @@ export function classifyAnthropic(err: unknown): "retry" | "fail" {
 /** Stripe-flavored retry classifier. */
 export function classifyStripe(err: unknown): "retry" | "fail" {
   if (!err) return "fail";
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const any = err as any;
-  const status = any?.statusCode ?? any?.status;
-  const type = any?.type ?? "";
+  const e = err as { status?: number; statusCode?: number; type?: string };
+  const status = e.statusCode ?? e.status;
+  const type = e.type ?? "";
   if (type === "StripeIdempotencyError") return "fail";
   if (type === "StripeRateLimitError") return "retry";
   if (type === "StripeConnectionError" || type === "StripeAPIError") return "retry";

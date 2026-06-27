@@ -2,18 +2,29 @@
 // with policy version reference. Used as evidence for DPA / GDPR audits.
 
 import { randomUUID } from "crypto";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/lib/db/types";
 
+type Db = SupabaseClient<Database>;
+
+// AUDYT #6 (iter28): wartości MUSZĄ pokrywać się z CHECK constraint w migracji
+// 20260520000000_tier17_security_advanced.sql (consent_ledger.purpose). Wcześniej
+// `as any` maskował, że kod używał wartości spoza constraintu (analytics_telemetry,
+// data_sharing_partners, ai_model_training) — insert wywalał się w runtime.
 export type ConsentPurpose =
+  | "tos"
+  | "privacy"
   | "marketing_email"
   | "marketing_sms"
   | "marketing_push"
-  | "analytics_telemetry"
+  | "analytics"
   | "profiling"
-  | "data_sharing_partners"
-  | "ai_model_training"
+  | "third_party_sharing"
   | "cookies_functional"
   | "cookies_analytics"
-  | "cookies_marketing";
+  | "cookies_marketing"
+  | "ai_training"
+  | "data_export";
 
 export interface ConsentEntry {
   id: string;
@@ -28,7 +39,7 @@ export interface ConsentEntry {
 }
 
 export async function recordConsent(
-  supabase: any,
+  supabase: Db,
   params: {
     userId: string;
     purpose: ConsentPurpose;
@@ -39,12 +50,13 @@ export async function recordConsent(
     userAgent?: string;
   },
 ): Promise<ConsentEntry> {
+  // REALNY BUG (maskowany przez as any): kolumna to `version`, nie `policy_version`.
   const row = {
     id: randomUUID(),
     user_id: params.userId,
     purpose: params.purpose,
     granted: params.granted,
-    policy_version: params.policyVersion,
+    version: params.policyVersion,
     source: params.source,
     ip: params.ip ?? null,
     user_agent: params.userAgent ?? null,
@@ -54,18 +66,19 @@ export async function recordConsent(
   return mapEntry(data);
 }
 
-export async function listConsents(supabase: any, userId: string): Promise<ConsentEntry[]> {
+export async function listConsents(supabase: Db, userId: string): Promise<ConsentEntry[]> {
+  // REALNY BUG (maskowany przez as any): kolumna to `recorded_at`, nie `captured_at`.
   const { data, error } = await supabase
     .from("consent_ledger")
     .select("*")
     .eq("user_id", userId)
-    .order("captured_at", { ascending: false });
+    .order("recorded_at", { ascending: false });
   if (error) throw error;
   return (data ?? []).map(mapEntry);
 }
 
 // Effective consent — latest entry per purpose decides the current state.
-export async function currentConsent(supabase: any, userId: string): Promise<Record<ConsentPurpose, boolean>> {
+export async function currentConsent(supabase: Db, userId: string): Promise<Record<ConsentPurpose, boolean>> {
   const entries = await listConsents(supabase, userId);
   const latest: Partial<Record<ConsentPurpose, ConsentEntry>> = {};
   for (const e of entries) {
@@ -79,16 +92,18 @@ export async function currentConsent(supabase: any, userId: string): Promise<Rec
   return result;
 }
 
-function mapEntry(r: any): ConsentEntry {
+type ConsentRow = Database["public"]["Tables"]["consent_ledger"]["Row"];
+
+function mapEntry(r: ConsentRow): ConsentEntry {
   return {
     id: r.id,
     userId: r.user_id,
-    purpose: r.purpose,
+    purpose: r.purpose as ConsentPurpose,
     granted: !!r.granted,
-    policyVersion: r.policy_version,
-    source: r.source,
+    policyVersion: r.version,
+    source: (r.source ?? "settings") as ConsentEntry["source"],
     ip: r.ip ?? undefined,
     userAgent: r.user_agent ?? undefined,
-    capturedAt: r.captured_at,
+    capturedAt: r.recorded_at,
   };
 }

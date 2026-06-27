@@ -4,6 +4,11 @@
 // in /api/offline-queue.
 
 import { randomUUID } from "crypto";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database, Json } from "@/lib/db/types";
+
+type Db = SupabaseClient<Database>;
+type OfflineQueueRow = Database["public"]["Tables"]["offline_queue"]["Row"];
 
 export type QueueOp = "case.create" | "case.update" | "document.draft" | "message.send" | "deadline.snooze";
 
@@ -24,8 +29,8 @@ export async function enqueueAction(op: QueueOp, payload: Record<string, unknown
   if (typeof indexedDB === "undefined") throw new Error("indexeddb_unavailable");
   const db = await openDb();
   const id =
-    typeof crypto !== "undefined" && (crypto as any).randomUUID
-      ? (crypto as any).randomUUID()
+    typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+      ? crypto.randomUUID()
       : Math.random().toString(36).slice(2);
   const action: QueuedAction = { id, op, payload, createdAt: new Date().toISOString(), retries: 0 };
   await new Promise<void>((resolve, reject) => {
@@ -90,14 +95,14 @@ export interface ServerQueuedAction {
   error?: string;
 }
 
-export async function persistServerAction(supabase: any, userId: string, op: QueueOp, payload: Record<string, unknown>): Promise<ServerQueuedAction> {
-  const row = { id: randomUUID(), user_id: userId, op, payload, status: "pending" };
+export async function persistServerAction(supabase: Db, userId: string, op: QueueOp, payload: Record<string, unknown>): Promise<ServerQueuedAction> {
+  const row = { id: randomUUID(), user_id: userId, op, payload: payload as Json, status: "pending" as const };
   const { data, error } = await supabase.from("offline_queue").insert(row).select("*").single();
   if (error) throw error;
   return mapAction(data);
 }
 
-export async function drainServerQueue(supabase: any, userId: string, handler: (a: ServerQueuedAction) => Promise<Record<string, unknown>>): Promise<{ processed: number; failed: number }> {
+export async function drainServerQueue(supabase: Db, userId: string, handler: (a: ServerQueuedAction) => Promise<Record<string, unknown>>): Promise<{ processed: number; failed: number }> {
   const { data, error } = await supabase.from("offline_queue").select("*").eq("user_id", userId).eq("status", "pending").limit(100);
   if (error) throw error;
   let processed = 0;
@@ -106,25 +111,26 @@ export async function drainServerQueue(supabase: any, userId: string, handler: (
     const a = mapAction(r);
     try {
       const result = await handler(a);
-      await supabase.from("offline_queue").update({ status: "done", processed_at: new Date().toISOString(), result }).eq("id", a.id);
+      await supabase.from("offline_queue").update({ status: "done", processed_at: new Date().toISOString(), result: result as Json }).eq("id", a.id);
       processed++;
-    } catch (e: any) {
-      await supabase.from("offline_queue").update({ status: "failed", processed_at: new Date().toISOString(), error: e?.message ?? "unknown" }).eq("id", a.id);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "unknown";
+      await supabase.from("offline_queue").update({ status: "failed", processed_at: new Date().toISOString(), error: msg }).eq("id", a.id);
       failed++;
     }
   }
   return { processed, failed };
 }
 
-function mapAction(r: any): ServerQueuedAction {
+function mapAction(r: OfflineQueueRow): ServerQueuedAction {
   return {
     id: r.id,
     userId: r.user_id,
     op: r.op,
-    payload: r.payload ?? {},
+    payload: (r.payload ?? {}) as Record<string, unknown>,
     createdAt: r.created_at,
     processedAt: r.processed_at ?? undefined,
-    result: r.result ?? undefined,
+    result: (r.result ?? undefined) as Record<string, unknown> | undefined,
     error: r.error ?? undefined,
   };
 }

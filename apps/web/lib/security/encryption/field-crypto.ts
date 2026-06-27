@@ -20,7 +20,8 @@ function loadKey(): Buffer {
 }
 
 export function encryptField(plaintext: string): string {
-  if (plaintext == null) return plaintext as any;
+  // Defensywne: wywołania spoza TS mogą przekazać null/undefined — zwróć jak jest.
+  if (plaintext == null) return plaintext as unknown as string;
   const iv = randomBytes(IV_LEN);
   const cipher = createCipheriv(ALGO, loadKey(), iv);
   const ct = Buffer.concat([cipher.update(plaintext, "utf8"), cipher.final()]);
@@ -29,7 +30,7 @@ export function encryptField(plaintext: string): string {
 }
 
 export function decryptField(payload: string): string {
-  if (payload == null) return payload as any;
+  if (payload == null) return payload as unknown as string;
   const parts = payload.split(":");
   if (parts.length !== 4 || parts[0] !== FORMAT_VERSION) {
     throw new Error("unsupported_field_format");

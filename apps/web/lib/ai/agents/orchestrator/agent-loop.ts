@@ -19,6 +19,7 @@ import { callWithFallback, type LlmMessage } from "../../llm-client";
 import { selectModel } from "../../model-router";
 import { getTool, listToolsForLlm, type ToolName } from "../tools/tool-registry";
 import { createSupabaseServerClient } from "@/lib/db/supabase-server";
+import type { Json } from "@/lib/db/types";
 import { randomUUID } from "crypto";
 
 export type AgentStepRole = "thought" | "action" | "observation" | "final";
@@ -146,17 +147,14 @@ export async function runAgent(args: {
   const startedAt = new Date().toISOString();
 
   // Persist run kickoff (best-effort)
-  const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = await createSupabaseServerClient();
   await sb.from("agent_runs").insert({
     id: runId,
     user_id: args.userId,
     goal: args.goal,
     status: "running",
     started_at: startedAt,
-  }).then(() => null).catch(() => null);
+  }).then(() => null, () => null);
 
   const toolsDescription = listToolsForLlm(toolset);
   const systemPrompt =
@@ -324,7 +322,7 @@ export async function runAgent(args: {
     final_answer: finalAnswer,
     total_cost_grosze: state.totalCost,
     finished_at: finishedAt,
-  }).eq("id", runId).then(() => null).catch(() => null);
+  }).eq("id", runId).then(() => null, () => null);
 
   if (state.steps.length > 0) {
     await sb.from("agent_steps").insert(
@@ -334,23 +332,20 @@ export async function runAgent(args: {
         role: s.role,
         content: s.content,
         action_name: s.action?.name ?? null,
-        action_args: s.action?.args ?? null,
+        action_args: (s.action?.args ?? null) as Json | null,
         observation: s.observation ?? null,
         cost_grosze: s.cost_grosze,
         latency_ms: s.latency_ms,
         at: s.at,
       })),
-    ).then(() => null).catch(() => null);
+    ).then(() => null, () => null);
   }
 
   return run;
 }
 
 export async function cancelAgentRun(runId: string, userId: string): Promise<void> {
-  const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = await createSupabaseServerClient();
   await sb
     .from("agent_runs")
     .update({ status: "canceled", finished_at: new Date().toISOString() })
