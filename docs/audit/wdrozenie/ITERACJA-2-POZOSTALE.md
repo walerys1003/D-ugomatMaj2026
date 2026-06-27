@@ -67,3 +67,45 @@
   tabel spoza lokalnej `Database` — wymagają albo gen:types, albo ręcznego typowania
   każdej tabeli z migracji.
 - **#16 cutover**, **#15 org↔tenant merge danych** — wymagają DB + decyzji produktowej.
+
+---
+
+## Iteracja 5 — #6 deadlines + REALNY BUG kolizji schematu tabeli
+
+### 🐛 Wykryty realny bug (krytyczny, latentny)
+Podczas usuwania `as any` z `lib/deadlines/deadline-tracker.ts` odkryto, że
+istnieją **DWIE** migracje `create table if not exists public.deadlines` o
+**sprzecznych** schematach:
+- `20260510130400` (Tier 2): `description`, `deadline_date`, `notif_d*_sent`,
+  `is_completed`; `kind` = enum `deadline_kind` (`sprzeciw_14dni`…)
+- `20260521000000` (Tier 18): `title`, `end_date`, `effective_end_date`,
+  `legal_basis`, `snoozed_until`, `reminders_sent text[]`; `kind` = text CHECK
+  (`sprzeciw_epu`…)
+
+Przez `if not exists` **wygrywa Tier 2** (uruchamiana wcześniej), a Tier 18
+jest po cichu pomijana. Tymczasem **cały kod** (`deadline-tracker.ts`,
+`deadline-engine.ts`) używa schematu Tier 18 → na realnej bazie te zapytania
+**padają w runtime** (brak kolumn / niedozwolona wartość enuma). `as any`
+maskowało to całkowicie. Dodatkowo `case-repository.ts` + `panel/page.tsx`
++ `case-actions.ts` używały **starego** schematu wprost — czyli aplikacja była
+wewnętrznie niespójna (część kodu Tier 2, część Tier 18).
+
+### ✅ Naprawa
+- **Nowa migracja** `20260627030000_audit_reconcile_deadlines_schema.sql` —
+  idempotentne pogodzenie tabeli do schematu Tier 18 (`ALTER ... ADD COLUMN
+  IF NOT EXISTS` + backfill: `description→title`, `deadline_date→end/effective_
+  end_date`, `notif_d*_sent→reminders_sent[]`, `is_completed→completed_at`)
+  + indeksy + RLS. Bezpieczna na świeżej i na starej bazie.
+- `lib/db/types.ts` — `deadlines` Row/Insert przepisane na schemat Tier 18.
+- `lib/deadlines/deadline-tracker.ts` — usunięto **6** `as any`.
+- `lib/cases/case-repository.ts` — `listDeadlinesForCurrentUser`,
+  `createDeadline`, `markDeadlineCompleted` dostosowane (completed_at /
+  effective_end_date / title).
+- `lib/cases/case-actions.ts` + `app/(panel)/panel/page.tsx` —
+  `description→title`, `deadline_date→effective_end_date`.
+
+### 📊 Walidacja
+- `tsc --noEmit` → **EXIT 0** (0 błędów; zmiana typu ujawniła 5 ukrytych błędów
+  w konsumentach starego schematu — wszystkie naprawione)
+- `next lint` → **0 errors** (376 warnings)
+- `as any`: **346 → 338**
