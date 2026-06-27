@@ -1480,6 +1480,71 @@ export interface Database {
         >;
         Relationships: [];
       };
+      // -----------------------------------------------------------------
+      // Tier 7 — Marketplace szablonów. Źródło:
+      // 20260512300000_tier7_marketplace_tenants_api.sql.
+      // -----------------------------------------------------------------
+      marketplace_templates: {
+        Row: {
+          id: string;
+          author_id: string;
+          author_display_name: string | null;
+          case_type: string;
+          title: string;
+          description: string;
+          body_markdown: string;
+          tags: string[];
+          status:
+            | "draft"
+            | "submitted"
+            | "in_review"
+            | "approved"
+            | "rejected"
+            | "deprecated";
+          rating_avg: number | null;
+          rating_count: number;
+          usage_count: number;
+          review_notes: string | null;
+          reviewer_id: string | null;
+          reviewed_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["marketplace_templates"]["Row"]
+        > & {
+          author_id: string;
+          case_type: string;
+          title: string;
+          description: string;
+          body_markdown: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["marketplace_templates"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      marketplace_template_ratings: {
+        Row: {
+          user_id: string;
+          template_id: string;
+          rating: number;
+          comment: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["marketplace_template_ratings"]["Row"]
+        > & {
+          user_id: string;
+          template_id: string;
+          rating: number;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["marketplace_template_ratings"]["Insert"]
+        >;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     // Audyt 2026-06-27: większość RPC nie jest jeszcze dotypowana (degraduje
