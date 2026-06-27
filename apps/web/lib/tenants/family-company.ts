@@ -17,6 +17,15 @@ import { logger } from "@/lib/observability/logger";
 
 export type TenantKind = "personal" | "family" | "company";
 export type TenantRole = "owner" | "admin" | "member" | "viewer" | "lawyer";
+/**
+ * Audyt 2026-06-27 (iter. 14): role, które MOŻNA zaprosić. Tabela
+ * tenant_invitations ma CHECK constraint role IN
+ * ('admin','member','viewer','lawyer') — BEZ 'owner'. Wcześniej inviteToTenant
+ * przyjmowało pełne TenantRole (z 'owner'), więc zaproszenie z rolą 'owner'
+ * przechodziło typecheck, ale wywalało się na constraint w runtime (insert
+ * error). `as any` to maskował. Zawężamy typ do realnie dozwolonych ról.
+ */
+export type InvitableRole = "admin" | "member" | "viewer" | "lawyer";
 
 export interface Tenant {
   id: string;
@@ -60,9 +69,7 @@ export async function createTenant(input: {
   regon?: string;
 }): Promise<{ ok: true; tenant: Tenant } | { ok: false; error: string }> {
   const supabase = getSupabaseAdmin();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const memberLimit = input.kind === "personal" ? 1 : input.kind === "family" ? 6 : 50;
 
   const { data, error } = await sb
@@ -92,12 +99,10 @@ export async function inviteToTenant(
   tenantId: string,
   inviterId: string,
   inviteeEmail: string,
-  role: TenantRole = "member",
+  role: InvitableRole = "member",
 ): Promise<{ ok: true; invitation_id: string; token: string } | { ok: false; error: string }> {
   const supabase = getSupabaseAdmin();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   // Verify inviter has admin or owner role
   const { data: membership } = await sb
     .from("tenant_members")
@@ -139,9 +144,7 @@ export async function acceptInvitation(
   userId: string,
 ): Promise<{ ok: true; tenant_id: string; role: TenantRole } | { ok: false; error: string }> {
   const supabase = getSupabaseAdmin();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { data: invitation } = await sb
     .from("tenant_invitations")
     .select("*")
@@ -168,15 +171,16 @@ export async function acceptInvitation(
 
 export async function listUserTenants(userId: string): Promise<Array<Tenant & { role: TenantRole }>> {
   const supabase = getSupabaseAdmin();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { data, error } = await sb
     .from("tenant_members")
     .select("role, tenants!inner(id, kind, name, owner_user_id, nip, regon, member_limit, created_at)")
     .eq("user_id", userId);
   if (error || !data) return [];
-  return data.map((row: any) => ({ ...(row.tenants as Tenant), role: row.role as TenantRole }));
+  // Embedded join nie jest inferowany przez typed-select — modelujemy wynik
+  // jednym lokalnym, typowanym castem zamiast `row: any`.
+  const rows = data as unknown as Array<{ role: TenantRole; tenants: Tenant }>;
+  return rows.map((row) => ({ ...row.tenants, role: row.role }));
 }
 
 export async function removeMember(
@@ -185,9 +189,7 @@ export async function removeMember(
   removeUserId: string,
 ): Promise<{ ok: boolean; error?: string }> {
   const supabase = getSupabaseAdmin();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   // Acting user must be owner or admin
   const { data: actingMembership } = await sb
     .from("tenant_members")

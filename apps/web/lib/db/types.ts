@@ -1545,6 +1545,78 @@ export interface Database {
         >;
         Relationships: [];
       };
+      // -----------------------------------------------------------------
+      // Tier 7 — Family/company tenanty. Źródło:
+      // 20260512300000_tier7_marketplace_tenants_api.sql.
+      // -----------------------------------------------------------------
+      tenants: {
+        Row: {
+          id: string;
+          kind: "personal" | "family" | "company";
+          name: string;
+          owner_user_id: string;
+          nip: string | null;
+          regon: string | null;
+          member_limit: number;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["tenants"]["Row"]> & {
+          kind: "personal" | "family" | "company";
+          name: string;
+          owner_user_id: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["tenants"]["Insert"]>;
+        Relationships: [];
+      };
+      tenant_members: {
+        Row: {
+          tenant_id: string;
+          user_id: string;
+          role: "owner" | "admin" | "member" | "viewer" | "lawyer";
+          joined_at: string;
+          invited_by_user_id: string | null;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["tenant_members"]["Row"]
+        > & {
+          tenant_id: string;
+          user_id: string;
+          role: "owner" | "admin" | "member" | "viewer" | "lawyer";
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["tenant_members"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      tenant_invitations: {
+        Row: {
+          id: string;
+          tenant_id: string;
+          invitee_email: string;
+          // UWAGA: CHECK constraint NIE dopuszcza 'owner' (tylko admin/
+          // member/viewer/lawyer). 20260512300000 linia 32.
+          role: "admin" | "member" | "viewer" | "lawyer";
+          invited_by_user_id: string;
+          token: string;
+          expires_at: string;
+          accepted_at: string | null;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["tenant_invitations"]["Row"]
+        > & {
+          tenant_id: string;
+          invitee_email: string;
+          role: "admin" | "member" | "viewer" | "lawyer";
+          invited_by_user_id: string;
+          token: string;
+          expires_at: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["tenant_invitations"]["Insert"]
+        >;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     // Audyt 2026-06-27: większość RPC nie jest jeszcze dotypowana (degraduje
