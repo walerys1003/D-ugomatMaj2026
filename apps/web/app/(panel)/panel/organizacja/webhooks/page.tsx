@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export const metadata: Metadata = { title: "Webhooki | Organizacja | Długomat" };
+
+export const dynamic = "force-dynamic";
 
 interface Webhook {
   id: string;
@@ -11,7 +15,6 @@ interface Webhook {
   events: string[];
   status: "active" | "paused" | "failing";
   last_delivery_at?: string;
-  last_status_code?: number;
   failure_count: number;
 }
 
@@ -38,19 +41,36 @@ const STATUS_LABEL: Record<Webhook["status"], string> = {
   failing: "Błędy",
 };
 
-async function fetchWebhooks(): Promise<Webhook[]> {
-  try {
-    const res = await fetch("/api/orgs/webhooks", { cache: "no-store" });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return data.webhooks ?? [];
-  } catch {
-    return [];
-  }
-}
-
 export default async function WebhooksPage() {
-  const webhooks = await fetchWebhooks();
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/logowanie?next=/panel/organizacja/webhooks");
+
+  const { data } = await supabase
+    .from("webhook_endpoints")
+    .select("id, url, events, enabled, failure_count, last_success_at, last_failure_at, created_at")
+    .order("created_at", { ascending: false });
+
+  const webhooks: Webhook[] = (data ?? []).map((w) => {
+    const events = Array.isArray(w.events)
+      ? (w.events as unknown[]).map((e) => String(e))
+      : [];
+    const status: Webhook["status"] = !w.enabled
+      ? "paused"
+      : (w.failure_count ?? 0) > 0
+      ? "failing"
+      : "active";
+    return {
+      id: w.id,
+      url: w.url,
+      events,
+      status,
+      last_delivery_at: w.last_success_at ?? w.last_failure_at ?? undefined,
+      failure_count: w.failure_count ?? 0,
+    };
+  });
 
   return (
     <main className="container mx-auto px-4 py-8 max-w-5xl space-y-6">
@@ -141,7 +161,7 @@ export default async function WebhooksPage() {
                   </div>
                   <div className="text-xs text-ink-500">
                     {w.last_delivery_at
-                      ? `Ostatnia dostawa: ${new Date(w.last_delivery_at).toLocaleString("pl-PL")} (${w.last_status_code})`
+                      ? `Ostatnia dostawa: ${new Date(w.last_delivery_at).toLocaleString("pl-PL")}`
                       : "Brak dostaw"}
                     {w.failure_count > 0 && ` · ${w.failure_count} błędów`}
                   </div>

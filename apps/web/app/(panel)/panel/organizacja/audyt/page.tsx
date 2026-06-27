@@ -1,35 +1,21 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export const metadata: Metadata = { title: "Audyt | Organizacja | Długomat" };
 
-interface AuditLog {
-  id: string;
-  actor_email: string;
-  action: string;
-  resource_type: string;
-  resource_id: string;
-  ip: string;
-  user_agent: string;
-  created_at: string;
-}
+export const dynamic = "force-dynamic";
 
-async function fetchAuditLogs(searchParams: {
-  action?: string;
-  actor?: string;
-}): Promise<AuditLog[]> {
-  try {
-    const qs = new URLSearchParams();
-    if (searchParams.action) qs.set("action", searchParams.action);
-    if (searchParams.actor) qs.set("actor", searchParams.actor);
-    const res = await fetch(`/api/orgs/audit?${qs.toString()}`, { cache: "no-store" });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return data.logs ?? [];
-  } catch {
-    return [];
-  }
+interface AuditLog {
+  id: number;
+  actor_id: string;
+  action: string;
+  target_type: string;
+  target_id: string | null;
+  ip: string | null;
+  created_at: string;
 }
 
 const ACTION_LABELS: Record<string, string> = {
@@ -48,7 +34,32 @@ export default async function AudytPage({
   searchParams: Promise<{ action?: string; actor?: string }>;
 }) {
   const sp = await searchParams;
-  const logs = await fetchAuditLogs(sp);
+
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/logowanie?next=/panel/organizacja/audyt");
+
+  // Wyznacz organizacje uzytkownika.
+  const { data: membership } = await supabase
+    .from("org_memberships")
+    .select("org_id")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  let logs: AuditLog[] = [];
+  if (membership) {
+    let query = supabase
+      .from("org_audit_log")
+      .select("id, actor_id, action, target_type, target_id, ip, created_at")
+      .eq("org_id", membership.org_id)
+      .order("created_at", { ascending: false })
+      .limit(100);
+    if (sp.action) query = query.eq("action", sp.action);
+    const { data } = await query;
+    logs = (data ?? []) as AuditLog[];
+  }
 
   return (
     <main className="container mx-auto px-4 py-8 max-w-6xl space-y-6">
@@ -66,14 +77,7 @@ export default async function AudytPage({
 
       <Card elevation="subtle">
         <CardContent className="pt-6">
-          <form className="grid sm:grid-cols-[1fr_1fr_auto] gap-2">
-            <input
-              type="text"
-              name="actor"
-              placeholder="E-mail użytkownika"
-              defaultValue={sp.actor}
-              className="rounded-lg border border-ink-300 dark:border-ink-700 bg-white dark:bg-ink-900 px-3 py-2 text-sm focus:outline-none focus-visible:shadow-shield-focus"
-            />
+          <form className="grid sm:grid-cols-[1fr_auto] gap-2">
             <select
               name="action"
               defaultValue={sp.action}
@@ -109,7 +113,7 @@ export default async function AudytPage({
                 <thead>
                   <tr className="text-left border-b border-ink-200 dark:border-ink-800 text-xs uppercase tracking-wider text-ink-500">
                     <th className="py-2 pr-3">Czas</th>
-                    <th className="py-2 pr-3">Aktor</th>
+                    <th className="py-2 pr-3">Aktor (ID)</th>
                     <th className="py-2 pr-3">Akcja</th>
                     <th className="py-2 pr-3">Zasób</th>
                     <th className="py-2 pr-3">IP</th>
@@ -121,8 +125,8 @@ export default async function AudytPage({
                       <td className="py-2.5 pr-3 text-ink-600 dark:text-ink-400 font-mono text-xs">
                         {new Date(l.created_at).toLocaleString("pl-PL")}
                       </td>
-                      <td className="py-2.5 pr-3 text-ink-900 dark:text-ink-50">
-                        {l.actor_email}
+                      <td className="py-2.5 pr-3 text-ink-900 dark:text-ink-50 font-mono text-xs">
+                        {l.actor_id.slice(0, 8)}
                       </td>
                       <td className="py-2.5 pr-3">
                         <span className="text-xs px-2 py-0.5 rounded-full bg-ink-100 dark:bg-ink-800">
@@ -130,9 +134,10 @@ export default async function AudytPage({
                         </span>
                       </td>
                       <td className="py-2.5 pr-3 text-ink-600 dark:text-ink-400 font-mono text-xs">
-                        {l.resource_type}:{l.resource_id.slice(0, 8)}
+                        {l.target_type}
+                        {l.target_id ? `:${l.target_id.slice(0, 8)}` : ""}
                       </td>
-                      <td className="py-2.5 pr-3 text-ink-500 font-mono text-xs">{l.ip}</td>
+                      <td className="py-2.5 pr-3 text-ink-500 font-mono text-xs">{l.ip ?? "—"}</td>
                     </tr>
                   ))}
                 </tbody>
