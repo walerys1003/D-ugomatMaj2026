@@ -60,6 +60,20 @@ tests/                       ← unit / integration / e2e (per QA agent)
    `agents/orchestrator.md` for the ownership map.
 4. **Done = squashed commit on `genspark_ai_developer` + updated PR to `main`.**
 
+## Deployment
+
+Najszybsza ścieżka do produkcji (Vercel + Supabase):
+
+```bash
+npm i -g vercel supabase
+bash scripts/deploy.sh          # interaktywny skrypt prowadzący
+```
+
+Dokumentacja:
+* **[`docs/DEPLOY_QUICKSTART.md`](docs/DEPLOY_QUICKSTART.md)** — checklista krok-po-kroku + pełna tabela ENV
+* [`docs/LAUNCH_CHECKLIST.md`](docs/LAUNCH_CHECKLIST.md) — pre-launch checklist
+* [`scripts/deploy.sh`](scripts/deploy.sh) — preflight + `supabase db push` + `vercel --prod`
+
 ## Local development
 
 Prerequisites land progressively:
