@@ -352,3 +352,50 @@ Dotypowane: error_reports (Tier10 20260513300000), realtime_events
 `lib/pwa/offline-queue`, `lib/observability/retry`,
 `lib/ai/agents/orchestrator/agent-loop`, `app/api/security/gdpr/consent/route`
 oraz liczne pliki po 2 casty.
+
+---
+
+## Iteracje 28–31 (kontynuacja #6 — redukcja `as any`)
+
+### Iteracja 28 — commit 6774518 (DB casts, 3 tabele: offline_queue, agent_runs, agent_steps)
+- lib/security/gdpr/consent-ledger.ts — typowanie SupabaseClient<Database>.
+  **3 REALNE BUGI** (migracja 20260520000000 consent_ledger):
+    1. purpose: kod używał wartości spoza CHECK constraint (analytics_telemetry,
+       data_sharing_partners, ai_model_training) → insert wywalał się w runtime.
+    2. policy_version: kolumna NIE ISTNIEJE → realna 'version'. Insert zawsze failował.
+    3. captured_at: kolumna NIE ISTNIEJE → realna 'recorded_at'. capturedAt zawsze pusty.
+- app/api/security/gdpr/consent/route.ts — 2 MARTWE casty usunięte.
+- lib/pwa/offline-queue.ts — 2 casty DB, payload/result as Json.
+- lib/ai/agents/orchestrator/agent-loop.ts — 2 casty DB; .then().catch()→.then(ok,err).
+
+### Iteracja 29 — commit 6774518 (casty przeglądarkowe/generyczne, nie-DB)
+- lib/sw/background-sync.ts — reg.sync typed interface, crypto.randomUUID guard.
+- lib/pwa/offline-queue.ts — crypto.randomUUID guard.
+- lib/security/encryption/field-crypto.ts — null-return as unknown as string.
+- lib/observability/retry.ts — err as any → typed error-shape narrowing.
+
+### Iteracja 30 — commit de25b14 (marketplace routes)
+- reseller/payouts/listings — 6 castów. **2 REALNE BUGI** martwego warunku roli
+  'owner' (UserRole = user|admin|moderator, BEZ owner).
+
+### Iteracja 31 — commit de25b14 (4 tabele: oauth_credentials, security_events, epuap_sign_sessions)
+- app/api/calendar/feed/route.ts — **2 REALNE BUGI + KOLIZJA**:
+    1. deadlines.due_at NIE ISTNIEJE (Tier18 → effective_end_date). ICS pusty.
+    2. KOLIZJA case_events: wygrywa WCZEŚNIEJSZA migracja (20260510130800:
+       event_type/created_at/metadata); późniejsza (20260512200000:
+       kind/occurred_at/title) pomijana. Kod pytał o skipnięty schemat → rozprawy
+       zawsze puste. Przejście na schemat zwycięski.
+- offline-queue/push/oauth/epuap routes — pozostałe casty usunięte.
+  UWAGA: 'oauth.disconnected' poza CHECK security_events → wymaga osobnej migracji.
+  UWAGA: security-events.ts używa wartości kropkowanych (auth.*/gdpr.*) spoza CHECK
+  constraint → szersze zdarzenia bezpieczeństwa wymagają migracji pogodzenia.
+
+### Postęp `as any`: 97 → 85 (iter29) → 69 (iter31).
+
+### Zidentyfikowane do osobnej, ostrożnej iteracji (głęboki drift schematu)
+- lib/cases/timeline.ts, lib/cases/dashboard.ts — pytają o tabelę `ai_runs`
+  (NIE ISTNIEJE w migracjach) oraz kolumny win_probability / deadlines.missed /
+  deadlines.due_at / cases.case_type (realna: `type`). Wymaga reconcyliacji
+  schematu (ew. migracji) zanim bezpiecznie usunie się `as any`.
+- lib/enterprise/{scim,organizations,audit-trail}.ts — `as any[]` na wynikach
+  embedded-join; do rozbioru z lokalnymi typami złączeń.
