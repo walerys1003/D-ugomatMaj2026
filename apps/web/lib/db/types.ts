@@ -1074,6 +1074,145 @@ export interface Database {
         >;
         Relationships: [];
       };
+      // -----------------------------------------------------------------
+      // Audyt 2026-06-27 (iter. 8): job queue. Źródło:
+      // 20260523000000_tier20_observability_flags_jobs_crdt.sql.
+      // -----------------------------------------------------------------
+      job_queue: {
+        Row: {
+          id: string;
+          kind: string;
+          payload: Json;
+          status:
+            | "pending"
+            | "claimed"
+            | "running"
+            | "completed"
+            | "failed"
+            | "dead_letter";
+          priority: number;
+          attempts: number;
+          max_attempts: number;
+          run_after: string;
+          claimed_at: string | null;
+          claimed_by: string | null;
+          heartbeat_at: string | null;
+          completed_at: string | null;
+          failed_at: string | null;
+          last_error: string | null;
+          idempotency_key: string | null;
+          trace_id: string | null;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["job_queue"]["Row"]
+        > & {
+          kind: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["job_queue"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      // -----------------------------------------------------------------
+      // Audyt 2026-06-27 (iter. 8): e-discovery / legal holds. Źródło:
+      // 20260526000000_tier23_compliance_security.sql.
+      // -----------------------------------------------------------------
+      legal_holds: {
+        Row: {
+          id: string;
+          case_reference: string;
+          description: string;
+          target_user_ids: string[];
+          target_organization_id: string | null;
+          resource_types: string[];
+          active: boolean;
+          imposed_by: string;
+          imposed_at: string;
+          released_at: string | null;
+          release_reason: string | null;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["legal_holds"]["Row"]
+        > & {
+          case_reference: string;
+          description: string;
+          imposed_by: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["legal_holds"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      ediscovery_queries: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          filters: Json;
+          requested_by: string;
+          requested_at: string;
+          status: "pending" | "running" | "completed" | "failed";
+          result_count: number;
+          custody_hash: string | null;
+          completed_at: string | null;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["ediscovery_queries"]["Row"]
+        > & {
+          requested_by: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["ediscovery_queries"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      // -----------------------------------------------------------------
+      // Audyt 2026-06-27 (iter. 8): drip campaigns. Źródło:
+      // 20260513100000_tier8_pricing_affiliate_growth.sql.
+      // -----------------------------------------------------------------
+      email_campaign_enrollments: {
+        Row: {
+          id: string;
+          user_id: string;
+          campaign_key: string;
+          start_at: string;
+          context: Json;
+          status: "active" | "cancelled" | "completed";
+          cancelled_at: string | null;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["email_campaign_enrollments"]["Row"]
+        > & {
+          user_id: string;
+          campaign_key: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["email_campaign_enrollments"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      email_send_log: {
+        Row: {
+          id: string;
+          enrollment_id: string;
+          step_id: string;
+          status: "sent" | "failed" | "skipped";
+          detail: string | null;
+          sent_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["email_send_log"]["Row"]
+        > & {
+          enrollment_id: string;
+          step_id: string;
+          status: "sent" | "failed" | "skipped";
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["email_send_log"]["Insert"]
+        >;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     // Audyt 2026-06-27: większość RPC nie jest jeszcze dotypowana (degraduje

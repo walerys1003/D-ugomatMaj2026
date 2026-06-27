@@ -15,6 +15,7 @@
  */
 
 import { createSupabaseServerClient } from "@/lib/db/supabase-server";
+import type { Json } from "@/lib/db/types";
 
 export type JobKind =
   | "ocr.process"
@@ -74,9 +75,7 @@ const VISIBILITY_TIMEOUT_MS = 5 * 60 * 1000;
 
 export async function enqueueJob(opts: EnqueueOptions): Promise<JobRecord> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
 
   // Idempotency: jeśli pending lub running job z tym kluczem istnieje, zwróć go.
   if (opts.idempotencyKey) {
@@ -93,7 +92,7 @@ export async function enqueueJob(opts: EnqueueOptions): Promise<JobRecord> {
     .from("job_queue")
     .insert({
       kind: opts.kind,
-      payload: opts.payload,
+      payload: opts.payload as Json,
       status: "pending" as JobStatus,
       priority: opts.priority ?? 5,
       attempts: 0,
@@ -117,9 +116,7 @@ export async function claimNextJob(args: {
   kinds?: JobKind[];
 }): Promise<JobRecord | null> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { data, error } = await sb.rpc("claim_next_job", {
     worker_id: args.workerId,
     kinds: args.kinds ?? null,
@@ -132,9 +129,7 @@ export async function claimNextJob(args: {
 
 export async function heartbeatJob(id: string, workerId: string): Promise<void> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { error } = await sb
     .from("job_queue")
     .update({ heartbeat_at: new Date().toISOString() })
@@ -146,9 +141,7 @@ export async function heartbeatJob(id: string, workerId: string): Promise<void> 
 
 export async function completeJob(id: string, workerId: string): Promise<void> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { error } = await sb
     .from("job_queue")
     .update({
@@ -167,9 +160,7 @@ export async function failJob(args: {
   retry?: boolean;
 }): Promise<void> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const { data: row, error: rowErr } = await sb
     .from("job_queue")
     .select("attempts,max_attempts")
@@ -216,9 +207,7 @@ export async function failJob(args: {
 /** Sweep stale jobs (brak heartbeat > 60s) — uwalnia je do ponownego claim. */
 export async function sweepStaleJobs(): Promise<number> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const cutoff = new Date(Date.now() - HEARTBEAT_STALE_MS).toISOString();
   const { data, error } = await sb
     .from("job_queue")
@@ -238,9 +227,7 @@ export async function sweepStaleJobs(): Promise<number> {
 
 export async function queueDepth(kind?: JobKind): Promise<{ pending: number; running: number; dead: number }> {
   const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = supabase;
   const base = sb.from("job_queue").select("status", { count: "exact", head: true });
   const filter = (b: typeof base) => (kind ? b.eq("kind", kind) : b);
   const [pending, running, dead] = await Promise.all([
