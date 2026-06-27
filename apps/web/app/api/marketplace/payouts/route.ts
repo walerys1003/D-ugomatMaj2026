@@ -6,19 +6,19 @@ async function getSupabase() {
   return createSupabaseServerClient();
 }
 
-async function requireAdmin(supabase: any) {
+type Db = Awaited<ReturnType<typeof getSupabase>>;
+
+async function requireAdmin(supabase: Db) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
+  // REALNY BUG (maskowany przez as any): UserRole nie ma 'owner' — porównanie martwe.
   const { data } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
-  if (data?.role !== "admin" && data?.role !== "owner") return null;
+  if (data?.role !== "admin") return null;
   return user;
 }
 
 export async function GET(_req: NextRequest) {
   const supabase = await getSupabase();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
   if (!(await requireAdmin(supabase))) return NextResponse.json({ error: "forbidden" }, { status: 403 });
   try {
     const lines = await computePendingPayouts(supabase);
@@ -30,9 +30,6 @@ export async function GET(_req: NextRequest) {
 
 export async function POST(_req: NextRequest) {
   const supabase = await getSupabase();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
   if (!(await requireAdmin(supabase))) return NextResponse.json({ error: "forbidden" }, { status: 403 });
   try {
     const batch = await createPayoutBatch(supabase);

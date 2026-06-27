@@ -14,44 +14,53 @@ export async function GET(req: NextRequest) {
   if (!verifyFeedToken(userId, token)) return new NextResponse("invalid token", { status: 403 });
 
   const supabase = getSupabaseAdmin();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://dlugomat.pl";
   const events: IcsEvent[] = [];
   try {
-    const { data: deadlines } = await sb
+    // REALNY BUG (maskowany przez as any): tabela `deadlines` (zreconcilowana do
+    // schematu Tier18 — migracja 20260627030000) NIE MA kolumny `due_at`. Realny
+    // termin to `effective_end_date`. Zapytania o `due_at` padały w runtime.
+    const { data: deadlines } = await supabase
       .from("deadlines")
-      .select("id, case_id, kind, title, due_at, completed_at")
+      .select("id, case_id, kind, title, effective_end_date, completed_at")
       .eq("user_id", userId)
-      .gte("due_at", new Date(Date.now() - 30 * 86_400_000).toISOString());
+      .gte("effective_end_date", new Date(Date.now() - 30 * 86_400_000).toISOString());
     for (const d of deadlines ?? []) {
       if (d.completed_at) continue;
       events.push({
         uid: `deadline-${d.id}`,
         summary: `📅 Termin: ${d.title ?? d.kind}`,
         description: `Sprawa: ${d.case_id}\nRodzaj: ${d.kind}`,
-        dtstart: d.due_at,
+        dtstart: d.effective_end_date,
         all_day: true,
         category: "deadline",
-        url: `${process.env.NEXT_PUBLIC_APP_URL ?? "https://dlugomat.pl"}/app/sprawy/${d.case_id}`,
+        url: `${appUrl}/app/sprawy/${d.case_id}`,
         alarm_minutes_before: 1440,
       });
     }
-    const { data: hearings } = await sb
+    // REALNY BUG + KOLIZJA: istnieją DWIE migracje `case_events`. Wygrywa
+    // WCZEŚNIEJSZA (20260510130800) ze schematem event_type/created_at/metadata.
+    // Późniejsza (20260512200000) z kind/occurred_at/title jest pomijana przez
+    // `if not exists`. Kod pytał o kind/occurred_at/title → kolumny NIE ISTNIEJĄ
+    // na realnej bazie → zapytanie o rozprawy ZAWSZE puste/wywrotka. Przejście na
+    // schemat zwycięski: event_type='hearing_scheduled', created_at, title z metadata.
+    const { data: hearings } = await supabase
       .from("case_events")
-      .select("id, case_id, title, occurred_at, metadata")
+      .select("id, case_id, event_type, metadata, created_at")
       .eq("user_id", userId)
-      .eq("kind", "hearing_scheduled")
-      .gte("occurred_at", new Date().toISOString());
+      .eq("event_type", "hearing_scheduled")
+      .gte("created_at", new Date().toISOString());
     for (const h of hearings ?? []) {
+      const meta = (h.metadata ?? {}) as Record<string, unknown>;
+      const startsAt = (meta.starts_at as string | undefined) ?? h.created_at;
       events.push({
         uid: `hearing-${h.id}`,
-        summary: `⚖️ Rozprawa: ${h.title ?? "termin sądowy"}`,
+        summary: `⚖️ Rozprawa: ${(meta.title as string | undefined) ?? "termin sądowy"}`,
         description: `Sprawa: ${h.case_id}`,
-        dtstart: h.occurred_at,
-        location: ((h.metadata as any) ?? {}).location ?? undefined,
+        dtstart: startsAt,
+        location: (meta.location as string | undefined) ?? undefined,
         category: "hearing",
-        url: `${process.env.NEXT_PUBLIC_APP_URL ?? "https://dlugomat.pl"}/app/sprawy/${h.case_id}`,
+        url: `${appUrl}/app/sprawy/${h.case_id}`,
         alarm_minutes_before: 1440,
       });
     }

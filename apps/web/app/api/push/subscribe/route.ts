@@ -9,10 +9,7 @@ async function getSupabase() {
 
 export async function POST(req: NextRequest) {
   const supabase = await getSupabase();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
-  const { data: { user } } = await sb.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const body = await req.json().catch(() => ({}));
@@ -22,7 +19,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const row = await upsertPushSubscription(
-      sb,
+      supabase,
       user.id,
       body.subscription,
       req.headers.get("user-agent") ?? undefined,
@@ -35,10 +32,7 @@ export async function POST(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   const supabase = await getSupabase();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
-  const { data: { user } } = await sb.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const body = await req.json().catch(() => ({}));
@@ -46,6 +40,6 @@ export async function DELETE(req: NextRequest) {
   if (!endpoint) return NextResponse.json({ error: "endpoint_required" }, { status: 400 });
 
   const endpointHash = createHash("sha256").update(endpoint).digest("hex");
-  await deactivateSubscription(sb, endpointHash);
+  await deactivateSubscription(supabase, endpointHash);
   return NextResponse.json({ ok: true });
 }

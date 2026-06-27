@@ -2455,6 +2455,84 @@ export interface Database {
         >;
         Relationships: [];
       };
+      oauth_credentials: {
+        Row: {
+          user_id: string;
+          provider: string;
+          access_token: string;
+          refresh_token: string | null;
+          expires_at: string | null;
+          scope: string | null;
+          raw: Json;
+          updated_at: string;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["oauth_credentials"]["Row"]
+        > & {
+          user_id: string;
+          provider: string;
+          access_token: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["oauth_credentials"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      security_events: {
+        // UWAGA (audyt #6): migracja 20260520000000 ma WĄSKI CHECK na `type`
+        // (login_success/consent_update/...), ale wiele miejsc w kodzie
+        // (lib/security/security-events.ts) wstawia wartości kropkowane
+        // (auth.login_success/gdpr.consent_granted/oauth.disconnected), które NIE
+        // przechodzą constraintu → insert pada w runtime. Wymaga osobnej migracji
+        // pogodzenia (poza zakresem czyszczenia as-any). Tu modelujemy `type`/
+        // `severity` jako string, by nie zawęzić dziesiątek wywołań poniżej constraintu.
+        Row: {
+          id: string;
+          user_id: string | null;
+          type: string;
+          severity: string;
+          ip: string | null;
+          user_agent: string | null;
+          metadata: Json;
+          occurred_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["security_events"]["Row"]
+        > & {
+          type: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["security_events"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      epuap_sign_sessions: {
+        Row: {
+          id: string;
+          session_id: string;
+          user_id: string;
+          case_id: string | null;
+          document_hashes: string[];
+          status: "pending" | "signed" | "hash_mismatch" | "expired" | "submitted" | "failed";
+          signed_at: string | null;
+          submitted_at: string | null;
+          upp_id: string | null;
+          expires_at: string;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["epuap_sign_sessions"]["Row"]
+        > & {
+          session_id: string;
+          user_id: string;
+          expires_at: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["epuap_sign_sessions"]["Insert"]
+        >;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     // Audyt 2026-06-27: większość RPC nie jest jeszcze dotypowana (degraduje

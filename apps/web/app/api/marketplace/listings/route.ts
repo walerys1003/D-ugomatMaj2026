@@ -8,12 +8,9 @@ async function getSupabase() {
 
 export async function GET(req: NextRequest) {
   const supabase = await getSupabase();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
   const sp = req.nextUrl.searchParams;
   try {
-    const listings = await listListings(sb, {
+    const listings = await listListings(supabase, {
       type: (sp.get("type") as ListingType) ?? undefined,
       category: sp.get("category") ?? undefined,
       status: (sp.get("status") as ListingStatus) ?? "approved",
@@ -28,10 +25,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const supabase = await getSupabase();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
-  const { data: { user } } = await sb.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const body = await req.json().catch(() => ({}));
@@ -39,7 +33,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "missing_fields" }, { status: 400 });
   }
   try {
-    const listing = await createListing(sb, {
+    const listing = await createListing(supabase, {
       publisherId: user.id,
       type: body.type as ListingType,
       name: body.name,

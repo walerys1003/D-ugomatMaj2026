@@ -8,10 +8,7 @@ async function getSupabase() {
 
 export async function POST(req: NextRequest) {
   const supabase = await getSupabase();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
-  const { data: { user } } = await sb.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const body = await req.json().catch(() => ({}));
@@ -23,7 +20,7 @@ export async function POST(req: NextRequest) {
   if (!v.ok) return NextResponse.json({ error: v.reason }, { status: 400 });
 
   try {
-    const reseller = await createReseller(sb, {
+    const reseller = await createReseller(supabase, {
       ownerUserId: user.id,
       brandName: body.brandName,
       brandSubdomain: body.brandSubdomain,
@@ -39,18 +36,17 @@ export async function POST(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   const supabase = await getSupabase();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
-  const { data: { user } } = await sb.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  const { data } = await sb.from("profiles").select("role").eq("id", user.id).maybeSingle();
-  if (data?.role !== "admin" && data?.role !== "owner") return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  // REALNY BUG (maskowany przez as any): UserRole = user|admin|moderator, BEZ 'owner'.
+  // Porównanie do 'owner' było martwe. Uprawnienie admina wystarcza.
+  const { data } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
+  if (data?.role !== "admin") return NextResponse.json({ error: "forbidden" }, { status: 403 });
 
   const body = await req.json().catch(() => ({}));
   if (!body.resellerId) return NextResponse.json({ error: "missing_fields" }, { status: 400 });
   try {
-    const reseller = await activateReseller(sb, body.resellerId, (body.tier as ResellerTier) ?? "starter");
+    const reseller = await activateReseller(supabase, body.resellerId, (body.tier as ResellerTier) ?? "starter");
     return NextResponse.json({ reseller });
   } catch (e: any) {
     return NextResponse.json({ error: e?.message ?? "activate_failed" }, { status: 500 });
