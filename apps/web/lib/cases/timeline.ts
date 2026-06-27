@@ -91,19 +91,16 @@ export async function buildCaseTimeline(opts: BuildTimelineOptions): Promise<Tim
   } = opts;
 
   const supabase = getSupabaseAdmin();
-  // W10-3: loose-cast wrapper — generated Database type is stale for
-  // columns added after migration tier 25 (case_type, title on
-  // evidence_uploads, etc.). Cast through a permissive `any`-shape so
-  // chained queries type-check.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
   const events: TimelineEvent[] = [];
 
   // 1. case row → case_created
+  // AUDYT #6 (iter32): wcześniejszy `as any` maskował, że tabela `cases` ma
+  // kolumnę `type` (nie `case_type`). Zapytanie o `case_type` padało w runtime
+  // → timeline ZAWSZE pusty. Naprawione na realny schemat.
   try {
-    const { data: caseRow } = await sb
+    const { data: caseRow } = await supabase
       .from("cases")
-      .select("id, user_id, case_type, created_at, updated_at, status, title")
+      .select("id, user_id, type, created_at, updated_at, status, title")
       .eq("id", case_id)
       .eq("user_id", user_id)
       .maybeSingle();
@@ -116,13 +113,15 @@ export async function buildCaseTimeline(opts: BuildTimelineOptions): Promise<Tim
       kind: "case_created",
       occurred_at: caseRow.created_at,
       title: "Sprawa utworzona",
-      description: caseRow.title ?? caseRow.case_type,
+      description: caseRow.title ?? caseRow.type,
       severity: "info",
       source: "user",
-      metadata: { case_type: caseRow.case_type, status: caseRow.status },
+      metadata: { case_type: caseRow.type, status: caseRow.status },
     });
 
-    if (caseRow.status === "closed") {
+    // AUDYT #6 (iter32): CaseStatus nie ma 'closed' — realne stany końcowe to
+    // 'completed'/'archived'. `as any` maskował martwe porównanie.
+    if (caseRow.status === "completed" || caseRow.status === "archived") {
       events.push({
         id: `case-closed-${caseRow.id}`,
         case_id: caseRow.id,
@@ -137,42 +136,30 @@ export async function buildCaseTimeline(opts: BuildTimelineOptions): Promise<Tim
     logger.warn("timeline.case_load_failed", { case_id, error: (err as Error).message });
   }
 
-  // 2. documents → received / generated / sent
+  // 2. documents → generated
+  // AUDYT #6 (iter32): realny schemat `documents` ma `type`/`status`, NIE
+  // `kind`/`source`/`sent_at`/`title`. Wcześniejszy `as any` maskował, że te
+  // kolumny nie istnieją (zapytanie padało). Dokumenty traktujemy jako
+  // wygenerowane; „wysłano” wynika z powiadomień (sekcja 4).
   try {
-    const { data: docs } = await sb
+    const { data: docs } = await supabase
       .from("documents")
-      .select("id, case_id, kind, source, created_at, sent_at, title")
+      .select("id, case_id, type, status, created_at")
       .eq("case_id", case_id)
       .order("created_at", { ascending: true });
 
     for (const d of docs ?? []) {
-      const kind: TimelineEventKind =
-        d.source === "received" || d.source === "ocr"
-          ? "document_received"
-          : "document_generated";
       events.push({
         id: `doc-${d.id}`,
         case_id,
-        kind,
+        kind: "document_generated",
         occurred_at: d.created_at,
-        title: kind === "document_received" ? `Otrzymano: ${d.title ?? d.kind}` : `Wygenerowano: ${d.title ?? d.kind}`,
-        description: d.kind,
-        severity: KIND_TO_SEVERITY[kind],
-        source: kind === "document_received" ? "ocr" : "ai",
+        title: `Wygenerowano: ${d.type}`,
+        description: d.status,
+        severity: KIND_TO_SEVERITY["document_generated"],
+        source: "ai",
         link: { type: "document", id: d.id },
       });
-      if (d.sent_at) {
-        events.push({
-          id: `doc-sent-${d.id}`,
-          case_id,
-          kind: "document_sent",
-          occurred_at: d.sent_at,
-          title: `Wysłano: ${d.title ?? d.kind}`,
-          severity: "success",
-          source: "user",
-          link: { type: "document", id: d.id },
-        });
-      }
     }
   } catch (err) {
     logger.warn("timeline.docs_load_failed", { case_id, error: (err as Error).message });
@@ -181,12 +168,16 @@ export async function buildCaseTimeline(opts: BuildTimelineOptions): Promise<Tim
   // 3. deadlines
   if (include_deadlines) {
     try {
-      const { data: deadlines } = await sb
+      // AUDYT #6 (iter32): realny schemat `deadlines` (Tier18, migracja
+      // 20260627030000) ma `effective_end_date`, NIE `due_at`; nie ma kolumny
+      // `missed` — „przekroczony” liczymy z daty. `as any` to maskował.
+      const { data: deadlines } = await supabase
         .from("deadlines")
-        .select("id, case_id, kind, due_at, completed_at, missed, created_at, title")
+        .select("id, case_id, kind, effective_end_date, completed_at, created_at, title")
         .eq("case_id", case_id);
       const now = Date.now();
       for (const dl of deadlines ?? []) {
+        const dueAt = dl.effective_end_date;
         events.push({
           id: `dl-set-${dl.id}`,
           case_id,
@@ -199,23 +190,23 @@ export async function buildCaseTimeline(opts: BuildTimelineOptions): Promise<Tim
         });
         if (dl.completed_at) {
           // already represented as document_sent typically
-        } else if (dl.missed || (dl.due_at && new Date(dl.due_at).getTime() < now)) {
+        } else if (dueAt && new Date(dueAt).getTime() < now) {
           events.push({
             id: `dl-missed-${dl.id}`,
             case_id,
             kind: "deadline_missed",
-            occurred_at: dl.due_at ?? dl.created_at,
+            occurred_at: dueAt,
             title: `Termin przekroczony: ${dl.title ?? dl.kind}`,
             severity: "critical",
             source: "system",
             link: { type: "deadline", id: dl.id },
           });
-        } else if (dl.due_at) {
+        } else if (dueAt) {
           events.push({
             id: `dl-due-${dl.id}`,
             case_id,
             kind: "deadline_due",
-            occurred_at: dl.due_at,
+            occurred_at: dueAt,
             title: `Termin: ${dl.title ?? dl.kind}`,
             severity: "warning",
             source: "system",
@@ -231,9 +222,11 @@ export async function buildCaseTimeline(opts: BuildTimelineOptions): Promise<Tim
   // 4. notifications
   if (include_notifications) {
     try {
-      const { data: notifs } = await sb
+      // AUDYT #6 (iter32): realny schemat `notifications` ma `template` (nie
+      // `kind`) i nie ma `title`. `as any` to maskował.
+      const { data: notifs } = await supabase
         .from("notifications")
-        .select("id, case_id, channel, kind, sent_at, status, title")
+        .select("id, case_id, channel, template, sent_at, status")
         .eq("case_id", case_id);
       for (const n of notifs ?? []) {
         if (!n.sent_at) continue;
@@ -242,8 +235,8 @@ export async function buildCaseTimeline(opts: BuildTimelineOptions): Promise<Tim
           case_id,
           kind: "document_sent",
           occurred_at: n.sent_at,
-          title: `Powiadomienie ${n.channel}: ${n.title ?? n.kind}`,
-          severity: n.status === "delivered" ? "success" : "info",
+          title: `Powiadomienie ${n.channel}: ${n.template}`,
+          severity: n.status === "sent" ? "success" : "info",
           source: "notification",
           link: { type: "notification", id: n.id },
         });
@@ -253,53 +246,39 @@ export async function buildCaseTimeline(opts: BuildTimelineOptions): Promise<Tim
     }
   }
 
-  // 5. ai_runs (optional)
-  if (include_ai_runs) {
-    try {
-      const { data: runs } = await sb
-        .from("ai_runs")
-        .select("id, case_id, kind, created_at, status, total_cost_pln")
-        .eq("case_id", case_id)
-        .order("created_at", { ascending: true })
-        .limit(50);
-      for (const r of runs ?? []) {
-        events.push({
-          id: `ai-${r.id}`,
-          case_id,
-          kind: "ai_generation",
-          occurred_at: r.created_at,
-          title: `AI: ${r.kind}`,
-          description: r.status,
-          severity: "info",
-          source: "ai",
-          link: { type: "ai_run", id: r.id },
-          metadata: { cost_pln: r.total_cost_pln },
-        });
-      }
-    } catch {
-      // optional
-    }
-  }
+  // 5. ai_runs — USUNIĘTE.
+  // AUDYT #6 (iter32): REALNY BUG. Tabela `ai_runs` (ani `ai_generation_runs`)
+  // NIE ISTNIEJE w migracjach — jedyny realny log AI to `ai_usage_log`, który NIE
+  // ma kolumny `case_id`, więc nie da się wiązać zdarzeń z konkretną sprawą.
+  // Poprzednio `as any` + try/catch maskowały wywrotkę (gałąź i tak zawsze
+  // zwracała pustkę). Do przywrócenia po dodaniu tabeli z `case_id`.
+  void include_ai_runs;
 
   // 6. case_events (free-form, may include hearing/ruling/appeal)
+  // AUDYT #6 (iter32) + KOLIZJA: wygrywa wcześniejsza migracja case_events
+  // (20260510130800: event_type/created_at/metadata). Późniejsza
+  // (20260512200000: kind/occurred_at/title/description) jest pomijana przez
+  // `if not exists`. Kod pytał o pominięty schemat → zawsze pustka/wywrotka.
+  // Tytuł/opis bierzemy z `metadata`.
   try {
-    const { data: caseEvents } = await sb
+    const { data: caseEvents } = await supabase
       .from("case_events")
-      .select("id, case_id, kind, occurred_at, title, description, metadata")
+      .select("id, case_id, event_type, created_at, metadata")
       .eq("case_id", case_id)
-      .order("occurred_at", { ascending: true });
+      .order("created_at", { ascending: true });
     for (const ev of caseEvents ?? []) {
-      const k = (ev.kind as TimelineEventKind) ?? "user_note";
+      const k = (ev.event_type as TimelineEventKind) ?? "user_note";
+      const meta = (ev.metadata ?? {}) as Record<string, unknown>;
       events.push({
         id: `ce-${ev.id}`,
         case_id,
         kind: k,
-        occurred_at: ev.occurred_at,
-        title: ev.title ?? k,
-        description: ev.description ?? undefined,
+        occurred_at: ev.created_at,
+        title: (meta.title as string | undefined) ?? k,
+        description: (meta.description as string | undefined) ?? undefined,
         severity: KIND_TO_SEVERITY[k] ?? "info",
         source: "user",
-        metadata: (ev.metadata ?? undefined) as Record<string, unknown> | undefined,
+        metadata: meta,
       });
     }
   } catch {

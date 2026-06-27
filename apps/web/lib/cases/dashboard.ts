@@ -35,17 +35,21 @@ export interface DashboardSummary {
 
 export async function buildDashboard(userId: string): Promise<DashboardSummary> {
   const supabase = getSupabaseAdmin();
-  // W10-3: loose cast — Database type stale for `missed`, `win_probability`, etc.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
 
-  const [casesResult, deadlinesResult, docsResult, suggestionsResult, runsResult] = await Promise.all([
-    sb.from("cases").select("id, case_type, title, status, created_at, updated_at, win_probability").eq("user_id", userId).order("updated_at", { ascending: false, nullsFirst: false }),
-    sb.from("deadlines").select("case_id, kind, due_at, completed_at, missed").eq("user_id", userId).is("completed_at", null),
-    sb.from("documents").select("case_id").eq("user_id", userId),
-    sb.from("ai_suggestions").select("case_id, dismissed, applied").eq("user_id", userId).is("dismissed_at", null),
-    sb.from("ai_runs").select("total_cost_pln, created_at").eq("user_id", userId).gte("created_at", new Date(Date.now() - 30 * 86_400_000).toISOString()),
-  ]);
+  // AUDYT #6 (iter33): wcześniejszy `as any` maskował liczne REALNE BUGI schematu:
+  //  - cases.case_type NIE ISTNIEJE (realna kolumna `type`); cases.win_probability
+  //    NIE ISTNIEJE.
+  //  - deadlines.due_at/missed NIE ISTNIEJĄ (realna `effective_end_date`).
+  //  - documents nie ma `user_id`? ma — ale liczymy po case_id z dostępnych spraw.
+  //  - ai_suggestions NIE MA `user_id` ani `dismissed_at` (jest `applied_at`);
+  //    kluczowane po `case_id`.
+  //  - ai_runs / ai_generation_runs NIE ISTNIEJE — realny log to `ai_usage_log`
+  //    (kolumna `cost_grosze`, brak `case_id`; sumujemy po użytkowniku).
+  const casesResult = await supabase
+    .from("cases")
+    .select("id, type, title, status, created_at, updated_at")
+    .eq("user_id", userId)
+    .order("updated_at", { ascending: false, nullsFirst: false });
 
   if (casesResult.error || !casesResult.data) {
     logger.warn("dashboard.cases_load_failed", { error: casesResult.error?.message });
@@ -53,19 +57,30 @@ export async function buildDashboard(userId: string): Promise<DashboardSummary> 
   }
 
   const cases = casesResult.data;
+  const caseIds = cases.map((c) => c.id);
   const now = Date.now();
+
+  const [deadlinesResult, docsResult, suggestionsResult, usageResult] = await Promise.all([
+    supabase.from("deadlines").select("case_id, kind, effective_end_date, completed_at").eq("user_id", userId).is("completed_at", null),
+    supabase.from("documents").select("case_id").eq("user_id", userId),
+    caseIds.length
+      ? supabase.from("ai_suggestions").select("case_id, dismissed, applied").in("case_id", caseIds).eq("dismissed", false)
+      : Promise.resolve({ data: [] as { case_id: string; dismissed: boolean; applied: boolean }[] }),
+    supabase.from("ai_usage_log").select("cost_grosze, created_at").eq("user_id", userId).gte("created_at", new Date(Date.now() - 30 * 86_400_000).toISOString()),
+  ]);
 
   // Group deadlines by case_id (earliest first)
   const deadlinesByCase = new Map<string, { kind: string; due_at: string }>();
   for (const d of deadlinesResult.data ?? []) {
-    if (!d.due_at) continue;
+    if (!d.case_id || !d.effective_end_date) continue;
     const existing = deadlinesByCase.get(d.case_id);
-    if (!existing || new Date(d.due_at).getTime() < new Date(existing.due_at).getTime()) {
-      deadlinesByCase.set(d.case_id, { kind: d.kind, due_at: d.due_at });
+    if (!existing || new Date(d.effective_end_date).getTime() < new Date(existing.due_at).getTime()) {
+      deadlinesByCase.set(d.case_id, { kind: d.kind, due_at: d.effective_end_date });
     }
   }
   const docCountByCase = new Map<string, number>();
   for (const d of docsResult.data ?? []) {
+    if (!d.case_id) continue;
     docCountByCase.set(d.case_id, (docCountByCase.get(d.case_id) ?? 0) + 1);
   }
   const suggestionsByCase = new Set<string>();
@@ -78,8 +93,10 @@ export async function buildDashboard(userId: string): Promise<DashboardSummary> 
   let active = 0;
   let completed = 0;
 
-  const dashboardCases: DashboardCase[] = cases.map((c: any) => {
-    if (c.status === "closed" || c.status === "completed") completed++;
+  const dashboardCases: DashboardCase[] = cases.map((c) => {
+    // AUDYT #6 (iter33): CaseStatus nie ma 'closed' — stany końcowe to
+    // 'completed'/'archived'. `as any` maskował martwe porównanie.
+    if (c.status === "completed" || c.status === "archived") completed++;
     else active++;
     const dl = deadlinesByCase.get(c.id);
     let days: number | undefined;
@@ -90,7 +107,7 @@ export async function buildDashboard(userId: string): Promise<DashboardSummary> 
     }
     return {
       id: c.id,
-      case_type: c.case_type,
+      case_type: c.type,
       title: c.title ?? undefined,
       status: c.status,
       created_at: c.created_at,
@@ -100,11 +117,12 @@ export async function buildDashboard(userId: string): Promise<DashboardSummary> 
       days_to_next_deadline: days,
       documents_count: docCountByCase.get(c.id) ?? 0,
       has_unread_suggestions: suggestionsByCase.has(c.id),
-      win_probability: c.win_probability ?? undefined,
+      // win_probability: kolumna nie istnieje na `cases` — pominięte.
     };
   });
 
-  const this_month_cost_pln = (runsResult.data ?? []).reduce((sum: number, r: any) => sum + Number(r.total_cost_pln ?? 0), 0);
+  // ai_usage_log.cost_grosze (grosze) → złote.
+  const this_month_cost_pln = (usageResult.data ?? []).reduce((sum: number, r) => sum + Number(r.cost_grosze ?? 0) / 100, 0);
 
   return {
     cases: dashboardCases,

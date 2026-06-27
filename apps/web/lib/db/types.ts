@@ -2533,6 +2533,31 @@ export interface Database {
         >;
         Relationships: [];
       };
+      ai_usage_log: {
+        Row: {
+          id: number;
+          user_id: string;
+          model_id: string;
+          task_type: string;
+          input_tokens: number;
+          output_tokens: number;
+          cost_grosze: number;
+          template_id: string | null;
+          metadata: Json;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["ai_usage_log"]["Row"]
+        > & {
+          user_id: string;
+          model_id: string;
+          task_type: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["ai_usage_log"]["Insert"]
+        >;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     // Audyt 2026-06-27: większość RPC nie jest jeszcze dotypowana (degraduje
