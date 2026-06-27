@@ -175,12 +175,20 @@ export interface Database {
           created_at: string;
           updated_at: string;
           deleted_at: string | null;
+          // Audyt 2026-06-27 (iter. 7): kolumny dla bulk-ops (migracja
+          // 20260627050000_audit_bulk_ops_missing_columns.sql).
+          archived_at: string | null;
+          purge_at: string | null;
+          tags: string[];
         };
         Insert: {
           id?: string;
           user_id: string;
           type: CaseType;
           status?: CaseStatus;
+          archived_at?: string | null;
+          purge_at?: string | null;
+          tags?: string[];
           title?: string;
           sygnatura?: string | null;
           sad?: string | null;
@@ -229,6 +237,8 @@ export interface Database {
           paid_at: string | null;
           downloaded_at: string | null;
           expires_at: string | null;
+          // Audyt 2026-06-27 (iter. 7): bulk documents.tag.
+          tags: string[];
         };
         Insert: {
           id?: string;
@@ -236,6 +246,7 @@ export interface Database {
           user_id: string;
           type: CaseType;
           status?: DocumentStatus;
+          tags?: string[];
           content_markdown?: string | null;
           content_html?: string | null;
           pdf_url?: string | null;
@@ -301,6 +312,8 @@ export interface Database {
           completed_at: string | null;
           reminders_sent: string[];
           created_at: string;
+          // Audyt 2026-06-27 (iter. 7): bulk deadlines.reassign.
+          assignee_id: string | null;
         };
         Insert: {
           id?: string;
@@ -316,6 +329,7 @@ export interface Database {
           completed_at?: string | null;
           reminders_sent?: string[];
           created_at?: string;
+          assignee_id?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["deadlines"]["Insert"]>;
         Relationships: [];
@@ -862,6 +876,44 @@ export interface Database {
         };
         Update: Partial<
           Database["public"]["Tables"]["subscription_coupon_redemptions"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      // -----------------------------------------------------------------
+      // Audyt 2026-06-27 (iter. 7): bulk-ops. Źródło:
+      // 20260524000000_tier21_realtime_bulk_audit.sql.
+      // -----------------------------------------------------------------
+      bulk_operations: {
+        Row: {
+          id: string;
+          user_id: string;
+          kind: string;
+          status:
+            | "pending"
+            | "running"
+            | "completed"
+            | "completed_with_errors"
+            | "canceled"
+            | "failed";
+          total: number;
+          processed: number;
+          failed: number;
+          target_ids: string[];
+          params: Json;
+          errors: Json;
+          result_url: string | null;
+          started_at: string | null;
+          finished_at: string | null;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["bulk_operations"]["Row"]
+        > & {
+          user_id: string;
+          kind: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["bulk_operations"]["Insert"]
         >;
         Relationships: [];
       };
