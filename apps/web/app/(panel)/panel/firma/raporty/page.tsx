@@ -1,41 +1,105 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
+import type { CaseStatus } from "@/lib/db/types";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
+import { getActiveOrgForUser } from "@/lib/orgs/server";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Raporty - panel firmy | Dlugomat",
-  description: "Dashboard analityczny wierzyciela - sciagalnosc, koszty, skutecznosc kancelarii.",
+  description: "Dashboard analityczny wierzyciela - struktura portfela i dynamika spraw.",
 };
 
-const overview = [
-  { label: "Odzyskano w 2026 Q2", value: "3,42 mln PLN", delta: "+12% rdr", tone: "success" as const },
-  { label: "Koszty windykacji", value: "418 200 PLN", delta: "-4% rdr", tone: "success" as const },
-  { label: "ROI procesowy", value: "8,2x", delta: "+0,4x rdr", tone: "info" as const },
-  { label: "Sprawy zamkniete", value: "1 124", delta: "+118 mdm", tone: "neutral" as const },
-];
+const RESOLVED: CaseStatus[] = ["paid", "downloaded", "completed"];
 
-const monthly = [
-  { month: "Sty", recovered: 412, ops: 64 },
-  { month: "Lut", recovered: 388, ops: 58 },
-  { month: "Mar", recovered: 524, ops: 71 },
-  { month: "Kwi", recovered: 612, ops: 78 },
-  { month: "Maj", recovered: 698, ops: 82 },
-];
+const currency = new Intl.NumberFormat("pl-PL", {
+  style: "currency",
+  currency: "PLN",
+  maximumFractionDigits: 0,
+});
 
-const maxRecovered = Math.max(...monthly.map((m) => m.recovered));
+const MONTHS_PL = ["Sty", "Lut", "Mar", "Kwi", "Maj", "Cze", "Lip", "Sie", "Wrz", "Pazd", "Lis", "Gru"];
 
-const channels = [
-  { name: "Negocjacje wewnetrzne", recovered: 1240000, cost: 84000, eff: 14.8 },
-  { name: "Kancelaria Kruk", recovered: 920000, cost: 142000, eff: 6.5 },
-  { name: "Kancelaria Nowak", recovered: 712000, cost: 118000, eff: 6.0 },
-  { name: "Egzekucja komornicza", recovered: 548000, cost: 74200, eff: 7.4 },
-];
+export default async function FirmaRaportyPage() {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-const currency = new Intl.NumberFormat("pl-PL", { style: "currency", currency: "PLN", maximumFractionDigits: 0 });
+  if (!user) {
+    redirect("/logowanie?next=/panel/firma/raporty");
+  }
 
-export default function FirmaRaportyPage() {
+  const org = await getActiveOrgForUser(user.id);
+
+  if (!org) {
+    return (
+      <div className="space-y-8 px-6 py-8 lg:px-10">
+        <header className="space-y-2">
+          <Badge tone="info" withDot>
+            Panel firmy - analityka
+          </Badge>
+          <h1 className="font-display text-3xl text-dlugomat-900">Raporty wierzyciela</h1>
+        </header>
+        <EmptyState
+          title="Brak organizacji"
+          description="Raporty wierzyciela sa dostepne dla organizacji firmowych. Dolacz do organizacji, aby zobaczyc analityke portfela."
+        />
+      </div>
+    );
+  }
+
+  const { data: casesData } = await supabase
+    .from("cases")
+    .select("id, status, kwota_razem, created_at, updated_at")
+    .eq("org_id", org.id)
+    .is("deleted_at", null)
+    .limit(2000);
+
+  const cases = casesData ?? [];
+
+  const resolved = cases.filter((c) => RESOLVED.includes(c.status));
+  const recoveredTotal = resolved.reduce((acc, c) => acc + (c.kwota_razem ?? 0), 0) / 100;
+  const openCases = cases.filter((c) => !RESOLVED.includes(c.status) && c.status !== "archived");
+  const openTotal = openCases.reduce((acc, c) => acc + (c.kwota_razem ?? 0), 0) / 100;
+  const resolutionRate = cases.length > 0 ? Math.round((resolved.length / cases.length) * 100) : 0;
+
+  // Dynamika ostatnich 6 miesiecy: liczba rozwiazanych spraw wg updated_at.
+  const now = new Date();
+  const buckets: { key: string; label: string; recovered: number; count: number }[] = [];
+  for (let i = 5; i >= 0; i -= 1) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    buckets.push({
+      key: `${d.getFullYear()}-${d.getMonth()}`,
+      label: MONTHS_PL[d.getMonth()],
+      recovered: 0,
+      count: 0,
+    });
+  }
+  const bucketIndex = new Map(buckets.map((b, i) => [b.key, i]));
+  for (const c of resolved) {
+    const d = new Date(c.updated_at);
+    if (Number.isNaN(d.getTime())) continue;
+    const key = `${d.getFullYear()}-${d.getMonth()}`;
+    const idx = bucketIndex.get(key);
+    if (idx == null) continue;
+    buckets[idx].recovered += (c.kwota_razem ?? 0) / 100;
+    buckets[idx].count += 1;
+  }
+  const maxRecovered = Math.max(1, ...buckets.map((b) => b.recovered));
+
+  const overview = [
+    { label: "Odzyskano (sprawy rozwiazane)", value: currency.format(recoveredTotal) },
+    { label: "Saldo otwarte", value: currency.format(openTotal) },
+    { label: "Sprawy rozwiazane", value: String(resolved.length) },
+    { label: "Wskaznik rozwiazania", value: `${resolutionRate}%` },
+  ];
+
   return (
     <div className="space-y-8 px-6 py-8 lg:px-10">
       <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
@@ -45,88 +109,68 @@ export default function FirmaRaportyPage() {
           </Badge>
           <h1 className="font-display text-3xl text-dlugomat-900">Raporty wierzyciela</h1>
           <p className="max-w-2xl text-sm text-dlugomat-600">
-            Skutecznosc procesow odzyskiwania naleznosci - rozbicie wedlug kanalu obslugi, miesieczna dynamika
-            odzyskan oraz wskazniki ROI.
+            Analityka portfela organizacji <strong>{org.name}</strong> - kwoty odzyskane, saldo otwarte
+            i dynamika rozwiazywania spraw. Dane pochodza z rejestru spraw firmy.
           </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <Button variant="secondary" size="md">Q1 2026</Button>
-          <Button variant="primary" size="md">Eksport raportu PDF</Button>
         </div>
       </header>
 
-      <section aria-label="Najwazniejsze wskazniki" className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {overview.map((kpi) => (
-          <Card key={kpi.label} elevation="subtle" className="p-5">
-            <p className="text-xs uppercase tracking-wide text-dlugomat-500">{kpi.label}</p>
-            <p className="mt-2 font-display text-2xl text-dlugomat-900">{kpi.value}</p>
-            <Badge tone={kpi.tone} className="mt-3">
-              {kpi.delta}
-            </Badge>
-          </Card>
-        ))}
-      </section>
-
-      <section aria-label="Odzyskania miesiac do miesiaca">
-        <Card elevation="subtle" className="p-6">
-          <header className="mb-5 flex items-end justify-between">
-            <div>
-              <h2 className="font-display text-lg text-dlugomat-900">Odzyskania miesiac do miesiaca</h2>
-              <p className="text-xs text-dlugomat-500">Kwoty w tys. PLN. Tempo wzrostu utrzymuje sie powyzej 8% mdm.</p>
-            </div>
-            <Badge tone="success">Trend wzrostowy</Badge>
-          </header>
-          <div className="flex h-48 items-end gap-6">
-            {monthly.map((m) => (
-              <div key={m.month} className="flex flex-1 flex-col items-center gap-2">
-                <div
-                  role="progressbar"
-                  aria-valuenow={m.recovered}
-                  aria-valuemin={0}
-                  aria-valuemax={maxRecovered}
-                  aria-label={`Odzyskania w miesiacu ${m.month}: ${m.recovered} tys. PLN`}
-                  className="flex w-full items-end justify-center rounded-md bg-accent-100"
-                  style={{ height: `${(m.recovered / maxRecovered) * 100}%`, minHeight: "12px" }}
-                >
-                  <span className="pb-2 text-xs font-mono text-dlugomat-700">{m.recovered}</span>
-                </div>
-                <span className="text-xs uppercase text-dlugomat-500">{m.month}</span>
-              </div>
+      {cases.length === 0 ? (
+        <EmptyState
+          title="Brak danych do raportu"
+          description="Ta organizacja nie ma jeszcze zadnych spraw. Analityka pojawi sie po utworzeniu pierwszych spraw."
+        />
+      ) : (
+        <>
+          <section
+            aria-label="Najwazniejsze wskazniki"
+            className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4"
+          >
+            {overview.map((kpi) => (
+              <Card key={kpi.label} elevation="subtle" className="p-5">
+                <p className="text-xs uppercase tracking-wide text-dlugomat-500">{kpi.label}</p>
+                <p className="mt-2 font-display text-2xl text-dlugomat-900">{kpi.value}</p>
+              </Card>
             ))}
-          </div>
-        </Card>
-      </section>
+          </section>
 
-      <section aria-label="Skutecznosc kanalow">
-        <Card elevation="subtle" className="overflow-hidden">
-          <header className="border-b border-dlugomat-100 px-6 py-4">
-            <h2 className="font-display text-lg text-dlugomat-900">Skutecznosc kanalow obslugi</h2>
-            <p className="text-xs text-dlugomat-500">Stosunek odzyskan do kosztow operacyjnych w 2026 YTD.</p>
-          </header>
-          <table className="w-full text-left text-sm">
-            <thead className="bg-dlugomat-50 text-xs uppercase tracking-wide text-dlugomat-500">
-              <tr>
-                <th className="px-6 py-3">Kanal</th>
-                <th className="px-6 py-3">Odzyskano</th>
-                <th className="px-6 py-3">Koszt</th>
-                <th className="px-6 py-3">Efektywnosc</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-dlugomat-100">
-              {channels.map((c) => (
-                <tr key={c.name} className="text-dlugomat-700">
-                  <td className="px-6 py-3 font-medium text-dlugomat-900">{c.name}</td>
-                  <td className="px-6 py-3 font-mono">{currency.format(c.recovered)}</td>
-                  <td className="px-6 py-3 font-mono">{currency.format(c.cost)}</td>
-                  <td className="px-6 py-3">
-                    <Badge tone={c.eff >= 10 ? "success" : c.eff >= 6 ? "info" : "neutral"}>{c.eff.toFixed(1)}x</Badge>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </Card>
-      </section>
+          <section aria-label="Odzyskania miesiac do miesiaca">
+            <Card elevation="subtle" className="p-6">
+              <header className="mb-5 flex items-end justify-between">
+                <div>
+                  <h2 className="font-display text-lg text-dlugomat-900">
+                    Odzyskania miesiac do miesiaca
+                  </h2>
+                  <p className="text-xs text-dlugomat-500">
+                    Suma kwot spraw rozwiazanych w danym miesiacu (ostatnie 6 miesiecy).
+                  </p>
+                </div>
+              </header>
+              <div className="flex h-48 items-end gap-6">
+                {buckets.map((m) => (
+                  <div key={m.key} className="flex flex-1 flex-col items-center gap-2">
+                    <div
+                      role="progressbar"
+                      aria-valuenow={Math.round(m.recovered)}
+                      aria-valuemin={0}
+                      aria-valuemax={Math.round(maxRecovered)}
+                      aria-label={`Odzyskania w miesiacu ${m.label}: ${currency.format(m.recovered)}`}
+                      className="flex w-full items-end justify-center rounded-md bg-accent-100"
+                      style={{ height: `${(m.recovered / maxRecovered) * 100}%`, minHeight: "12px" }}
+                    >
+                      <span className="pb-2 font-mono text-xs text-dlugomat-700">{m.count}</span>
+                    </div>
+                    <span className="text-xs uppercase text-dlugomat-500">{m.label}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-3 text-xs text-dlugomat-500">
+                Liczba na slupku oznacza liczbe spraw rozwiazanych w danym miesiacu.
+              </p>
+            </Card>
+          </section>
+        </>
+      )}
     </div>
   );
 }
