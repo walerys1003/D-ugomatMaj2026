@@ -18,6 +18,26 @@ import "server-only";
 import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 import { logger } from "@/lib/observability/logger";
 
+/**
+ * REALNY BUG (audyt #6): KOLIZJA `create table if not exists document_versions`.
+ *   - 20260510130300_documents.sql — WYGRYWA (najwcześniejsza): kolumny
+ *     document_id, version_number, content_markdown, changed_by, change_summary.
+ *   - 20260512100000_tier7_d9_d16_modules.sql — POMINIĘTA przez `if not exists`:
+ *     case_id, version_no, parent_id, source, content_md, diff_summary,
+ *     ai_run_id, created_by.
+ * TEN plik (Tier7) odpytuje/zapisuje kolumny ze schematu Tier7, których NIE MA
+ * w żywej tabeli → wszystkie zapytania zwracają błąd w runtime. Plik jest jednak
+ * AKTYWNIE używany (3 callery: api/documents/[id]/restore, .../versions,
+ * lib/ai/multi-turn-revision). Naprawa właściwa = migracja ujednolicająca schemat
+ * (poza zakresem #6 = usuwanie `as any`). Tu usuwamy `as any`, a niezgodność
+ * schematu modelujemy świadomymi boundary castami przez `unknown`.
+ */
+import type { Database } from "@/lib/db/types";
+
+/** Wiersz w schemacie Tier7, którego oczekuje ten moduł (≠ żywa tabela). */
+type DocVersionsTier7Insert =
+  Database["public"]["Tables"]["document_versions"]["Insert"];
+
 export type DocumentVersionSource =
   | "generation"
   | "manual_edit"
@@ -51,21 +71,19 @@ export async function saveDocumentVersion(params: {
   aiRunId?: string | null;
   createdBy?: string | null;
 }): Promise<DocumentVersion | null> {
-  const supabase = createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseServerClient();
 
-  // Get latest version_no for case
+  // Get latest version_no for case (kolumny Tier7 — patrz nota o kolizji).
   const { data: latest } = await sb
     .from("document_versions")
-    .select("version_no")
-    .eq("case_id", params.caseId)
-    .order("version_no", { ascending: false })
+    .select("version_no" as "*")
+    .eq("case_id" as never, params.caseId as never)
+    .order("version_no" as never, { ascending: false })
     .limit(1)
     .maybeSingle();
 
-  const nextVersion = (latest?.version_no ?? 0) + 1;
+  const nextVersion =
+    ((latest as { version_no?: number } | null)?.version_no ?? 0) + 1;
 
   const { data, error } = await sb
     .from("document_versions")
@@ -79,7 +97,7 @@ export async function saveDocumentVersion(params: {
       diff_summary: params.diffSummary ?? null,
       ai_run_id: params.aiRunId ?? null,
       created_by: params.createdBy ?? null,
-    })
+    } as unknown as DocVersionsTier7Insert)
     .select("*")
     .single();
 
@@ -91,19 +109,16 @@ export async function saveDocumentVersion(params: {
     return null;
   }
 
-  return data as DocumentVersion;
+  return data as unknown as DocumentVersion;
 }
 
 export async function listDocumentVersions(caseId: string): Promise<DocumentVersion[]> {
-  const supabase = createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseServerClient();
   const { data, error } = await sb
     .from("document_versions")
     .select("*")
-    .eq("case_id", caseId)
-    .order("version_no", { ascending: false });
+    .eq("case_id" as never, caseId as never)
+    .order("version_no" as never, { ascending: false });
 
   if (error) {
     logger.warn("doc_version.list_failed", {
@@ -113,16 +128,13 @@ export async function listDocumentVersions(caseId: string): Promise<DocumentVers
     return [];
   }
 
-  return (data ?? []) as DocumentVersion[];
+  return (data ?? []) as unknown as DocumentVersion[];
 }
 
 export async function getDocumentVersion(
   versionId: string,
 ): Promise<DocumentVersion | null> {
-  const supabase = createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseServerClient();
   const { data, error } = await sb
     .from("document_versions")
     .select("*")
@@ -134,7 +146,7 @@ export async function getDocumentVersion(
     return null;
   }
 
-  return data as DocumentVersion | null;
+  return data as unknown as DocumentVersion | null;
 }
 
 /**

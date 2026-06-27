@@ -43,10 +43,7 @@ export interface EventPayload {
  * Dispatch — non-blocking. W route handlerze wywołujemy `void dispatchEvent(...)`.
  */
 export async function dispatchEvent(payload: EventPayload): Promise<{ triggered: number }> {
-  const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = await createSupabaseServerClient();
   const { data: workflows, error } = await sb
     .from("automation_workflows")
     .select("id, user_id, trigger")
@@ -54,7 +51,7 @@ export async function dispatchEvent(payload: EventPayload): Promise<{ triggered:
     .eq("enabled", true);
   if (error || !workflows) return { triggered: 0 };
 
-  const matching = (workflows as Array<{ id: string; user_id: string; trigger: { kind: string; config: { event_kind?: string } } }>)
+  const matching = (workflows as unknown as Array<{ id: string; user_id: string; trigger: { kind: string; config: { event_kind?: string } } }>)
     .filter(
       (w) =>
         w.trigger.kind === "event" &&
@@ -100,10 +97,7 @@ export async function dispatchEvent(payload: EventPayload): Promise<{ triggered:
  * Używamy uproszczonego matchera (minute hour dow).
  */
 export async function evaluateCronTriggers(): Promise<{ triggered: number }> {
-  const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = await createSupabaseServerClient();
   const { data: workflows, error } = await sb
     .from("automation_workflows")
     .select("id, user_id, trigger")
@@ -112,7 +106,7 @@ export async function evaluateCronTriggers(): Promise<{ triggered: number }> {
 
   const now = new Date();
   let triggered = 0;
-  for (const wf of workflows as Array<{ id: string; user_id: string; trigger: { kind: string; config: { cron?: string } } }>) {
+  for (const wf of workflows as unknown as Array<{ id: string; user_id: string; trigger: { kind: string; config: { cron?: string } } }>) {
     if (wf.trigger.kind !== "cron") continue;
     const cron = wf.trigger.config.cron;
     if (!cron || !matchesCronExpression(cron, now)) continue;
@@ -170,51 +164,59 @@ function matchCronField(expr: string, value: number): boolean {
  * znajduje terminy w ciągu 24h i emituje event per termin.
  */
 export async function scanUpcomingDeadlines(): Promise<{ found: number }> {
-  const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = await createSupabaseServerClient();
   const now = new Date();
   const cutoff = new Date(now.getTime() + 24 * 3_600_000);
+  // REALNY BUG NAPRAWIONY (audyt #6): poprzednia wersja odpytywała kolumny
+  // `due_at`, `rule_id`, `notified_24h`, które NIE ISTNIEJĄ w żadnym schemacie
+  // `deadlines` (ani Tier2, ani Tier18 po reconcile 20260627030000). `as any`
+  // maskowało, że ta funkcja PADAŁA w runtime (kolumny nieznane PostgREST).
+  // Żywy schemat (Tier18) ma: effective_end_date (termin), completed_at,
+  // reminders_sent text[] (zamiast flagi notified_24h), kind (zamiast rule_id).
   const { data, error } = await sb
     .from("deadlines")
-    .select("id, user_id, due_at, rule_id, case_id, notified_24h")
-    .gte("due_at", now.toISOString())
-    .lte("due_at", cutoff.toISOString())
+    .select("id, user_id, effective_end_date, kind, case_id, reminders_sent")
+    .gte("effective_end_date", now.toISOString())
+    .lte("effective_end_date", cutoff.toISOString())
     .is("completed_at", null)
-    .or("notified_24h.is.null,notified_24h.eq.false")
     .limit(500);
   if (error || !data) return { found: 0 };
 
-  for (const dl of data as Array<{
-    id: string;
-    user_id: string;
-    due_at: string;
-    rule_id: string;
-    case_id: string | null;
-  }>) {
+  // Filtr „nie powiadomiono o 24h" realizujemy po stronie aplikacji na bazie
+  // tablicy reminders_sent (brak dedykowanej kolumny boolean w schemacie).
+  const pending = data.filter(
+    (dl) => !(dl.reminders_sent ?? []).includes("24h"),
+  );
+
+  for (const dl of pending) {
     void dispatchEvent({
       kind: "deadline.upcoming",
       userId: dl.user_id,
       data: {
         deadline_id: dl.id,
-        due_at: dl.due_at,
-        rule_id: dl.rule_id,
+        due_at: dl.effective_end_date,
+        kind: dl.kind,
         case_id: dl.case_id,
         hours_remaining: Math.round(
-          (new Date(dl.due_at).getTime() - now.getTime()) / 3_600_000,
+          (new Date(dl.effective_end_date).getTime() - now.getTime()) /
+            3_600_000,
         ),
       },
     }).catch(() => null);
 
-    // Mark as notified
-    await sb
-      .from("deadlines")
-      .update({ notified_24h: true })
-      .eq("id", dl.id)
-      .then(() => null)
-      .catch(() => null);
+    // Oznacz jako powiadomione — dopisz "24h" do reminders_sent (idempotentnie).
+    const nextReminders = Array.from(
+      new Set([...(dl.reminders_sent ?? []), "24h"]),
+    );
+    try {
+      await sb
+        .from("deadlines")
+        .update({ reminders_sent: nextReminders })
+        .eq("id", dl.id);
+    } catch {
+      /* ignore — best-effort oznaczenie powiadomienia */
+    }
   }
 
-  return { found: data.length };
+  return { found: pending.length };
 }
