@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import {
   CheckCircle2,
   Download,
@@ -22,12 +22,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export const metadata: Metadata = {
   title: "Dokument — Dlugomat",
   description:
     "Szczegoly dokumentu z weryfikacja, historia wersji i mozliwoscia udostepnienia.",
 };
+
+export const dynamic = "force-dynamic";
 
 type Document = {
   id: string;
@@ -61,39 +64,6 @@ type AuditRow = {
   at: string;
 };
 
-const DOCS: Record<string, Document> = {
-  "doc-001": {
-    id: "doc-001",
-    name: "Nakaz zaplaty I Nc 4521-26.pdf",
-    type: "application/pdf",
-    size: "412 KB",
-    pages: 4,
-    category: "nakaz",
-    caseId: "spr-001",
-    caseSignature: "I Nc 4521/26",
-    uploadedAt: "2026-04-22T10:32:18",
-    uploadedBy: "Anna Nowak",
-    verified: true,
-    verifiedBy: "System OCR + Mecenas Kowalska",
-    encryption: "AES-256",
-    hash: "sha256:9f3a4b2c8d1e7f6a5b9c4d2e3f8a1b6c",
-    tags: ["EPU", "nakaz", "warszawa-mokotow"],
-  },
-};
-
-const VERSIONS: VersionRow[] = [
-  { version: 3, date: "2026-04-23T08:14:00", by: "System OCR", note: "Weryfikacja prawnika" },
-  { version: 2, date: "2026-04-22T14:08:00", by: "System OCR", note: "Rozpoznawanie tekstu" },
-  { version: 1, date: "2026-04-22T10:32:18", by: "Anna Nowak", note: "Pierwsze wgranie" },
-];
-
-const AUDIT: AuditRow[] = [
-  { id: "a-1", action: "document.view", by: "Anna Nowak", at: "2026-05-10T09:14:00" },
-  { id: "a-2", action: "document.share", by: "Anna Nowak", at: "2026-05-09T17:48:00" },
-  { id: "a-3", action: "document.download", by: "Mecenas Kowalska", at: "2026-04-28T12:24:00" },
-  { id: "a-4", action: "document.verify", by: "System OCR", at: "2026-04-23T08:14:00" },
-];
-
 const CATEGORY_LABEL: Record<Document["category"], string> = {
   nakaz: "Nakaz",
   pismo: "Pismo procesowe",
@@ -122,8 +92,91 @@ const fmtTime = (iso: string) =>
     minute: "2-digit",
   }).format(new Date(iso));
 
-async function loadDocument(id: string): Promise<Document | null> {
-  return DOCS[id] ?? DOCS["doc-001"] ?? null;
+/** Mapuje typ sprawy/dokumentu na kategorię widoku. */
+function categoryFromType(type: string): Document["category"] {
+  if (type === "sprzeciw_epu" || type === "nakaz_zaplaty") return "nakaz";
+  if (type === "umowa") return "umowa";
+  return "pismo";
+}
+
+interface LoadedDocument {
+  doc: Document;
+  versions: VersionRow[];
+}
+
+async function loadDocument(id: string): Promise<LoadedDocument | null> {
+  // Walidacja UUID — chroni przed niepotrzebnym zapytaniem dla mock-ID.
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return null;
+
+  const supabase = createSupabaseServerClient();
+  const { data: u } = await supabase.auth.getUser();
+  if (!u.user) redirect(`/logowanie?next=/panel/dokumenty/${id}`);
+
+  // RLS zapewnia, że user widzi tylko swoje dokumenty.
+  const { data: row } = await supabase
+    .from("documents")
+    .select("*, cases(sygnatura, type)")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (!row) return null;
+
+  const { data: versionRows } = await supabase
+    .from("document_versions")
+    .select("version_number, changed_by, change_summary, created_at")
+    .eq("document_id", id)
+    .order("version_number", { ascending: false });
+
+  const caseRel = (row as { cases?: { sygnatura?: string | null; type?: string | null } })
+    .cases;
+
+  const doc: Document = {
+    id: row.id,
+    name: `Pismo ${caseRel?.sygnatura ?? row.id.slice(0, 8)}.pdf`,
+    type: row.pdf_url ? "application/pdf" : "text/markdown",
+    size: row.pdf_url ? "—" : `${Math.max(1, Math.round((row.content_markdown?.length ?? 0) / 1024))} KB`,
+    pages: 1,
+    category: categoryFromType(caseRel?.type ?? row.type),
+    caseId: row.case_id,
+    caseSignature: caseRel?.sygnatura ?? undefined,
+    uploadedAt: row.created_at,
+    uploadedBy: "Ty",
+    verified:
+      row.status === "validated" ||
+      row.status === "paid" ||
+      row.status === "downloaded",
+    verifiedBy:
+      row.validation_score != null
+        ? `Walidator AI (${Math.round(row.validation_score)}%)`
+        : undefined,
+    encryption: "AES-256",
+    hash: row.prompt_hash ? `sha256:${row.prompt_hash.slice(0, 32)}` : "—",
+    tags: row.tags ?? [],
+  };
+
+  const versions: VersionRow[] = (versionRows ?? []).map((v) => ({
+    version: v.version_number,
+    date: v.created_at,
+    by:
+      v.changed_by === "ai"
+        ? "System AI"
+        : v.changed_by === "admin"
+          ? "Prawnik"
+          : "Ty",
+    note: v.change_summary ?? "Aktualizacja",
+  }));
+
+  // Fallback: gdy brak osobnych wersji, pokaż bieżącą.
+  if (versions.length === 0) {
+    versions.push({
+      version: row.version,
+      date: row.updated_at,
+      by: "System AI",
+      note: "Wygenerowano",
+    });
+  }
+
+  return { doc, versions };
 }
 
 export default async function DocumentDetailPage({
@@ -132,8 +185,16 @@ export default async function DocumentDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const doc = await loadDocument(id);
-  if (!doc) return notFound();
+  const loaded = await loadDocument(id);
+  if (!loaded) return notFound();
+  const { doc, versions: VERSIONS } = loaded;
+  // Audyt dostępu — realne zdarzenia wymagają tabeli access_log; do czasu jej
+  // podpięcia pokazujemy zdarzenia wyprowadzone z cyklu życia dokumentu.
+  const AUDIT: AuditRow[] = [
+    doc.verified
+      ? { id: "ev-verify", action: "document.verify", by: doc.verifiedBy ?? "Walidator AI", at: doc.uploadedAt }
+      : { id: "ev-create", action: "document.create", by: "System AI", at: doc.uploadedAt },
+  ];
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-10">
@@ -173,10 +234,21 @@ export default async function DocumentDetailPage({
               <Share2 className="mr-1 h-4 w-4" />
               Udostepnij
             </Button>
-            <Button variant="primary" size="sm">
-              <Download className="mr-1 h-4 w-4" />
-              Pobierz
-            </Button>
+            {doc.caseId ? (
+              <Button variant="primary" size="sm" asChild>
+                <Link
+                  href={`/panel/sprawa/${doc.caseId}/dokument/${doc.id}/print`}
+                >
+                  <Download className="mr-1 h-4 w-4" />
+                  Pobierz / Drukuj
+                </Link>
+              </Button>
+            ) : (
+              <Button variant="primary" size="sm" disabled>
+                <Download className="mr-1 h-4 w-4" />
+                Pobierz
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -197,10 +269,16 @@ export default async function DocumentDetailPage({
                   <p className="mt-3 text-sm text-slate-500">
                     Strona 1 z {doc.pages}
                   </p>
-                  <Button variant="secondary" size="sm" className="mt-3">
-                    <Eye className="mr-1 h-4 w-4" />
-                    Pelny podglad
-                  </Button>
+                  {doc.caseId ? (
+                    <Button variant="secondary" size="sm" className="mt-3" asChild>
+                      <Link
+                        href={`/panel/sprawa/${doc.caseId}/dokument/${doc.id}/podglad`}
+                      >
+                        <Eye className="mr-1 h-4 w-4" />
+                        Pelny podglad
+                      </Link>
+                    </Button>
+                  ) : null}
                 </div>
               </div>
             </CardContent>

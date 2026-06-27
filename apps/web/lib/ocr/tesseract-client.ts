@@ -35,6 +35,24 @@ export async function ocrFileWithTesseract(
   const lang = opts.lang ?? "pol";
   const onProgress = opts.onProgress ?? (() => {});
 
+  // Audyt #18 — PDF guard.
+  // Tesseract.js (klient-side) NIE renderuje PDF do bitmapy — `recognize()`
+  // na pliku application/pdf zwraca pusty/śmieciowy tekst. Zamiast cichej
+  // porażki (confidence ~0) zwracamy jawny wynik z flagą wymuszającą
+  // fallback na Textract (server-side, obsługuje single-page PDF przez Bytes).
+  // Dzięki temu use-ocr-upload.ts od razu eskaluje, a użytkownik nie dostaje
+  // mylącego "Skan przeanalizowany" z pustą treścią.
+  if (isPdfFile(file)) {
+    return {
+      provider: "tesseract",
+      pages: [],
+      text: "",
+      confidence: 0,
+      durationMs: Date.now() - start,
+      // pusta treść + confidence 0 → shouldFallbackToTextract() === true
+    };
+  }
+
   // Lazy import — tesseract.js nie jest częścią initial bundle.
   const { createWorker } = await import("tesseract.js");
   const worker = await createWorker(lang, 1, {
@@ -87,6 +105,16 @@ export async function ocrFileWithTesseract(
  *   - tekst < 50 znaków → fallback (najpewniej obraz, nie tekst)
  *   - brak ANY z kluczowych słów ("nakaz", "sygn", "komornik", "BIK") → fallback
  */
+/**
+ * Czy plik jest PDF-em? Sprawdzamy MIME oraz rozszerzenie nazwy
+ * (niektóre przeglądarki nie ustawiają type dla drag-drop).
+ */
+export function isPdfFile(file: File | Blob): boolean {
+  if (file.type === "application/pdf") return true;
+  const name = (file as File).name;
+  return typeof name === "string" && name.toLowerCase().endsWith(".pdf");
+}
+
 export function shouldFallbackToTextract(result: OcrRawResult): boolean {
   if (result.confidence < 60) return true;
   if (!result.text || result.text.length < 50) return true;

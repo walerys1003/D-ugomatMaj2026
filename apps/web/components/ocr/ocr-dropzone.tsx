@@ -117,8 +117,12 @@ export function OcrDropzone({
             <div className="space-y-1">
               <p className="text-base font-medium text-shield-900">{ctaText}</p>
               <p className="text-sm text-ink-600">
-                PDF, JPG, PNG, WEBP &middot; do 20 MB &middot; OCR uruchamia się
+                JPG, PNG, WEBP &middot; do 20 MB &middot; OCR uruchamia się
                 lokalnie (PII chronione)
+              </p>
+              <p className="text-xs text-ink-500">
+                PDF jest obsługiwany przez zaawansowany OCR (pojedyncza strona,
+                do 10 MB). Najlepsze wyniki: wyraźne zdjęcie dokumentu.
               </p>
             </div>
           </>

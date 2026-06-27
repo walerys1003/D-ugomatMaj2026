@@ -149,8 +149,18 @@ export function useOcrUpload(
           );
           setProgress(0.85);
 
-          // Konwersja file → base64 (max 10MB)
+          // Audyt #18 — PDF który Tesseract pominął (pusta treść) MUSI przejść
+          // przez Textract. Jeśli plik jest za duży na Textract sync API (10MB)
+          // i Tesseract nic nie wyciągnął, nie udawajmy sukcesu — zgłoś jawnie.
+          const tesseractEmpty = !tessResult.text || tessResult.text.trim().length < 20;
           if (file.size > 10 * 1024 * 1024) {
+            if (tesseractEmpty) {
+              throw new Error(
+                "Ten plik (PDF lub duży skan) wymaga zaawansowanego OCR, " +
+                  "ale przekracza limit 10 MB. Zmniejsz plik lub wgraj pojedynczą " +
+                  "stronę jako zdjęcie (JPG/PNG).",
+              );
+            }
             // Mimo niskiej jakości — submitujemy Tesseract; user dostaje review.
             const submit = await submitOcrResultAction({
               csrf,
@@ -188,6 +198,16 @@ export function useOcrUpload(
             setResult(fallback);
             return fallback;
           } catch (e) {
+            // Audyt #18 — gdy Tesseract nic nie wyciągnął (np. PDF) ORAZ
+            // Textract zawiódł/niedostępny, NIE udawajmy sukcesu z pustą treścią.
+            if (tesseractEmpty) {
+              console.warn("[ocr] Textract fallback failed for empty Tesseract", e);
+              throw new Error(
+                "Nie udało się odczytać tekstu z tego pliku. Dla plików PDF " +
+                  "spróbuj wgrać pojedynczą stronę jako zdjęcie (JPG/PNG) lub " +
+                  "skontaktuj się ze wsparciem.",
+              );
+            }
             // Fallback failure — zwracamy Tesseract z flag'ą low_confidence.
             const submit = await submitOcrResultAction({
               csrf,
