@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import {
   Activity,
   Clock,
@@ -20,11 +20,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export const metadata: Metadata = {
   title: "Szczegoly sesji — Dlugomat",
   description: "Pelne dane sesji urzadzenia z mozliwoscia uniewaznienia.",
 };
+
+export const dynamic = "force-dynamic";
+
+type SessionStatus = "active" | "expired" | "revoked";
 
 type SessionDetail = {
   id: string;
@@ -32,68 +37,46 @@ type SessionDetail = {
   os: string;
   browser: string;
   ip: string;
-  location: { city: string; country: string; coords: string };
+  location: { city: string; country: string };
   startedAt: string;
   lastActiveAt: string;
   current: boolean;
-  status: "active" | "expired" | "revoked";
-  riskScore: "low" | "medium" | "high";
+  status: SessionStatus;
   recentActivity: Array<{ at: string; action: string; resource: string }>;
 };
 
-const SESSIONS: Record<string, SessionDetail> = {
-  "ses-1": {
-    id: "ses-1",
-    device: "desktop",
-    os: "macOS 14.4",
-    browser: "Safari 17.4",
-    ip: "85.219.44.18",
-    location: {
-      city: "Warszawa",
-      country: "Polska",
-      coords: "52.2297, 21.0122",
-    },
-    startedAt: "2026-05-10T08:14:00",
-    lastActiveAt: "2026-05-10T11:42:00",
-    current: true,
-    status: "active",
-    riskScore: "low",
-    recentActivity: [
-      { at: "2026-05-10T11:42:00", action: "panel.view", resource: "/panel" },
-      { at: "2026-05-10T11:24:00", action: "case.view", resource: "spr-001" },
-      { at: "2026-05-10T10:18:00", action: "document.download", resource: "doc-001" },
-      { at: "2026-05-10T09:48:00", action: "auth.refresh", resource: "session" },
-      { at: "2026-05-10T08:14:00", action: "auth.login", resource: "credentials" },
-    ],
-  },
-};
-
-const STATUS_TONE: Record<SessionDetail["status"], "success" | "neutral" | "danger"> = {
+const STATUS_TONE: Record<SessionStatus, "success" | "neutral" | "danger"> = {
   active: "success",
   expired: "neutral",
   revoked: "danger",
 };
 
-const STATUS_LABEL: Record<SessionDetail["status"], string> = {
+const STATUS_LABEL: Record<SessionStatus, string> = {
   active: "Aktywna",
   expired: "Wygasla",
   revoked: "Uniewazniona",
 };
 
-const RISK_TONE: Record<
-  SessionDetail["riskScore"],
-  "success" | "warning" | "danger"
-> = {
-  low: "success",
-  medium: "warning",
-  high: "danger",
-};
-
-const RISK_LABEL: Record<SessionDetail["riskScore"], string> = {
-  low: "Niskie",
-  medium: "Sredne",
-  high: "Wysokie",
-};
+function parseUserAgent(ua: string | null): {
+  os: string;
+  browser: string;
+  device: SessionDetail["device"];
+} {
+  if (!ua) return { os: "Nieznany system", browser: "Nieznana przegladarka", device: "desktop" };
+  const isMobile = /mobile|android|iphone|ipad/i.test(ua);
+  let os = "Nieznany system";
+  if (/windows/i.test(ua)) os = "Windows";
+  else if (/mac os|macintosh/i.test(ua)) os = "macOS";
+  else if (/android/i.test(ua)) os = "Android";
+  else if (/iphone|ipad|ios/i.test(ua)) os = "iOS";
+  else if (/linux/i.test(ua)) os = "Linux";
+  let browser = "Nieznana przegladarka";
+  if (/edg\//i.test(ua)) browser = "Edge";
+  else if (/chrome\//i.test(ua) && !/edg\//i.test(ua)) browser = "Chrome";
+  else if (/firefox\//i.test(ua)) browser = "Firefox";
+  else if (/safari\//i.test(ua) && !/chrome\//i.test(ua)) browser = "Safari";
+  return { os, browser, device: isMobile ? "mobile" : "desktop" };
+}
 
 function deviceIcon(d: SessionDetail["device"]) {
   if (d === "mobile") return Smartphone;
@@ -109,18 +92,69 @@ const fmtTime = (iso: string) =>
     minute: "2-digit",
   }).format(new Date(iso));
 
-async function loadSession(id: string): Promise<SessionDetail | null> {
-  return SESSIONS[id] ?? SESSIONS["ses-1"] ?? null;
-}
-
 export default async function SessionDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const session = await loadSession(id);
-  if (!session) return notFound();
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect(`/logowanie?next=/panel/ustawienia/sesje/${id}`);
+
+  const { data: row } = await supabase
+    .from("user_sessions")
+    .select("*")
+    .eq("id", id)
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (!row) return notFound();
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const r = row as any;
+  const ua = parseUserAgent(r.user_agent ?? null);
+  const now = Date.now();
+  const status: SessionStatus = r.revoked_at
+    ? "revoked"
+    : r.expires_at && new Date(r.expires_at).getTime() < now
+      ? "expired"
+      : "active";
+
+  // Powiazana aktywnosc — security_events tego usera (opcjonalnie po sesji).
+  const { data: events } = await supabase
+    .from("security_events")
+    .select("type, occurred_at, metadata")
+    .eq("user_id", user.id)
+    .order("occurred_at", { ascending: false })
+    .limit(8);
+
+  const session: SessionDetail = {
+    id: r.id,
+    device: ua.device,
+    os: ua.os,
+    browser: ua.browser,
+    ip: r.ip ?? "—",
+    location: { city: r.city ?? "—", country: r.country ?? "—" },
+    startedAt: r.created_at,
+    lastActiveAt: r.last_activity_at ?? r.created_at,
+    current: false,
+    status,
+    recentActivity: (events ?? []).map((e) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const meta = (e as any).metadata as Record<string, unknown> | null;
+      return {
+        at: e.occurred_at,
+        action: e.type,
+        resource:
+          (meta && typeof meta.resource === "string" && meta.resource) ||
+          (meta && typeof meta.scope === "string" && meta.scope) ||
+          "—",
+      };
+    }),
+  };
 
   const Icon = deviceIcon(session.device);
   const durationMs =
@@ -217,12 +251,6 @@ export default async function SessionDetailPage({
                   {session.ip}
                 </dd>
               </div>
-              <div className="flex justify-between gap-3">
-                <dt className="text-slate-500">Wspolrzedne</dt>
-                <dd className="font-mono text-xs text-slate-700">
-                  {session.location.coords}
-                </dd>
-              </div>
             </dl>
           </CardContent>
         </Card>
@@ -260,24 +288,21 @@ export default async function SessionDetailPage({
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <ShieldCheck className="h-4 w-4 text-slate-500" />
-              Ryzyko
+              Bezpieczenstwo
             </CardTitle>
             <CardDescription>
-              Ocena na podstawie zachowania i lokalizacji
+              Status i polityka sesji
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="mb-3 flex items-center gap-3">
-              <Badge tone={RISK_TONE[session.riskScore]} withDot>
-                {RISK_LABEL[session.riskScore]}
+              <Badge tone={STATUS_TONE[session.status]} withDot>
+                {STATUS_LABEL[session.status]}
               </Badge>
-              <span className="text-xs text-slate-500">
-                Znana lokalizacja, urzadzenie zaufane
-              </span>
             </div>
             <p className="text-xs text-slate-600">
-              Sesje z ryzykiem wysokim sa automatycznie konczone po 15 min
-              nieaktywnosci i wymagaja ponownego logowania z 2FA.
+              Sesje wygasaja automatycznie po 30 dniach bezczynnosci. Jesli nie
+              rozpoznajesz tej sesji, uniewaznij ja i zmien haslo.
             </p>
           </CardContent>
         </Card>
@@ -312,6 +337,13 @@ export default async function SessionDetailPage({
                   </td>
                 </tr>
               ))}
+              {session.recentActivity.length === 0 && (
+                <tr>
+                  <td colSpan={3} className="px-6 py-8 text-center text-sm text-slate-500">
+                    Brak zarejestrowanej aktywnosci dla tej sesji.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </CardContent>

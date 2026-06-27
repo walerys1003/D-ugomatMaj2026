@@ -1,17 +1,26 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { ArrowLeft, Bell, Mail, Smartphone, Megaphone } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
+import {
+  getUserPreferences,
+  type Category,
+  type Channel,
+} from "@/lib/notifications/orchestration/preferences";
 
 export const metadata: Metadata = {
   title: "Ustawienia — Powiadomienia",
   robots: { index: false, follow: false },
 };
 
+export const dynamic = "force-dynamic";
+
 interface NotificationChannel {
-  key: "email" | "sms" | "push" | "inapp";
+  key: Channel;
   label: string;
   icon: typeof Bell;
 }
@@ -24,76 +33,85 @@ const CHANNELS: ReadonlyArray<NotificationChannel> = [
 ];
 
 interface NotificationRow {
-  id: string;
+  id: Category;
   group: string;
   title: string;
   desc: string;
   recommended: boolean;
-  channels: Record<NotificationChannel["key"], boolean>;
 }
 
-const ROWS: ReadonlyArray<NotificationRow> = [
+// Mapowanie kategorii domenowych -> wiersze UI (grupy + opisy).
+const ROW_DEFS: ReadonlyArray<NotificationRow> = [
   {
-    id: "n1",
+    id: "deadline",
     group: "Sprawy i terminy",
-    title: "Termin procesowy < 48 h",
-    desc: "Przypomnienie o zblizajacym sie terminie sprzeciwu, zarzutow, odpowiedzi.",
+    title: "Terminy procesowe",
+    desc: "Przypomnienia o zblizajacych sie terminach sprzeciwu, zarzutow, odpowiedzi.",
     recommended: true,
-    channels: { email: true, sms: true, push: true, inapp: true },
   },
   {
-    id: "n2",
+    id: "case_update",
     group: "Sprawy i terminy",
     title: "Zmiana statusu sprawy",
-    desc: "Aktualizacja postepowania, decyzja sadu, doreczenie pisma.",
+    desc: "Aktualizacja postepowania, decyzja sadu, doreczenie pisma, wiadomosc od prawnika.",
     recommended: true,
-    channels: { email: true, sms: false, push: true, inapp: true },
   },
   {
-    id: "n3",
-    group: "Sprawy i terminy",
-    title: "Nowa wiadomosc od prawnika",
-    desc: "Odpowiedz prawnika lub pracownika wsparcia.",
-    recommended: true,
-    channels: { email: true, sms: false, push: true, inapp: true },
-  },
-  {
-    id: "n4",
+    id: "billing",
     group: "Platnosci",
-    title: "Rata harmonogramu zaplaty < 7 dni",
-    desc: "Przypomnienie o nadchodzacej racie.",
+    title: "Platnosci i raty",
+    desc: "Nadchodzace raty, nieudane platnosci, faktury i potwierdzenia.",
     recommended: true,
-    channels: { email: true, sms: false, push: false, inapp: true },
   },
   {
-    id: "n5",
-    group: "Platnosci",
-    title: "Nieudana platnosc",
-    desc: "Karta odrzucona, brak srodkow, blad bramki.",
+    id: "security",
+    group: "Bezpieczenstwo",
+    title: "Zdarzenia bezpieczenstwa",
+    desc: "Logowania z nowego urzadzenia, zmiana hasla, alerty dostepowe.",
     recommended: true,
-    channels: { email: true, sms: true, push: true, inapp: true },
   },
   {
-    id: "n6",
-    group: "Marketing",
-    title: "Newsletter Dlugomat (raz w miesiacu)",
-    desc: "Nowe funkcje, case studies, przewodniki.",
+    id: "system",
+    group: "System",
+    title: "Komunikaty systemowe",
+    desc: "Prace serwisowe, zmiany regulaminu, wazne ogloszenia.",
     recommended: false,
-    channels: { email: true, sms: false, push: false, inapp: false },
   },
   {
-    id: "n7",
-    group: "Marketing",
-    title: "Promocje i kody rabatowe",
-    desc: "Okazjonalne kupony, rabaty na pakiety.",
+    id: "onboarding",
+    group: "System",
+    title: "Wdrozenie i porady",
+    desc: "Wskazowki jak najlepiej korzystac z Dlugomat.",
     recommended: false,
-    channels: { email: false, sms: false, push: false, inapp: true },
+  },
+  {
+    id: "marketing",
+    group: "Marketing",
+    title: "Newsletter, promocje i kody rabatowe",
+    desc: "Nowe funkcje, case studies, okazjonalne kupony.",
+    recommended: false,
   },
 ];
 
-const GROUPS = ["Sprawy i terminy", "Platnosci", "Marketing"] as const;
+const GROUPS = ["Sprawy i terminy", "Platnosci", "Bezpieczenstwo", "System", "Marketing"] as const;
 
-export default function PowiadomieniaPage() {
+export default async function PowiadomieniaPage() {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/logowanie?next=/panel/ustawienia/powiadomienia");
+
+  const prefs = await getUserPreferences(user.id);
+
+  // Wiersz aktywny tylko gdy kanal globalnie wlaczony ORAZ kategoria go zawiera.
+  const isOn = (category: Category, channel: Channel): boolean => {
+    if (!prefs.channels[channel]) return false;
+    return (prefs.categories[category] ?? []).includes(channel);
+  };
+
+  const ROWS = ROW_DEFS;
+
   return (
     <div className="space-y-6">
       <Link href="/panel/ustawienia" className="inline-flex items-center gap-2 text-sm text-ink-600 hover:text-dlugomat-900">
@@ -117,9 +135,17 @@ export default function PowiadomieniaPage() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="text-sm font-medium text-dlugomat-900">Tryb skupienia (Do Not Disturb)</p>
-              <p className="text-xs text-ink-500">Wycisza powiadomienia push i SMS w godzinach 22:00 — 07:00.</p>
+              <p className="text-xs text-ink-500">
+                {prefs.dnd_start && prefs.dnd_end
+                  ? `Wycisza powiadomienia push i SMS w godzinach ${prefs.dnd_start} — ${prefs.dnd_end} (${prefs.timezone}).`
+                  : "Tryb skupienia jest wylaczony — powiadomienia docieraja o kazdej porze."}
+              </p>
             </div>
-            <Button variant="secondary" size="sm">Wlaczone · 22:00–07:00</Button>
+            <Button variant="secondary" size="sm">
+              {prefs.dnd_start && prefs.dnd_end
+                ? `Wlaczone · ${prefs.dnd_start}–${prefs.dnd_end}`
+                : "Wylaczone"}
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -170,7 +196,7 @@ export default function PowiadomieniaPage() {
                             </span>
                             <input
                               type="checkbox"
-                              defaultChecked={r.channels[c.key]}
+                              defaultChecked={isOn(r.id, c.key)}
                               className="h-4 w-4 rounded border-ink-300 text-dlugomat-700 focus-visible:outline-none focus-visible:shadow-shield-focus"
                             />
                           </label>
