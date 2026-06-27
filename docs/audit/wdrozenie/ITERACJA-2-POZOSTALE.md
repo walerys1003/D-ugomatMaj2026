@@ -209,7 +209,60 @@ REALNE BUGI ujawnione (maskowane przez as any):
 
 Stan: tsc 0 błędów, lint 0 błędów. Postęp as any: 310 -> 262.
 
-### Pozostałe rodziny (do dalszych iteracji)
-compliance-reports (5; uwaga: slo_metrics nie istnieje w migracjach — do
-weryfikacji), realtime/crdt/y-doc-store (7), api/documents/[id]/revise (7),
-marketplace/* , tenants/family-company, security/impersonation i in. (~262).
+## Iteracje 11–17 (kolejna tura „kontynuuj paralelnie")
+
+Dotypowane tabele (lib/db/types.ts):
+  - Tier 17: consent_ledger, erasure_requests, mfa_secrets
+  - Tier 14: metric_snapshots
+  - Tier 23: compliance_evidence, impersonation_sessions
+  - Tier 6: idempotency_records
+  - Tier 20: crdt_updates, crdt_awareness
+  - Tier 7: marketplace_templates, marketplace_template_ratings, tenants,
+    tenant_members, tenant_invitations
+  - Tier 10: admin_audit_log
+  - Tier 21: presence_state
+  - Tier 9: mobile_devices
+
+Rodziny przerobione:
+  - compliance/reports/compliance-reports (−5) — commit 2b16613
+  - api/documents/[id]/revise + observability/idempotency (−10) — commit c0ca871
+  - realtime/crdt/y-doc-store (−7) — commit 3a49b17
+  - marketplace/templates (−5) — commit 91e4728
+  - tenants/family-company (−5) — commit 94711f7
+  - security/impersonation/impersonation (−5) — commit 23291a8
+  - realtime/presence/presence-tracker (−5) — commit 1190190
+  - mobile/device-registration (−5) — commit 2a333d3
+
+REALNE BUGI ujawnione (maskowane przez as any):
+  5. compliance-reports generateDpia: select nieistniejących kolumn
+     consent_ledger.revoked_at/granted_at -> granted/recorded_at; erasure_requests
+     deadline_at/completed_at -> scheduled_for/executed_at; podsumowania DPIA
+     zawsze puste.
+  6. compliance-reports generateSoc2Evidence: tabela slo_metrics NIE ISTNIEJE
+     w migracjach (zweryfikowane) -> metric_snapshots; sekcja availability
+     zawsze pusta.
+  7. compliance-reports listComplianceReports: .eq('organization_id', null)
+     nie matchuje NULL -> .is(...).
+  8. api/documents/[id]/revise: embedded join select nieistniejących
+     cases.case_type/cases.facts -> type/metadata; endpoint revise ZAWSZE
+     zwracał 404.
+  9. revise idempotency: (lookup as any).reservation_id nie istnieje w
+     IdempotencyLookup -> zawsze null => completeIdempotency/abortIdempotency
+     NIGDY się nie wykonywały (rekordy in_progress wisiały do TTL).
+  10. y-doc-store AwarenessState: interfejs camelCase docId/userId/clientId vs
+      kolumny snake_case crdt_awareness -> odczyty zawsze undefined.
+  11. tenants inviteToTenant: role: TenantRole (z 'owner') vs CHECK constraint
+      tenant_invitations role IN (admin/member/viewer/lawyer) BEZ 'owner';
+      zaproszenie z rolą 'owner' wywalało się na constraint w runtime ->
+      nowy typ InvitableRole.
+  12. impersonation: 3x .then().catch() na typowanym query builderze (brak
+      .catch()) -> try/await/catch.
+
+Stan: tsc 0 błędów, lint 0 błędów. Postęp as any: 262 -> 210.
+
+### Pozostałe rodziny (do dalszych iteracji, ~210)
+sharing/lawyer-share (4), security/rbac-fine/policy-engine (4),
+ocr/ocr-actions (4), experiments/ab* (8), cases/case-actions (4),
+ai/suggestions (4), admin/admin-actions (4) oraz liczne pliki po 2–3 casty
+(notifications, invoices, growth, versioning, public-api, app/api/security/*,
+app/api/marketplace/partners).
