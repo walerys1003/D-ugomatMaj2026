@@ -81,10 +81,7 @@ export async function adminUpdateCaseStatusAction(input: {
     throw new Error("Nieobsługiwany status sprawy.");
   }
 
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseAdminClient();
 
   const { data: existing, error: readErr } = await sb
     .from("cases")
@@ -174,10 +171,7 @@ export async function adminUpsertPromptTemplateAction(
     );
   }
 
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseAdminClient();
   let id = parsed.data.id;
   let version: number;
 
@@ -326,10 +320,7 @@ export async function adminUpdateUserRoleAction(input: {
     );
   }
 
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseAdminClient();
   const { error } = await sb
     .from("profiles")
     .update({ role: parsed.data.role })
@@ -398,10 +389,7 @@ export async function adminCreateRefundAction(
     throw new Error("Niepoprawne dane refundu.");
   }
 
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseAdminClient();
 
   // 1) Load payment
   const { data: payment, error: payErr } = await sb
