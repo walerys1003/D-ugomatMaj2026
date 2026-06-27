@@ -2558,6 +2558,33 @@ export interface Database {
         >;
         Relationships: [];
       };
+      // Audyt 2026-06-27 (iter. 35): załączone dowody powiązane ze sprawą
+      // (migracja 20260512200000_tier7_tables.sql).
+      evidence_uploads: {
+        Row: {
+          id: string;
+          case_id: string;
+          user_id: string;
+          evidence_id: string;
+          storage_path: string | null;
+          filename: string | null;
+          file_size_bytes: number | null;
+          mime_type: string | null;
+          notes: string | null;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["evidence_uploads"]["Row"]
+        > & {
+          case_id: string;
+          user_id: string;
+          evidence_id: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["evidence_uploads"]["Insert"]
+        >;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     // Audyt 2026-06-27: większość RPC nie jest jeszcze dotypowana (degraduje

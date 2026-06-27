@@ -57,14 +57,18 @@ async function withTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
 async function checkSupabase(): Promise<ComponentHealth> {
   const start = Date.now();
   try {
-    const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+    // Audyt 2026-06-27 (iter. 35): usuwamy `as any`. REALNY BUG: ping RTT
+    // odpytywał tabelę `audit_log`, która NIE ISTNIEJE — health-check Supabase
+    // zawsze raportowałby "down". Przepinamy na realną `admin_audit_log`.
+    const sb = createSupabaseAdminClient();
     if (!sb) return { name: "sb", status: "skipped" };
     // Minimal RTT query: query existing tiny table, head only.
+    // PostgREST builder jest tylko `PromiseLike` (thenable) — opakowujemy w
+    // Promise.resolve, by spełnić sygnaturę `withTimeout<T>(p: Promise<T>)`.
     const { error } = await withTimeout<{ error: { message: string } | null }>(
-      sb.from("audit_log").select("id", { head: true, count: "exact" }).limit(1),
+      Promise.resolve(
+        sb.from("admin_audit_log").select("id", { head: true, count: "exact" }).limit(1),
+      ),
       1500,
     );
     if (error) {

@@ -17,6 +17,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { createSupabaseAdminClient } from "@/lib/db/supabase-server";
 import { logger } from "@/lib/observability/logger";
+import type { Database } from "@/lib/db/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -135,11 +136,17 @@ export async function POST(req: NextRequest): Promise<Response> {
   const reports = normalize(parsed);
   if (reports.length === 0) return new NextResponse(null, { status: 204 });
 
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
-  const toInsert: Array<Record<string, unknown>> = [];
+  // Audyt 2026-06-27 (iter. 35): usuwamy `as any`. REALNY BUG: kod zapisywał
+  // raporty do tabeli `audit_log`, która NIE ISTNIEJE (żadna migracja jej nie
+  // tworzy — istnieją tylko `admin_audit_log`, `org_audit_log`, `audit_chain`;
+  // tier6 zakłada nawet indeks na nieistniejącej `public.audit_log`). Co więcej
+  // wstawiane kolumny (event_type/actor_type/resource_type/resource_id) NIE
+  // PASUJĄ do żadnej istniejącej tabeli. Przepinamy log do realnej
+  // `admin_audit_log` z poprawnymi kolumnami (actor_id/action/target_type/...).
+  const sb = createSupabaseAdminClient();
+  const toInsert: Database["public"]["Tables"]["admin_audit_log"]["Insert"][] = [];
+  // Sentinel actor dla zdarzeń systemowych/przeglądarkowych (brak usera).
+  const SYSTEM_ACTOR = "00000000-0000-0000-0000-000000000000";
 
   for (const r of reports) {
     if (shouldThrottle(r)) continue;
@@ -163,10 +170,10 @@ export async function POST(req: NextRequest): Promise<Response> {
 
     if (sb) {
       toInsert.push({
-        event_type: "csp_violation",
-        actor_type: "browser",
-        resource_type: "csp",
-        resource_id: r.directive,
+        actor_id: SYSTEM_ACTOR,
+        action: "csp_violation",
+        target_type: "csp",
+        target_id: r.directive,
         metadata: {
           directive: r.directive,
           blocked_url: r.blocked_url.slice(0, 500),
@@ -182,7 +189,7 @@ export async function POST(req: NextRequest): Promise<Response> {
 
   if (sb && toInsert.length > 0) {
     try {
-      await sb.from("audit_log").insert(toInsert);
+      await sb.from("admin_audit_log").insert(toInsert);
     } catch (e) {
       logger.warn("csp.audit_log_insert_failed", {
         error: e instanceof Error ? e.message : String(e),

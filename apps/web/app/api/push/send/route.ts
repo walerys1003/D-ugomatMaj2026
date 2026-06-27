@@ -6,19 +6,22 @@ async function getSupabase() {
   return createSupabaseServerClient();
 }
 
-async function requireAdmin(sb: any) {
+type Db = Awaited<ReturnType<typeof getSupabase>>;
+
+async function requireAdmin(sb: Db) {
   const { data: { user } } = await sb.auth.getUser();
   if (!user) return null;
   const { data } = await sb.from("profiles").select("role").eq("id", user.id).maybeSingle();
-  if (data?.role !== "admin" && data?.role !== "owner") return null;
+  // REALNY BUG (iter. 35): `role !== "owner"` był martwym warunkiem — UserRole
+  // to "user" | "admin" | "moderator" (brak "owner"). Po dotypowaniu klienta
+  // TypeScript wymusza poprawne wartości.
+  if (data?.role !== "admin") return null;
   return user;
 }
 
 export async function POST(req: NextRequest) {
-  const supabase = await getSupabase();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  // Audyt 2026-06-27 (iter. 35): typowany klient zamiast `as any`.
+  const sb = await getSupabase();
   if (!(await requireAdmin(sb))) return NextResponse.json({ error: "forbidden" }, { status: 403 });
 
   const body = await req.json().catch(() => ({}));

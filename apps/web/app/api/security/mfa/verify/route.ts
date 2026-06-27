@@ -3,6 +3,7 @@ import { verifyTotp } from "@/lib/security/mfa/totp";
 import { verifyBackupCode } from "@/lib/security/mfa/backup-codes";
 import { decryptField } from "@/lib/security/encryption/field-crypto";
 import { recordSecurityEvent } from "@/lib/security/security-events";
+import type { Json } from "@/lib/db/types";
 
 async function getSupabase() {
   const { createSupabaseServerClient } = await import("@/lib/db/supabase-server");
@@ -10,10 +11,9 @@ async function getSupabase() {
 }
 
 export async function POST(req: NextRequest) {
-  const supabase = await getSupabase();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  // Audyt 2026-06-27 (iter. 35): tabela `mfa_secrets` jest dotypowana
+  // w Database — usuwamy `as any`, korzystamy z typowanego klienta.
+  const sb = await getSupabase();
   const { data: { user } } = await sb.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
@@ -40,12 +40,12 @@ export async function POST(req: NextRequest) {
   }
 
   // Fall back to backup codes.
-  const codes = (data.backup_codes ?? []) as Array<{ code_hash: string; used: boolean }>;
+  const codes = (data.backup_codes ?? []) as unknown as Array<{ code_hash: string; used: boolean }>;
   for (let i = 0; i < codes.length; i++) {
     const c = codes[i];
     if (!c.used && verifyBackupCode(token, c.code_hash)) {
       codes[i] = { ...c, used: true };
-      await sb.from("mfa_secrets").update({ backup_codes: codes }).eq("user_id", user.id);
+      await sb.from("mfa_secrets").update({ backup_codes: codes as unknown as Json }).eq("user_id", user.id);
       await recordSecurityEvent(sb, { userId: user.id, type: "auth.backup_code_used", ip, userAgent: ua });
       return NextResponse.json({ verified: true, method: "backup_code", remainingBackupCodes: codes.filter((x) => !x.used).length });
     }

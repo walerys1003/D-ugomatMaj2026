@@ -11,13 +11,13 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
   const auth = await getAuthenticatedUser(req);
   if (!auth.ok) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
-  const supabase = getSupabaseAdmin();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  // Audyt 2026-06-27 (iter. 35): tabele `cases` i `evidence_uploads` są
+  // dotypowane — usuwamy `as any`. REALNY BUG: kolumna `case_type` NIE ISTNIEJE
+  // (prawidłowo: `type`). Wcześniej zapytanie padało w runtime.
+  const sb = getSupabaseAdmin();
   const { data: caseRow } = await sb
     .from("cases")
-    .select("id, user_id, case_type")
+    .select("id, user_id, type")
     .eq("id", id)
     .eq("user_id", auth.user.id)
     .maybeSingle();
@@ -27,9 +27,9 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
     .from("evidence_uploads")
     .select("evidence_id")
     .eq("case_id", id);
-  const uploaded = (uploadedDocs ?? []).map((u: any) => ({ id: u.evidence_id }));
+  const uploaded = (uploadedDocs ?? []).map((u) => ({ id: u.evidence_id }));
 
-  const requests = getEvidenceRequests(caseRow.case_type);
-  const progress = summarizeEvidenceProgress(caseRow.case_type, uploaded);
-  return NextResponse.json({ requests, progress, uploaded_ids: uploaded.map((u: any) => u.id) });
+  const requests = getEvidenceRequests(caseRow.type);
+  const progress = summarizeEvidenceProgress(caseRow.type, uploaded);
+  return NextResponse.json({ requests, progress, uploaded_ids: uploaded.map((u) => u.id) });
 }

@@ -55,10 +55,11 @@ async function applyAction(sb: any, action: ServerQueuedAction): Promise<Record<
 }
 
 export async function POST(_req: NextRequest) {
-  const supabase = await getSupabase();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  // Audyt 2026-06-27 (iter. 35): typowany klient na poziomie route'a.
+  // `applyAction` pozostaje luźno typowany (`sb: any`) celowo — jest cienkim
+  // routerem rozpakowującym dynamiczne `action.payload` do różnych tabel, czego
+  // nie da się statycznie dotypować bez schematu per-op.
+  const sb = await getSupabase();
   const { data: { user } } = await sb.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 

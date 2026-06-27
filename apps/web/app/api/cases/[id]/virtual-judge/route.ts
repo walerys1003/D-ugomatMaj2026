@@ -12,19 +12,23 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
   const auth = await getAuthenticatedUser(req);
   if (!auth.ok) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
-  const supabase = getSupabaseAdmin();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  // Audyt 2026-06-27 (iter. 35): tabela `cases` jest dotypowana — usuwamy
+  // `as any`. REALNY BUG: kolumny `case_type` i `facts` NIE ISTNIEJĄ
+  // (prawidłowo: `type`; fakty sprawy są w `metadata`). Zapytanie wcześniej
+  // padało w runtime, maskowane przez `as any`.
+  const sb = getSupabaseAdmin();
   const { data: caseRow } = await sb
     .from("cases")
-    .select("id, user_id, case_type, facts")
+    .select("id, user_id, type, metadata")
     .eq("id", id)
     .eq("user_id", auth.user.id)
     .maybeSingle();
   if (!caseRow) return NextResponse.json({ error: "case_not_found" }, { status: 404 });
 
-  let body: any = {};
+  let body: {
+    document_markdown?: string;
+    opposing_party?: "konsument" | "przedsiebiorca" | "bank" | "windykator" | "skarb_panstwa" | "inny";
+  } = {};
   try {
     body = await req.json();
   } catch {
@@ -33,8 +37,10 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
 
   try {
     const result = await runVirtualJudge({
-      case_type: caseRow.case_type,
-      case_facts: caseRow.facts ?? "",
+      case_type: caseRow.type,
+      case_facts: typeof caseRow.metadata === "string"
+        ? caseRow.metadata
+        : JSON.stringify(caseRow.metadata ?? {}),
       user_document_markdown: body.document_markdown,
       opposing_party: body.opposing_party,
     });
