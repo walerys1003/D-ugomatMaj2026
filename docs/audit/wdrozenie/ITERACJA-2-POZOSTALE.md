@@ -399,3 +399,37 @@ oraz liczne pliki po 2 casty.
   schematu (ew. migracji) zanim bezpiecznie usunie się `as any`.
 - lib/enterprise/{scim,organizations,audit-trail}.ts — `as any[]` na wynikach
   embedded-join; do rozbioru z lokalnymi typami złączeń.
+
+---
+
+## Iteracje 32–33 (kontynuacja #6 — głęboki drift schematu cases)
+
+### Iteracja 32 — commit a6e5387 — lib/cases/timeline.ts
+`buildCaseTimeline` ZAWSZE zwracał `[]`. `as any` maskował **7 REALNYCH BUGÓW + KOLIZJĘ**:
+1. cases.case_type NIE ISTNIEJE → realna `type`.
+2. documents nie ma kind/source/sent_at/title → ma type/status.
+3. deadlines.due_at/missed NIE ISTNIEJĄ → effective_end_date.
+4. notifications.kind/title NIE ISTNIEJĄ → template.
+5. NotificationStatus nie ma 'delivered' → 'sent'.
+6. CaseStatus nie ma 'closed' → completed/archived.
+7. KOLIZJA case_events: kod pytał o pominięty schemat (kind/occurred_at/title).
+USUNIĘTO gałąź ai_runs — tabela ai_runs/ai_generation_runs NIE ISTNIEJE
+(jest tylko index do nieistniejącej tabeli). Realny log: ai_usage_log (bez case_id).
+
+### Iteracja 33 — commit a6e5387 — lib/cases/dashboard.ts
+**REALNY BUG #8**: ai_suggestions nie ma user_id ani dismissed_at (ma applied_at,
+klucz case_id) → filtr padał. + cases.case_type→type, win_probability usunięte,
+deadlines.due_at→effective_end_date, ai_runs→ai_usage_log (cost_grosze/100).
+Dotypowano ai_usage_log. Postęp as any: 69 → 67.
+
+### Nowo wykryta KOLIZJA (do migracji — POZA czyszczeniem as-any)
+**organizations** — DWIE migracje:
+- Tier7 (20260512300000, WYGRYWA): id/name/nip/owner_user_id/plan(free..enterprise)/created_at.
+- Tier13 (20260516000000, POMIJANA): id/slug/name/plan(team)/seats_purchased/
+  data_residency/domain/created_at.
+Kod lib/enterprise/organizations.ts jest zbudowany na schemacie Tier13 (POMIJANYM):
+wstawia slug/seats_purchased/data_residency, pyta o `slug`, NIE podaje
+owner_user_id (NOT NULL w Tier7) → **createOrganization/ensureUniqueSlug PADAJĄ
+w runtime**. Wymaga decyzji: migracja dorównująca kolumny Tier13 albo przepisanie
+kodu na schemat Tier7. Pliki lib/enterprise/{scim,organizations,audit-trail}.ts
+pozostawione z `sb: any` do czasu tej decyzji (nie wymuszamy niepełnej zmiany).
