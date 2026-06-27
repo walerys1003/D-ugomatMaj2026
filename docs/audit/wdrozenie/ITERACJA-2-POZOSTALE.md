@@ -477,3 +477,44 @@ pozostawione z `sb: any` do czasu tej decyzji (nie wymuszamy niepełnej zmiany).
   `lib/ai/rag-scaffold.ts`, `lib/ai/rag/hybrid/hybrid-retriever.ts` odpytują
   nieistniejące tabele → wymagają decyzji o migracji przed usunięciem `as any`.
 - `knowledge_articles` — istnieje tylko w tier7; do dotypowania w kolejnej iteracji.
+
+## Iteracja 36–37 — rodo / routes / analytics / integrations / admin (#6)
+
+### ✅ Zaimplementowane
+- Dotypowano tabele: `webhook_endpoints`, `webhook_deliveries`
+  (20260515000000_tier12), `crm_sync_log` (20260527000000_tier24).
+- Usunięto 14 castów `as any`. Po iteracjach: **56 → 42**.
+- Commity: `72734ce` (iter 36), `ffcb0b4` (iter 37).
+
+### 🐛 REALNE BUGI (maskowane przez `as any`)
+1. **`/admin/secrets`** — zapytanie wybierało kolumny `name`/
+   `rotation_period_days`/`last_rotated_at`/`updated_at`, których **NIE MA**
+   w `secret_vault` (realne: `key`/`rotation_due_at`/`last_accessed_at`).
+   Strona padała w runtime. Wybrano realne kolumny + mapowanie na SecretMeta.
+2. **`/admin/rbac`** — komponent oczekiwał `resource_pattern`/`action_pattern`/
+   `roles`/`condition`, a `rbac_policies` ma `actions[]`/`resources[]`/
+   `subjects`/`conditions`. Dodano mapowanie.
+
+### 🔧 Wyczyszczone casty (bez zmiany zachowania)
+- `lib/rodo/data-export.ts`, `lib/security/gdpr/data-export.ts`,
+  `lib/ai/usage-tracker.ts`, `lib/analytics/{funnel-builder,data-warehouse}.ts`,
+  `lib/integrations/{crm/crm-v2,webhooks-v2}.ts`.
+- `app/api/{jobs,i18n/translations,precedents/search,growth/track,documents/[id]/versions}`.
+
+### 📊 Walidacja
+- `tsc --noEmit` → EXIT 0
+- `next lint` → 0 errors
+
+### ⏸️ Pozostałe (do kolejnej iteracji)
+- Strony admina `/admin/{impersonate,compliance,legal-hold}` — wymagają
+  mapowania niezgodnych kształtów (DB row → prop komponentu), analogicznie do
+  secrets/rbac. Wykryto kolejne niezgodności (np. `legal_holds` ma
+  `case_reference`/`resource_types[]`/`active`, a komponent oczekuje
+  `resource_type`/`resource_id`/`expires_at`).
+- Strony `ustawienia/{powiadomienia,page,bezpieczenstwo}` — casty na propsach UI.
+- `lib/ai/qa-knowledge.ts` (knowledge_articles — istnieje tylko w tier7).
+- Poza zakresem (SDK/klient): billing/*, pdfa-conformance, court-efiling,
+  rum-collector, web-push, coupon-engine, customer-portal, lazy-loaders,
+  sdk-generator, mobywatel-autofill, logger/global-error (globalThis).
+- Decyzje migracyjne (brak tabel): scheduled_reminders, legal_references;
+  kolizja organizations; CHECK security_events.
