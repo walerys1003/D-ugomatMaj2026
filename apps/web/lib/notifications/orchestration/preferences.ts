@@ -10,6 +10,9 @@
  */
 
 import { createSupabaseServerClient } from "@/lib/db/supabase-server";
+import type { Database } from "@/lib/db/types";
+
+type NotifPrefsInsert = Database["public"]["Tables"]["notification_preferences"]["Insert"];
 
 export type Channel = "email" | "sms" | "push" | "whatsapp" | "inapp";
 export type Category =
@@ -64,17 +67,15 @@ export const DEFAULT_PREFS: Omit<NotificationPreferences, "user_id" | "updated_a
 };
 
 export async function getUserPreferences(userId: string): Promise<NotificationPreferences> {
-  const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = await createSupabaseServerClient();
   const { data, error } = await sb
     .from("notification_preferences")
     .select("*")
     .eq("user_id", userId)
     .maybeSingle();
   if (error) throw error;
-  if (data) return data as NotificationPreferences;
+  // channels/categories/caps są jsonb (Json) — boundary cast na strukturę domeny.
+  if (data) return data as unknown as NotificationPreferences;
   return {
     user_id: userId,
     ...DEFAULT_PREFS,
@@ -86,18 +87,15 @@ export async function updateUserPreferences(
   userId: string,
   patch: Partial<NotificationPreferences>,
 ): Promise<NotificationPreferences> {
-  const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = await createSupabaseServerClient();
   const merged = { ...(await getUserPreferences(userId)), ...patch, user_id: userId, updated_at: new Date().toISOString() };
   const { data, error } = await sb
     .from("notification_preferences")
-    .upsert(merged, { onConflict: "user_id" })
+    .upsert(merged as unknown as NotifPrefsInsert, { onConflict: "user_id" })
     .select("*")
     .single();
   if (error) throw error;
-  return data as NotificationPreferences;
+  return data as unknown as NotificationPreferences;
 }
 
 /** Czy aktualnie obowiązuje DND? Wewnątrz strefy czasowej użytkownika. */

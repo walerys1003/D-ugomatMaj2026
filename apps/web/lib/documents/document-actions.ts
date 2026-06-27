@@ -94,10 +94,7 @@ export async function generateDocumentFromWizardAction(
   // Mark case as in-analysis (krótko, ale daje feedback w UI)
   await patchCase({ id: caseId, status: "analysis" });
 
-  const supabase = createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseServerClient();
 
   // -------------------------------------------------------------------------
   // 1) Spróbuj AI pipeline; jeśli niedostępny → static fallback
@@ -289,10 +286,7 @@ export async function markDocumentDownloadedAction(
     throw e;
   }
 
-  const supabase = createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseServerClient();
   // RLS i tak ogranicza widok do własnych dokumentów, ale dla pewności
   // używamy `.eq("user_id", userId)` — defense in depth.
   const { error } = await sb

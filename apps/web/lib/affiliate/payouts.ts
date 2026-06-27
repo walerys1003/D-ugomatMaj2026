@@ -29,10 +29,7 @@ export interface PayoutBatch {
  * w pending commissions. Zwraca listę utworzonych batchy.
  */
 export async function runMonthlyPayouts(): Promise<PayoutBatch[]> {
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseAdminClient();
   const periodEnd = new Date().toISOString();
 
   // Aggregate pending commissions per affiliate
@@ -42,8 +39,16 @@ export async function runMonthlyPayouts(): Promise<PayoutBatch[]> {
     .eq("status", "pending");
   if (error) throw error;
 
+  // Embedded join (affiliate_accounts) nie jest inferowany przez typed-select —
+  // modelujemy wynik jednym lokalnym, typowanym castem.
+  type CommissionWithAffiliate = {
+    id: string;
+    affiliate_id: string;
+    amount_grosze: number;
+    affiliate: { payout_email: string; slug: string } | null;
+  };
   const grouped = new Map<string, { sum: number; ids: string[]; email: string; slug: string }>();
-  for (const row of (rows as Array<any>) ?? []) {
+  for (const row of ((rows as unknown as CommissionWithAffiliate[]) ?? [])) {
     const key = row.affiliate_id;
     const existing = grouped.get(key) ?? {
       sum: 0,
@@ -80,14 +85,14 @@ export async function runMonthlyPayouts(): Promise<PayoutBatch[]> {
       .from("affiliate_commissions")
       .update({
         status: "paid",
-        payout_id: (payout as { id: string }).id,
+        payout_id: payout.id,
         paid_at: periodEnd,
       })
       .in("id", agg.ids);
 
     batches.push({
       affiliateId,
-      payoutId: (payout as { id: string }).id,
+      payoutId: payout.id,
       amountGrosze: agg.sum,
       commissionIds: agg.ids,
       affiliateEmail: agg.email,
@@ -102,10 +107,7 @@ export async function markPayoutTransferred(
   payoutId: string,
   externalRef: string,
 ): Promise<void> {
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseAdminClient();
   await sb
     .from("affiliate_payouts")
     .update({

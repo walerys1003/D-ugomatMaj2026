@@ -15,6 +15,7 @@
  */
 import "server-only";
 import { createSupabaseAdminClient } from "@/lib/db/supabase-server";
+import type { Json } from "@/lib/db/types";
 
 export type ConversionEvent =
   | "landing_view"
@@ -54,10 +55,7 @@ export interface RecordEventInput {
 }
 
 export async function recordConversionEvent(input: RecordEventInput): Promise<void> {
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseAdminClient();
   await sb.from("conversion_events").insert({
     event: input.event,
     user_id: input.userId ?? null,
@@ -65,8 +63,8 @@ export async function recordConversionEvent(input: RecordEventInput): Promise<vo
     case_id: input.caseId ?? null,
     payment_id: input.paymentId ?? null,
     amount_grosze: input.amountGrosze ?? null,
-    attribution: input.attribution ?? null,
-    meta: input.meta ?? null,
+    attribution: (input.attribution ?? null) as Json,
+    meta: (input.meta ?? null) as Json,
   });
 }
 
@@ -81,10 +79,7 @@ export async function computeFunnel(
   steps: ConversionEvent[],
   windowDays: number = 30,
 ): Promise<FunnelStep[]> {
-  const supabase = createSupabaseAdminClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = createSupabaseAdminClient();
   const since = new Date(Date.now() - windowDays * 86_400_000).toISOString();
 
   const counts: number[] = [];

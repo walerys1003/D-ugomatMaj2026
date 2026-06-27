@@ -2173,6 +2173,108 @@ export interface Database {
         >;
         Relationships: [];
       };
+      // Audyt 2026-06-27 (iter. 25): tabele Tier18 (20260521000000_tier18_ocr_deadlines_courts.sql).
+      // UWAGA — kolizja `create table if not exists notification_preferences`:
+      // Tier18 (20260521000000) wygrywa nad Tier27 (20260528000000). Kod
+      // notifications/orchestration/preferences.ts używa kształtu Tier18
+      // (channels/categories/caps jako jsonb) — zgodne ze zwycięzcą.
+      notification_preferences: {
+        Row: {
+          user_id: string;
+          channels: Json;
+          categories: Json;
+          dnd_start: string | null;
+          dnd_end: string | null;
+          timezone: string;
+          quiet_days: number[];
+          caps: Json;
+          updated_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["notification_preferences"]["Row"]
+        > & {
+          user_id: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["notification_preferences"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      notification_log: {
+        Row: {
+          id: string;
+          user_id: string;
+          channel: "email" | "sms" | "push" | "whatsapp" | "inapp";
+          category: string;
+          priority: "low" | "normal" | "high" | "critical";
+          delivered: boolean;
+          error_message: string | null;
+          external_id: string | null;
+          sent_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["notification_log"]["Row"]
+        > & {
+          user_id: string;
+          channel: "email" | "sms" | "push" | "whatsapp" | "inapp";
+          category: string;
+          priority: "low" | "normal" | "high" | "critical";
+          delivered: boolean;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["notification_log"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      // Audyt 2026-06-27 (iter. 25): Tier8 growth (20260513100000_tier8_pricing_affiliate_growth.sql).
+      conversion_events: {
+        Row: {
+          id: string;
+          event: string;
+          user_id: string | null;
+          anon_id: string | null;
+          case_id: string | null;
+          payment_id: string | null;
+          amount_grosze: number | null;
+          attribution: Json | null;
+          meta: Json | null;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["conversion_events"]["Row"]
+        > & {
+          event: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["conversion_events"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      // Audyt 2026-06-27 (iter. 25): Tier14 analytics (20260517000000_tier14_analytics_bi.sql).
+      analytics_events: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          org_id: string | null;
+          session_id: string | null;
+          anonymous_id: string | null;
+          event: string;
+          properties: Json;
+          context: Json;
+          occurred_at: string;
+          received_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["analytics_events"]["Row"]
+        > & {
+          id: string;
+          event: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["analytics_events"]["Insert"]
+        >;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     // Audyt 2026-06-27: większość RPC nie jest jeszcze dotypowana (degraduje

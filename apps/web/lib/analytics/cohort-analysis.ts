@@ -20,7 +20,7 @@ export async function computeWeeklyCohorts(weeksBack = 12): Promise<CohortRow[]>
     .not("user_id", "is", null);
 
   const cohortMap = new Map<string, { ids: Set<string>; createdAt: Map<string, Date> }>();
-  for (const p of (profiles as any[]) ?? []) {
+  for (const p of (profiles ?? [])) {
     const wk = isoWeek(new Date(p.created_at));
     if (!cohortMap.has(wk)) cohortMap.set(wk, { ids: new Set(), createdAt: new Map() });
     cohortMap.get(wk)!.ids.add(p.id);
@@ -28,7 +28,8 @@ export async function computeWeeklyCohorts(weeksBack = 12): Promise<CohortRow[]>
   }
 
   const activityByUser = new Map<string, Set<number>>();
-  for (const e of (events as any[]) ?? []) {
+  for (const e of (events ?? [])) {
+    if (!e.user_id) continue;
     const set = activityByUser.get(e.user_id) ?? new Set<number>();
     set.add(weekIndexOf(new Date(e.occurred_at)));
     activityByUser.set(e.user_id, set);
