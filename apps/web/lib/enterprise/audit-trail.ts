@@ -4,6 +4,7 @@
  */
 import { createHash } from "crypto";
 import { createSupabaseServerClient } from "@/lib/db/supabase-server";
+import type { Json } from "@/lib/db/types";
 
 export interface OrgAuditEntry {
   org_id: string;
@@ -17,9 +18,7 @@ export interface OrgAuditEntry {
 }
 
 export async function recordOrgAuditEntry(entry: OrgAuditEntry): Promise<void> {
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createSupabaseServerClient();
+  const sb = await createSupabaseServerClient();
   // Compute hash chain: sha256(prev_hash + JSON(entry))
   const { data: last } = await sb
     .from("org_audit_log")
@@ -39,7 +38,7 @@ export async function recordOrgAuditEntry(entry: OrgAuditEntry): Promise<void> {
     action: entry.action,
     target_type: entry.target_type,
     target_id: entry.target_id ?? null,
-    metadata: entry.metadata ?? {},
+    metadata: (entry.metadata ?? {}) as Json,
     ip: entry.ip ?? null,
     user_agent: entry.user_agent ?? null,
     prev_hash: prev,
@@ -49,16 +48,14 @@ export async function recordOrgAuditEntry(entry: OrgAuditEntry): Promise<void> {
 }
 
 export async function verifyAuditChain(orgId: string): Promise<{ ok: boolean; broken_at?: string }> {
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb: any = await createSupabaseServerClient();
+  const sb = await createSupabaseServerClient();
   const { data } = await sb
     .from("org_audit_log")
     .select("*")
     .eq("org_id", orgId)
     .order("created_at", { ascending: true });
   let prev = "";
-  for (const e of (data as any[]) ?? []) {
+  for (const e of data ?? []) {
     const expected = createHash("sha256")
       .update(prev + JSON.stringify({
         org_id: e.org_id,

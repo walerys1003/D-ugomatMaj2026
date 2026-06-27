@@ -79,11 +79,8 @@ function scoreArticle(article: KnowledgeArticle, queryTokens: string[]): number 
 
 export async function loadKnowledgeArticles(): Promise<KnowledgeArticle[]> {
   const supabase = getSupabaseAdmin();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
   try {
-    const { data, error } = await sb
+    const { data, error } = await supabase
       .from("knowledge_articles")
       .select("slug, title, category, excerpt, content, updated_at")
       .eq("published", true);
@@ -91,7 +88,16 @@ export async function loadKnowledgeArticles(): Promise<KnowledgeArticle[]> {
       logger.warn("qa.knowledge_articles_load_failed", { error: error.message });
       return [];
     }
-    return data ?? [];
+    // Kolumny DB to `string | null`; interfejs KnowledgeArticle używa
+    // opcjonalnych `string | undefined` — mapujemy null → undefined.
+    return (data ?? []).map((a) => ({
+      slug: a.slug,
+      title: a.title,
+      category: a.category ?? undefined,
+      excerpt: a.excerpt ?? undefined,
+      content: a.content,
+      updated_at: a.updated_at,
+    }));
   } catch (err) {
     logger.warn("qa.knowledge_articles_exception", { error: (err as Error).message });
     return [];

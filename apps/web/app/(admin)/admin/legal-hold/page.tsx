@@ -23,7 +23,11 @@ export default async function LegalHoldPage() {
   } = await sb.auth.getUser();
   if (!user) redirect("/sign-in?next=/admin/legal-hold");
 
-  const [{ data: holds }, { data: queries }] = await Promise.all([
+  // Audyt 2026-06-27 (iter. 38): komponent oczekuje kształtu LegalHold
+  // (resource_type/resource_id/expires_at/reason), a tabela `legal_holds` ma
+  // case_reference/description/resource_types[]/active/release_reason.
+  // Mapujemy zamiast `as any`.
+  const [{ data: holdsRaw }, { data: queriesRaw }] = await Promise.all([
     sb
       .from("legal_holds")
       .select("*")
@@ -32,10 +36,40 @@ export default async function LegalHoldPage() {
       .limit(50),
     sb
       .from("ediscovery_queries")
-      .select("id, requested_by, query, status, items_count, created_at, completed_at")
-      .order("created_at", { ascending: false })
+      // REALNY BUG: strona pytała o kolumny query/items_count/created_at, które
+      // NIE istnieją w tabeli `ediscovery_queries`. Prawdziwe kolumny to
+      // filters (jsonb) / result_count / requested_at. Maskowane przez `as any`.
+      .select(
+        "id, requested_by, filters, status, result_count, requested_at, completed_at",
+      )
+      .order("requested_at", { ascending: false })
       .limit(20),
   ]);
+  const holds = (holdsRaw ?? []).map((h) => ({
+    id: h.id,
+    resource_type: (h.resource_types ?? []).join(", "),
+    resource_id: h.case_reference,
+    imposed_by: h.imposed_by,
+    imposed_at: h.imposed_at,
+    expires_at: null as string | null,
+    reason: h.description,
+    released_at: h.released_at,
+  }));
+  const queries = (queriesRaw ?? []).map((q) => ({
+    id: q.id,
+    requested_by: q.requested_by,
+    // filters (jsonb) → query (kształt oczekiwany przez komponent)
+    query: (q.filters ?? {}) as Record<string, unknown>,
+    // DB używa "pending"; komponent oczekuje "queued" — mapujemy.
+    status: (q.status === "pending" ? "queued" : q.status) as
+      | "queued"
+      | "running"
+      | "completed"
+      | "failed",
+    items_count: q.result_count,
+    created_at: q.requested_at,
+    completed_at: q.completed_at,
+  }));
 
   return (
     <main className="container py-8 space-y-6">
@@ -51,7 +85,7 @@ export default async function LegalHoldPage() {
         </Link>
       </header>
 
-      <LegalHoldClient initialHolds={(holds ?? []) as any} initialQueries={(queries ?? []) as any} />
+      <LegalHoldClient initialHolds={holds} initialQueries={queries} />
     </main>
   );
 }

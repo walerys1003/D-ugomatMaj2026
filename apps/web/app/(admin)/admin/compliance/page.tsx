@@ -26,17 +26,32 @@ export default async function ComplianceDashboard() {
   } = await sb.auth.getUser();
   if (!user) redirect("/sign-in?next=/admin/compliance");
 
-  const { data: reports } = await sb
+  // Audyt 2026-06-27 (iter. 38): komponent oczekuje kształtu Report
+  // (generated_by/summary/payload), a tabela compliance_evidence ma
+  // data/format i nie ma generated_by/summary. Mapujemy zamiast `as any`.
+  // Pomijamy rekordy o kind=iso27001 (poza unią obsługiwaną przez UI).
+  const { data: reportsRaw } = await sb
     .from("compliance_evidence")
-    .select("*")
+    .select("id, kind, generated_at, data")
     .order("generated_at", { ascending: false })
     .limit(50);
+  const reports = (reportsRaw ?? [])
+    .filter((r): r is typeof r & { kind: "dpia" | "ropa" | "soc2" | "audit_integrity" } =>
+      r.kind === "dpia" || r.kind === "ropa" || r.kind === "soc2" || r.kind === "audit_integrity")
+    .map((r) => ({
+      id: r.id,
+      kind: r.kind,
+      generated_at: r.generated_at,
+      generated_by: null,
+      summary: (r.data ?? null) as Record<string, unknown> | null,
+      payload: (r.data ?? null) as Record<string, unknown> | null,
+    }));
 
   const counts = {
-    dpia: reports?.filter((r: any) => r.kind === "dpia").length ?? 0,
-    ropa: reports?.filter((r: any) => r.kind === "ropa").length ?? 0,
-    soc2: reports?.filter((r: any) => r.kind === "soc2").length ?? 0,
-    audit_integrity: reports?.filter((r: any) => r.kind === "audit_integrity").length ?? 0,
+    dpia: reports.filter((r) => r.kind === "dpia").length,
+    ropa: reports.filter((r) => r.kind === "ropa").length,
+    soc2: reports.filter((r) => r.kind === "soc2").length,
+    audit_integrity: reports.filter((r) => r.kind === "audit_integrity").length,
   };
 
   return (
@@ -64,7 +79,7 @@ export default async function ComplianceDashboard() {
         />
       </section>
 
-      <ComplianceReportsClient initialReports={(reports ?? []) as any} />
+      <ComplianceReportsClient initialReports={reports} />
     </main>
   );
 }

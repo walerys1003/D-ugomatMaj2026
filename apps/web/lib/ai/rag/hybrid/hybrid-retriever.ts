@@ -43,10 +43,9 @@ const DEFAULT_TOP_K = 12;
 const DEFAULT_PER_RETRIEVER_LIMIT = 30;
 
 export async function hybridRetrieve(opts: HybridRetrievalOptions): Promise<RetrievedChunk[]> {
-  const supabase = await createSupabaseServerClient();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  // RPC-y rag_bm25_search / rag_vector_search nie są dotypowane w Database
+  // (degradują do luźnego wywołania). Klient pozostaje typowany.
+  const sb = await createSupabaseServerClient();
   const topK = opts.topK ?? DEFAULT_TOP_K;
   const bm25Limit = opts.bm25Limit ?? DEFAULT_PER_RETRIEVER_LIMIT;
   const vectorLimit = opts.vectorLimit ?? DEFAULT_PER_RETRIEVER_LIMIT;

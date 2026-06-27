@@ -117,10 +117,11 @@ export async function autoTagDeadlineFromLetter(input: AutoTagInput): Promise<Au
   const dueAt = new Date(baseDate.getTime() + rule.days * 86_400_000);
   const days_remaining = Math.ceil((dueAt.getTime() - Date.now()) / 86_400_000);
 
-  const supabase = getSupabaseAdmin();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = getSupabaseAdmin();
+  // REALNY BUG: poprzednio (pod `as any`) zapisywano kolumny description/due_at/
+  // source, które NIE istnieją w tabeli `deadlines`. Prawdziwy schemat używa
+  // start_date/end_date/effective_end_date. Mapujemy termin na te kolumny.
+  const dueIso = dueAt.toISOString();
   const { data, error } = await sb
     .from("deadlines")
     .insert({
@@ -128,9 +129,9 @@ export async function autoTagDeadlineFromLetter(input: AutoTagInput): Promise<Au
       case_id: input.case_id,
       kind: rule.kind,
       title: rule.title,
-      description: rule.description,
-      due_at: dueAt.toISOString(),
-      source: "ocr_auto_tag",
+      start_date: dueIso,
+      end_date: dueIso,
+      effective_end_date: dueIso,
     })
     .select("id")
     .single();

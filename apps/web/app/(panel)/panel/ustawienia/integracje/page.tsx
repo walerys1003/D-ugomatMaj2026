@@ -79,12 +79,15 @@ export default async function IntegrationsSettingsPage() {
     .select("provider, scope, expires_at, created_at")
     .eq("user_id", user.id);
 
-  const connectedMap: Record<string, { scope?: string; expires_at?: string; created_at: string }> = {};
+  const connectedMap: Record<
+    string,
+    { scope?: string; expires_at?: string; created_at: string }
+  > = {};
   for (const c of creds ?? []) {
-    connectedMap[(c as any).provider] = {
-      scope: (c as any).scope,
-      expires_at: (c as any).expires_at,
-      created_at: (c as any).created_at,
+    connectedMap[c.provider] = {
+      scope: c.scope ?? undefined,
+      expires_at: c.expires_at ?? undefined,
+      created_at: c.created_at,
     };
   }
 

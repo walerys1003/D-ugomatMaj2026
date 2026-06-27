@@ -134,7 +134,7 @@ export default async function SettingsHomePage() {
                   <tile.icon className="h-5 w-5" />
                 </div>
                 {effectiveBadge && (
-                  <Badge tone={(effectiveTone ?? "neutral") as any} withDot>
+                  <Badge tone={effectiveTone ?? "neutral"} withDot>
                     {effectiveBadge}
                   </Badge>
                 )}

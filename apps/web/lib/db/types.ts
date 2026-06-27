@@ -127,6 +127,14 @@ export interface Database {
           referred_by_code: string | null;
           /** Vlasny kod referral usera (do udostępniania). */
           referral_code: string | null;
+          /** SCIM/enterprise (20260516000000_tier13): kanał provisioningu. */
+          provisioned_via: string | null;
+          /** SCIM external id (IdP). */
+          external_id: string | null;
+          /** Konto aktywne (SCIM deactivate ustawia false). */
+          active: boolean | null;
+          /** Ostatnia aktywność (20260528000000_tier27_28). */
+          last_seen_at: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -143,6 +151,10 @@ export interface Database {
           settings?: Json;
           referred_by_code?: string | null;
           referral_code?: string | null;
+          provisioned_via?: string | null;
+          external_id?: string | null;
+          active?: boolean | null;
+          last_seen_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -2666,6 +2678,187 @@ export interface Database {
         };
         Update: Partial<
           Database["public"]["Tables"]["crm_sync_log"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      // Audyt 2026-06-27 (iter. 38): baza wiedzy QA (BM25 retrieval). Źródło:
+      // 20260512200000_tier7_tables.sql.
+      knowledge_articles: {
+        Row: {
+          slug: string;
+          title: string;
+          category: string | null;
+          excerpt: string | null;
+          content: string;
+          published: boolean;
+          embedding: string | null;
+          updated_at: string;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["knowledge_articles"]["Row"]
+        > & {
+          slug: string;
+          title: string;
+          content: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["knowledge_articles"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      // Audyt 2026-06-27 (iter. 38): enterprise multi-tenant. Źródło:
+      // 20260516000000_tier13_enterprise_multitenant.sql.
+      // UWAGA — KOLIZJA SCHEMATÓW: tabela `organizations` jest też definiowana w
+      // 20260512300000_tier7 (id/name/nip/owner_user_id/plan). Migracje używają
+      // CREATE TABLE IF NOT EXISTS, więc fizycznie wygrywa wcześniejszy tier7.
+      // Kod enterprise (lib/enterprise/*) używa kształtu tier13 — typujemy tier13,
+      // a kolizję dokumentujemy do osobnego zadania migracyjnego.
+      organizations: {
+        Row: {
+          id: string;
+          slug: string;
+          name: string;
+          plan: string;
+          seats_purchased: number;
+          data_residency: string;
+          domain: string | null;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["organizations"]["Row"]
+        > & {
+          id: string;
+          slug: string;
+          name: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["organizations"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      org_memberships: {
+        Row: {
+          org_id: string;
+          user_id: string;
+          role: string;
+          joined_at: string;
+          last_active_at: string | null;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["org_memberships"]["Row"]
+        > & {
+          org_id: string;
+          user_id: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["org_memberships"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      org_invitations: {
+        Row: {
+          id: number;
+          org_id: string;
+          email: string;
+          role: string;
+          token: string;
+          invited_by: string | null;
+          accepted_at: string | null;
+          expires_at: string;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["org_invitations"]["Row"]
+        > & {
+          org_id: string;
+          email: string;
+          token: string;
+          expires_at: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["org_invitations"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      org_audit_log: {
+        Row: {
+          id: number;
+          org_id: string;
+          actor_id: string;
+          action: string;
+          target_type: string;
+          target_id: string | null;
+          metadata: Json;
+          ip: string | null;
+          user_agent: string | null;
+          prev_hash: string | null;
+          hash: string;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["org_audit_log"]["Row"]
+        > & {
+          org_id: string;
+          actor_id: string;
+          action: string;
+          target_type: string;
+          hash: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["org_audit_log"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      // Audyt 2026-06-27 (iter. 38): brakujące tabele dodane migracją
+      // 20260627040000_audit_missing_tables.sql (latentny bug — kod ich używał).
+      scheduled_reminders: {
+        Row: {
+          id: string;
+          user_id: string;
+          case_id: string | null;
+          deadline_id: string | null;
+          remind_at: string;
+          title: string;
+          days_before: number;
+          sent_at: string | null;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["scheduled_reminders"]["Row"]
+        > & {
+          user_id: string;
+          remind_at: string;
+          title: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["scheduled_reminders"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      legal_references: {
+        Row: {
+          id: string;
+          citation: string;
+          signature: string | null;
+          abbreviation: string | null;
+          article_number: string | null;
+          ref_type: string;
+          legal_area: string | null;
+          body: string | null;
+          url: string | null;
+          publication_date: string | null;
+          verified: boolean;
+          embedding: string | null;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["legal_references"]["Row"]
+        > & {
+          citation: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["legal_references"]["Insert"]
         >;
         Relationships: [];
       };

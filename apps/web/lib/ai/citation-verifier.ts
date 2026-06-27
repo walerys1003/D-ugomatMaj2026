@@ -184,16 +184,19 @@ export async function verifyCitations(
     try {
       const { data } = await supabase
         .from("legal_references")
-        .select("id,source_url,citation_text,kind,slug")
-        .eq("kind", c.kind)
-        .eq("normalized", c.normalized)
+        .select("id,url,citation,ref_type")
+        // citation-verifier filtruje po znormalizowanej sygnaturze; tabela
+        // legal_references nie ma kolumn kind/normalized/slug — używamy
+        // ref_type + citation (REALNE kolumny). Maskowane wcześniej przez `as any`.
+        .eq("ref_type", c.kind)
+        .ilike("citation", `%${c.normalized}%`)
         .maybeSingle();
 
       if (data) {
         verified.push({
           ...c,
           verified: true,
-          source_url: (data.source_url as string | null) ?? undefined,
+          source_url: data.url ?? undefined,
           match_score: 1.0,
         });
       } else {

@@ -44,7 +44,13 @@ export function NotificationsForm({ initial }: Props) {
     });
   };
 
-  const toggle = (key: keyof Prefs) => () => update(key, !prefs[key] as any);
+  // Audyt 2026-06-27 (iter. 38): `toggle` działa wyłącznie na polach typu
+  // boolean — zawężamy klucze do takich, zamiast `as any`. Dzięki temu próba
+  // przełączenia pola tekstowego (np. push_quiet_start) jest błędem kompilacji.
+  type BooleanKeys = {
+    [K in keyof Prefs]: Prefs[K] extends boolean ? K : never;
+  }[keyof Prefs];
+  const toggle = (key: BooleanKeys) => () => update(key, !prefs[key]);
 
   const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
     <div className="flex flex-col gap-2 border-b border-ink-200 py-3 last:border-b-0 dark:border-dlugomat-700">

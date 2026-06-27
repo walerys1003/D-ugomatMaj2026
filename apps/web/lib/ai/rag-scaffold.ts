@@ -51,10 +51,7 @@ class InHouseProvider implements RagProviderImpl {
   }
 
   async search(q: RagQuery): Promise<RagResult[]> {
-    const supabase = getSupabaseAdmin();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+    const sb = getSupabaseAdmin();
     const limit = q.limit ?? 5;
     const tokens = tokenize(q.query);
     if (tokens.length === 0) return [];

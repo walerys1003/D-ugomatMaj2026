@@ -27,11 +27,19 @@ export default async function SecuritySettingsPage() {
     .eq("user_id", user.id)
     .maybeSingle();
 
-  const { data: webauthn } = await supabase
+  // REALNY BUG: strona pytała o kolumnę `device_name`, która NIE istnieje w
+  // tabeli `webauthn_credentials`. Prawdziwa kolumna to `label`. Maskowane przez
+  // `as any`. Pobieramy prawdziwą kolumnę i mapujemy do kształtu komponentu.
+  const { data: webauthnRaw } = await supabase
     .from("webauthn_credentials")
-    .select("id, device_name, created_at")
+    .select("id, label, created_at")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
+  const webauthn = (webauthnRaw ?? []).map((c) => ({
+    id: c.id,
+    device_name: c.label,
+    created_at: c.created_at,
+  }));
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6">
@@ -60,7 +68,7 @@ export default async function SecuritySettingsPage() {
         <CardContent>
           <SecurityClient
             mfaEnabled={!!mfa?.verified}
-            webauthnCredentials={(webauthn ?? []) as any}
+            webauthnCredentials={webauthn}
           />
         </CardContent>
       </Card>

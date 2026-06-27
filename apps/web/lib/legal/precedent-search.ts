@@ -34,10 +34,7 @@ export interface PrecedentResult {
 }
 
 export async function searchPrecedents(input: PrecedentSearchInput): Promise<{ results: PrecedentResult[]; total: number }> {
-  const supabase = getSupabaseAdmin();
-  // W10-3: loose cast — typed Database stale for recent schema columns
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = supabase as any;
+  const sb = getSupabaseAdmin();
   const limit = Math.min(input.limit ?? 20, 50);
   const offset = Math.max(input.offset ?? 0, 0);
   const tokens = tokenize(input.query);
