@@ -66,7 +66,7 @@ export default async function UlubionePage() {
 
   const supabase = createSupabaseServerClient();
   const { data: u } = await supabase.auth.getUser();
-  if (!u.user) redirect("/logowanie?next=/panel/ulubione");
+  if (!u.user) redirect("/sign-in?next=/panel/ulubione");
 
   const { data: rows } = await supabase
     .from("favorites")

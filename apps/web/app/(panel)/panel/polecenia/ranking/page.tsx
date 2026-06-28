@@ -50,7 +50,7 @@ export default async function PoleceniaRankingPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/logowanie?next=/panel/polecenia/ranking");
+  if (!user) redirect("/sign-in?next=/panel/polecenia/ranking");
 
   const stats = await listReferralStats(user.id);
 

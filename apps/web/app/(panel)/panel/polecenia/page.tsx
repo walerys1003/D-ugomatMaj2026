@@ -47,7 +47,7 @@ export default async function PoleceniaPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/auth/sign-in?next=/panel/polecenia");
+  if (!user) redirect("/sign-in?next=/panel/polecenia");
 
   // Idempotent — utworzy jeśli brak.
   const code = await getOrCreateReferralCode(user.id);

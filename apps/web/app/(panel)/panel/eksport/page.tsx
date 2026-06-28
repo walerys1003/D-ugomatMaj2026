@@ -49,7 +49,7 @@ export default async function EksportRodoPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/logowanie?next=/panel/eksport");
+  if (!user) redirect("/sign-in?next=/panel/eksport");
 
   const [casesCount, paymentsCount, documentsCount, messagesCount, auditCount] =
     await Promise.all([

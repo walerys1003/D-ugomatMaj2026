@@ -62,14 +62,21 @@ test.describe("Krytyczne ścieżki publiczne", () => {
     const res = await request.get("/api/health");
     expect(res.status()).toBe(200);
     const data = await res.json();
-    expect(data).toHaveProperty("status");
+    // /api/health zwraca { ok, service, version, env, uptime_seconds, time }.
+    expect(data).toHaveProperty("ok", true);
+    expect(data).toHaveProperty("service");
   });
 
   test("Auth pages dostępne", async ({ page }) => {
-    await page.goto("/auth/sign-in");
-    await expect(page.locator("form, input[type='email']")).toBeVisible();
-    await page.goto("/auth/sign-up");
-    await expect(page.locator("form, input[type='email']")).toBeVisible();
+    // Strony auth żyją w route-group `(auth)` → realne URL-e: /sign-in, /sign-up
+    // (NIE /auth/sign-in). `.first()` bo strony mają >1 formularz (hasło +
+    // magic-link), więc samo `form` łamie strict-mode Playwright.
+    const signIn = await page.goto("/sign-in");
+    expect(signIn?.status()).toBeLessThan(400);
+    await expect(page.locator("input[type='email']").first()).toBeVisible();
+    const signUp = await page.goto("/sign-up");
+    expect(signUp?.status()).toBeLessThan(400);
+    await expect(page.locator("input[type='email']").first()).toBeVisible();
   });
 
   test("Panel wymaga logowania (redirect 200/302)", async ({ page }) => {

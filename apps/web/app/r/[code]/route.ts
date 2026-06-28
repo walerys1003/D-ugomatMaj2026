@@ -37,7 +37,7 @@ const ALLOWED_TARGETS = new Set([
   "/cennik",
   "/jak-to-dziala",
   "/moduly",
-  "/auth/sign-up",
+  "/sign-up",
 ]);
 
 function safeTarget(rawTo: string | null): string {

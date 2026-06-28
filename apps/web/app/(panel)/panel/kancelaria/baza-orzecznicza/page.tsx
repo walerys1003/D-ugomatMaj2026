@@ -26,7 +26,7 @@ export default async function KancelariaBazaOrzeczniczaPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/logowanie?next=/panel/kancelaria/baza-orzecznicza");
+  if (!user) redirect("/sign-in?next=/panel/kancelaria/baza-orzecznicza");
 
   const { data: refsData } = await supabase
     .from("legal_references")

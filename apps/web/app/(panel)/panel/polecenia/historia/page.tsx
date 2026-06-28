@@ -96,7 +96,7 @@ export default async function ReferralHistoryPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/logowanie?next=/panel/polecenia/historia");
+  if (!user) redirect("/sign-in?next=/panel/polecenia/historia");
 
   const stats = await listReferralStats(user.id);
 

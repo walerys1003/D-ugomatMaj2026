@@ -22,7 +22,7 @@ export default function BikPage() {
       tagline="Negatywny wpis w BIK blokuje kredyt? Wniosek o korektę z konkretną podstawą prawną."
       description="Bank ma obowiązek przekazywać do BIK wyłącznie dane prawdziwe i aktualne (art. 105a Prawa bankowego). Niewłaściwy wpis można zmienić — w trybie reklamacji do banku, a jeśli to nie pomoże, w trybie żądania korekty bezpośrednio do BIK i Rzecznika Finansowego. BIK-Fix wygeneruje pismo z konkretnymi podstawami prawnymi i wyliczeniami."
       price="129 zł"
-      ctaHref="/auth/sign-up?next=/panel/sprawy/nowa?module=bik"
+      ctaHref="/sign-up?next=/panel/sprawy/nowa?module=bik"
       ctaLabel="Skoryguj wpis BIK — 129 zł"
       whenSignals={[
         "BIK pokazuje opóźnienie, którego nigdy nie miałeś (np. po cesji długu).",

@@ -48,7 +48,7 @@ export default function SprzeciwEpuPage() {
       tagline="Sprzeciw od nakazu zapłaty z e-Sądu — masz 14 dni, my potrzebujemy 12 minut."
       description="Po wniesieniu skutecznego sprzeciwu nakaz zapłaty traci moc, a sprawa trafia do sądu rejonowego właściwego dla Twojego miejsca zamieszkania. To jest Twoje konstytucyjne prawo — sprzeciw nie wymaga uzasadnienia, ale dobrze przygotowany sprzeciw z zarzutami merytorycznymi znacząco zwiększa szanse w dalszym postępowaniu."
       price="159 zł"
-      ctaHref="/auth/sign-up?next=/panel/sprawy/nowa?module=sprzeciw_epu"
+      ctaHref="/sign-up?next=/panel/sprawy/nowa?module=sprzeciw_epu"
       ctaLabel="Złóż sprzeciw — 159 zł"
       whenSignals={[
         "Nakaz zapłaty pochodzi z VI Wydziału Cywilnego SR Lublin-Zachód (e-Sąd, EPU).",

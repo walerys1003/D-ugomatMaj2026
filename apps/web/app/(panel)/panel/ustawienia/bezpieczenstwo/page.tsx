@@ -19,7 +19,7 @@ export default async function SecuritySettingsPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/auth/sign-in?next=/panel/ustawienia/bezpieczenstwo");
+  if (!user) redirect("/sign-in?next=/panel/ustawienia/bezpieczenstwo");
 
   const { data: mfa } = await supabase
     .from("mfa_secrets")

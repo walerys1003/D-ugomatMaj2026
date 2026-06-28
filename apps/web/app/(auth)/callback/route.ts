@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
   const safeNext = next && next.startsWith("/") && !next.startsWith("//") ? next : "/panel";
 
   if (!code) {
-    return NextResponse.redirect(`${origin}/auth/sign-in?error=missing_code`);
+    return NextResponse.redirect(`${origin}/sign-in?error=missing_code`);
   }
 
   const supabase = createSupabaseServerClient();
@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
 
   if (error) {
     const reason = encodeURIComponent(error.message ?? "exchange_failed");
-    return NextResponse.redirect(`${origin}/auth/sign-in?error=${reason}`);
+    return NextResponse.redirect(`${origin}/sign-in?error=${reason}`);
   }
 
   // Onboarding enrollment (zad. 243) — best-effort, never blokuje login.

@@ -27,7 +27,7 @@ export default async function AiAsystentHistoriaPage() {
     data: { user },
   } = await sb.auth.getUser();
   if (!user) {
-    redirect("/logowanie?next=/panel/ai-asystent/historia");
+    redirect("/sign-in?next=/panel/ai-asystent/historia");
   }
 
   return (

@@ -22,7 +22,7 @@ export default function UpadloscPage() {
       tagline="Wniosek o upadłość konsumencką — kiedy nic innego już nie zadziała."
       description="Upadłość konsumencka jest ostatecznym narzędziem prawnym dla osób, które straciły zdolność spłaty zobowiązań. Po reformie z 2020 r. procedura jest zdecydowanie prostsza — kluczem jest dobrze przygotowany wniosek z uzasadnieniem niewypłacalności, kompletnym spisem wierzytelności i majątku oraz propozycją planu spłaty. Upadłość-Lite generuje wszystkie te elementy w jednym pakiecie."
       price="249 zł"
-      ctaHref="/auth/sign-up?next=/panel/sprawy/nowa?module=upadlosc"
+      ctaHref="/sign-up?next=/panel/sprawy/nowa?module=upadlosc"
       ctaLabel="Złóż wniosek — 249 zł"
       whenSignals={[
         "Twoje miesięczne zobowiązania znacząco przekraczają dochody — od ponad 3 miesięcy.",

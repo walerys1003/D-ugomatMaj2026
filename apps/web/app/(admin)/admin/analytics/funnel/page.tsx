@@ -31,7 +31,7 @@ export default async function FunnelPage({
   searchParams: Promise<{ range?: string }>;
 }) {
   const gate = await requireAdmin();
-  if (!gate.ok) redirect("/logowanie?next=/admin/analytics/funnel");
+  if (!gate.ok) redirect("/sign-in?next=/admin/analytics/funnel");
 
   const sp = await searchParams;
   const range = sp.range ?? "30d";

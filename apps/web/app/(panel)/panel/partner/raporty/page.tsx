@@ -42,7 +42,7 @@ export default async function PartnerRaportyPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/logowanie?next=/panel/partner/raporty");
+  if (!user) redirect("/sign-in?next=/panel/partner/raporty");
 
   const { data: account } = await supabase
     .from("affiliate_accounts")

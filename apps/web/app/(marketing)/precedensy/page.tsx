@@ -296,7 +296,7 @@ export default async function PrecedentsPage({
               </p>
             </div>
             <Button asChild size="lg" variant="success" className="w-full">
-              <Link href="/auth/sign-up">Wypróbuj za darmo</Link>
+              <Link href="/sign-up">Wypróbuj za darmo</Link>
             </Button>
           </CardContent>
         </Card>

@@ -29,7 +29,7 @@ export default async function EditProfilePage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/logowanie?next=/panel/profil/edycja");
+  if (!user) redirect("/sign-in?next=/panel/profil/edycja");
 
   const { data: row } = await supabase
     .from("profiles")

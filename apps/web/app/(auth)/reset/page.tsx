@@ -21,7 +21,7 @@ export default function ResetPasswordPage() {
       <ResetPasswordForm />
       <p className="text-fluid-sm text-ink-600 dark:text-ink-300">
         Pamiętasz hasło?{" "}
-        <Link href="/auth/sign-in" className="font-semibold text-dlugomat-700 hover:underline dark:text-dlugomat-300">
+        <Link href="/sign-in" className="font-semibold text-dlugomat-700 hover:underline dark:text-dlugomat-300">
           Wróć do logowania
         </Link>
       </p>

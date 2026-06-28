@@ -48,7 +48,7 @@ export default function SkanerNakazuPage() {
       tagline="Wczytaj nakaz, sprawdź czy roszczenie jest przedawnione, dowiedz się co masz zrobić jako pierwsze."
       description="Wystarczy zdjęcie pisma z aparatu telefonu. OCR wyciągnie sygnaturę, kwotę, datę wymagalności i wierzyciela. W 30 sekund powiemy Ci, ile masz dni na reakcję i które moduły Długomatu są dla Ciebie."
       price="DARMOWE"
-      ctaHref="/auth/sign-up?next=/panel/skaner"
+      ctaHref="/sign-up?next=/panel/skaner"
       ctaLabel="Zeskanuj pismo — DARMOWE"
       whenSignals={[
         "Dostałeś nakaz zapłaty z e-Sądu (EPU) i nie wiesz, czy się odwołać.",

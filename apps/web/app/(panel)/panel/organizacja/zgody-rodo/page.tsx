@@ -35,7 +35,7 @@ export default async function ZgodyRodoPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/logowanie?next=/panel/organizacja/zgody-rodo");
+  if (!user) redirect("/sign-in?next=/panel/organizacja/zgody-rodo");
 
   const { data: rows } = await supabase
     .from("consent_ledger")

@@ -55,7 +55,7 @@ export default async function FirmaDashboardPage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/logowanie?next=/panel/firma");
+    redirect("/sign-in?next=/panel/firma");
   }
 
   const org = await getActiveOrgForUser(user.id);

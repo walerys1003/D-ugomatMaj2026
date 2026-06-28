@@ -95,7 +95,7 @@ export default async function PrecedentDetailPage({ params }: Props) {
                 )}
                 <div className="border-t border-ink-200 pt-4 dark:border-dlugomat-800">
                   <Button asChild variant="success" size="lg" className="w-full">
-                    <Link href="/auth/sign-up">Wykorzystaj w sprawie</Link>
+                    <Link href="/sign-up">Wykorzystaj w sprawie</Link>
                   </Button>
                 </div>
               </CardContent>

@@ -49,7 +49,7 @@ export default async function SzczegolyWydarzeniaPage({ params }: { params: Para
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect(`/logowanie?next=/panel/kalendarz/${id}`);
+  if (!user) redirect(`/sign-in?next=/panel/kalendarz/${id}`);
 
   const { data: event } = await supabase
     .from("deadlines")

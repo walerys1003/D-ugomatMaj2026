@@ -51,7 +51,7 @@ async function fetchTickets(): Promise<SupportTicket[]> {
   const {
     data: { user },
   } = await sb.auth.getUser();
-  if (!user) redirect("/logowanie?next=/panel/wsparcie");
+  if (!user) redirect("/sign-in?next=/panel/wsparcie");
 
   const { data, error } = await sb
     .from("support_tickets")

@@ -44,7 +44,7 @@ export default async function DokumentyTagiPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/logowanie?next=/panel/dokumenty/tagi");
+  if (!user) redirect("/sign-in?next=/panel/dokumenty/tagi");
 
   const { data: docs } = await supabase
     .from("documents")

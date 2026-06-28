@@ -57,7 +57,7 @@ async function fetchAgenda(): Promise<AgendaItem[]> {
   const {
     data: { user },
   } = await sb.auth.getUser();
-  if (!user) redirect("/logowanie?next=/panel/kalendarz/agenda");
+  if (!user) redirect("/sign-in?next=/panel/kalendarz/agenda");
 
   const records = await listUserDeadlines(user.id).catch(() => []);
   const now = Date.now();

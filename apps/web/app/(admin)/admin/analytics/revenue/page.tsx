@@ -13,7 +13,7 @@ const PLN = (grosze: number) =>
 
 export default async function RevenuePage() {
   const gate = await requireAdmin();
-  if (!gate.ok) redirect("/logowanie?next=/admin/analytics/revenue");
+  if (!gate.ok) redirect("/sign-in?next=/admin/analytics/revenue");
 
   const data = await computeRevenueMetrics();
 

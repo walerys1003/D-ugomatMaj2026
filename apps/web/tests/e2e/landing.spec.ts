@@ -34,10 +34,10 @@ test.describe("Landing — Calm Authority surface", () => {
     expect(ldJsonCount).toBeGreaterThan(0);
   });
 
-  test("nieautoryzowany dostęp do /panel przekierowuje do /auth/sign-in", async ({ page }) => {
+  test("nieautoryzowany dostęp do /panel przekierowuje do /sign-in", async ({ page }) => {
     const response = await page.goto("/panel");
-    // Po redirect URL kończy się /auth/sign-in?next=/panel
-    expect(page.url()).toMatch(/\/auth\/sign-in/);
+    // Po redirect URL kończy się /sign-in?next=/panel
+    expect(page.url()).toMatch(/\/sign-in/);
     expect(response?.ok()).toBeTruthy();
   });
 });

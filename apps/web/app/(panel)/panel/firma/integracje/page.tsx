@@ -42,7 +42,7 @@ export default async function FirmaIntegracjePage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/logowanie?next=/panel/firma/integracje");
+    redirect("/sign-in?next=/panel/firma/integracje");
   }
 
   const org = await getActiveOrgForUser(user.id);

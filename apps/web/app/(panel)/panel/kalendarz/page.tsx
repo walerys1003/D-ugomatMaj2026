@@ -43,7 +43,7 @@ async function fetchDeadlines(): Promise<DeadlineEvent[]> {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/logowanie?next=/panel/kalendarz");
+  if (!user) redirect("/sign-in?next=/panel/kalendarz");
 
   const records = await listUserDeadlines(user.id).catch(() => []);
   const now = Date.now();

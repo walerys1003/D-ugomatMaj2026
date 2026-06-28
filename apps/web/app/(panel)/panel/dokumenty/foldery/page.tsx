@@ -42,7 +42,7 @@ export default async function DokumentyFolderyPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/logowanie?next=/panel/dokumenty/foldery");
+  if (!user) redirect("/sign-in?next=/panel/dokumenty/foldery");
 
   // Foldery = sprawy uzytkownika; liczymy dokumenty per sprawa.
   const [casesRes, docsRes] = await Promise.all([

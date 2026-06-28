@@ -110,7 +110,7 @@ async function loadDocument(id: string): Promise<LoadedDocument | null> {
 
   const supabase = createSupabaseServerClient();
   const { data: u } = await supabase.auth.getUser();
-  if (!u.user) redirect(`/logowanie?next=/panel/dokumenty/${id}`);
+  if (!u.user) redirect(`/sign-in?next=/panel/dokumenty/${id}`);
 
   // RLS zapewnia, że user widzi tylko swoje dokumenty.
   const { data: row } = await supabase

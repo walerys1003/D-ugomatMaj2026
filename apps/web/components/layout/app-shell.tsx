@@ -368,7 +368,7 @@ function Topbar({
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link href="/auth/sign-out">Wyloguj</Link>
+              <Link href="/sign-out">Wyloguj</Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -78,7 +78,7 @@ export default async function SettingsHomePage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/auth/sign-in?next=/panel/ustawienia");
+  if (!user) redirect("/sign-in?next=/panel/ustawienia");
 
   // Sprawdź czy MFA jest aktywne dla tile-badge
   let mfaEnabled = false;

@@ -59,7 +59,7 @@ interface Message {
 export default async function WiadomosciPage() {
   const supabase = await createSupabaseServerClient();
   const { data: auth } = await supabase.auth.getUser();
-  if (!auth.user) redirect("/logowanie?next=/panel/wiadomosci");
+  if (!auth.user) redirect("/sign-in?next=/panel/wiadomosci");
 
   const { data: threadRows } = await supabase
     .from("message_threads")

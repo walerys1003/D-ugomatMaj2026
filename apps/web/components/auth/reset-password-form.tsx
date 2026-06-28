@@ -24,7 +24,7 @@ export function ResetPasswordForm() {
     try {
       const sb = createSupabaseBrowserClient();
       const { error } = await sb.auth.resetPasswordForEmail(values.email, {
-        redirectTo: `${window.location.origin}/auth/update-password`,
+        redirectTo: `${window.location.origin}/update-password`,
       });
       if (error) {
         setServerError("Nie udało się wysłać linku. Spróbuj ponownie.");

@@ -54,7 +54,7 @@ export default async function KancelariaSprawyPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/logowanie?next=/panel/kancelaria/sprawy");
+  if (!user) redirect("/sign-in?next=/panel/kancelaria/sprawy");
 
   const org = await getActiveOrgForUser(user.id);
 

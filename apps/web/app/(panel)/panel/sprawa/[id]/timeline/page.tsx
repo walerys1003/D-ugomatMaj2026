@@ -80,7 +80,7 @@ export default async function SprawaTimelinePage({ params }: PageProps) {
     data: { user },
   } = await sb.auth.getUser();
   if (!user) {
-    redirect(`/logowanie?next=/panel/sprawa/${id}/timeline`);
+    redirect(`/sign-in?next=/panel/sprawa/${id}/timeline`);
   }
 
   const events: TimelineEvent[] = await buildCaseTimeline({

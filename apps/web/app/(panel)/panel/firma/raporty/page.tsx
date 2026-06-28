@@ -32,7 +32,7 @@ export default async function FirmaRaportyPage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/logowanie?next=/panel/firma/raporty");
+    redirect("/sign-in?next=/panel/firma/raporty");
   }
 
   const org = await getActiveOrgForUser(user.id);

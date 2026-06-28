@@ -23,7 +23,7 @@ export default async function ScimPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/logowanie?next=/panel/organizacja/scim");
+  if (!user) redirect("/sign-in?next=/panel/organizacja/scim");
 
   await getActiveOrgForUser(user.id);
   // SCIM nie jest jeszcze skonfigurowane (brak tabeli konfiguracji SCIM) —

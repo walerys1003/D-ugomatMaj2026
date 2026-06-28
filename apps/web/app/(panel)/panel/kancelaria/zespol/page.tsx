@@ -18,7 +18,7 @@ export default async function KancelariaZespolPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/logowanie?next=/panel/kancelaria/zespol");
+  if (!user) redirect("/sign-in?next=/panel/kancelaria/zespol");
 
   return (
     <div className="space-y-8 px-6 py-8 lg:px-10">

@@ -90,7 +90,7 @@ export default async function SzczegolyAktywnosciPage({ params }: { params: Para
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect(`/logowanie?next=/panel/aktywnosc/${id}`);
+  if (!user) redirect(`/sign-in?next=/panel/aktywnosc/${id}`);
 
   const { data: event } = await supabase
     .from("security_events")

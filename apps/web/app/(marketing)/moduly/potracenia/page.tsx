@@ -22,7 +22,7 @@ export default function PotraceniaPage() {
       tagline="Wstrzymaj zajęcie wynagrodzenia, odblokuj kwotę wolną na koncie bankowym."
       description="Pracodawca i bank mają obowiązek pozostawić Ci kwotę wolną — minimalne wynagrodzenie netto z wynagrodzenia za pracę i 75% minimalnego wynagrodzenia na rachunku. Często tego nie robią — bo nie wiedzą, bo źle zinterpretowali zajęcie albo bo wysłali zbyt szeroko. PotrąceniaStop wygeneruje pismo, które przywraca Twoje uprawnienia w 7 dni."
       price="od 79 zł"
-      ctaHref="/auth/sign-up?next=/panel/sprawy/nowa?module=potracenia"
+      ctaHref="/sign-up?next=/panel/sprawy/nowa?module=potracenia"
       ctaLabel="Odblokuj kwotę wolną — od 79 zł"
       whenSignals={[
         "Pracodawca przelał Ci 0 zł lub kwotę poniżej minimalnego wynagrodzenia.",

@@ -99,7 +99,7 @@ export function SignInForm({ next, initialError }: { next?: string; initialError
           required
           error={passwordForm.formState.errors.password?.message}
           hint={
-            <Link href="/auth/reset" className="text-dlugomat-600 hover:underline dark:text-dlugomat-300">
+            <Link href="/reset" className="text-dlugomat-600 hover:underline dark:text-dlugomat-300">
               Zapomniałem hasła
             </Link>
           }

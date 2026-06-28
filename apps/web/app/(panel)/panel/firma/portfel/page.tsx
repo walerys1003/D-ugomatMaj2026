@@ -57,7 +57,7 @@ export default async function FirmaPortfelPage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/logowanie?next=/panel/firma/portfel");
+    redirect("/sign-in?next=/panel/firma/portfel");
   }
 
   const org = await getActiveOrgForUser(user.id);

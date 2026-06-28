@@ -33,7 +33,7 @@ export default async function SkanerPage() {
   const supabase = createSupabaseServerClient();
   const { data: userResult } = await supabase.auth.getUser();
   if (!userResult.user) {
-    redirect("/logowanie?next=/panel/skaner");
+    redirect("/sign-in?next=/panel/skaner");
   }
 
   const { data: history } = await supabase

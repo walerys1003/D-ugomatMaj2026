@@ -62,7 +62,7 @@ export default async function FirmaZespolPage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/logowanie?next=/panel/firma/zespol");
+    redirect("/sign-in?next=/panel/firma/zespol");
   }
 
   const org = await getActiveOrgForUser(user.id);

@@ -73,7 +73,7 @@ function fmtDate(iso: string): string {
 export default async function AktywnoscPage() {
   const supabase = createSupabaseServerClient();
   const { data: u } = await supabase.auth.getUser();
-  if (!u.user) redirect("/logowanie?next=/panel/aktywnosc");
+  if (!u.user) redirect("/sign-in?next=/panel/aktywnosc");
 
   const EVENTS = await getAccountActivity(90);
   const total = EVENTS.length;

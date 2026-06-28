@@ -48,7 +48,7 @@ export default async function RulingDetailPage({
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect(`/logowanie?next=/panel/baza-orzecznicza/${id}`);
+  if (!user) redirect(`/sign-in?next=/panel/baza-orzecznicza/${id}`);
 
   const { data: ref } = await supabase
     .from("legal_references")

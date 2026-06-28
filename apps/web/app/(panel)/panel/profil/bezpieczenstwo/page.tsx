@@ -65,7 +65,7 @@ export default async function BezpieczenstwoPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/logowanie?next=/panel/profil/bezpieczenstwo");
+  if (!user) redirect("/sign-in?next=/panel/profil/bezpieczenstwo");
 
   const [sessRes, auditRes] = await Promise.all([
     supabase

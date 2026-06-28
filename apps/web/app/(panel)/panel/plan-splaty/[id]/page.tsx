@@ -73,7 +73,7 @@ export default async function PaymentPlanDetailPage({
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect(`/logowanie?next=/panel/plan-splaty/${id}`);
+  if (!user) redirect(`/sign-in?next=/panel/plan-splaty/${id}`);
 
   // [id] = identyfikator sprawy. Plan splaty = sprawa + historia jej platnosci.
   const { data: kase } = await supabase

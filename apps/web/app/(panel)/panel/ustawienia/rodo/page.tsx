@@ -35,7 +35,7 @@ export default async function RodoSettingsPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/logowanie?next=/panel/ustawienia/rodo");
+  if (!user) redirect("/sign-in?next=/panel/ustawienia/rodo");
 
   const { data: consents } = await supabase
     .from("consent_ledger")

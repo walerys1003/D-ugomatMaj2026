@@ -29,7 +29,7 @@ const TRIGGER_LABEL: Record<string, string> = {
 
 export default async function WorkflowsPage() {
   const gate = await requireAdmin();
-  if (!gate.ok) redirect("/logowanie?next=/admin/workflows");
+  if (!gate.ok) redirect("/sign-in?next=/admin/workflows");
 
   // W10-3: loose cast — typed Database stale for recent schema columns
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

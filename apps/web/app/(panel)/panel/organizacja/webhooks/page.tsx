@@ -46,7 +46,7 @@ export default async function WebhooksPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/logowanie?next=/panel/organizacja/webhooks");
+  if (!user) redirect("/sign-in?next=/panel/organizacja/webhooks");
 
   const { data } = await supabase
     .from("webhook_endpoints")

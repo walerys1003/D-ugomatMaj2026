@@ -37,7 +37,7 @@ export default async function ApiKluczePage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/logowanie?next=/panel/organizacja/api-klucze");
+  if (!user) redirect("/sign-in?next=/panel/organizacja/api-klucze");
 
   const org = await getActiveOrgForUser(user.id);
 

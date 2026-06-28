@@ -39,7 +39,7 @@ export default async function AudytPage({
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/logowanie?next=/panel/organizacja/audyt");
+  if (!user) redirect("/sign-in?next=/panel/organizacja/audyt");
 
   // Wyznacz organizacje uzytkownika.
   const { data: membership } = await supabase

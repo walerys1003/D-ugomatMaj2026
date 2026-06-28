@@ -100,7 +100,7 @@ export default async function PowiadomieniaPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/logowanie?next=/panel/ustawienia/powiadomienia");
+  if (!user) redirect("/sign-in?next=/panel/ustawienia/powiadomienia");
 
   const prefs = await getUserPreferences(user.id);
 

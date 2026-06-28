@@ -45,7 +45,7 @@ async function loadWeek(): Promise<{ events: CalEvent[]; dates: string[]; weekLa
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/logowanie?next=/panel/kalendarz/tydzien");
+  if (!user) redirect("/sign-in?next=/panel/kalendarz/tydzien");
 
   const now = new Date();
   const weekStart = mondayOf(now);

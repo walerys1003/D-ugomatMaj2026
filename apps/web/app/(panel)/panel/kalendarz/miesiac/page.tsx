@@ -36,7 +36,7 @@ async function loadMonth(): Promise<{
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/logowanie?next=/panel/kalendarz/miesiac");
+  if (!user) redirect("/sign-in?next=/panel/kalendarz/miesiac");
 
   const now = new Date();
   const year = now.getFullYear();

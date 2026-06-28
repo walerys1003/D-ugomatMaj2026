@@ -276,7 +276,7 @@ export function RegistrationWizard() {
 
             <p className="text-xs text-ink-500 text-center">
               Masz już konto?{" "}
-              <a href="/logowanie" className="text-accent-700 hover:underline">
+              <a href="/sign-in" className="text-accent-700 hover:underline">
                 Zaloguj się
               </a>
             </p>

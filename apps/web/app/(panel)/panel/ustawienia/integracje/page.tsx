@@ -72,7 +72,7 @@ export default async function IntegrationsSettingsPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/auth/sign-in?next=/panel/ustawienia/integracje");
+  if (!user) redirect("/sign-in?next=/panel/ustawienia/integracje");
 
   const { data: creds } = await supabase
     .from("oauth_credentials")

@@ -35,7 +35,7 @@ export async function loginAsTestUser(
     };
   }
 
-  await page.goto("/auth/sign-in");
+  await page.goto("/sign-in");
   await page.getByLabel(/e-?mail/i).fill(email);
   // Magic-link domyślnie; jeśli formularz ma password mode, użyjemy go.
   const passwordField = page.getByLabel(/has[łl]o|password/i);

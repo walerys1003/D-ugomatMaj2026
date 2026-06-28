@@ -18,7 +18,7 @@ export default async function KancelariaKlienciPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/logowanie?next=/panel/kancelaria/klienci");
+  if (!user) redirect("/sign-in?next=/panel/kancelaria/klienci");
 
   return (
     <div className="space-y-8 px-6 py-8 lg:px-10">

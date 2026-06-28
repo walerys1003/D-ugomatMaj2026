@@ -32,7 +32,7 @@ export default async function PaymentsSettingsPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/auth/sign-in?next=/panel/ustawienia/platnosci");
+  if (!user) redirect("/sign-in?next=/panel/ustawienia/platnosci");
 
   // Audyt #6 — kolumny zgodne z kanonicznym schematem `subscriptions`
   // (20260522000000_tier19_rag_payments_ux.sql). Wcześniej zapytanie używało

@@ -32,7 +32,7 @@ import { cn } from "@/lib/utils";
  *  - Dropdown desktop: Radix-free, kontrolowany state, focus-visible OK,
  *    Escape zamyka, klik poza zamyka
  *  - Usunięty dekoracyjny Cmd+K (nie miał backendu, audit V4 §3.3)
- *  - Naprawione URL-e auth: /sign-in /sign-up (były /auth/sign-in)
+ *  - Naprawione URL-e auth: /sign-in /sign-up (były /sign-in)
  *  - Tighter: text-[13px] nav (Linear), chevron 12px, gap-1 między linkami
  *
  * Bez zmian z v3:

@@ -18,7 +18,7 @@ export default async function MaterialyPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/logowanie?next=/panel/partner/materialy");
+  if (!user) redirect("/sign-in?next=/panel/partner/materialy");
 
   const { data: account } = await supabase
     .from("affiliate_accounts")

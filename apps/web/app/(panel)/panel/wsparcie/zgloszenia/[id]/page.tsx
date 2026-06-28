@@ -47,7 +47,7 @@ export default async function TicketDetailPage({
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect(`/logowanie?next=/panel/wsparcie/zgloszenia/${id}`);
+  if (!user) redirect(`/sign-in?next=/panel/wsparcie/zgloszenia/${id}`);
 
   const { data: thread } = await supabase
     .from("message_threads")

@@ -27,7 +27,7 @@ export default async function ZapisanePage() {
     data: { user },
   } = await sb.auth.getUser();
   if (!user) {
-    redirect("/logowanie?next=/panel/ai-asystent/zapisane");
+    redirect("/sign-in?next=/panel/ai-asystent/zapisane");
   }
 
   return (

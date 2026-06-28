@@ -22,7 +22,7 @@ export default function KomornikPage() {
       tagline="Komornik zajął więcej niż mu wolno? Wiesz dokładnie, jakie pismo i do kogo wysłać."
       description="Komornik nie ma nieograniczonej władzy. Kodeks postępowania cywilnego określa limity zajęć, kwoty wolne od egzekucji i tryby zaskarżenia każdej czynności. KomornikShield wskaże dokładnie, które przepisy zostały naruszone i wygeneruje pismo procesowe — skargę, wniosek o ograniczenie albo wniosek o wyłączenie spod egzekucji."
       price="od 79 zł"
-      ctaHref="/auth/sign-up?next=/panel/sprawy/nowa?module=komornik"
+      ctaHref="/sign-up?next=/panel/sprawy/nowa?module=komornik"
       ctaLabel="Zatrzymaj komornika — od 79 zł"
       whenSignals={[
         "Komornik zajął całe wynagrodzenie zamiast pozostawić kwotę wolną.",

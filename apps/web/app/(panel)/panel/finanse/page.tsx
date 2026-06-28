@@ -70,7 +70,7 @@ function mapPaymentStatus(status: string): Transaction["status"] {
 export default async function FinansePage() {
   const supabase = createSupabaseServerClient();
   const { data: u } = await supabase.auth.getUser();
-  if (!u.user) redirect("/logowanie?next=/panel/finanse");
+  if (!u.user) redirect("/sign-in?next=/panel/finanse");
 
   const { data: payments } = await supabase
     .from("payments")

@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 export default async function FeatureFlagsPage() {
   const gate = await requireAdmin();
-  if (!gate.ok) redirect("/logowanie");
+  if (!gate.ok) redirect("/sign-in");
   const flags = await listFlags();
   return (
     <main className="mx-auto max-w-5xl px-4 py-10">

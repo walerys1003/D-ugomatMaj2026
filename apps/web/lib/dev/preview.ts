@@ -17,7 +17,7 @@ import "server-only";
  *   - createSupabaseServerClient() zwraca lekki klient-mock (auth.getUser → mock user,
  *     zapytania `.from(...)` → puste, bezbłędne wyniki),
  *   - guardy w layoutach paneli oraz RBAC przepuszczają mockowego usera/admina,
- *   - middleware traktuje request jako zalogowany (bez redirectu na /auth/sign-in).
+ *   - middleware traktuje request jako zalogowany (bez redirectu na /sign-in).
  */
 
 export const DEV_PREVIEW_ENABLED =

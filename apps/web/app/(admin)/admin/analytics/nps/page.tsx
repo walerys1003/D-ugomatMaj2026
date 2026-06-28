@@ -13,7 +13,7 @@ const pct = (part: number, total: number) =>
 
 export default async function NpsPage() {
   const gate = await requireAdmin();
-  if (!gate.ok) redirect("/logowanie?next=/admin/analytics/nps");
+  if (!gate.ok) redirect("/sign-in?next=/admin/analytics/nps");
 
   const data = await computeNps(90);
 

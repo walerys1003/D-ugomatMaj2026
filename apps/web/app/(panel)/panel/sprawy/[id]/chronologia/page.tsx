@@ -103,7 +103,7 @@ export default async function CaseTimelinePage({
     data: { user },
   } = await sb.auth.getUser();
   if (!user) {
-    redirect(`/logowanie?next=/panel/sprawy/${id}/chronologia`);
+    redirect(`/sign-in?next=/panel/sprawy/${id}/chronologia`);
   }
 
   const events: TimelineEvent[] = await buildCaseTimeline({

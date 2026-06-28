@@ -38,7 +38,7 @@ export default async function BillingPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/logowanie?next=/panel/organizacja/billing");
+  if (!user) redirect("/sign-in?next=/panel/organizacja/billing");
 
   const org = await getActiveOrgForUser(user.id);
   if (!org) {

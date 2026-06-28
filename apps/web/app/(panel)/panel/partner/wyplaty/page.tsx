@@ -27,7 +27,7 @@ export default async function WyplatyPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/logowanie?next=/panel/partner/wyplaty");
+  if (!user) redirect("/sign-in?next=/panel/partner/wyplaty");
 
   // Konto afiliacyjne biezacego uzytkownika (RLS filtruje po user_id).
   const { data: account } = await supabase

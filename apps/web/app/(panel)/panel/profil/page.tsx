@@ -59,7 +59,7 @@ export default async function ProfilPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/logowanie?next=/panel/profil");
+  if (!user) redirect("/sign-in?next=/panel/profil");
 
   const { data: row } = await supabase
     .from("profiles")

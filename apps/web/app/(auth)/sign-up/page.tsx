@@ -29,7 +29,7 @@ export default function SignUpPage({ searchParams }: PageProps) {
       <p className="text-fluid-sm text-ink-600 dark:text-ink-300">
         Masz już konto?{" "}
         <Link
-          href={`/auth/sign-in${searchParams.next ? `?next=${encodeURIComponent(searchParams.next)}` : ""}`}
+          href={`/sign-in${searchParams.next ? `?next=${encodeURIComponent(searchParams.next)}` : ""}`}
           className="font-semibold text-dlugomat-700 hover:underline dark:text-dlugomat-300"
         >
           Zaloguj się

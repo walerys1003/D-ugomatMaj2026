@@ -24,7 +24,7 @@ export default async function SsoPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/logowanie?next=/panel/organizacja/sso");
+  if (!user) redirect("/sign-in?next=/panel/organizacja/sso");
 
   await getActiveOrgForUser(user.id);
   // SSO nie jest jeszcze skonfigurowane dla zadnej organizacji (brak tabeli

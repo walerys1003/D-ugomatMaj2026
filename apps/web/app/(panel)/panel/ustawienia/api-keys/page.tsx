@@ -17,7 +17,7 @@ export default async function ApiKeysPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/auth/sign-in?next=/panel/ustawienia/api-keys");
+  if (!user) redirect("/sign-in?next=/panel/ustawienia/api-keys");
 
   return (
     <div className="mx-auto flex max-w-4xl flex-col gap-6">

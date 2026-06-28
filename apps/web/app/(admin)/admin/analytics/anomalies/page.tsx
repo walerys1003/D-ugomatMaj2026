@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 export default async function AnomaliesPage() {
   const gate = await requireAdmin();
-  if (!gate.ok) redirect("/logowanie?next=/admin/analytics/anomalies");
+  if (!gate.ok) redirect("/sign-in?next=/admin/analytics/anomalies");
 
   return (
     <main className="container mx-auto px-4 py-8 max-w-6xl space-y-6">

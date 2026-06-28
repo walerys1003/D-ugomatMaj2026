@@ -102,7 +102,7 @@ export default async function SessionDetailPage({
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect(`/logowanie?next=/panel/ustawienia/sesje/${id}`);
+  if (!user) redirect(`/sign-in?next=/panel/ustawienia/sesje/${id}`);
 
   const { data: row } = await supabase
     .from("user_sessions")

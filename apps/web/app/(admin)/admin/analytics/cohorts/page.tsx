@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 
 export default async function CohortsPage() {
   const gate = await requireAdmin();
-  if (!gate.ok) redirect("/logowanie?next=/admin/analytics/cohorts");
+  if (!gate.ok) redirect("/sign-in?next=/admin/analytics/cohorts");
 
   const raw = await computeWeeklyCohorts(12).catch(() => []);
   const cohorts = raw.map((r) => ({

@@ -22,7 +22,7 @@ export default async function NotatkaPage({ params }: { params: Params }) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect(`/logowanie?next=/panel/notatki/${id}`);
+  if (!user) redirect(`/sign-in?next=/panel/notatki/${id}`);
 
   const { data: note } = await supabase
     .from("notes")

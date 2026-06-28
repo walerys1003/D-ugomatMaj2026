@@ -33,7 +33,7 @@ export default async function DomenyPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/logowanie?next=/panel/organizacja/domeny");
+  if (!user) redirect("/sign-in?next=/panel/organizacja/domeny");
 
   const org = await getActiveOrgForUser(user.id);
   const domains: DomainRow[] = org?.domain

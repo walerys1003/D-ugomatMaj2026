@@ -22,7 +22,7 @@ export default function UgodaPage() {
       tagline="Propozycja ugody z wierzycielem — uczciwie, ale po Twojej stronie."
       description="Ugoda w sprawach zadłużenia jest często jedynym rozwiązaniem, które kończy sprawę bez sądu i bez komornika. Klucz to właściwa propozycja: realny harmonogram, jasne zasady umorzenia odsetek, klauzule chroniące Cię przed cofnięciem ugody. UgodoMat wyliczy ratę, którą faktycznie udźwigniesz, i przygotuje pismo zgodne z dobrymi praktykami negocjacyjnymi."
       price="119 zł"
-      ctaHref="/auth/sign-up?next=/panel/sprawy/nowa?module=ugoda"
+      ctaHref="/sign-up?next=/panel/sprawy/nowa?module=ugoda"
       ctaLabel="Zaproponuj ugodę — 119 zł"
       whenSignals={[
         "Wierzyciel (bank, fundusz, firma pożyczkowa) deklaruje gotowość do rozmowy.",

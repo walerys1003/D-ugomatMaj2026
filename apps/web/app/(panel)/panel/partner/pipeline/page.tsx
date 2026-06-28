@@ -47,7 +47,7 @@ export default async function PartnerPipelinePage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/logowanie?next=/panel/partner/pipeline");
+  if (!user) redirect("/sign-in?next=/panel/partner/pipeline");
 
   const { data: account } = await supabase
     .from("affiliate_accounts")

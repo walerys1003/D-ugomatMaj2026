@@ -22,7 +22,7 @@ export default function CesjaPage() {
       tagline="Fundusz po cesji żąda zapłaty? Zweryfikuj legitymację — często jej po prostu nie mają."
       description="Cesja wierzytelności (art. 509 KC) wymaga skutecznej umowy między pierwotnym wierzycielem a funduszem oraz prawidłowego zawiadomienia dłużnika. W praktyce fundusze sekurytyzacyjne (Kruk, Best, Ultimo, Hoist, Intrum) bardzo często nie potrafią wykazać pełnego łańcucha cesji — bo umowy są pakietowe, niekompletne, a czasem dotyczą wierzytelności, których w pakiecie w ogóle nie było."
       price="149 zł"
-      ctaHref="/auth/sign-up?next=/panel/sprawy/nowa?module=cesja"
+      ctaHref="/sign-up?next=/panel/sprawy/nowa?module=cesja"
       ctaLabel="Sprawdź cesję — 149 zł"
       whenSignals={[
         "Otrzymałeś pismo od funduszu (Kruk, Best, Ultimo, Hoist, Intrum), z którym nigdy nie zawierałeś umowy.",

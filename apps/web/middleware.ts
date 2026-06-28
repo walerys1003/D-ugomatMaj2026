@@ -28,7 +28,8 @@ function edgeCorrelationId(headers: Headers): string {
  * Edge middleware — odpowiada za:
  *
  *  1) Refresh sesji Supabase (rotacja access tokenu, jeśli wygasł).
- *  2) Route-guard: redirect /panel/* dla anonimowych, /auth/* dla zalogowanych.
+ *  2) Route-guard: redirect /panel/* dla anonimowych, ekrany auth
+ *     (/sign-in, /sign-up, /reset, /update-password) dla zalogowanych.
  *  3) Edge rate-limit per-IP (defense in depth — NIE zastępuje rate-limitów
  *     w API routes, które używają konkretnych profili).
  *  4) CSP nonce — generowany per-request, eksponowany przez nagłówek
@@ -44,7 +45,7 @@ export async function middleware(request: NextRequest) {
 
   // DEV-PREVIEW — w trybie podglądu paneli (poza produkcją + za flagą) traktuj
   // wszystkie żądania jako zalogowane, by route-guard nie przekierowywał
-  // /panel i /admin na /auth/sign-in. Patrz lib/dev/preview.ts.
+  // /panel i /admin na /sign-in. Patrz lib/dev/preview.ts.
   const devPreview =
     process.env.NODE_ENV !== "production" &&
     process.env.NEXT_PUBLIC_DEV_PREVIEW === "1";
@@ -170,20 +171,24 @@ function enforceRouteGuards(
 ) {
   const path = request.nextUrl.pathname;
 
-  // Protect /panel/* — push to /auth/sign-in with `?next=` so the user
+  // Audyt 2026-06-28: poprzednio przekierowywano na `/auth/sign-in`, ale
+  // strony auth żyją w route-group `(auth)` → ich realne URL-e to `/sign-in`,
+  // `/sign-up`, `/reset`, `/sign-out` (segment `(auth)` jest usuwany z URL).
+  // `/auth/sign-in` nie istnieje (404 w produkcji). Poprawiamy na `/sign-in`.
+  //
+  // Protect /panel/* — push to /sign-in with `?next=` so the user
   // returns to the page they wanted after logging in.
   if (path.startsWith("/panel") && !userPresent) {
-    const redirect = new URL("/auth/sign-in", request.url);
+    const redirect = new URL("/sign-in", request.url);
     redirect.searchParams.set("next", path);
     return NextResponse.redirect(redirect);
   }
 
-  // Already-logged-in users should not see auth screens (except /sign-out).
-  if (
-    userPresent &&
-    path.startsWith("/auth") &&
-    !path.startsWith("/auth/sign-out")
-  ) {
+  // Already-logged-in users should not see auth screens (except sign-out).
+  // Auth pages: /sign-in, /sign-up, /reset, /update-password (route-group
+  // `(auth)`), więc dopasowujemy te konkretne ścieżki zamiast prefiksu /auth.
+  const AUTH_SCREENS = ["/sign-in", "/sign-up", "/reset", "/update-password"];
+  if (userPresent && AUTH_SCREENS.some((p) => path === p || path.startsWith(`${p}/`))) {
     return NextResponse.redirect(new URL("/panel", request.url));
   }
 

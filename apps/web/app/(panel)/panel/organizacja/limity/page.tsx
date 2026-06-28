@@ -31,7 +31,7 @@ export default async function LimityPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/logowanie?next=/panel/organizacja/limity");
+  if (!user) redirect("/sign-in?next=/panel/organizacja/limity");
 
   const { data: usage } = await supabase
     .from("subscription_usage")

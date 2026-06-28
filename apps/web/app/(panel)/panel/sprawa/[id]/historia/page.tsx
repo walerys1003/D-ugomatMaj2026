@@ -114,7 +114,7 @@ export default async function SprawaHistoriaPage({ params }: PageProps) {
     data: { user },
   } = await sb.auth.getUser();
   if (!user) {
-    redirect(`/logowanie?next=/panel/sprawa/${id}/historia`);
+    redirect(`/sign-in?next=/panel/sprawa/${id}/historia`);
   }
 
   const events: TimelineEvent[] = await buildCaseTimeline({

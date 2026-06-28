@@ -35,7 +35,7 @@ export default async function PartnerLeadyPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/logowanie?next=/panel/partner/leady");
+  if (!user) redirect("/sign-in?next=/panel/partner/leady");
 
   const { data: account } = await supabase
     .from("affiliate_accounts")

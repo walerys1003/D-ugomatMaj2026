@@ -37,7 +37,7 @@ export default async function FirmaFakturyPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/logowanie?next=/panel/firma/faktury");
+  if (!user) redirect("/sign-in?next=/panel/firma/faktury");
 
   const { data: paymentsRaw } = await supabase
     .from("payments")

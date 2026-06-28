@@ -17,7 +17,7 @@ export default async function SessionsPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/auth/sign-in?next=/panel/ustawienia/sesje");
+  if (!user) redirect("/sign-in?next=/panel/ustawienia/sesje");
 
   return (
     <div className="mx-auto flex max-w-4xl flex-col gap-6">

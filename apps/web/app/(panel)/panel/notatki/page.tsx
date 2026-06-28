@@ -39,7 +39,7 @@ function fmtUpdated(iso: string): string {
 export default async function NotatkiPage() {
   const supabase = createSupabaseServerClient();
   const { data: u } = await supabase.auth.getUser();
-  if (!u.user) redirect("/logowanie?next=/panel/notatki");
+  if (!u.user) redirect("/sign-in?next=/panel/notatki");
 
   const { data: rows } = await supabase
     .from("notes")

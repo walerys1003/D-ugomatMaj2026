@@ -26,7 +26,7 @@ export default async function PanelLayout({ children }: { children: React.ReactN
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/auth/sign-in?next=/panel");
+    redirect("/sign-in?next=/panel");
   }
 
   return (

@@ -19,7 +19,7 @@ export default async function KancelariaPismaPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/logowanie?next=/panel/kancelaria/pisma");
+  if (!user) redirect("/sign-in?next=/panel/kancelaria/pisma");
 
   return (
     <div className="space-y-8 px-6 py-8 lg:px-10">

@@ -104,7 +104,7 @@ export default async function SkanerHistoriaPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/logowanie?next=/panel/skaner/historia");
+  if (!user) redirect("/sign-in?next=/panel/skaner/historia");
 
   const { data: rows } = await supabase
     .from("ocr_results")

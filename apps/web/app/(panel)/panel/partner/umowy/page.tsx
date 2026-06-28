@@ -19,7 +19,7 @@ export default async function PartnerUmowyPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/logowanie?next=/panel/partner/umowy");
+  if (!user) redirect("/sign-in?next=/panel/partner/umowy");
 
   return (
     <div className="mx-auto flex max-w-4xl flex-col gap-8">

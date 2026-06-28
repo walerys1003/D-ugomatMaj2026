@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 export default async function ErrorsPage() {
   const gate = await requireAdmin();
-  if (!gate.ok) redirect("/logowanie");
+  if (!gate.ok) redirect("/sign-in");
   // W10-phase2: recentErrorSummary returns flat array. Derive aggregates here.
   const rows = await recentErrorSummary();
   const total = rows.reduce((sum, r) => sum + r.count, 0);
