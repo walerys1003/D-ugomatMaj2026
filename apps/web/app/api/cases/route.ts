@@ -116,6 +116,15 @@ const postBodySchema = z.object({
 });
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
+  // Kolejność: najpierw AUTH, potem walidacja body. Nieuwierzytelniony request
+  // dostaje 401 zanim ujawnimy szczegóły walidacji (issues z Zod) — spójnie z GET
+  // oraz z /api/ai/ocr i resztą chronionych endpointów.
+  const supabase = createSupabaseServerClient();
+  const { data: u, error: authErr } = await supabase.auth.getUser();
+  if (authErr || !u.user) {
+    return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
+  }
+
   let raw: unknown;
   try {
     raw = await req.json();
@@ -128,12 +137,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       { error: "validation_error", issues: parsed.error.issues },
       { status: 400 },
     );
-  }
-
-  const supabase = createSupabaseServerClient();
-  const { data: u, error: authErr } = await supabase.auth.getUser();
-  if (authErr || !u.user) {
-    return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
   }
 
   // Mocniejszy rate-limit dla POST (zapobiega zalewaniu DB śmieciowymi szkicami)

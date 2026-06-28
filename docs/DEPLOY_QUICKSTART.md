@@ -71,36 +71,51 @@ vercel --prod                         # deploy produkcyjny
 
 ## Krok 3 — Zmienne środowiskowe (ENV)
 
-### 🔴 WYMAGANE — build na Vercel **rzuci błędem** bez nich
-(źródło prawdy: `apps/web/next.config.mjs`)
+### 🔴 WYMAGANE — serwer produkcyjny **NIE WSTANIE** bez nich
+**Źródło prawdy: [`apps/web/lib/env.ts`](../apps/web/lib/env.ts)** (`assertEnv()` w instrumentation hook
+rzuca błąd na starcie w `NODE_ENV=production`). Potwierdzone runtime — `next start`
+bez tych zmiennych kończy się `[env] Walidacja środowiska nie powiodła się`.
 
 | Zmienna | Skąd wziąć |
 |---|---|
-| `NEXT_PUBLIC_APP_URL` | `https://dlugomat.pl` (Twoja domena) |
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase → Settings → API |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase → Settings → API |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase → Settings → API (sekret) |
 | `STRIPE_SECRET_KEY` | Stripe → Developers → API keys (`sk_live_...`) |
 | `STRIPE_WEBHOOK_SECRET` | Stripe → Developers → Webhooks (`whsec_...`) |
-| `CRON_SECRET` | `openssl rand -hex 32` |
+| `CRON_SECRET` | `openssl rand -hex 32` (chroni `/api/cron/*`) |
+| `ENCRYPTION_KEY` | `openssl rand -hex 32` (**min. 32 znaki**) |
+| **Backend AI** — JEDEN z dwóch: | |
+| → `ANTHROPIC_API_KEY` | Anthropic Console (bezpośrednio) |
+| → **albo** `APIPOD_API_KEY` + `APIPOD_BASE_URL` | Gateway APIPod (rate-limit/retry) |
 
-> Awaryjny deploy bez kompletu (NIE dla produkcji): `SKIP_PROD_ENV_CHECK=1`.
+> Reguła krzyżowa z `lib/env.ts`: musi istnieć **przynajmniej jeden** backend AI
+> (`ANTHROPIC_API_KEY` **lub** komplet `APIPOD_API_KEY`+`APIPOD_BASE_URL`),
+> inaczej build/boot rzuci: „Brak skonfigurowanego backendu AI".
 
-### 🟡 WAŻNE — pełna funkcjonalność (brak = soft-warn, deploy przejdzie)
+`NEXT_PUBLIC_APP_URL` jest opcjonalne (domyślnie `http://localhost:3000`), ale na
+produkcji **ustaw je** na `https://dlugomat.pl` (poprawne linki w mailach, OG, sitemap).
+
+### 🟡 ZALECANE — brak = ostrzeżenie (deploy przejdzie), ale ryzyko
+
+| Zmienna | Konsekwencja braku |
+|---|---|
+| `AI_USAGE_DAILY_CAP_USD` | **brak dziennego limitu kosztów AI** (soft-warn z env.ts) |
+| `AI_USAGE_CASE_CAP_USD` | brak limitu kosztu AI na sprawę |
+| `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` | rate-limit in-memory (nieskuteczny przy >1 instancji — Vercel skaluje!) |
+
+### 🟢 WAŻNE dla pełnej funkcjonalności (brak = dana funkcja wyłączona)
 
 | Zmienna | Funkcja gdy brak |
 |---|---|
-| `ANTHROPIC_API_KEY` | Generowanie pism AI — fallback do szablonu |
-| `APIPOD_API_KEY` + `APIPOD_BASE_URL` | Gateway AI (rate-limit/retry) |
-| `AWS_REGION` `AWS_ACCESS_KEY_ID` `AWS_SECRET_ACCESS_KEY` | Textract — OCR PDF fallback (obrazki działają bez tego) |
+| `AWS_REGION` `AWS_ACCESS_KEY_ID` `AWS_SECRET_ACCESS_KEY` | Textract — OCR PDF fallback (obrazki/Tesseract działają bez tego) |
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe Checkout (frontend) |
 | `RESEND_API_KEY` + `RESEND_FROM_EMAIL` | E-maile transakcyjne / przypomnienia |
 | `SMSAPI_OAUTH_TOKEN` + `SMSAPI_SENDER` | SMS D3/D1/D0 |
 | `FAKTUROWNIA_API_TOKEN` + `FAKTUROWNIA_DOMAIN` | Automatyczne faktury VAT |
-| `APP_ENCRYPTION_KEY` | Szyfrowanie at-rest — `openssl rand -base64 48` |
 | `REFERRAL_IP_SALT` | Anty-fraud poleceń — `openssl rand -hex 16` |
 
-### 🟢 OPCJONALNE — monitoring / dodatki
+### 🔵 OPCJONALNE — monitoring / dodatki
 
 | Zmienna | Funkcja |
 |---|---|
@@ -136,10 +151,10 @@ Stripe → Developers → Webhooks → **Add endpoint**:
 ## Krok 5 — Smoke test po deployu
 
 ```bash
-curl https://dlugomat.pl/api/health          # → {"ok":true}
+curl https://dlugomat.pl/api/health          # → {"ok":true,"service":"..."}
 ```
 Ręcznie w przeglądarce:
-- `/logowanie` → rejestracja + logowanie (Supabase Auth)
+- `/sign-up` → rejestracja, `/sign-in` → logowanie (Supabase Auth, grupa tras `(auth)`)
 - `/panel/skaner` → upload zdjęcia/PDF → OCR → wynik
 - `/panel/moje-zadluzenie/kreator` → wygenerowanie pisma
 - `/panel/dokumenty` → odczyt/pobranie

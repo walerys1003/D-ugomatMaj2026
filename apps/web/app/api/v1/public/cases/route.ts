@@ -70,15 +70,37 @@ export async function POST(req: NextRequest) {
   // Audyt 2026-06-27 (iter. 24) — REALNY BUG zamaskowany przez `as any`:
   // poprzednio insert używał kolumn `organization_id`, `case_type`, `facts`,
   // `answers`, które NIE ISTNIEJĄ w tabeli `cases`. Realne kolumny: `org_id`,
-  // `type` (CaseType), `metadata` (jsonb). `user_id` jest NOT NULL — publiczne
-  // API nie ma kontekstu usera, więc insert i tak był niepoprawny architektonicznie.
+  // `type` (CaseType), `metadata` (jsonb).
+  //
+  // `user_id` (cases) jest NOT NULL → FK do auth.users. Publiczne API uwierzytelnia
+  // organizację (klucz API), nie konkretnego usera. Poprawnie atrybuujemy sprawę
+  // do WŁAŚCICIELA organizacji — rozwiązujemy go z `org_memberships`
+  // (role = 'owner'; migracja Tier13 20260516000000). To realny, istniejący user
+  // (user_id NOT NULL), więc FK do auth.users i RLS są spójne (poprzedni placeholder
+  // `org_id` łamał FK do auth.users — to był realny bug).
+  const { data: owner, error: ownerErr } = await sb
+    .from("org_memberships")
+    .select("user_id")
+    .eq("org_id", verified.key.organization_id)
+    .eq("role", "owner")
+    .order("joined_at", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+  if (ownerErr || !owner?.user_id) {
+    logger.warn("public_api.org_owner_missing", {
+      org_id: verified.key.organization_id,
+      error: ownerErr?.message,
+    });
+    return NextResponse.json({ error: "organization_owner_not_found" }, { status: 422 });
+  }
+
   // `type` jest ścisłym enumem CaseType — przyjmujemy wartość z body przez
   // lokalny boundary cast (walidacja enuma poza zakresem tego audytu).
   const { data, error } = await sb
     .from("cases")
     .insert({
       org_id: verified.key.organization_id,
-      user_id: verified.key.organization_id, // FIXME(arch): public API nie ma kontekstu usera; org_id jako placeholder
+      user_id: owner.user_id,
       type: caseType as never,
       title: typeof body.title === "string" ? body.title : "",
       metadata: (body.facts ?? body.answers ?? {}) as Json,

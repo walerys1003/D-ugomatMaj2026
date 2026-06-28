@@ -34,16 +34,25 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 WEB="$ROOT/apps/web"
 cd "$ROOT"
 
-# 7 zmiennych twardo wymaganych przez next.config.mjs (build rzuca bez nich).
+# Zmienne twardo wymagane na produkcji.
+# Źródło prawdy: apps/web/lib/env.ts (assertEnv() w instrumentation hook rzuca
+# błąd na starcie w NODE_ENV=production, jeśli którejś brakuje).
 REQUIRED_ENV=(
-  NEXT_PUBLIC_APP_URL
   NEXT_PUBLIC_SUPABASE_URL
   NEXT_PUBLIC_SUPABASE_ANON_KEY
   SUPABASE_SERVICE_ROLE_KEY
   STRIPE_SECRET_KEY
   STRIPE_WEBHOOK_SECRET
   CRON_SECRET
+  ENCRYPTION_KEY
 )
+
+# Backend AI — wymagany JEDEN z dwóch wariantów (reguła krzyżowa z lib/env.ts):
+#   (a) ANTHROPIC_API_KEY
+#   (b) APIPOD_API_KEY + APIPOD_BASE_URL
+# Bez żadnego z nich boot rzuci: „Brak skonfigurowanego backendu AI".
+AI_ENV_OPTION_A=( ANTHROPIC_API_KEY )
+AI_ENV_OPTION_B=( APIPOD_API_KEY APIPOD_BASE_URL )
 
 # =============================================================================
 step "0. Sprawdzenie narzędzi (preflight)"
@@ -112,18 +121,35 @@ if command -v vercel >/dev/null 2>&1; then
 
   # --- ENV ---
   step "4. Vercel — zmienne środowiskowe (production)"
-  echo "7 zmiennych WYMAGANYCH (bez nich build na Vercel rzuci błędem):"
+  echo "Zmienne WYMAGANE (bez nich serwer produkcyjny NIE WSTANIE — assertEnv() w lib/env.ts):"
   for k in "${REQUIRED_ENV[@]}"; do echo "   - $k"; done
+  echo ""
+  echo "Backend AI — wymagany JEDEN z wariantów:"
+  echo "   (a) ${AI_ENV_OPTION_A[*]}"
+  echo "   (b) ${AI_ENV_OPTION_B[*]}"
+  echo ""
+  echo "Pełna tabela (zalecane / funkcjonalne / opcjonalne): docs/DEPLOY_QUICKSTART.md"
   echo ""
   echo "Dodaj je interaktywnie (wartości NIE są logowane do repo):"
   echo "   vercel env add <NAZWA> production"
   echo "lub hurtowo z lokalnego pliku .env.production:"
   echo "   while IFS='=' read -r k v; do [[ \"\$k\" =~ ^[A-Z] ]] && echo \"\$v\" | vercel env add \"\$k\" production; done < .env.production"
   echo ""
-  if confirm "Dodać teraz 7 wymaganych zmiennych interaktywnie?"; then
+  if confirm "Dodać teraz zmienne WYMAGANE interaktywnie?"; then
     for k in "${REQUIRED_ENV[@]}"; do
       if confirm "  Dodać $k?"; then vercel env add "$k" production || warn "  $k pominięte/istnieje"; fi
     done
+    echo ""
+    info "Teraz backend AI — wybierz wariant (a) Anthropic lub (b) APIPod:"
+    if confirm "  Wariant (a): dodać ANTHROPIC_API_KEY?"; then
+      vercel env add ANTHROPIC_API_KEY production || warn "  ANTHROPIC_API_KEY pominięte/istnieje"
+    elif confirm "  Wariant (b): dodać APIPOD_API_KEY + APIPOD_BASE_URL?"; then
+      for k in "${AI_ENV_OPTION_B[@]}"; do
+        vercel env add "$k" production || warn "  $k pominięte/istnieje"
+      done
+    else
+      warn "  Nie dodano backendu AI — boot rzuci „Brak skonfigurowanego backendu AI”."
+    fi
   fi
 
   # --- Deploy ---
@@ -142,8 +168,9 @@ step "6. Po deployu — smoke test"
 # =============================================================================
 cat <<'EOF'
 Po deployu sprawdź:
-  - https://<twoja-domena>/api/health          → { ok: true }
-  - https://<twoja-domena>/logowanie           → rejestracja/logowanie
+  - https://<twoja-domena>/api/health          → { ok: true, service: ... }
+  - https://<twoja-domena>/sign-up             → rejestracja (grupa tras (auth))
+  - https://<twoja-domena>/sign-in             → logowanie
   - /panel/skaner                              → upload skanu → OCR
   - /panel/moje-zadluzenie/kreator             → generowanie pisma
   - Stripe → Developers → Webhooks → endpoint:
