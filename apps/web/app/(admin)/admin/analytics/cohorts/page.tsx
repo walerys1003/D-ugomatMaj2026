@@ -1,49 +1,24 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CohortGrid, type CohortRow } from "@/components/analytics/cohort-grid";
+import { CohortGrid } from "@/components/analytics/cohort-grid";
+import { computeWeeklyCohorts } from "@/lib/analytics/cohort-analysis";
+import { requireAdmin } from "@/lib/auth/require-admin";
 
 export const metadata: Metadata = { title: "Cohorts | Admin Analytics | Długomat" };
+export const dynamic = "force-dynamic";
 
-interface CohortsData {
-  metric: "retention" | "revenue_retention";
-  period: "month" | "week";
-  cohorts: CohortRow[];
-  insights: string[];
-}
+export default async function CohortsPage() {
+  const gate = await requireAdmin();
+  if (!gate.ok) redirect("/logowanie?next=/admin/analytics/cohorts");
 
-async function fetchCohorts(metric: string, period: string): Promise<CohortsData | null> {
-  try {
-    const res = await fetch(
-      `/api/admin/analytics/cohorts?metric=${metric}&period=${period}`,
-      { cache: "no-store" },
-    );
-    if (!res.ok) return null;
-    return (await res.json()) as CohortsData;
-  } catch {
-    return null;
-  }
-}
-
-const METRICS = [
-  { value: "retention", label: "Retencja użytkowników" },
-  { value: "revenue_retention", label: "Retencja przychodów" },
-];
-
-const PERIODS = [
-  { value: "month", label: "Miesięcznie" },
-  { value: "week", label: "Tygodniowo" },
-];
-
-export default async function CohortsPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ metric?: string; period?: string }>;
-}) {
-  const sp = await searchParams;
-  const metric = sp.metric ?? "retention";
-  const period = sp.period ?? "month";
-  const data = await fetchCohorts(metric, period);
+  const raw = await computeWeeklyCohorts(12).catch(() => []);
+  const cohorts = raw.map((r) => ({
+    cohort_label: r.cohort_week,
+    cohort_size: r.cohort_size,
+    retention: r.retention,
+  }));
 
   return (
     <main className="container mx-auto px-4 py-8 max-w-7xl space-y-6">
@@ -55,76 +30,26 @@ export default async function CohortsPage({
           Cohorty
         </h1>
         <p className="text-sm text-ink-500 mt-1">
-          Retencja użytkowników i przychodów w ujęciu kohortowym
+          Retencja użytkowników w ujęciu kohortowym (12 tygodni) — liczone z
+          tabeli zdarzeń.
         </p>
-      </div>
-
-      <div className="flex flex-wrap gap-4">
-        <div className="flex gap-2">
-          {METRICS.map((m) => (
-            <Link
-              key={m.value}
-              href={`/admin/analytics/cohorts?metric=${m.value}&period=${period}`}
-              className={`text-sm px-3 py-1.5 rounded-full border ${
-                metric === m.value
-                  ? "border-ink-900 bg-ink-900 text-ink-50"
-                  : "border-ink-300 text-ink-700 hover:border-ink-400"
-              }`}
-            >
-              {m.label}
-            </Link>
-          ))}
-        </div>
-        <div className="flex gap-2">
-          {PERIODS.map((p) => (
-            <Link
-              key={p.value}
-              href={`/admin/analytics/cohorts?metric=${metric}&period=${p.value}`}
-              className={`text-sm px-3 py-1.5 rounded-full border ${
-                period === p.value
-                  ? "border-ink-900 bg-ink-900 text-ink-50"
-                  : "border-ink-300 text-ink-700 hover:border-ink-400"
-              }`}
-            >
-              {p.label}
-            </Link>
-          ))}
-        </div>
       </div>
 
       <Card elevation="subtle">
         <CardHeader>
-          <CardTitle>
-            {METRICS.find((m) => m.value === metric)?.label} (
-            {PERIODS.find((p) => p.value === period)?.label})
-          </CardTitle>
+          <CardTitle>Retencja tygodniowa</CardTitle>
         </CardHeader>
         <CardContent>
-          {data ? (
-            <CohortGrid
-              cohorts={data.cohorts}
-              periodLabel={period === "month" ? "Miesiąc" : "Tydzień"}
-            />
+          {cohorts.length > 0 ? (
+            <CohortGrid cohorts={cohorts} periodLabel="Tydzień" />
           ) : (
-            <p className="text-sm text-ink-500">Brak danych.</p>
+            <p className="text-sm text-ink-500">
+              Brak danych kohortowych w wybranym oknie. Wynik pojawi się, gdy
+              zbierzemy wystarczająco zdarzeń aktywności użytkowników.
+            </p>
           )}
         </CardContent>
       </Card>
-
-      {data && data.insights.length > 0 && (
-        <Card elevation="subtle">
-          <CardHeader>
-            <CardTitle>Spostrzeżenia</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2 text-sm text-ink-700 dark:text-ink-300 list-disc list-inside">
-              {data.insights.map((i, idx) => (
-                <li key={idx}>{i}</li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-      )}
     </main>
   );
 }

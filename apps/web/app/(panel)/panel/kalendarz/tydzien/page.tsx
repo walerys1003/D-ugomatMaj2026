@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Calendar, ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { redirect } from "next/navigation";
+import { Calendar, Plus } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,95 +12,78 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
+import { listUserDeadlines } from "@/lib/deadlines";
+import { DEADLINE_RULES, type DeadlineKind } from "@/lib/deadlines/deadline-engine";
 
 export const metadata: Metadata = {
   title: "Kalendarz — widok tygodniowy",
-  description: "Twój tydzień w jednym widoku: terminy sądowe, spotkania, deadliny.",
+  description: "Twój tydzień w jednym widoku: terminy i deadliny.",
 };
+export const dynamic = "force-dynamic";
 
 interface CalEvent {
   id: string;
   day: number; // 0=Pon..6=Nd
-  start: string; // HH:MM
-  end: string;
+  time: string; // HH:MM
   title: string;
-  kind: "rozprawa" | "spotkanie" | "deadline" | "konsultacja";
-  location?: string;
+  kind: DeadlineKind;
+  caseId: string | null;
 }
 
-const EVENTS: CalEvent[] = [
-  {
-    id: "e1",
-    day: 0,
-    start: "09:00",
-    end: "10:30",
-    title: "Rozprawa — sygn. I C 412/25",
-    kind: "rozprawa",
-    location: "SR Warszawa-Mokotów, sala 214",
-  },
-  {
-    id: "e2",
-    day: 0,
-    start: "14:00",
-    end: "14:45",
-    title: "Konsultacja z mec. Nowakiem",
-    kind: "konsultacja",
-    location: "online",
-  },
-  {
-    id: "e3",
-    day: 1,
-    start: "11:00",
-    end: "12:00",
-    title: "Spotkanie z partnerem prawnym",
-    kind: "spotkanie",
-  },
-  {
-    id: "e4",
-    day: 2,
-    start: "23:59",
-    end: "23:59",
-    title: "Deadline: odpowiedź na pozew",
-    kind: "deadline",
-  },
-  {
-    id: "e5",
-    day: 3,
-    start: "10:00",
-    end: "11:30",
-    title: "Rozprawa — sygn. II Cz 89/26",
-    kind: "rozprawa",
-    location: "SO Warszawa, sala 502",
-  },
-  {
-    id: "e6",
-    day: 4,
-    start: "15:00",
-    end: "16:00",
-    title: "Konsultacja BIK z klientem",
-    kind: "konsultacja",
-  },
-  {
-    id: "e7",
-    day: 4,
-    start: "17:00",
-    end: "17:00",
-    title: "Deadline: złożenie wniosku BIK",
-    kind: "deadline",
-  },
-];
-
-const KIND_TONE: Record<CalEvent["kind"], "danger" | "info" | "warning" | "success"> = {
-  rozprawa: "danger",
-  spotkanie: "info",
-  deadline: "warning",
-  konsultacja: "success",
-};
-
 const DAYS = ["Pon", "Wt", "Śr", "Cz", "Pt", "Sb", "Nd"];
-const DATES = ["11.05", "12.05", "13.05", "14.05", "15.05", "16.05", "17.05"];
 
-export default function KalendarzTydzienPage() {
+function mondayOf(d: Date): Date {
+  const m = new Date(d);
+  m.setHours(0, 0, 0, 0);
+  m.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+  return m;
+}
+
+async function loadWeek(): Promise<{ events: CalEvent[]; dates: string[]; weekLabel: string }> {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/logowanie?next=/panel/kalendarz/tydzien");
+
+  const now = new Date();
+  const weekStart = mondayOf(now);
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekStart.getDate() + 7);
+
+  const dates: string[] = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(weekStart);
+    d.setDate(weekStart.getDate() + i);
+    return d.toLocaleDateString("pl-PL", { day: "2-digit", month: "2-digit" });
+  });
+
+  const records = await listUserDeadlines(user.id).catch(() => []);
+  const events: CalEvent[] = [];
+  for (const r of records) {
+    const due = new Date(r.snoozed_until ?? r.effective_end_date);
+    if (due < weekStart || due >= weekEnd) continue;
+    const day = (due.getDay() + 6) % 7;
+    events.push({
+      id: r.id,
+      day,
+      time: due.toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" }),
+      title: r.title,
+      kind: r.kind,
+      caseId: r.case_id,
+    });
+  }
+
+  const weekLabel = `${weekStart.toLocaleDateString("pl-PL", { day: "numeric", month: "long" })} – ${new Date(
+    weekEnd.getTime() - 86400_000,
+  ).toLocaleDateString("pl-PL", { day: "numeric", month: "long", year: "numeric" })}`;
+
+  return { events, dates, weekLabel };
+}
+
+export default async function KalendarzTydzienPage() {
+  const { events, dates, weekLabel } = await loadWeek();
+
   return (
     <div className="space-y-8">
       <header className="flex flex-wrap items-start justify-between gap-4">
@@ -107,25 +91,18 @@ export default function KalendarzTydzienPage() {
           <p className="text-xs uppercase tracking-[0.18em] text-ink-500">
             Kalendarz · widok tygodniowy
           </p>
-          <h1 className="font-display text-fluid-h1 text-dlugomat-950">
-            Tydzień 20 · 11–17 maja 2026
-          </h1>
+          <h1 className="font-display text-fluid-h1 text-dlugomat-950">{weekLabel}</h1>
           <p className="max-w-2xl text-ink-600">
-            Wszystkie terminy sądowe, spotkania oraz deadliny w jednym widoku.
+            Wszystkie Twoje terminy i deadliny w bieżącym tygodniu.
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="ghost" size="sm" aria-label="Poprzedni tydzień">
-            <ChevronLeft className="h-4 w-4" aria-hidden />
-          </Button>
-          <Button variant="ghost" size="sm">Dziś</Button>
-          <Button variant="ghost" size="sm" aria-label="Następny tydzień">
-            <ChevronRight className="h-4 w-4" aria-hidden />
-          </Button>
-          <Button>
-            <Plus className="mr-2 h-4 w-4" aria-hidden />
-            Nowe wydarzenie
-          </Button>
+          <Link href="/panel/kalendarz/nowy">
+            <Button>
+              <Plus className="mr-2 h-4 w-4" aria-hidden />
+              Nowe wydarzenie
+            </Button>
+          </Link>
         </div>
       </header>
 
@@ -156,11 +133,11 @@ export default function KalendarzTydzienPage() {
                 className="border-b border-ink-200 bg-ink-50 px-3 py-2 text-center"
               >
                 <p className="text-xs uppercase tracking-wide text-ink-500">{d}</p>
-                <p className="font-display text-lg text-dlugomat-950">{DATES[i]}</p>
+                <p className="font-display text-lg text-dlugomat-950">{dates[i]}</p>
               </div>
             ))}
             {DAYS.map((_, dayIdx) => {
-              const dayEvents = EVENTS.filter((e) => e.day === dayIdx);
+              const dayEvents = events.filter((e) => e.day === dayIdx);
               return (
                 <div
                   key={dayIdx}
@@ -169,27 +146,40 @@ export default function KalendarzTydzienPage() {
                   {dayEvents.length === 0 ? (
                     <p className="text-xs text-ink-400 px-1 mt-2">—</p>
                   ) : (
-                    dayEvents.map((ev) => (
-                      <article
-                        key={ev.id}
-                        className="rounded-md border border-ink-200 bg-white p-2 text-xs shadow-card"
-                      >
-                        <div className="flex items-center justify-between gap-1">
-                          <span className="font-mono text-ink-500">
-                            {ev.kind === "deadline" ? ev.start : `${ev.start}–${ev.end}`}
-                          </span>
-                          <Badge tone={KIND_TONE[ev.kind]} withDot>
-                            {ev.kind}
-                          </Badge>
-                        </div>
-                        <p className="mt-1 font-medium text-dlugomat-900 leading-snug">
-                          {ev.title}
-                        </p>
-                        {ev.location ? (
-                          <p className="mt-0.5 text-ink-500 truncate">{ev.location}</p>
-                        ) : null}
-                      </article>
-                    ))
+                    dayEvents.map((ev) => {
+                      const inner = (
+                        <>
+                          <div className="flex items-center justify-between gap-1">
+                            <span className="font-mono text-ink-500">{ev.time}</span>
+                            <Badge tone="warning" withDot>
+                              termin
+                            </Badge>
+                          </div>
+                          <p className="mt-1 font-medium text-dlugomat-900 leading-snug">
+                            {ev.title}
+                          </p>
+                          <p className="mt-0.5 text-ink-500 truncate">
+                            {DEADLINE_RULES[ev.kind]?.label ?? "Termin"}
+                          </p>
+                        </>
+                      );
+                      return ev.caseId ? (
+                        <Link
+                          key={ev.id}
+                          href={`/panel/sprawa/${ev.caseId}`}
+                          className="block rounded-md border border-ink-200 bg-white p-2 text-xs shadow-card hover:border-shield-300"
+                        >
+                          {inner}
+                        </Link>
+                      ) : (
+                        <article
+                          key={ev.id}
+                          className="rounded-md border border-ink-200 bg-white p-2 text-xs shadow-card"
+                        >
+                          {inner}
+                        </article>
+                      );
+                    })
                   )}
                 </div>
               );
@@ -198,11 +188,13 @@ export default function KalendarzTydzienPage() {
         </CardContent>
       </Card>
 
-      <section className="grid gap-4 sm:grid-cols-4" aria-label="Statystyki tygodnia">
-        <KpiCard label="Rozprawy" value={EVENTS.filter((e) => e.kind === "rozprawa").length} tone="danger" />
-        <KpiCard label="Deadliny" value={EVENTS.filter((e) => e.kind === "deadline").length} tone="warning" />
-        <KpiCard label="Spotkania" value={EVENTS.filter((e) => e.kind === "spotkanie").length} tone="info" />
-        <KpiCard label="Konsultacje" value={EVENTS.filter((e) => e.kind === "konsultacja").length} tone="success" />
+      <section className="grid gap-4 sm:grid-cols-2" aria-label="Statystyki tygodnia">
+        <KpiCard label="Terminy w tym tygodniu" value={events.length} tone="warning" />
+        <KpiCard
+          label="Powiązane ze sprawą"
+          value={events.filter((e) => e.caseId).length}
+          tone="info"
+        />
       </section>
     </div>
   );

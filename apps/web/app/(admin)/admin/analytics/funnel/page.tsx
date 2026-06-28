@@ -1,50 +1,48 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { computeFunnel } from "@/lib/analytics/funnel-builder";
+import { STANDARD_FUNNEL } from "@/lib/growth/conversion-tracking";
+import { requireAdmin } from "@/lib/auth/require-admin";
 
 export const metadata: Metadata = { title: "Funnel | Admin Analytics | Długomat" };
-
-interface FunnelStep {
-  key: string;
-  label: string;
-  users: number;
-  conversion_from_previous_percent: number;
-  conversion_from_top_percent: number;
-  avg_time_to_next_minutes: number | null;
-}
-
-interface FunnelData {
-  range_label: string;
-  steps: FunnelStep[];
-  drop_off_alert: string | null;
-}
-
-async function fetchFunnel(range: string): Promise<FunnelData | null> {
-  try {
-    const res = await fetch(`/api/admin/analytics/funnel?range=${range}`, {
-      cache: "no-store",
-    });
-    if (!res.ok) return null;
-    return (await res.json()) as FunnelData;
-  } catch {
-    return null;
-  }
-}
+export const dynamic = "force-dynamic";
 
 const RANGES = [
-  { value: "7d", label: "7 dni" },
-  { value: "30d", label: "30 dni" },
-  { value: "90d", label: "90 dni" },
+  { value: "7d", label: "7 dni", days: 7 },
+  { value: "30d", label: "30 dni", days: 30 },
+  { value: "90d", label: "90 dni", days: 90 },
 ];
+
+const STEP_LABELS: Record<string, string> = {
+  landing_view: "Wizyta na stronie",
+  signup_completed: "Rejestracja",
+  wizard_started: "Rozpoczęcie kreatora",
+  wizard_completed: "Ukończenie kreatora",
+  checkout_started: "Rozpoczęcie płatności",
+  payment_completed: "Płatność",
+  document_downloaded: "Pobranie dokumentu",
+};
 
 export default async function FunnelPage({
   searchParams,
 }: {
   searchParams: Promise<{ range?: string }>;
 }) {
+  const gate = await requireAdmin();
+  if (!gate.ok) redirect("/logowanie?next=/admin/analytics/funnel");
+
   const sp = await searchParams;
   const range = sp.range ?? "30d";
-  const data = await fetchFunnel(range);
+  const days = RANGES.find((r) => r.value === range)?.days ?? 30;
+
+  const result = await computeFunnel(
+    STANDARD_FUNNEL.map((event) => ({ event })),
+    { sinceDays: days },
+  ).catch(() => null);
+
+  const steps = result?.steps ?? [];
 
   return (
     <main className="container mx-auto px-4 py-8 max-w-6xl space-y-6">
@@ -56,7 +54,7 @@ export default async function FunnelPage({
           Lejek konwersji
         </h1>
         <p className="text-sm text-ink-500 mt-1">
-          Od pierwszej wizyty do płatnej subskrypcji
+          Od pierwszej wizyty do pobrania dokumentu — liczone z tabeli zdarzeń.
         </p>
       </div>
 
@@ -76,33 +74,31 @@ export default async function FunnelPage({
         ))}
       </div>
 
-      {data?.drop_off_alert && (
-        <Card elevation="pop" urgency="warning">
-          <CardContent className="pt-4 text-sm text-warn-700">
-            <strong>Alert:</strong> {data.drop_off_alert}
-          </CardContent>
-        </Card>
-      )}
-
       <Card elevation="subtle">
         <CardHeader>
-          <CardTitle>Etapy lejka ({data?.range_label ?? range})</CardTitle>
+          <CardTitle>
+            Etapy lejka ({RANGES.find((r) => r.value === range)?.label})
+            {result ? ` · konwersja ${(result.conversion_rate * 100).toFixed(1)}%` : ""}
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          {!data || data.steps.length === 0 ? (
-            <p className="text-sm text-ink-500">Brak danych.</p>
+          {steps.length === 0 || (result?.total_users ?? 0) === 0 ? (
+            <p className="text-sm text-ink-500">
+              Brak zdarzeń w wybranym oknie. Lejek wypełni się danymi, gdy
+              zaczniemy zbierać zdarzenia (analytics_events).
+            </p>
           ) : (
             <ul className="space-y-3">
-              {data.steps.map((s, i) => {
-                const width = s.conversion_from_top_percent;
+              {steps.map((s, i) => {
+                const width = s.conversion_from_start * 100;
                 return (
-                  <li key={s.key}>
+                  <li key={s.event}>
                     <div className="flex items-baseline justify-between text-sm mb-1">
                       <span className="font-medium text-ink-900 dark:text-ink-50">
-                        {i + 1}. {s.label}
+                        {i + 1}. {STEP_LABELS[s.event] ?? s.event}
                       </span>
                       <span className="text-ink-600 dark:text-ink-400">
-                        {s.users.toLocaleString("pl-PL")} użytkowników
+                        {s.count.toLocaleString("pl-PL")} użytkowników
                       </span>
                     </div>
                     <div className="relative h-9 rounded-md bg-ink-100 dark:bg-ink-800 overflow-hidden">
@@ -116,16 +112,11 @@ export default async function FunnelPage({
                         </span>
                         {i > 0 && (
                           <span className="text-ink-700 dark:text-ink-300">
-                            {s.conversion_from_previous_percent.toFixed(1)}% z poprz.
+                            {(s.conversion_from_previous * 100).toFixed(1)}% z poprz.
                           </span>
                         )}
                       </div>
                     </div>
-                    {s.avg_time_to_next_minutes !== null && i < data.steps.length - 1 && (
-                      <div className="text-xs text-ink-500 mt-1">
-                        Średni czas do następnego: {s.avg_time_to_next_minutes} min
-                      </div>
-                    )}
                   </li>
                 );
               })}
