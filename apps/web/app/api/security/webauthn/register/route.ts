@@ -1,0 +1,95 @@
+import { NextRequest, NextResponse } from "next/server";
+import {
+  buildRegistrationOptions,
+  verifyClientDataChallenge,
+  credentialFingerprint,
+} from "@/lib/security/mfa/webauthn";
+import { recordSecurityEvent } from "@/lib/security/security-events";
+
+async function getSupabase() {
+  const { createSupabaseServerClient } = await import("@/lib/db/supabase-server");
+  return createSupabaseServerClient();
+}
+
+function rpConfig(req: NextRequest) {
+  const host = req.headers.get("host") ?? "dlugomat.pl";
+  const rpId = host.split(":")[0];
+  const origin = `${req.headers.get("x-forwarded-proto") ?? "https"}://${host}`;
+  return { rpId, origin };
+}
+
+// GET — issue registration challenge
+export async function GET(req: NextRequest) {
+  const sb = await getSupabase();
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+
+  const { rpId } = rpConfig(req);
+  const options = buildRegistrationOptions({
+    userId: user.id,
+    userName: user.email ?? user.id,
+    displayName: user.email ?? "Długomat User",
+    rpName: "Długomat",
+    rpId,
+  });
+
+  // Store challenge for later verification.
+  await sb.from("webauthn_challenges").upsert(
+    { user_id: user.id, challenge: options.challenge, kind: "registration", expires_at: new Date(Date.now() + 60_000).toISOString() },
+    { onConflict: "user_id,kind" },
+  );
+
+  return NextResponse.json(options);
+}
+
+// POST — finalize registration with attestation response from client
+export async function POST(req: NextRequest) {
+  const sb = await getSupabase();
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+
+  const body = await req.json().catch(() => ({}));
+  if (!body.credentialId || !body.clientDataJSON || !body.publicKey) {
+    return NextResponse.json({ error: "missing_fields" }, { status: 400 });
+  }
+
+  const { origin } = rpConfig(req);
+
+  // Get + consume the challenge.
+  const { data: challengeRow } = await sb
+    .from("webauthn_challenges")
+    .select("challenge")
+    .eq("user_id", user.id)
+    .eq("kind", "registration")
+    .maybeSingle();
+  if (!challengeRow) return NextResponse.json({ error: "no_pending_challenge" }, { status: 400 });
+
+  const verification = verifyClientDataChallenge(body.clientDataJSON, challengeRow.challenge, [origin]);
+  if (!verification.ok) return NextResponse.json({ error: verification.reason }, { status: 400 });
+
+  // Audyt 2026-06-27 (iter. 26) — REALNY BUG zamaskowany przez `as any`:
+  // poprzednio insert używał kolumn `rp_id` (NIE ISTNIEJE) oraz `device_name`
+  // (realna kolumna to `label`). Insert ZAWSZE failował => rejestracja
+  // passkey nie działała. rpId nie jest persystowany (weryfikacja origin/rp
+  // odbywa się przy logowaniu z nagłówka host).
+  await sb.from("webauthn_credentials").insert({
+    user_id: user.id,
+    credential_id: body.credentialId,
+    fingerprint: credentialFingerprint(body.credentialId),
+    public_key: body.publicKey,
+    transports: body.transports ?? [],
+    label: body.deviceName ?? null,
+    sign_count: 0,
+  });
+
+  await sb.from("webauthn_challenges").delete().eq("user_id", user.id).eq("kind", "registration");
+
+  await recordSecurityEvent(sb, {
+    userId: user.id,
+    type: "auth.webauthn_registered",
+    ip: req.headers.get("x-forwarded-for") ?? undefined,
+    userAgent: req.headers.get("user-agent") ?? undefined,
+  });
+
+  return NextResponse.json({ registered: true });
+}

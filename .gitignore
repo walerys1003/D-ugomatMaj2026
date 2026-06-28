@@ -1,0 +1,46 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# next.js
+.next/
+out/
+next-env.d.ts
+
+# tests / coverage
+coverage/
+playwright-report/
+test-results/
+.eslintcache
+
+# env
+.env
+.env.*
+!.env.example
+
+# logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# os / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# python (KB scripts)
+__pycache__/
+*.pyc
+.venv/
+
+# build artifacts
+dist/
+build/
+
+# supabase local
+supabase/.branches
+supabase/.temp
+supabase/volumes

@@ -1,0 +1,19 @@
+{
+  "name": "dlugomat",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Długomat — AI-powered legal-tech platform for Polish debtors. Monorepo root.",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "kb:build": "python3 scripts/build_kb.py",
+    "kb:query": "python3 scripts/kb_query.py",
+    "kb:tags": "python3 scripts/kb_query.py --list-tags",
+    "dev": "echo 'Run inside apps/web after Tier 1.1 bootstrap'",
+    "build": "echo 'Run inside apps/web after Tier 1.1 bootstrap'"
+  }
+}

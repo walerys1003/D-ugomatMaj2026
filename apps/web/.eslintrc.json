@@ -1,0 +1,38 @@
+{
+  "extends": ["next/core-web-vitals", "next/typescript"],
+  "rules": {
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }
+    ],
+    "@typescript-eslint/no-explicit-any": "warn",
+    "react/no-unescaped-entities": "off"
+  },
+  "overrides": [
+    {
+      "files": ["app/**/*.ts", "app/**/*.tsx"],
+      "excludedFiles": [
+        "app/api/cron/**",
+        "app/api/**/webhook/**",
+        "app/api/webhooks/**",
+        "app/(admin)/**",
+        "app/api/admin/**"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "warn",
+          {
+            "paths": [
+              {
+                "name": "@/lib/db/supabase-server",
+                "importNames": ["createSupabaseAdminClient"],
+                "message": "createSupabaseAdminClient omija RLS — używaj go tylko w cron/webhook/admin. W kodzie user-scoped użyj createSupabaseServerClient."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "ignorePatterns": [".next/", "node_modules/", "playwright-report/", "test-results/"]
+}

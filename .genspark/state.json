@@ -1,0 +1,25 @@
+{
+  "project": "dlugomat",
+  "branch": "genspark_ai_developer",
+  "current_tier": 1,
+  "tier_status": {
+    "0_knowledge_base": "done",
+    "1_foundation": "in_progress",
+    "2_core_data_wizard": "queued",
+    "3_ai_ocr_modules_d1_d2_d5": "queued",
+    "4_modules_d3_d4_d6_d7_d8_payments": "queued",
+    "5_hardening_launch": "queued"
+  },
+  "next_tasks": [
+    "T1.1 — bootstrap Next.js 14 app in apps/web",
+    "T1.2 — Tailwind 3.4 with brand theme extension",
+    "T1.3 — shadcn/ui base setup + global CSS variables",
+    "T1.9 — CSS variables for Shield Navy palette"
+  ],
+  "agents_dispatched": [],
+  "kb": {
+    "chunks": 307,
+    "tags": 15,
+    "index": "knowledge-base/index/"
+  }
+}

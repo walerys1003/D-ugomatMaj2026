@@ -1,0 +1,4140 @@
+[
+  {
+    "i": 0,
+    "id": "SPEC_FULL:0",
+    "source": "SPEC_FULL",
+    "section": "0",
+    "title": "PREAMBLE",
+    "tags": [
+      "ai-engine"
+    ],
+    "char_len": 205,
+    "file": "knowledge-base/chunks/0000__SPEC_FULL_0.md"
+  },
+  {
+    "i": 1,
+    "id": "SPEC_FULL:1",
+    "source": "SPEC_FULL",
+    "section": "1",
+    "title": "Wizja produktu i analiza rynku",
+    "tags": [
+      "strategy"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0001__SPEC_FULL_1.md"
+  },
+  {
+    "i": 2,
+    "id": "SPEC_FULL:2",
+    "source": "SPEC_FULL",
+    "section": "2",
+    "title": "Architektura systemu (high-level)",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0002__SPEC_FULL_2.md"
+  },
+  {
+    "i": 3,
+    "id": "SPEC_FULL:3",
+    "source": "SPEC_FULL",
+    "section": "3",
+    "title": "Stack technologiczny — uzasadnienie każdego wyboru",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0003__SPEC_FULL_3.md"
+  },
+  {
+    "i": 4,
+    "id": "SPEC_FULL:4",
+    "source": "SPEC_FULL",
+    "section": "4",
+    "title": "Struktura monorepo i konwencje",
+    "tags": [
+      "monorepo"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0004__SPEC_FULL_4.md"
+  },
+  {
+    "i": 5,
+    "id": "SPEC_FULL:5",
+    "source": "SPEC_FULL",
+    "section": "5",
+    "title": "Frontend — architektura, routing, komponenty, design system",
+    "tags": [
+      "frontend"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0005__SPEC_FULL_5.md"
+  },
+  {
+    "i": 6,
+    "id": "SPEC_FULL:6",
+    "source": "SPEC_FULL",
+    "section": "6",
+    "title": "Backend — API Routes, middleware, logika biznesowa",
+    "tags": [
+      "backend"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0006__SPEC_FULL_6.md"
+  },
+  {
+    "i": 7,
+    "id": "SPEC_FULL:7",
+    "source": "SPEC_FULL",
+    "section": "7",
+    "title": "Baza danych — schemat, tabele, indeksy, RLS, migracje",
+    "tags": [
+      "database"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0007__SPEC_FULL_7.md"
+  },
+  {
+    "i": 8,
+    "id": "SPEC_FULL:8",
+    "source": "SPEC_FULL",
+    "section": "8",
+    "title": "Supabase self-hosting — konfiguracja, bezpieczeństwo, backup",
+    "tags": [
+      "database",
+      "security"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0008__SPEC_FULL_8.md"
+  },
+  {
+    "i": 9,
+    "id": "SPEC_FULL:9",
+    "source": "SPEC_FULL",
+    "section": "9",
+    "title": "System OCR — pipeline rozpoznawania dokumentów",
+    "tags": [
+      "ocr"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0009__SPEC_FULL_9.md"
+  },
+  {
+    "i": 10,
+    "id": "SPEC_FULL:10",
+    "source": "SPEC_FULL",
+    "section": "10",
+    "title": "AI Engine — prompty, RAG, walidacja, pipeline generowania pism",
+    "tags": [
+      "ai-engine"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0010__SPEC_FULL_10.md"
+  },
+  {
+    "i": 11,
+    "id": "SPEC_FULL:11",
+    "source": "SPEC_FULL",
+    "section": "11",
+    "title": "Moduły biznesowe (D1–D10) — specyfikacja każdego modułu",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0011__SPEC_FULL_11.md"
+  },
+  {
+    "i": 12,
+    "id": "SPEC_FULL:12",
+    "source": "SPEC_FULL",
+    "section": "12",
+    "title": "System płatności — Stripe, faktury, modele cenowe",
+    "tags": [
+      "payments"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0012__SPEC_FULL_12.md"
+  },
+  {
+    "i": 13,
+    "id": "SPEC_FULL:13",
+    "source": "SPEC_FULL",
+    "section": "13",
+    "title": "System powiadomień — e-mail, SMS, push, deadline tracker",
+    "tags": [
+      "notifications"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0013__SPEC_FULL_13.md"
+  },
+  {
+    "i": 14,
+    "id": "SPEC_FULL:14",
+    "source": "SPEC_FULL",
+    "section": "14",
+    "title": "Szata graficzna — design system, paleta, typografia, komponenty UI",
+    "tags": [
+      "frontend",
+      "brand"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0014__SPEC_FULL_14.md"
+  },
+  {
+    "i": 15,
+    "id": "SPEC_FULL:15",
+    "source": "SPEC_FULL",
+    "section": "15",
+    "title": "Bezpieczeństwo — RODO, szyfrowanie, audyt, penetration testing",
+    "tags": [
+      "security"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0015__SPEC_FULL_15.md"
+  },
+  {
+    "i": 16,
+    "id": "SPEC_FULL:16",
+    "source": "SPEC_FULL",
+    "section": "16",
+    "title": "Deployment — CI/CD, GitHub Actions, infrastruktura",
+    "tags": [
+      "devops"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0016__SPEC_FULL_16.md"
+  },
+  {
+    "i": 17,
+    "id": "SPEC_FULL:17",
+    "source": "SPEC_FULL",
+    "section": "17",
+    "title": "Monitoring i analityka",
+    "tags": [
+      "devops"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0017__SPEC_FULL_17.md"
+  },
+  {
+    "i": 18,
+    "id": "SPEC_FULL:18",
+    "source": "SPEC_FULL",
+    "section": "18",
+    "title": "Roadmap wdrożeniowa — fazy, kamienie milowe, estymacje tokenów",
+    "tags": [
+      "strategy"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0018__SPEC_FULL_18.md"
+  },
+  {
+    "i": 19,
+    "id": "SPEC_FULL:19",
+    "source": "SPEC_FULL",
+    "section": "19",
+    "title": "Instrukcja dla Kilo Code / Genspark — podział na prompty",
+    "tags": [
+      "ai-engine"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0019__SPEC_FULL_19.md"
+  },
+  {
+    "i": 20,
+    "id": "SPEC_FULL:1",
+    "source": "SPEC_FULL",
+    "section": "1",
+    "title": "WIZJA PRODUKTU I ANALIZA RYNKU",
+    "tags": [
+      "strategy"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0020__SPEC_FULL_1.md"
+  },
+  {
+    "i": 21,
+    "id": "SPEC_FULL:1.1",
+    "source": "SPEC_FULL",
+    "section": "1.1",
+    "title": "Problem",
+    "tags": [
+      "strategy"
+    ],
+    "char_len": 788,
+    "file": "knowledge-base/chunks/0021__SPEC_FULL_1.1.md"
+  },
+  {
+    "i": 22,
+    "id": "SPEC_FULL:1.2",
+    "source": "SPEC_FULL",
+    "section": "1.2",
+    "title": "Rozwiązanie",
+    "tags": [
+      "ai-engine",
+      "ocr",
+      "modules"
+    ],
+    "char_len": 525,
+    "file": "knowledge-base/chunks/0022__SPEC_FULL_1.2.md"
+  },
+  {
+    "i": 23,
+    "id": "SPEC_FULL:1.3",
+    "source": "SPEC_FULL",
+    "section": "1.3",
+    "title": "Rynek (TAM/SAM/SOM)",
+    "tags": [
+      "modules",
+      "strategy"
+    ],
+    "char_len": 694,
+    "file": "knowledge-base/chunks/0023__SPEC_FULL_1.3.md"
+  },
+  {
+    "i": 24,
+    "id": "SPEC_FULL:1.4",
+    "source": "SPEC_FULL",
+    "section": "1.4",
+    "title": "Przewaga konkurencyjna",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 437,
+    "file": "knowledge-base/chunks/0024__SPEC_FULL_1.4.md"
+  },
+  {
+    "i": 25,
+    "id": "SPEC_FULL:2",
+    "source": "SPEC_FULL",
+    "section": "2",
+    "title": "ARCHITEKTURA SYSTEMU (HIGH-LEVEL)",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0025__SPEC_FULL_2.md"
+  },
+  {
+    "i": 26,
+    "id": "SPEC_FULL:2.1",
+    "source": "SPEC_FULL",
+    "section": "2.1",
+    "title": "Diagram architektury",
+    "tags": [
+      "frontend",
+      "backend",
+      "database",
+      "ai-engine",
+      "ocr",
+      "payments",
+      "notifications"
+    ],
+    "char_len": 2436,
+    "file": "knowledge-base/chunks/0026__SPEC_FULL_2.1.md"
+  },
+  {
+    "i": 27,
+    "id": "SPEC_FULL:2.2",
+    "source": "SPEC_FULL",
+    "section": "2.2",
+    "title": "Zasady architektoniczne",
+    "tags": [
+      "database",
+      "ai-engine",
+      "security"
+    ],
+    "char_len": 595,
+    "file": "knowledge-base/chunks/0027__SPEC_FULL_2.2.md"
+  },
+  {
+    "i": 28,
+    "id": "SPEC_FULL:3",
+    "source": "SPEC_FULL",
+    "section": "3",
+    "title": "STACK TECHNOLOGICZNY — UZASADNIENIE",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0028__SPEC_FULL_3.md"
+  },
+  {
+    "i": 29,
+    "id": "SPEC_FULL:3.1",
+    "source": "SPEC_FULL",
+    "section": "3.1",
+    "title": "Frontend",
+    "tags": [
+      "frontend",
+      "backend",
+      "ai-engine",
+      "ocr"
+    ],
+    "char_len": 1295,
+    "file": "knowledge-base/chunks/0029__SPEC_FULL_3.1.md"
+  },
+  {
+    "i": 30,
+    "id": "SPEC_FULL:3.2",
+    "source": "SPEC_FULL",
+    "section": "3.2",
+    "title": "Backend",
+    "tags": [
+      "backend"
+    ],
+    "char_len": 380,
+    "file": "knowledge-base/chunks/0030__SPEC_FULL_3.2.md"
+  },
+  {
+    "i": 31,
+    "id": "SPEC_FULL:3.3",
+    "source": "SPEC_FULL",
+    "section": "3.3",
+    "title": "Baza danych",
+    "tags": [
+      "database",
+      "ai-engine",
+      "notifications",
+      "security"
+    ],
+    "char_len": 636,
+    "file": "knowledge-base/chunks/0031__SPEC_FULL_3.3.md"
+  },
+  {
+    "i": 32,
+    "id": "SPEC_FULL:3.4",
+    "source": "SPEC_FULL",
+    "section": "3.4",
+    "title": "AI Engine",
+    "tags": [
+      "ai-engine"
+    ],
+    "char_len": 779,
+    "file": "knowledge-base/chunks/0032__SPEC_FULL_3.4.md"
+  },
+  {
+    "i": 33,
+    "id": "SPEC_FULL:3.5",
+    "source": "SPEC_FULL",
+    "section": "3.5",
+    "title": "OCR",
+    "tags": [
+      "ocr"
+    ],
+    "char_len": 318,
+    "file": "knowledge-base/chunks/0033__SPEC_FULL_3.5.md"
+  },
+  {
+    "i": 34,
+    "id": "SPEC_FULL:3.6",
+    "source": "SPEC_FULL",
+    "section": "3.6",
+    "title": "PDF Generation",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 296,
+    "file": "knowledge-base/chunks/0034__SPEC_FULL_3.6.md"
+  },
+  {
+    "i": 35,
+    "id": "SPEC_FULL:4",
+    "source": "SPEC_FULL",
+    "section": "4",
+    "title": "STRUKTURA MONOREPO I KONWENCJE",
+    "tags": [
+      "monorepo"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0035__SPEC_FULL_4.md"
+  },
+  {
+    "i": 36,
+    "id": "SPEC_FULL:4.1",
+    "source": "SPEC_FULL",
+    "section": "4.1",
+    "title": "Struktura katalogów",
+    "tags": [
+      "frontend",
+      "backend",
+      "database",
+      "ai-engine",
+      "ocr",
+      "payments",
+      "notifications",
+      "modules",
+      "devops",
+      "monorepo"
+    ],
+    "char_len": 11519,
+    "file": "knowledge-base/chunks/0036__SPEC_FULL_4.1.md"
+  },
+  {
+    "i": 37,
+    "id": "SPEC_FULL:4.2",
+    "source": "SPEC_FULL",
+    "section": "4.2",
+    "title": "Konwencje kodowania",
+    "tags": [
+      "frontend",
+      "database",
+      "monorepo"
+    ],
+    "char_len": 910,
+    "file": "knowledge-base/chunks/0037__SPEC_FULL_4.2.md"
+  },
+  {
+    "i": 38,
+    "id": "SPEC_FULL:5",
+    "source": "SPEC_FULL",
+    "section": "5",
+    "title": "FRONTEND — ARCHITEKTURA, ROUTING, DESIGN SYSTEM",
+    "tags": [
+      "frontend"
+    ],
+    "char_len": 75,
+    "file": "knowledge-base/chunks/0038__SPEC_FULL_5.md"
+  },
+  {
+    "i": 39,
+    "id": "SPEC_FULL:5.A",
+    "source": "SPEC_FULL",
+    "section": "5.A",
+    "title": "Panel użytkownika – Długomat (Dashboard)",
+    "tags": [
+      "frontend"
+    ],
+    "char_len": 170,
+    "file": "knowledge-base/chunks/0039__SPEC_FULL_5.A.md"
+  },
+  {
+    "i": 40,
+    "id": "SPEC_FULL:5.A.1",
+    "source": "SPEC_FULL",
+    "section": "5.A.1",
+    "title": "Czym jest Długomat",
+    "tags": [
+      "devops"
+    ],
+    "char_len": 426,
+    "file": "knowledge-base/chunks/0040__SPEC_FULL_5.A.1.md"
+  },
+  {
+    "i": 41,
+    "id": "SPEC_FULL:5.A.2",
+    "source": "SPEC_FULL",
+    "section": "5.A.2",
+    "title": "Zakres funkcjonalny modułu",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 33,
+    "file": "knowledge-base/chunks/0041__SPEC_FULL_5.A.2.md"
+  },
+  {
+    "i": 42,
+    "id": "SPEC_FULL:1",
+    "source": "SPEC_FULL",
+    "section": "1",
+    "title": "Analiza zadłużenia – OCR lub ręczne wprowadzenie danych z wezwania / nakazu / tytułu wykonawczego; automatyczna klasyfikacja typu długu i wierzyciela.",
+    "tags": [
+      "ocr"
+    ],
+    "char_len": 212,
+    "file": "knowledge-base/chunks/0042__SPEC_FULL_1.md"
+  },
+  {
+    "i": 43,
+    "id": "SPEC_FULL:3",
+    "source": "SPEC_FULL",
+    "section": "3",
+    "title": "Generator pism – AI (Claude Sonnet 4.6) generuje dokumenty procesowe na bazie dynamicznego formularza i kontekstu RAG; walidacja Haiku 4.5; podgląd markdown → PDF.",
+    "tags": [
+      "ai-engine"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0043__SPEC_FULL_3.md"
+  },
+  {
+    "i": 44,
+    "id": "SPEC_FULL:4",
+    "source": "SPEC_FULL",
+    "section": "4",
+    "title": "Kalkulator zadłużenia – naliczanie odsetek ustawowych, umownych, maksymalnych; kapitalizacja; tabela amortyzacyjna; porównanie kosztów spłaty jednorazowej vs ratalnej.",
+    "tags": [
+      "database"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0044__SPEC_FULL_4.md"
+  },
+  {
+    "i": 45,
+    "id": "SPEC_FULL:5",
+    "source": "SPEC_FULL",
+    "section": "5",
+    "title": "Harmonogram i monitoring – kalendarz terminów procesowych z powiadomieniami e-mail/SMS (Resend + SMSAPI); integracja z CRON /api/deadlines/check.",
+    "tags": [
+      "notifications",
+      "devops"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0045__SPEC_FULL_5.md"
+  },
+  {
+    "i": 46,
+    "id": "SPEC_FULL:6",
+    "source": "SPEC_FULL",
+    "section": "6",
+    "title": "Baza wiedzy – artykuły, checklisty, e-booki o tematyce oddłużeniowej; dostępne bez logowania jako lead-magnety SEO.",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0046__SPEC_FULL_6.md"
+  },
+  {
+    "i": 47,
+    "id": "SPEC_FULL:7",
+    "source": "SPEC_FULL",
+    "section": "7",
+    "title": "AI Chat – asystent prawny (streaming SSE) z kontekstem RAG i historią konwersacji.",
+    "tags": [
+      "ai-engine"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0047__SPEC_FULL_7.md"
+  },
+  {
+    "i": 48,
+    "id": "SPEC_FULL:5.A.3",
+    "source": "SPEC_FULL",
+    "section": "5.A.3",
+    "title": "Katalog pism Długomat",
+    "tags": [
+      "ai-engine",
+      "payments",
+      "modules",
+      "monorepo"
+    ],
+    "char_len": 1529,
+    "file": "knowledge-base/chunks/0048__SPEC_FULL_5.A.3.md"
+  },
+  {
+    "i": 49,
+    "id": "SPEC_FULL:5.A.4",
+    "source": "SPEC_FULL",
+    "section": "5.A.4",
+    "title": "Struktura nawigacji w sidebarze",
+    "tags": [
+      "frontend",
+      "payments",
+      "notifications",
+      "brand"
+    ],
+    "char_len": 1699,
+    "file": "knowledge-base/chunks/0049__SPEC_FULL_5.A.4.md"
+  },
+  {
+    "i": 50,
+    "id": "SPEC_FULL:5.A.5",
+    "source": "SPEC_FULL",
+    "section": "5.A.5",
+    "title": "Widok główny – Pulpit Długomat",
+    "tags": [
+      "frontend",
+      "database",
+      "brand",
+      "strategy"
+    ],
+    "char_len": 1141,
+    "file": "knowledge-base/chunks/0050__SPEC_FULL_5.A.5.md"
+  },
+  {
+    "i": 51,
+    "id": "SPEC_FULL:5.A.6",
+    "source": "SPEC_FULL",
+    "section": "5.A.6",
+    "title": "Widok szczegółów sprawy",
+    "tags": [
+      "ai-engine",
+      "ocr",
+      "notifications",
+      "strategy"
+    ],
+    "char_len": 1294,
+    "file": "knowledge-base/chunks/0051__SPEC_FULL_5.A.6.md"
+  },
+  {
+    "i": 52,
+    "id": "SPEC_FULL:5.A.7",
+    "source": "SPEC_FULL",
+    "section": "5.A.7",
+    "title": "Kalkulator przedawnienia – logika i UI",
+    "tags": [
+      "strategy"
+    ],
+    "char_len": 975,
+    "file": "knowledge-base/chunks/0052__SPEC_FULL_5.A.7.md"
+  },
+  {
+    "i": 53,
+    "id": "SPEC_FULL:5.A.8",
+    "source": "SPEC_FULL",
+    "section": "5.A.8",
+    "title": "Kalkulator odsetek – logika i UI",
+    "tags": [
+      "database"
+    ],
+    "char_len": 635,
+    "file": "knowledge-base/chunks/0053__SPEC_FULL_5.A.8.md"
+  },
+  {
+    "i": 54,
+    "id": "SPEC_FULL:5.A.9",
+    "source": "SPEC_FULL",
+    "section": "5.A.9",
+    "title": "Spójność z Mandatomatem",
+    "tags": [
+      "frontend",
+      "backend",
+      "database",
+      "ocr",
+      "payments",
+      "notifications",
+      "modules",
+      "brand",
+      "strategy"
+    ],
+    "char_len": 1278,
+    "file": "knowledge-base/chunks/0054__SPEC_FULL_5.A.9.md"
+  },
+  {
+    "i": 55,
+    "id": "SPEC_FULL:5.A.10",
+    "source": "SPEC_FULL",
+    "section": "5.A.10",
+    "title": "Komponenty specyficzne dla Długomat",
+    "tags": [
+      "frontend",
+      "database",
+      "brand",
+      "strategy"
+    ],
+    "char_len": 2065,
+    "file": "knowledge-base/chunks/0055__SPEC_FULL_5.A.10.md"
+  },
+  {
+    "i": 56,
+    "id": "SPEC_FULL:5.B",
+    "source": "SPEC_FULL",
+    "section": "5.B",
+    "title": "Panel Administracyjny – Długomat",
+    "tags": [
+      "admin"
+    ],
+    "char_len": 143,
+    "file": "knowledge-base/chunks/0056__SPEC_FULL_5.B.md"
+  },
+  {
+    "i": 57,
+    "id": "SPEC_FULL:5.B.1",
+    "source": "SPEC_FULL",
+    "section": "5.B.1",
+    "title": "Architektura panelu admina Długomat",
+    "tags": [
+      "frontend",
+      "backend",
+      "database",
+      "ai-engine",
+      "strategy",
+      "admin"
+    ],
+    "char_len": 641,
+    "file": "knowledge-base/chunks/0057__SPEC_FULL_5.B.1.md"
+  },
+  {
+    "i": 58,
+    "id": "SPEC_FULL:5.B.2",
+    "source": "SPEC_FULL",
+    "section": "5.B.2",
+    "title": "Nawigacja administracyjna – sekcja Długomat",
+    "tags": [
+      "frontend",
+      "ai-engine",
+      "payments",
+      "notifications",
+      "devops",
+      "brand",
+      "admin"
+    ],
+    "char_len": 1672,
+    "file": "knowledge-base/chunks/0058__SPEC_FULL_5.B.2.md"
+  },
+  {
+    "i": 59,
+    "id": "SPEC_FULL:5.B.3",
+    "source": "SPEC_FULL",
+    "section": "5.B.3",
+    "title": "Dashboard KPI – widok główny",
+    "tags": [
+      "frontend",
+      "database",
+      "ai-engine",
+      "payments",
+      "notifications",
+      "brand",
+      "strategy",
+      "admin"
+    ],
+    "char_len": 2274,
+    "file": "knowledge-base/chunks/0059__SPEC_FULL_5.B.3.md"
+  },
+  {
+    "i": 60,
+    "id": "SPEC_FULL:5.B.4",
+    "source": "SPEC_FULL",
+    "section": "5.B.4",
+    "title": "Zarządzanie użytkownikami Długomat",
+    "tags": [
+      "frontend",
+      "database",
+      "ai-engine",
+      "payments",
+      "strategy"
+    ],
+    "char_len": 1506,
+    "file": "knowledge-base/chunks/0060__SPEC_FULL_5.B.4.md"
+  },
+  {
+    "i": 61,
+    "id": "SPEC_FULL:5.B.5",
+    "source": "SPEC_FULL",
+    "section": "5.B.5",
+    "title": "Zarządzanie sprawami Długomat",
+    "tags": [
+      "frontend",
+      "database",
+      "ai-engine",
+      "ocr",
+      "payments",
+      "notifications",
+      "strategy"
+    ],
+    "char_len": 1850,
+    "file": "knowledge-base/chunks/0061__SPEC_FULL_5.B.5.md"
+  },
+  {
+    "i": 62,
+    "id": "SPEC_FULL:5.B.6",
+    "source": "SPEC_FULL",
+    "section": "5.B.6",
+    "title": "Zarządzanie szablonami pism (32 typy)",
+    "tags": [
+      "database",
+      "ai-engine",
+      "brand",
+      "strategy"
+    ],
+    "char_len": 2635,
+    "file": "knowledge-base/chunks/0062__SPEC_FULL_5.B.6.md"
+  },
+  {
+    "i": 63,
+    "id": "SPEC_FULL:5.B.7",
+    "source": "SPEC_FULL",
+    "section": "5.B.7",
+    "title": "Zarządzanie promptami AI",
+    "tags": [
+      "frontend",
+      "database",
+      "ai-engine",
+      "strategy"
+    ],
+    "char_len": 1118,
+    "file": "knowledge-base/chunks/0063__SPEC_FULL_5.B.7.md"
+  },
+  {
+    "i": 64,
+    "id": "SPEC_FULL:5.B.8",
+    "source": "SPEC_FULL",
+    "section": "5.B.8",
+    "title": "Baza wiedzy i RAG",
+    "tags": [
+      "database",
+      "ai-engine"
+    ],
+    "char_len": 1380,
+    "file": "knowledge-base/chunks/0064__SPEC_FULL_5.B.8.md"
+  },
+  {
+    "i": 65,
+    "id": "SPEC_FULL:5.B.9",
+    "source": "SPEC_FULL",
+    "section": "5.B.9",
+    "title": "Konfiguracja kalkulatorów",
+    "tags": [
+      "database",
+      "notifications",
+      "strategy"
+    ],
+    "char_len": 1039,
+    "file": "knowledge-base/chunks/0065__SPEC_FULL_5.B.9.md"
+  },
+  {
+    "i": 66,
+    "id": "SPEC_FULL:5.B.10",
+    "source": "SPEC_FULL",
+    "section": "5.B.10",
+    "title": "Zarządzanie płatnościami",
+    "tags": [
+      "frontend",
+      "database",
+      "payments"
+    ],
+    "char_len": 1496,
+    "file": "knowledge-base/chunks/0066__SPEC_FULL_5.B.10.md"
+  },
+  {
+    "i": 67,
+    "id": "SPEC_FULL:5.B.11",
+    "source": "SPEC_FULL",
+    "section": "5.B.11",
+    "title": "Analityka zaawansowana",
+    "tags": [
+      "frontend",
+      "database",
+      "ai-engine",
+      "payments",
+      "devops"
+    ],
+    "char_len": 1606,
+    "file": "knowledge-base/chunks/0067__SPEC_FULL_5.B.11.md"
+  },
+  {
+    "i": 68,
+    "id": "SPEC_FULL:5.B.12",
+    "source": "SPEC_FULL",
+    "section": "5.B.12",
+    "title": "Zarządzanie powiadomieniami",
+    "tags": [
+      "database",
+      "notifications"
+    ],
+    "char_len": 1168,
+    "file": "knowledge-base/chunks/0068__SPEC_FULL_5.B.12.md"
+  },
+  {
+    "i": 69,
+    "id": "SPEC_FULL:5.B.13",
+    "source": "SPEC_FULL",
+    "section": "5.B.13",
+    "title": "Ustawienia systemowe Długomat",
+    "tags": [
+      "database",
+      "ai-engine",
+      "ocr",
+      "payments",
+      "notifications",
+      "strategy"
+    ],
+    "char_len": 1556,
+    "file": "knowledge-base/chunks/0069__SPEC_FULL_5.B.13.md"
+  },
+  {
+    "i": 70,
+    "id": "SPEC_FULL:5.B.14",
+    "source": "SPEC_FULL",
+    "section": "5.B.14",
+    "title": "API Routes administracyjne – Długomat",
+    "tags": [
+      "frontend",
+      "backend",
+      "database",
+      "ai-engine",
+      "payments",
+      "notifications",
+      "devops",
+      "admin"
+    ],
+    "char_len": 5894,
+    "file": "knowledge-base/chunks/0070__SPEC_FULL_5.B.14.md"
+  },
+  {
+    "i": 71,
+    "id": "SPEC_FULL:5.B.15",
+    "source": "SPEC_FULL",
+    "section": "5.B.15",
+    "title": "RLS i bezpieczeństwo panelu admina",
+    "tags": [
+      "frontend",
+      "backend",
+      "database",
+      "ai-engine",
+      "security",
+      "admin"
+    ],
+    "char_len": 935,
+    "file": "knowledge-base/chunks/0071__SPEC_FULL_5.B.15.md"
+  },
+  {
+    "i": 72,
+    "id": "SPEC_FULL:5.B.16",
+    "source": "SPEC_FULL",
+    "section": "5.B.16",
+    "title": "Komponenty React panelu admina – Długomat",
+    "tags": [
+      "frontend",
+      "backend",
+      "database",
+      "ai-engine",
+      "payments",
+      "notifications",
+      "strategy",
+      "admin"
+    ],
+    "char_len": 2600,
+    "file": "knowledge-base/chunks/0072__SPEC_FULL_5.B.16.md"
+  },
+  {
+    "i": 73,
+    "id": "SPEC_FULL:5.1",
+    "source": "SPEC_FULL",
+    "section": "5.1",
+    "title": "Routing (App Router)",
+    "tags": [
+      "frontend",
+      "backend",
+      "database",
+      "payments",
+      "modules",
+      "strategy"
+    ],
+    "char_len": 1121,
+    "file": "knowledge-base/chunks/0073__SPEC_FULL_5.1.md"
+  },
+  {
+    "i": 74,
+    "id": "SPEC_FULL:5.2",
+    "source": "SPEC_FULL",
+    "section": "5.2",
+    "title": "Design System — „Tarcza\"",
+    "tags": [
+      "frontend",
+      "modules",
+      "security",
+      "brand"
+    ],
+    "char_len": 2377,
+    "file": "knowledge-base/chunks/0074__SPEC_FULL_5.2.md"
+  },
+  {
+    "i": 75,
+    "id": "SPEC_FULL:5.3",
+    "source": "SPEC_FULL",
+    "section": "5.3",
+    "title": "Kluczowe komponenty UI",
+    "tags": [
+      "frontend",
+      "database",
+      "ai-engine",
+      "ocr",
+      "payments",
+      "notifications",
+      "brand",
+      "strategy"
+    ],
+    "char_len": 3286,
+    "file": "knowledge-base/chunks/0075__SPEC_FULL_5.3.md"
+  },
+  {
+    "i": 76,
+    "id": "SPEC_FULL:5.4",
+    "source": "SPEC_FULL",
+    "section": "5.4",
+    "title": "Stany UI",
+    "tags": [
+      "frontend",
+      "ai-engine"
+    ],
+    "char_len": 369,
+    "file": "knowledge-base/chunks/0076__SPEC_FULL_5.4.md"
+  },
+  {
+    "i": 77,
+    "id": "SPEC_FULL:5.5",
+    "source": "SPEC_FULL",
+    "section": "5.5",
+    "title": "Animacje (Framer Motion)",
+    "tags": [
+      "frontend",
+      "ocr",
+      "payments"
+    ],
+    "char_len": 490,
+    "file": "knowledge-base/chunks/0077__SPEC_FULL_5.5.md"
+  },
+  {
+    "i": 78,
+    "id": "SPEC_FULL:5.6",
+    "source": "SPEC_FULL",
+    "section": "5.6",
+    "title": "Responsywność",
+    "tags": [
+      "frontend"
+    ],
+    "char_len": 426,
+    "file": "knowledge-base/chunks/0078__SPEC_FULL_5.6.md"
+  },
+  {
+    "i": 79,
+    "id": "SPEC_FULL:5.7",
+    "source": "SPEC_FULL",
+    "section": "5.7",
+    "title": "Accessibility (WCAG 2.1 AA) — kontynuacja",
+    "tags": [
+      "frontend",
+      "database",
+      "ai-engine",
+      "ocr",
+      "brand"
+    ],
+    "char_len": 1041,
+    "file": "knowledge-base/chunks/0079__SPEC_FULL_5.7.md"
+  },
+  {
+    "i": 80,
+    "id": "SPEC_FULL:5.8",
+    "source": "SPEC_FULL",
+    "section": "5.8",
+    "title": "SEO (strony marketingowe)",
+    "tags": [
+      "database",
+      "ai-engine",
+      "payments"
+    ],
+    "char_len": 814,
+    "file": "knowledge-base/chunks/0080__SPEC_FULL_5.8.md"
+  },
+  {
+    "i": 81,
+    "id": "SPEC_FULL:6",
+    "source": "SPEC_FULL",
+    "section": "6",
+    "title": "BACKEND — API ROUTES, MIDDLEWARE, LOGIKA BIZNESOWA",
+    "tags": [
+      "backend"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0081__SPEC_FULL_6.md"
+  },
+  {
+    "i": 82,
+    "id": "SPEC_FULL:6.1",
+    "source": "SPEC_FULL",
+    "section": "6.1",
+    "title": "Middleware (Next.js Middleware)",
+    "tags": [
+      "backend",
+      "database",
+      "ocr",
+      "payments"
+    ],
+    "char_len": 1249,
+    "file": "knowledge-base/chunks/0082__SPEC_FULL_6.1.md"
+  },
+  {
+    "i": 83,
+    "id": "SPEC_FULL:6.2",
+    "source": "SPEC_FULL",
+    "section": "6.2",
+    "title": "Standaryzacja odpowiedzi API",
+    "tags": [
+      "backend",
+      "ai-engine",
+      "ocr"
+    ],
+    "char_len": 787,
+    "file": "knowledge-base/chunks/0083__SPEC_FULL_6.2.md"
+  },
+  {
+    "i": 84,
+    "id": "SPEC_FULL:6.3",
+    "source": "SPEC_FULL",
+    "section": "6.3",
+    "title": "Endpointy API — pełna specyfikacja",
+    "tags": [
+      "backend"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0084__SPEC_FULL_6.3.md"
+  },
+  {
+    "i": 85,
+    "id": "SPEC_FULL:6.3.1",
+    "source": "SPEC_FULL",
+    "section": "6.3.1",
+    "title": "Auth (/api/auth/)",
+    "tags": [
+      "database",
+      "notifications"
+    ],
+    "char_len": 609,
+    "file": "knowledge-base/chunks/0085__SPEC_FULL_6.3.1.md"
+  },
+  {
+    "i": 86,
+    "id": "SPEC_FULL:6.3.2",
+    "source": "SPEC_FULL",
+    "section": "6.3.2",
+    "title": "Cases — sprawy (/api/cases/)",
+    "tags": [
+      "database",
+      "ai-engine",
+      "ocr",
+      "payments",
+      "notifications",
+      "modules",
+      "strategy"
+    ],
+    "char_len": 1023,
+    "file": "knowledge-base/chunks/0086__SPEC_FULL_6.3.2.md"
+  },
+  {
+    "i": 87,
+    "id": "SPEC_FULL:6.3.3",
+    "source": "SPEC_FULL",
+    "section": "6.3.3",
+    "title": "OCR (/api/ocr/)",
+    "tags": [
+      "frontend",
+      "database",
+      "ai-engine",
+      "ocr"
+    ],
+    "char_len": 698,
+    "file": "knowledge-base/chunks/0087__SPEC_FULL_6.3.3.md"
+  },
+  {
+    "i": 88,
+    "id": "SPEC_FULL:6.3.4",
+    "source": "SPEC_FULL",
+    "section": "6.3.4",
+    "title": "AI Engine (/api/ai/)",
+    "tags": [
+      "frontend",
+      "backend",
+      "ai-engine",
+      "ocr"
+    ],
+    "char_len": 568,
+    "file": "knowledge-base/chunks/0088__SPEC_FULL_6.3.4.md"
+  },
+  {
+    "i": 89,
+    "id": "SPEC_FULL:1",
+    "source": "SPEC_FULL",
+    "section": "1",
+    "title": "Walidacja Zod inputu",
+    "tags": [
+      "ai-engine"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0089__SPEC_FULL_1.md"
+  },
+  {
+    "i": 90,
+    "id": "SPEC_FULL:2",
+    "source": "SPEC_FULL",
+    "section": "2",
+    "title": "Pobranie kontekstu RAG (orzecznictwo, przepisy) z tabeli legal_knowledge",
+    "tags": [
+      "database",
+      "ai-engine"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0090__SPEC_FULL_2.md"
+  },
+  {
+    "i": 91,
+    "id": "SPEC_FULL:3",
+    "source": "SPEC_FULL",
+    "section": "3",
+    "title": "Kompozycja promptu (system + context + user data)",
+    "tags": [
+      "ai-engine"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0091__SPEC_FULL_3.md"
+  },
+  {
+    "i": 92,
+    "id": "SPEC_FULL:4",
+    "source": "SPEC_FULL",
+    "section": "4",
+    "title": "Wywołanie Claude Sonnet 4.6 via APIPod",
+    "tags": [
+      "ai-engine"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0092__SPEC_FULL_4.md"
+  },
+  {
+    "i": 93,
+    "id": "SPEC_FULL:5",
+    "source": "SPEC_FULL",
+    "section": "5",
+    "title": "Parsowanie odpowiedzi (Markdown)",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0093__SPEC_FULL_5.md"
+  },
+  {
+    "i": 94,
+    "id": "SPEC_FULL:6",
+    "source": "SPEC_FULL",
+    "section": "6",
+    "title": "Walidacja przez Claude Haiku 4.5 (checklist kompletności)",
+    "tags": [
+      "ai-engine"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0094__SPEC_FULL_6.md"
+  },
+  {
+    "i": 95,
+    "id": "SPEC_FULL:7",
+    "source": "SPEC_FULL",
+    "section": "7",
+    "title": "Jeśli walidacja failed → retry z korektami (max 2 retry)",
+    "tags": [
+      "ai-engine",
+      "strategy"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0095__SPEC_FULL_7.md"
+  },
+  {
+    "i": 96,
+    "id": "SPEC_FULL:8",
+    "source": "SPEC_FULL",
+    "section": "8",
+    "title": "Zapis do tabeli documents (treść Markdown + metadata)",
+    "tags": [
+      "database"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0096__SPEC_FULL_8.md"
+  },
+  {
+    "i": 97,
+    "id": "SPEC_FULL:9",
+    "source": "SPEC_FULL",
+    "section": "9",
+    "title": "Zwrot { document_id, content_markdown, validation_score, warnings[] }",
+    "tags": [
+      "ai-engine",
+      "ocr",
+      "notifications",
+      "modules"
+    ],
+    "char_len": 982,
+    "file": "knowledge-base/chunks/0097__SPEC_FULL_9.md"
+  },
+  {
+    "i": 98,
+    "id": "SPEC_FULL:6.3.5",
+    "source": "SPEC_FULL",
+    "section": "6.3.5",
+    "title": "Documents (/api/documents/)",
+    "tags": [
+      "frontend",
+      "database",
+      "ai-engine",
+      "modules"
+    ],
+    "char_len": 844,
+    "file": "knowledge-base/chunks/0098__SPEC_FULL_6.3.5.md"
+  },
+  {
+    "i": 99,
+    "id": "SPEC_FULL:6.3.6",
+    "source": "SPEC_FULL",
+    "section": "6.3.6",
+    "title": "Payments (/api/payments/)",
+    "tags": [
+      "frontend",
+      "database",
+      "payments"
+    ],
+    "char_len": 748,
+    "file": "knowledge-base/chunks/0099__SPEC_FULL_6.3.6.md"
+  },
+  {
+    "i": 100,
+    "id": "SPEC_FULL:6.3.7",
+    "source": "SPEC_FULL",
+    "section": "6.3.7",
+    "title": "Notifications (/api/notifications/)",
+    "tags": [
+      "notifications"
+    ],
+    "char_len": 279,
+    "file": "knowledge-base/chunks/0100__SPEC_FULL_6.3.7.md"
+  },
+  {
+    "i": 101,
+    "id": "SPEC_FULL:6.3.8",
+    "source": "SPEC_FULL",
+    "section": "6.3.8",
+    "title": "Admin (/api/admin/)",
+    "tags": [
+      "frontend",
+      "admin"
+    ],
+    "char_len": 371,
+    "file": "knowledge-base/chunks/0101__SPEC_FULL_6.3.8.md"
+  },
+  {
+    "i": 102,
+    "id": "SPEC_FULL:6.4",
+    "source": "SPEC_FULL",
+    "section": "6.4",
+    "title": "Logika biznesowa — kluczowe procesy",
+    "tags": [
+      "backend"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0102__SPEC_FULL_6.4.md"
+  },
+  {
+    "i": 103,
+    "id": "SPEC_FULL:6.4.1",
+    "source": "SPEC_FULL",
+    "section": "6.4.1",
+    "title": "Cykl życia sprawy (Case Lifecycle)",
+    "tags": [
+      "backend",
+      "database",
+      "ocr",
+      "payments",
+      "strategy"
+    ],
+    "char_len": 1297,
+    "file": "knowledge-base/chunks/0103__SPEC_FULL_6.4.1.md"
+  },
+  {
+    "i": 104,
+    "id": "SPEC_FULL:6.4.2",
+    "source": "SPEC_FULL",
+    "section": "6.4.2",
+    "title": "Logika terminów procesowych (Deadline Engine)",
+    "tags": [
+      "frontend",
+      "database",
+      "notifications",
+      "modules"
+    ],
+    "char_len": 1023,
+    "file": "knowledge-base/chunks/0104__SPEC_FULL_6.4.2.md"
+  },
+  {
+    "i": 105,
+    "id": "SPEC_FULL:6.4.3",
+    "source": "SPEC_FULL",
+    "section": "6.4.3",
+    "title": "System wersjonowania dokumentów",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 253,
+    "file": "knowledge-base/chunks/0105__SPEC_FULL_6.4.3.md"
+  },
+  {
+    "i": 106,
+    "id": "SPEC_FULL:7",
+    "source": "SPEC_FULL",
+    "section": "7",
+    "title": "BAZA DANYCH — SCHEMAT, TABELE, INDEKSY, RLS",
+    "tags": [
+      "database"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0106__SPEC_FULL_7.md"
+  },
+  {
+    "i": 107,
+    "id": "SPEC_FULL:7.1",
+    "source": "SPEC_FULL",
+    "section": "7.1",
+    "title": "Diagram ERD (Entity-Relationship)",
+    "tags": [
+      "database",
+      "ocr",
+      "payments",
+      "notifications"
+    ],
+    "char_len": 3351,
+    "file": "knowledge-base/chunks/0107__SPEC_FULL_7.1.md"
+  },
+  {
+    "i": 108,
+    "id": "SPEC_FULL:7.2#p1",
+    "source": "SPEC_FULL",
+    "section": "7.2#p1",
+    "title": "Definicje tabel (SQL Migrations) (part 1)",
+    "tags": [
+      "database",
+      "ai-engine",
+      "notifications",
+      "modules",
+      "security",
+      "strategy"
+    ],
+    "char_len": 3910,
+    "file": "knowledge-base/chunks/0108__SPEC_FULL_7.2_p1.md"
+  },
+  {
+    "i": 109,
+    "id": "SPEC_FULL:7.2#p2",
+    "source": "SPEC_FULL",
+    "section": "7.2#p2",
+    "title": "Definicje tabel (SQL Migrations) (part 2)",
+    "tags": [
+      "database",
+      "ai-engine",
+      "modules",
+      "strategy"
+    ],
+    "char_len": 3896,
+    "file": "knowledge-base/chunks/0109__SPEC_FULL_7.2_p2.md"
+  },
+  {
+    "i": 110,
+    "id": "SPEC_FULL:7.2#p3",
+    "source": "SPEC_FULL",
+    "section": "7.2#p3",
+    "title": "Definicje tabel (SQL Migrations) (part 3)",
+    "tags": [
+      "database",
+      "ai-engine",
+      "ocr",
+      "payments",
+      "notifications",
+      "modules",
+      "strategy"
+    ],
+    "char_len": 3920,
+    "file": "knowledge-base/chunks/0110__SPEC_FULL_7.2_p3.md"
+  },
+  {
+    "i": 111,
+    "id": "SPEC_FULL:7.2#p4",
+    "source": "SPEC_FULL",
+    "section": "7.2#p4",
+    "title": "Definicje tabel (SQL Migrations) (part 4)",
+    "tags": [
+      "database",
+      "ai-engine",
+      "ocr",
+      "payments",
+      "notifications",
+      "modules",
+      "strategy"
+    ],
+    "char_len": 3922,
+    "file": "knowledge-base/chunks/0111__SPEC_FULL_7.2_p4.md"
+  },
+  {
+    "i": 112,
+    "id": "SPEC_FULL:7.2#p5",
+    "source": "SPEC_FULL",
+    "section": "7.2#p5",
+    "title": "Definicje tabel (SQL Migrations) (part 5)",
+    "tags": [
+      "backend",
+      "database",
+      "ocr",
+      "notifications",
+      "modules",
+      "strategy"
+    ],
+    "char_len": 3888,
+    "file": "knowledge-base/chunks/0112__SPEC_FULL_7.2_p5.md"
+  },
+  {
+    "i": 113,
+    "id": "SPEC_FULL:7.2#p6",
+    "source": "SPEC_FULL",
+    "section": "7.2#p6",
+    "title": "Definicje tabel (SQL Migrations) (part 6)",
+    "tags": [
+      "database"
+    ],
+    "char_len": 750,
+    "file": "knowledge-base/chunks/0113__SPEC_FULL_7.2_p6.md"
+  },
+  {
+    "i": 114,
+    "id": "SPEC_FULL:7.3",
+    "source": "SPEC_FULL",
+    "section": "7.3",
+    "title": "Supabase Storage Buckets",
+    "tags": [
+      "frontend",
+      "database",
+      "ai-engine",
+      "ocr"
+    ],
+    "char_len": 872,
+    "file": "knowledge-base/chunks/0114__SPEC_FULL_7.3.md"
+  },
+  {
+    "i": 115,
+    "id": "SPEC_FULL:8",
+    "source": "SPEC_FULL",
+    "section": "8",
+    "title": "SUPABASE SELF-HOSTING — KONFIGURACJA",
+    "tags": [
+      "database"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0115__SPEC_FULL_8.md"
+  },
+  {
+    "i": 116,
+    "id": "SPEC_FULL:8.1",
+    "source": "SPEC_FULL",
+    "section": "8.1",
+    "title": "Kiedy self-hosting, kiedy cloud",
+    "tags": [
+      "frontend",
+      "database",
+      "ai-engine",
+      "security",
+      "strategy"
+    ],
+    "char_len": 509,
+    "file": "knowledge-base/chunks/0116__SPEC_FULL_8.1.md"
+  },
+  {
+    "i": 117,
+    "id": "SPEC_FULL:8.2#p1",
+    "source": "SPEC_FULL",
+    "section": "8.2#p1",
+    "title": "Docker Compose (self-hosted Supabase) (part 1)",
+    "tags": [
+      "backend",
+      "database",
+      "ai-engine",
+      "notifications",
+      "devops"
+    ],
+    "char_len": 3247,
+    "file": "knowledge-base/chunks/0117__SPEC_FULL_8.2_p1.md"
+  },
+  {
+    "i": 118,
+    "id": "SPEC_FULL:8.2#p2",
+    "source": "SPEC_FULL",
+    "section": "8.2#p2",
+    "title": "Docker Compose (self-hosted Supabase) (part 2)",
+    "tags": [
+      "database",
+      "ai-engine",
+      "devops"
+    ],
+    "char_len": 2165,
+    "file": "knowledge-base/chunks/0118__SPEC_FULL_8.2_p2.md"
+  },
+  {
+    "i": 119,
+    "id": "SPEC_FULL:8.3",
+    "source": "SPEC_FULL",
+    "section": "8.3",
+    "title": "Backup strategy",
+    "tags": [
+      "database",
+      "ai-engine",
+      "notifications",
+      "security",
+      "devops"
+    ],
+    "char_len": 310,
+    "file": "knowledge-base/chunks/0119__SPEC_FULL_8.3.md"
+  },
+  {
+    "i": 120,
+    "id": "SPEC_FULL:8.4",
+    "source": "SPEC_FULL",
+    "section": "8.4",
+    "title": "Alternatywy do Supabase self-hosting",
+    "tags": [
+      "database",
+      "ai-engine",
+      "security"
+    ],
+    "char_len": 623,
+    "file": "knowledge-base/chunks/0120__SPEC_FULL_8.4.md"
+  },
+  {
+    "i": 121,
+    "id": "SPEC_FULL:9",
+    "source": "SPEC_FULL",
+    "section": "9",
+    "title": "SYSTEM OCR — PIPELINE ROZPOZNAWANIA DOKUMENTÓW",
+    "tags": [
+      "ocr"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0121__SPEC_FULL_9.md"
+  },
+  {
+    "i": 122,
+    "id": "SPEC_FULL:9.1",
+    "source": "SPEC_FULL",
+    "section": "9.1",
+    "title": "Architektura OCR",
+    "tags": [
+      "frontend",
+      "database",
+      "ai-engine",
+      "ocr"
+    ],
+    "char_len": 2023,
+    "file": "knowledge-base/chunks/0122__SPEC_FULL_9.1.md"
+  },
+  {
+    "i": 123,
+    "id": "SPEC_FULL:9.2",
+    "source": "SPEC_FULL",
+    "section": "9.2",
+    "title": "NakazParser — specjalizowany parser",
+    "tags": [
+      "ocr",
+      "modules",
+      "strategy"
+    ],
+    "char_len": 961,
+    "file": "knowledge-base/chunks/0123__SPEC_FULL_9.2.md"
+  },
+  {
+    "i": 124,
+    "id": "SPEC_FULL:9.3",
+    "source": "SPEC_FULL",
+    "section": "9.3",
+    "title": "Obsługa pism komorniczych",
+    "tags": [
+      "ai-engine",
+      "modules"
+    ],
+    "char_len": 433,
+    "file": "knowledge-base/chunks/0124__SPEC_FULL_9.3.md"
+  },
+  {
+    "i": 125,
+    "id": "SPEC_FULL:10",
+    "source": "SPEC_FULL",
+    "section": "10",
+    "title": "AI ENGINE — PROMPTY, RAG, WALIDACJA",
+    "tags": [
+      "ai-engine"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0125__SPEC_FULL_10.md"
+  },
+  {
+    "i": 126,
+    "id": "SPEC_FULL:10.1",
+    "source": "SPEC_FULL",
+    "section": "10.1",
+    "title": "Pipeline generowania pisma (szczegółowy)",
+    "tags": [
+      "ai-engine",
+      "modules"
+    ],
+    "char_len": 1876,
+    "file": "knowledge-base/chunks/0126__SPEC_FULL_10.1.md"
+  },
+  {
+    "i": 127,
+    "id": "SPEC_FULL:10.2",
+    "source": "SPEC_FULL",
+    "section": "10.2",
+    "title": "System Promptów — architektura",
+    "tags": [
+      "ai-engine"
+    ],
+    "char_len": 351,
+    "file": "knowledge-base/chunks/0127__SPEC_FULL_10.2.md"
+  },
+  {
+    "i": 128,
+    "id": "SPEC_FULL:1",
+    "source": "SPEC_FULL",
+    "section": "1",
+    "title": "Pismo MUSI być zgodne z wymogami formalnymi Kodeksu postępowania cywilnego.",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0128__SPEC_FULL_1.md"
+  },
+  {
+    "i": 129,
+    "id": "SPEC_FULL:2",
+    "source": "SPEC_FULL",
+    "section": "2",
+    "title": "Używaj wyłącznie aktualnych przepisów (stan prawny na kwiecień 2026).",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0129__SPEC_FULL_2.md"
+  },
+  {
+    "i": 130,
+    "id": "SPEC_FULL:3",
+    "source": "SPEC_FULL",
+    "section": "3",
+    "title": "NIGDY nie wymyślaj sygnatur, dat, nazwisk — używaj WYŁĄCZNIE danych podanych.",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0130__SPEC_FULL_3.md"
+  },
+  {
+    "i": 131,
+    "id": "SPEC_FULL:4",
+    "source": "SPEC_FULL",
+    "section": "4",
+    "title": "Każde twierdzenie prawne MUSI mieć podstawę prawną (artykuł, paragraf).",
+    "tags": [
+      "database",
+      "ai-engine"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0131__SPEC_FULL_4.md"
+  },
+  {
+    "i": 132,
+    "id": "SPEC_FULL:5",
+    "source": "SPEC_FULL",
+    "section": "5",
+    "title": "Styl: formalny, rzeczowy, bez emocji, bez potoczności.",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0132__SPEC_FULL_5.md"
+  },
+  {
+    "i": 133,
+    "id": "SPEC_FULL:6",
+    "source": "SPEC_FULL",
+    "section": "6",
+    "title": "Format: Markdown z nagłówkami ## dla sekcji pisma.",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0133__SPEC_FULL_6.md"
+  },
+  {
+    "i": 134,
+    "id": "SPEC_FULL:7",
+    "source": "SPEC_FULL",
+    "section": "7",
+    "title": "Zakończ pismo znacznikiem ---KONIEC---",
+    "tags": [
+      "ai-engine",
+      "modules"
+    ],
+    "char_len": 2344,
+    "file": "knowledge-base/chunks/0134__SPEC_FULL_7.md"
+  },
+  {
+    "i": 135,
+    "id": "SPEC_FULL:10.3",
+    "source": "SPEC_FULL",
+    "section": "10.3",
+    "title": "Prompty per moduł — klucze",
+    "tags": [
+      "ai-engine",
+      "modules",
+      "security",
+      "strategy"
+    ],
+    "char_len": 2792,
+    "file": "knowledge-base/chunks/0135__SPEC_FULL_10.3.md"
+  },
+  {
+    "i": 136,
+    "id": "SPEC_FULL:10.4",
+    "source": "SPEC_FULL",
+    "section": "10.4",
+    "title": "Walidacja (Haiku Checklist)",
+    "tags": [
+      "ai-engine"
+    ],
+    "char_len": 220,
+    "file": "knowledge-base/chunks/0136__SPEC_FULL_10.4.md"
+  },
+  {
+    "i": 137,
+    "id": "SPEC_FULL:1",
+    "source": "SPEC_FULL",
+    "section": "1",
+    "title": "Czy pismo zawiera miejscowość i datę?",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0137__SPEC_FULL_1.md"
+  },
+  {
+    "i": 138,
+    "id": "SPEC_FULL:2",
+    "source": "SPEC_FULL",
+    "section": "2",
+    "title": "Czy wskazano prawidłowy sąd (Sąd Rejonowy Lublin-Zachód)?",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0138__SPEC_FULL_2.md"
+  },
+  {
+    "i": 139,
+    "id": "SPEC_FULL:3",
+    "source": "SPEC_FULL",
+    "section": "3",
+    "title": "Czy podano sygnaturę akt?",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0139__SPEC_FULL_3.md"
+  },
+  {
+    "i": 140,
+    "id": "SPEC_FULL:4",
+    "source": "SPEC_FULL",
+    "section": "4",
+    "title": "Czy wskazano dane pozwanego (imię, nazwisko, adres)?",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0140__SPEC_FULL_4.md"
+  },
+  {
+    "i": 141,
+    "id": "SPEC_FULL:5",
+    "source": "SPEC_FULL",
+    "section": "5",
+    "title": "Czy wskazano dane powoda (nazwa, adres)?",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0141__SPEC_FULL_5.md"
+  },
+  {
+    "i": 142,
+    "id": "SPEC_FULL:6",
+    "source": "SPEC_FULL",
+    "section": "6",
+    "title": "Czy pismo jest zatytułowane \"SPRZECIW\"?",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0142__SPEC_FULL_6.md"
+  },
+  {
+    "i": 143,
+    "id": "SPEC_FULL:7",
+    "source": "SPEC_FULL",
+    "section": "7",
+    "title": "Czy zawiera żądanie oddalenia powództwa?",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0143__SPEC_FULL_7.md"
+  },
+  {
+    "i": 144,
+    "id": "SPEC_FULL:8",
+    "source": "SPEC_FULL",
+    "section": "8",
+    "title": "Czy żąda zasądzenia kosztów procesu?",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0144__SPEC_FULL_8.md"
+  },
+  {
+    "i": 145,
+    "id": "SPEC_FULL:9",
+    "source": "SPEC_FULL",
+    "section": "9",
+    "title": "Czy uzasadnienie zawiera co najmniej jeden zarzut merytoryczny?",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0145__SPEC_FULL_9.md"
+  },
+  {
+    "i": 146,
+    "id": "SPEC_FULL:10",
+    "source": "SPEC_FULL",
+    "section": "10",
+    "title": "Czy każdy zarzut jest poparty podstawą prawną (artykuł)?",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0146__SPEC_FULL_10.md"
+  },
+  {
+    "i": 147,
+    "id": "SPEC_FULL:11",
+    "source": "SPEC_FULL",
+    "section": "11",
+    "title": "Czy powołano się na prawidłowe przepisy (nie zmyślone)?",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0147__SPEC_FULL_11.md"
+  },
+  {
+    "i": 148,
+    "id": "SPEC_FULL:12",
+    "source": "SPEC_FULL",
+    "section": "12",
+    "title": "Czy daty w piśmie są spójne (data nakazu < data doręczenia < data pisma)?",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0148__SPEC_FULL_12.md"
+  },
+  {
+    "i": 149,
+    "id": "SPEC_FULL:13",
+    "source": "SPEC_FULL",
+    "section": "13",
+    "title": "Czy kwoty w piśmie odpowiadają kwotom z danych wejściowych?",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0149__SPEC_FULL_13.md"
+  },
+  {
+    "i": 150,
+    "id": "SPEC_FULL:14",
+    "source": "SPEC_FULL",
+    "section": "14",
+    "title": "Czy pismo zawiera sekcję \"Załączniki\"?",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0150__SPEC_FULL_14.md"
+  },
+  {
+    "i": 151,
+    "id": "SPEC_FULL:15",
+    "source": "SPEC_FULL",
+    "section": "15",
+    "title": "Czy język jest formalny (brak kolokwializmów, emocji)?",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0151__SPEC_FULL_15.md"
+  },
+  {
+    "i": 152,
+    "id": "SPEC_FULL:16",
+    "source": "SPEC_FULL",
+    "section": "16",
+    "title": "Czy pismo zawiera podpis pozwanego?",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 193,
+    "file": "knowledge-base/chunks/0152__SPEC_FULL_16.md"
+  },
+  {
+    "i": 153,
+    "id": "SPEC_FULL:10.5",
+    "source": "SPEC_FULL",
+    "section": "10.5",
+    "title": "Fallback strategy",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 489,
+    "file": "knowledge-base/chunks/0153__SPEC_FULL_10.5.md"
+  },
+  {
+    "i": 154,
+    "id": "SPEC_FULL:10.6",
+    "source": "SPEC_FULL",
+    "section": "10.6",
+    "title": "Token tracking & cost control",
+    "tags": [
+      "frontend"
+    ],
+    "char_len": 349,
+    "file": "knowledge-base/chunks/0154__SPEC_FULL_10.6.md"
+  },
+  {
+    "i": 155,
+    "id": "SPEC_FULL:11",
+    "source": "SPEC_FULL",
+    "section": "11",
+    "title": "MODUŁY BIZNESOWE (D1–D10) — SPECYFIKACJA SZCZEGÓŁOWA",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0155__SPEC_FULL_11.md"
+  },
+  {
+    "i": 156,
+    "id": "SPEC_FULL:11.1",
+    "source": "SPEC_FULL",
+    "section": "11.1",
+    "title": "D1 — Skaner Nakazu (DARMOWY)",
+    "tags": [
+      "modules"
+    ],
+    "char_len": 161,
+    "file": "knowledge-base/chunks/0156__SPEC_FULL_11.1.md"
+  },
+  {
+    "i": 157,
+    "id": "SPEC_FULL:10",
+    "source": "SPEC_FULL",
+    "section": "10",
+    "title": "Landing page z drag-and-drop upload zone",
+    "tags": [
+      "frontend",
+      "ai-engine"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0157__SPEC_FULL_10.md"
+  },
+  {
+    "i": 158,
+    "id": "SPEC_FULL:11",
+    "source": "SPEC_FULL",
+    "section": "11",
+    "title": "OCR (Tesseract → Textract fallback)",
+    "tags": [
+      "ocr"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0158__SPEC_FULL_11.md"
+  },
+  {
+    "i": 159,
+    "id": "SPEC_FULL:12",
+    "source": "SPEC_FULL",
+    "section": "12",
+    "title": "NakazParser ekstrahuje dane",
+    "tags": [
+      "ocr"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0159__SPEC_FULL_12.md"
+  },
+  {
+    "i": 160,
+    "id": "SPEC_FULL:13",
+    "source": "SPEC_FULL",
+    "section": "13",
+    "title": "AI Analyzer (Sonnet) ocenia: typ dokumentu, identyfikuje potencjalne zarzuty, scoring 0–100%",
+    "tags": [
+      "ai-engine"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0160__SPEC_FULL_13.md"
+  },
+  {
+    "i": 161,
+    "id": "SPEC_FULL:14",
+    "source": "SPEC_FULL",
+    "section": "14",
+    "title": "Wyświetl wynik: „Szansa na skuteczny sprzeciw: 78%\" + lista wykrytych zarzutów (przedawnienie: tak, cesja: tak, kwota sporna: nie)",
+    "tags": [
+      "modules"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0161__SPEC_FULL_14.md"
+  },
+  {
+    "i": 162,
+    "id": "SPEC_FULL:15",
+    "source": "SPEC_FULL",
+    "section": "15",
+    "title": "CTA button: „Wygeneruj sprzeciw — 159 zł\"",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0162__SPEC_FULL_15.md"
+  },
+  {
+    "i": 163,
+    "id": "SPEC_FULL:16",
+    "source": "SPEC_FULL",
+    "section": "16",
+    "title": "Capture email (wymagane do zobaczenia pełnego raportu)",
+    "tags": [
+      "ai-engine",
+      "notifications"
+    ],
+    "char_len": 203,
+    "file": "knowledge-base/chunks/0163__SPEC_FULL_16.md"
+  },
+  {
+    "i": 164,
+    "id": "SPEC_FULL:11.2",
+    "source": "SPEC_FULL",
+    "section": "11.2",
+    "title": "D2 — Sprzeciwomat EPU (159 zł)",
+    "tags": [
+      "frontend",
+      "ai-engine",
+      "ocr",
+      "payments",
+      "notifications",
+      "modules",
+      "brand",
+      "strategy"
+    ],
+    "char_len": 2026,
+    "file": "knowledge-base/chunks/0164__SPEC_FULL_11.2.md"
+  },
+  {
+    "i": 165,
+    "id": "SPEC_FULL:11.3",
+    "source": "SPEC_FULL",
+    "section": "11.3",
+    "title": "D3 — KomornikShield (199 zł pakiet / 79–99 zł per pismo)",
+    "tags": [
+      "ocr",
+      "modules",
+      "brand",
+      "strategy"
+    ],
+    "char_len": 1066,
+    "file": "knowledge-base/chunks/0165__SPEC_FULL_11.3.md"
+  },
+  {
+    "i": 166,
+    "id": "SPEC_FULL:17",
+    "source": "SPEC_FULL",
+    "section": "17",
+    "title": "Wniosek o zwolnienie rachunku bankowego z zajęcia (art. 54 Prawo bankowe)",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0166__SPEC_FULL_17.md"
+  },
+  {
+    "i": 167,
+    "id": "SPEC_FULL:18",
+    "source": "SPEC_FULL",
+    "section": "18",
+    "title": "Wniosek o zwolnienie świadczeń z egzekucji (art. 833 § 6 KPC)",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0167__SPEC_FULL_18.md"
+  },
+  {
+    "i": 168,
+    "id": "SPEC_FULL:19",
+    "source": "SPEC_FULL",
+    "section": "19",
+    "title": "Skarga na czynności komornika (art. 767 KPC) — termin 7 dni",
+    "tags": [
+      "modules"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0168__SPEC_FULL_19.md"
+  },
+  {
+    "i": 169,
+    "id": "SPEC_FULL:20",
+    "source": "SPEC_FULL",
+    "section": "20",
+    "title": "Wniosek o ograniczenie egzekucji (art. 829 KPC)",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0169__SPEC_FULL_20.md"
+  },
+  {
+    "i": 170,
+    "id": "SPEC_FULL:21",
+    "source": "SPEC_FULL",
+    "section": "21",
+    "title": "Wniosek o umorzenie postępowania egzekucyjnego (art. 825 KPC)",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0170__SPEC_FULL_21.md"
+  },
+  {
+    "i": 171,
+    "id": "SPEC_FULL:22",
+    "source": "SPEC_FULL",
+    "section": "22",
+    "title": "Wniosek o rozłożenie na raty",
+    "tags": [
+      "frontend"
+    ],
+    "char_len": 368,
+    "file": "knowledge-base/chunks/0171__SPEC_FULL_22.md"
+  },
+  {
+    "i": 172,
+    "id": "SPEC_FULL:11.4",
+    "source": "SPEC_FULL",
+    "section": "11.4",
+    "title": "D4 — PotrąceniaStop (199 zł pakiet / 79 zł solo)",
+    "tags": [
+      "ai-engine",
+      "modules"
+    ],
+    "char_len": 506,
+    "file": "knowledge-base/chunks/0172__SPEC_FULL_11.4.md"
+  },
+  {
+    "i": 173,
+    "id": "SPEC_FULL:23",
+    "source": "SPEC_FULL",
+    "section": "23",
+    "title": "Wniosek do pracodawcy o korektę potrąceń (powołanie na art. 87¹ KP)",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0173__SPEC_FULL_23.md"
+  },
+  {
+    "i": 174,
+    "id": "SPEC_FULL:24",
+    "source": "SPEC_FULL",
+    "section": "24",
+    "title": "Wniosek do komornika o zmniejszenie potrąceń (powołanie na art. 833 KPC)",
+    "tags": [
+      "modules"
+    ],
+    "char_len": 54,
+    "file": "knowledge-base/chunks/0174__SPEC_FULL_24.md"
+  },
+  {
+    "i": 175,
+    "id": "SPEC_FULL:11.5",
+    "source": "SPEC_FULL",
+    "section": "11.5",
+    "title": "D5 — BIK-Fix (129 zł)",
+    "tags": [
+      "modules",
+      "security"
+    ],
+    "char_len": 628,
+    "file": "knowledge-base/chunks/0175__SPEC_FULL_11.5.md"
+  },
+  {
+    "i": 176,
+    "id": "SPEC_FULL:25",
+    "source": "SPEC_FULL",
+    "section": "25",
+    "title": "Reklamacja do banku (art. 105a Prawo bankowe)",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0176__SPEC_FULL_25.md"
+  },
+  {
+    "i": 177,
+    "id": "SPEC_FULL:26",
+    "source": "SPEC_FULL",
+    "section": "26",
+    "title": "Wniosek o sprostowanie/usunięcie danych do BIK S.A. (art. 16-17 RODO)",
+    "tags": [
+      "modules",
+      "security"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0177__SPEC_FULL_26.md"
+  },
+  {
+    "i": 178,
+    "id": "SPEC_FULL:27",
+    "source": "SPEC_FULL",
+    "section": "27",
+    "title": "Skarga do Prezesa UODO (art. 77 RODO)",
+    "tags": [
+      "database",
+      "security"
+    ],
+    "char_len": 176,
+    "file": "knowledge-base/chunks/0178__SPEC_FULL_27.md"
+  },
+  {
+    "i": 179,
+    "id": "SPEC_FULL:11.6",
+    "source": "SPEC_FULL",
+    "section": "11.6",
+    "title": "D6 — CesjaCheck (149 zł)",
+    "tags": [
+      "ai-engine",
+      "ocr",
+      "modules"
+    ],
+    "char_len": 848,
+    "file": "knowledge-base/chunks/0179__SPEC_FULL_11.6.md"
+  },
+  {
+    "i": 180,
+    "id": "SPEC_FULL:28",
+    "source": "SPEC_FULL",
+    "section": "28",
+    "title": "Odpowiedź na pozew funduszu sekurytyzacyjnego z zarzutami (2–6 stron)",
+    "tags": [
+      "strategy"
+    ],
+    "char_len": 73,
+    "file": "knowledge-base/chunks/0180__SPEC_FULL_28.md"
+  },
+  {
+    "i": 181,
+    "id": "SPEC_FULL:11.7",
+    "source": "SPEC_FULL",
+    "section": "11.7",
+    "title": "D7 — UgodoMat (119 zł)",
+    "tags": [
+      "modules"
+    ],
+    "char_len": 800,
+    "file": "knowledge-base/chunks/0181__SPEC_FULL_11.7.md"
+  },
+  {
+    "i": 182,
+    "id": "SPEC_FULL:29",
+    "source": "SPEC_FULL",
+    "section": "29",
+    "title": "Wniosek o rozłożenie na raty z uzasadnieniem sytuacji materialnej",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0182__SPEC_FULL_29.md"
+  },
+  {
+    "i": 183,
+    "id": "SPEC_FULL:30",
+    "source": "SPEC_FULL",
+    "section": "30",
+    "title": "Wniosek o umorzenie odsetek i kosztów",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0183__SPEC_FULL_30.md"
+  },
+  {
+    "i": 184,
+    "id": "SPEC_FULL:31",
+    "source": "SPEC_FULL",
+    "section": "31",
+    "title": "Propozycja ugody (kompleksowa — raty + częściowe umorzenie)",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 306,
+    "file": "knowledge-base/chunks/0184__SPEC_FULL_31.md"
+  },
+  {
+    "i": 185,
+    "id": "SPEC_FULL:11.8",
+    "source": "SPEC_FULL",
+    "section": "11.8",
+    "title": "D8 — Upadłość-Lite (249 zł)",
+    "tags": [
+      "ai-engine",
+      "modules",
+      "strategy"
+    ],
+    "char_len": 1600,
+    "file": "knowledge-base/chunks/0185__SPEC_FULL_11.8.md"
+  },
+  {
+    "i": 186,
+    "id": "SPEC_FULL:32",
+    "source": "SPEC_FULL",
+    "section": "32",
+    "title": "Wniosek o ogłoszenie upadłości konsumenckiej (art. 491² Prawo upadłościowe)",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0186__SPEC_FULL_32.md"
+  },
+  {
+    "i": 187,
+    "id": "SPEC_FULL:33",
+    "source": "SPEC_FULL",
+    "section": "33",
+    "title": "Wykaz majątku",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0187__SPEC_FULL_33.md"
+  },
+  {
+    "i": 188,
+    "id": "SPEC_FULL:34",
+    "source": "SPEC_FULL",
+    "section": "34",
+    "title": "Spis wierzycieli",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0188__SPEC_FULL_34.md"
+  },
+  {
+    "i": 189,
+    "id": "SPEC_FULL:35",
+    "source": "SPEC_FULL",
+    "section": "35",
+    "title": "Oświadczenie o stanie rodzinnym, majątku, dochodach i źródłach utrzymania",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0189__SPEC_FULL_35.md"
+  },
+  {
+    "i": 190,
+    "id": "SPEC_FULL:36",
+    "source": "SPEC_FULL",
+    "section": "36",
+    "title": "Lista dokumentów do załączenia (checklist)",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 13,
+    "file": "knowledge-base/chunks/0190__SPEC_FULL_36.md"
+  },
+  {
+    "i": 191,
+    "id": "SPEC_FULL:11.9",
+    "source": "SPEC_FULL",
+    "section": "11.9",
+    "title": "D9 — OCR + AI Parser (wspólny moduł)",
+    "tags": [
+      "ocr",
+      "modules"
+    ],
+    "char_len": 333,
+    "file": "knowledge-base/chunks/0191__SPEC_FULL_11.9.md"
+  },
+  {
+    "i": 192,
+    "id": "SPEC_FULL:11.10",
+    "source": "SPEC_FULL",
+    "section": "11.10",
+    "title": "D10 — Centrum Dowodzenia (V2, subskrypcja 79 zł/mc)",
+    "tags": [
+      "frontend",
+      "notifications",
+      "modules",
+      "devops"
+    ],
+    "char_len": 422,
+    "file": "knowledge-base/chunks/0192__SPEC_FULL_11.10.md"
+  },
+  {
+    "i": 193,
+    "id": "SPEC_FULL:12",
+    "source": "SPEC_FULL",
+    "section": "12",
+    "title": "SYSTEM PŁATNOŚCI — STRIPE, FAKTURY, MODELE CENOWE",
+    "tags": [
+      "payments"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0193__SPEC_FULL_12.md"
+  },
+  {
+    "i": 194,
+    "id": "SPEC_FULL:12.1",
+    "source": "SPEC_FULL",
+    "section": "12.1",
+    "title": "Stripe Integration",
+    "tags": [
+      "frontend",
+      "backend",
+      "payments",
+      "notifications"
+    ],
+    "char_len": 1043,
+    "file": "knowledge-base/chunks/0194__SPEC_FULL_12.1.md"
+  },
+  {
+    "i": 195,
+    "id": "SPEC_FULL:12.2",
+    "source": "SPEC_FULL",
+    "section": "12.2",
+    "title": "Fakturowanie",
+    "tags": [
+      "payments"
+    ],
+    "char_len": 342,
+    "file": "knowledge-base/chunks/0195__SPEC_FULL_12.2.md"
+  },
+  {
+    "i": 196,
+    "id": "SPEC_FULL:12.3",
+    "source": "SPEC_FULL",
+    "section": "12.3",
+    "title": "Cennik (podsumowanie)",
+    "tags": [
+      "frontend",
+      "ai-engine",
+      "payments",
+      "modules"
+    ],
+    "char_len": 584,
+    "file": "knowledge-base/chunks/0196__SPEC_FULL_12.3.md"
+  },
+  {
+    "i": 197,
+    "id": "SPEC_FULL:12.4",
+    "source": "SPEC_FULL",
+    "section": "12.4",
+    "title": "Incubator fee model",
+    "tags": [
+      "payments"
+    ],
+    "char_len": 383,
+    "file": "knowledge-base/chunks/0197__SPEC_FULL_12.4.md"
+  },
+  {
+    "i": 198,
+    "id": "SPEC_FULL:13",
+    "source": "SPEC_FULL",
+    "section": "13",
+    "title": "SYSTEM POWIADOMIEŃ",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0198__SPEC_FULL_13.md"
+  },
+  {
+    "i": 199,
+    "id": "SPEC_FULL:13.1",
+    "source": "SPEC_FULL",
+    "section": "13.1",
+    "title": "Kanały",
+    "tags": [
+      "frontend",
+      "database",
+      "payments",
+      "notifications"
+    ],
+    "char_len": 834,
+    "file": "knowledge-base/chunks/0199__SPEC_FULL_13.1.md"
+  },
+  {
+    "i": 200,
+    "id": "SPEC_FULL:13.2",
+    "source": "SPEC_FULL",
+    "section": "13.2",
+    "title": "Deadline CRON (Edge Function)",
+    "tags": [
+      "database",
+      "notifications"
+    ],
+    "char_len": 474,
+    "file": "knowledge-base/chunks/0200__SPEC_FULL_13.2.md"
+  },
+  {
+    "i": 201,
+    "id": "SPEC_FULL:14",
+    "source": "SPEC_FULL",
+    "section": "14",
+    "title": "SZATA GRAFICZNA — ZAAWANSOWANE ELEMENTY",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0201__SPEC_FULL_14.md"
+  },
+  {
+    "i": 202,
+    "id": "SPEC_FULL:14.1",
+    "source": "SPEC_FULL",
+    "section": "14.1",
+    "title": "Landing Page — struktura sekcji",
+    "tags": [
+      "frontend",
+      "payments",
+      "modules",
+      "security",
+      "brand",
+      "strategy"
+    ],
+    "char_len": 1799,
+    "file": "knowledge-base/chunks/0202__SPEC_FULL_14.1.md"
+  },
+  {
+    "i": 203,
+    "id": "SPEC_FULL:14.2",
+    "source": "SPEC_FULL",
+    "section": "14.2",
+    "title": "Dashboard — layout",
+    "tags": [
+      "frontend",
+      "database",
+      "payments",
+      "notifications",
+      "brand"
+    ],
+    "char_len": 685,
+    "file": "knowledge-base/chunks/0203__SPEC_FULL_14.2.md"
+  },
+  {
+    "i": 204,
+    "id": "SPEC_FULL:14.3",
+    "source": "SPEC_FULL",
+    "section": "14.3",
+    "title": "Ikony i ilustracje",
+    "tags": [
+      "frontend",
+      "notifications",
+      "modules",
+      "brand"
+    ],
+    "char_len": 549,
+    "file": "knowledge-base/chunks/0204__SPEC_FULL_14.3.md"
+  },
+  {
+    "i": 205,
+    "id": "SPEC_FULL:14.4",
+    "source": "SPEC_FULL",
+    "section": "14.4",
+    "title": "Dark Mode",
+    "tags": [
+      "frontend",
+      "brand"
+    ],
+    "char_len": 320,
+    "file": "knowledge-base/chunks/0205__SPEC_FULL_14.4.md"
+  },
+  {
+    "i": 206,
+    "id": "SPEC_FULL:15",
+    "source": "SPEC_FULL",
+    "section": "15",
+    "title": "BEZPIECZEŃSTWO",
+    "tags": [
+      "security"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0206__SPEC_FULL_15.md"
+  },
+  {
+    "i": 207,
+    "id": "SPEC_FULL:15.1",
+    "source": "SPEC_FULL",
+    "section": "15.1",
+    "title": "RODO (GDPR) Compliance",
+    "tags": [
+      "backend",
+      "ai-engine",
+      "ocr",
+      "security"
+    ],
+    "char_len": 696,
+    "file": "knowledge-base/chunks/0207__SPEC_FULL_15.1.md"
+  },
+  {
+    "i": 208,
+    "id": "SPEC_FULL:15.2",
+    "source": "SPEC_FULL",
+    "section": "15.2",
+    "title": "Szyfrowanie",
+    "tags": [
+      "database",
+      "security",
+      "devops"
+    ],
+    "char_len": 386,
+    "file": "knowledge-base/chunks/0208__SPEC_FULL_15.2.md"
+  },
+  {
+    "i": 209,
+    "id": "SPEC_FULL:15.3",
+    "source": "SPEC_FULL",
+    "section": "15.3",
+    "title": "Authentication Security",
+    "tags": [
+      "backend",
+      "database",
+      "strategy"
+    ],
+    "char_len": 325,
+    "file": "knowledge-base/chunks/0209__SPEC_FULL_15.3.md"
+  },
+  {
+    "i": 210,
+    "id": "SPEC_FULL:15.4",
+    "source": "SPEC_FULL",
+    "section": "15.4",
+    "title": "Input Validation",
+    "tags": [
+      "backend",
+      "database",
+      "ai-engine"
+    ],
+    "char_len": 400,
+    "file": "knowledge-base/chunks/0210__SPEC_FULL_15.4.md"
+  },
+  {
+    "i": 211,
+    "id": "SPEC_FULL:16",
+    "source": "SPEC_FULL",
+    "section": "16",
+    "title": "DEPLOYMENT — CI/CD, GITHUB ACTIONS",
+    "tags": [
+      "devops"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0211__SPEC_FULL_16.md"
+  },
+  {
+    "i": 212,
+    "id": "SPEC_FULL:16.1",
+    "source": "SPEC_FULL",
+    "section": "16.1",
+    "title": "GitHub Repository Setup",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 402,
+    "file": "knowledge-base/chunks/0212__SPEC_FULL_16.1.md"
+  },
+  {
+    "i": 213,
+    "id": "SPEC_FULL:16.2",
+    "source": "SPEC_FULL",
+    "section": "16.2",
+    "title": "GitHub Actions — CI Pipeline",
+    "tags": [
+      "database",
+      "ai-engine",
+      "payments",
+      "devops"
+    ],
+    "char_len": 1808,
+    "file": "knowledge-base/chunks/0213__SPEC_FULL_16.2.md"
+  },
+  {
+    "i": 214,
+    "id": "SPEC_FULL:16.3",
+    "source": "SPEC_FULL",
+    "section": "16.3",
+    "title": "Deployment Pipeline",
+    "tags": [
+      "database",
+      "devops"
+    ],
+    "char_len": 661,
+    "file": "knowledge-base/chunks/0214__SPEC_FULL_16.3.md"
+  },
+  {
+    "i": 215,
+    "id": "SPEC_FULL:16.4",
+    "source": "SPEC_FULL",
+    "section": "16.4",
+    "title": "Environment Variables",
+    "tags": [
+      "database",
+      "ocr",
+      "payments",
+      "notifications",
+      "devops"
+    ],
+    "char_len": 981,
+    "file": "knowledge-base/chunks/0215__SPEC_FULL_16.4.md"
+  },
+  {
+    "i": 216,
+    "id": "SPEC_FULL:17",
+    "source": "SPEC_FULL",
+    "section": "17",
+    "title": "MONITORING I ANALITYKA",
+    "tags": [
+      "devops"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0216__SPEC_FULL_17.md"
+  },
+  {
+    "i": 217,
+    "id": "SPEC_FULL:17.1",
+    "source": "SPEC_FULL",
+    "section": "17.1",
+    "title": "Analytics (PostHog)",
+    "tags": [
+      "frontend",
+      "payments",
+      "modules",
+      "devops"
+    ],
+    "char_len": 574,
+    "file": "knowledge-base/chunks/0217__SPEC_FULL_17.1.md"
+  },
+  {
+    "i": 218,
+    "id": "SPEC_FULL:17.2",
+    "source": "SPEC_FULL",
+    "section": "17.2",
+    "title": "Error Monitoring",
+    "tags": [
+      "frontend",
+      "backend",
+      "ocr",
+      "notifications",
+      "devops"
+    ],
+    "char_len": 312,
+    "file": "knowledge-base/chunks/0218__SPEC_FULL_17.2.md"
+  },
+  {
+    "i": 219,
+    "id": "SPEC_FULL:17.3",
+    "source": "SPEC_FULL",
+    "section": "17.3",
+    "title": "Uptime Monitoring",
+    "tags": [
+      "backend",
+      "database",
+      "notifications",
+      "devops"
+    ],
+    "char_len": 253,
+    "file": "knowledge-base/chunks/0219__SPEC_FULL_17.3.md"
+  },
+  {
+    "i": 220,
+    "id": "SPEC_FULL:17.4",
+    "source": "SPEC_FULL",
+    "section": "17.4",
+    "title": "AI Quality Monitoring",
+    "tags": [
+      "frontend",
+      "devops"
+    ],
+    "char_len": 280,
+    "file": "knowledge-base/chunks/0220__SPEC_FULL_17.4.md"
+  },
+  {
+    "i": 221,
+    "id": "SPEC_FULL:18",
+    "source": "SPEC_FULL",
+    "section": "18",
+    "title": "ROADMAP WDROŻENIOWA — FAZY I ESTYMACJE TOKENÓW",
+    "tags": [
+      "strategy"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0221__SPEC_FULL_18.md"
+  },
+  {
+    "i": 222,
+    "id": "SPEC_FULL:18.1",
+    "source": "SPEC_FULL",
+    "section": "18.1",
+    "title": "Faza 0 — Setup (2–3 dni)",
+    "tags": [
+      "frontend",
+      "database",
+      "ai-engine",
+      "strategy"
+    ],
+    "char_len": 401,
+    "file": "knowledge-base/chunks/0222__SPEC_FULL_18.1.md"
+  },
+  {
+    "i": 223,
+    "id": "SPEC_FULL:18.2",
+    "source": "SPEC_FULL",
+    "section": "18.2",
+    "title": "Faza 1 — Core (5–7 dni)",
+    "tags": [
+      "frontend",
+      "backend",
+      "database",
+      "strategy"
+    ],
+    "char_len": 442,
+    "file": "knowledge-base/chunks/0223__SPEC_FULL_18.2.md"
+  },
+  {
+    "i": 224,
+    "id": "SPEC_FULL:18.3",
+    "source": "SPEC_FULL",
+    "section": "18.3",
+    "title": "Faza 2 — OCR Pipeline (3–5 dni)",
+    "tags": [
+      "database",
+      "ai-engine",
+      "ocr",
+      "modules",
+      "strategy"
+    ],
+    "char_len": 314,
+    "file": "knowledge-base/chunks/0224__SPEC_FULL_18.3.md"
+  },
+  {
+    "i": 225,
+    "id": "SPEC_FULL:18.4",
+    "source": "SPEC_FULL",
+    "section": "18.4",
+    "title": "Faza 3 — AI Engine (5–7 dni)",
+    "tags": [
+      "ai-engine",
+      "strategy"
+    ],
+    "char_len": 465,
+    "file": "knowledge-base/chunks/0225__SPEC_FULL_18.4.md"
+  },
+  {
+    "i": 226,
+    "id": "SPEC_FULL:18.5",
+    "source": "SPEC_FULL",
+    "section": "18.5",
+    "title": "Faza 4 — Moduł D1 + D2 (5–7 dni)",
+    "tags": [
+      "frontend",
+      "ocr",
+      "payments",
+      "notifications",
+      "modules",
+      "strategy"
+    ],
+    "char_len": 432,
+    "file": "knowledge-base/chunks/0226__SPEC_FULL_18.5.md"
+  },
+  {
+    "i": 227,
+    "id": "SPEC_FULL:18.6",
+    "source": "SPEC_FULL",
+    "section": "18.6",
+    "title": "Faza 5 — Moduły D3 + D4 (4–6 dni)",
+    "tags": [
+      "frontend",
+      "modules",
+      "strategy"
+    ],
+    "char_len": 260,
+    "file": "knowledge-base/chunks/0227__SPEC_FULL_18.6.md"
+  },
+  {
+    "i": 228,
+    "id": "SPEC_FULL:18.7",
+    "source": "SPEC_FULL",
+    "section": "18.7",
+    "title": "Faza 6 — Moduły D5 + D6 + D7 (5–7 dni)",
+    "tags": [
+      "frontend",
+      "modules",
+      "strategy"
+    ],
+    "char_len": 282,
+    "file": "knowledge-base/chunks/0228__SPEC_FULL_18.7.md"
+  },
+  {
+    "i": 229,
+    "id": "SPEC_FULL:18.8",
+    "source": "SPEC_FULL",
+    "section": "18.8",
+    "title": "Faza 7 — Moduł D8 (3–5 dni)",
+    "tags": [
+      "ai-engine",
+      "modules",
+      "strategy"
+    ],
+    "char_len": 202,
+    "file": "knowledge-base/chunks/0229__SPEC_FULL_18.8.md"
+  },
+  {
+    "i": 230,
+    "id": "SPEC_FULL:18.9",
+    "source": "SPEC_FULL",
+    "section": "18.9",
+    "title": "Faza 8 — Marketing site + SEO (3–4 dni)",
+    "tags": [
+      "frontend",
+      "payments",
+      "strategy"
+    ],
+    "char_len": 320,
+    "file": "knowledge-base/chunks/0230__SPEC_FULL_18.9.md"
+  },
+  {
+    "i": 231,
+    "id": "SPEC_FULL:18.10",
+    "source": "SPEC_FULL",
+    "section": "18.10",
+    "title": "Faza 9 — Polish & Launch (3–5 dni)",
+    "tags": [
+      "frontend",
+      "devops",
+      "strategy"
+    ],
+    "char_len": 360,
+    "file": "knowledge-base/chunks/0231__SPEC_FULL_18.10.md"
+  },
+  {
+    "i": 232,
+    "id": "SPEC_FULL:18.11",
+    "source": "SPEC_FULL",
+    "section": "18.11",
+    "title": "Podsumowanie kosztów tokenów — Długomat",
+    "tags": [
+      "frontend",
+      "ai-engine",
+      "ocr",
+      "modules",
+      "security",
+      "strategy"
+    ],
+    "char_len": 1477,
+    "file": "knowledge-base/chunks/0232__SPEC_FULL_18.11.md"
+  },
+  {
+    "i": 233,
+    "id": "SPEC_FULL:18.12",
+    "source": "SPEC_FULL",
+    "section": "18.12",
+    "title": "Łączna estymacja dla 4 SaaS",
+    "tags": [
+      "strategy"
+    ],
+    "char_len": 226,
+    "file": "knowledge-base/chunks/0233__SPEC_FULL_18.12.md"
+  },
+  {
+    "i": 234,
+    "id": "SPEC_FULL:19",
+    "source": "SPEC_FULL",
+    "section": "19",
+    "title": "INSTRUKCJA DLA KILO CODE / GENSPARK — PODZIAŁ NA PROMPTY",
+    "tags": [
+      "ai-engine"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0234__SPEC_FULL_19.md"
+  },
+  {
+    "i": 235,
+    "id": "SPEC_FULL:19.1",
+    "source": "SPEC_FULL",
+    "section": "19.1",
+    "title": "Strategia promptowania",
+    "tags": [
+      "frontend",
+      "database",
+      "ai-engine"
+    ],
+    "char_len": 500,
+    "file": "knowledge-base/chunks/0235__SPEC_FULL_19.1.md"
+  },
+  {
+    "i": 236,
+    "id": "SPEC_FULL:19.2",
+    "source": "SPEC_FULL",
+    "section": "19.2",
+    "title": "Sekwencja promptów — rekomendowana kolejność",
+    "tags": [
+      "ai-engine"
+    ],
+    "char_len": 36,
+    "file": "knowledge-base/chunks/0236__SPEC_FULL_19.2.md"
+  },
+  {
+    "i": 237,
+    "id": "SPEC_FULL:37",
+    "source": "SPEC_FULL",
+    "section": "37",
+    "title": "Next.js 14 boilerplate z App Router, Tailwind, shadcn/ui",
+    "tags": [
+      "frontend"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0237__SPEC_FULL_37.md"
+  },
+  {
+    "i": 238,
+    "id": "SPEC_FULL:38",
+    "source": "SPEC_FULL",
+    "section": "38",
+    "title": "Folder structure (src/app, components, lib, hooks, stores, types)",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0238__SPEC_FULL_38.md"
+  },
+  {
+    "i": 239,
+    "id": "SPEC_FULL:39",
+    "source": "SPEC_FULL",
+    "section": "39",
+    "title": "Tailwind config z custom theme (paleta „Tarcza\", fonty, shadows)",
+    "tags": [
+      "frontend",
+      "brand"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0239__SPEC_FULL_39.md"
+  },
+  {
+    "i": 240,
+    "id": "SPEC_FULL:40",
+    "source": "SPEC_FULL",
+    "section": "40",
+    "title": "Supabase client utilities (browser, server, admin)",
+    "tags": [
+      "database"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0240__SPEC_FULL_40.md"
+  },
+  {
+    "i": 241,
+    "id": "SPEC_FULL:41",
+    "source": "SPEC_FULL",
+    "section": "41",
+    "title": "Auth middleware (session check, rate limiting)",
+    "tags": [
+      "backend"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0241__SPEC_FULL_41.md"
+  },
+  {
+    "i": 242,
+    "id": "SPEC_FULL:42",
+    "source": "SPEC_FULL",
+    "section": "42",
+    "title": "Database migration: core tables (profiles, cases)",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0242__SPEC_FULL_42.md"
+  },
+  {
+    "i": 243,
+    "id": "SPEC_FULL:43",
+    "source": "SPEC_FULL",
+    "section": "43",
+    "title": "Database migration: documents, deadlines, ocr_results",
+    "tags": [
+      "ocr",
+      "notifications"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0243__SPEC_FULL_43.md"
+  },
+  {
+    "i": 244,
+    "id": "SPEC_FULL:44",
+    "source": "SPEC_FULL",
+    "section": "44",
+    "title": "Database migration: payments, notifications, case_events",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0244__SPEC_FULL_44.md"
+  },
+  {
+    "i": 245,
+    "id": "SPEC_FULL:45",
+    "source": "SPEC_FULL",
+    "section": "45",
+    "title": "Database migration: legal_knowledge + pgvector",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0245__SPEC_FULL_45.md"
+  },
+  {
+    "i": 246,
+    "id": "SPEC_FULL:46",
+    "source": "SPEC_FULL",
+    "section": "46",
+    "title": "RLS policies",
+    "tags": [
+      "frontend",
+      "database",
+      "ai-engine",
+      "ocr",
+      "payments",
+      "notifications",
+      "modules",
+      "devops"
+    ],
+    "char_len": 2385,
+    "file": "knowledge-base/chunks/0246__SPEC_FULL_46.md"
+  },
+  {
+    "i": 247,
+    "id": "SPEC_FULL:19.3",
+    "source": "SPEC_FULL",
+    "section": "19.3",
+    "title": "Przykład jednego prompta (prompt #39)",
+    "tags": [
+      "frontend",
+      "database",
+      "ai-engine"
+    ],
+    "char_len": 312,
+    "file": "knowledge-base/chunks/0247__SPEC_FULL_19.3.md"
+  },
+  {
+    "i": 248,
+    "id": "SPEC_FULL:1",
+    "source": "SPEC_FULL",
+    "section": "1",
+    "title": "React Hook Form + Zod walidacja",
+    "tags": [
+      "ai-engine"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0248__SPEC_FULL_1.md"
+  },
+  {
+    "i": 249,
+    "id": "SPEC_FULL:2",
+    "source": "SPEC_FULL",
+    "section": "2",
+    "title": "Pola: sygnatura (text, regex VI Nc-e), sąd (select — domyślnie e-Sąd",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 248,
+    "file": "knowledge-base/chunks/0249__SPEC_FULL_2.md"
+  },
+  {
+    "i": 250,
+    "id": "SPEC_FULL:3",
+    "source": "SPEC_FULL",
+    "section": "3",
+    "title": "Auto-fill z OCR data (props: ocrData?: OcrExtractedData)",
+    "tags": [
+      "ocr"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0250__SPEC_FULL_3.md"
+  },
+  {
+    "i": 251,
+    "id": "SPEC_FULL:4",
+    "source": "SPEC_FULL",
+    "section": "4",
+    "title": "Real-time walidacja: sygnatura musi pasować do regex, data doręczenia",
+    "tags": [
+      "ai-engine"
+    ],
+    "char_len": 28,
+    "file": "knowledge-base/chunks/0251__SPEC_FULL_4.md"
+  },
+  {
+    "i": 252,
+    "id": "SPEC_FULL:5",
+    "source": "SPEC_FULL",
+    "section": "5",
+    "title": "Obliczanie deadline'u na żywo: data doręczenia + 14 dni",
+    "tags": [
+      "frontend",
+      "notifications"
+    ],
+    "char_len": 112,
+    "file": "knowledge-base/chunks/0252__SPEC_FULL_5.md"
+  },
+  {
+    "i": 253,
+    "id": "SPEC_FULL:6",
+    "source": "SPEC_FULL",
+    "section": "6",
+    "title": "Panel boczny z wskazówką (gdzie znaleźć sygnaturę, format daty)",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0253__SPEC_FULL_6.md"
+  },
+  {
+    "i": 254,
+    "id": "SPEC_FULL:7",
+    "source": "SPEC_FULL",
+    "section": "7",
+    "title": "Tailwind + shadcn/ui components",
+    "tags": [
+      "frontend"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0254__SPEC_FULL_7.md"
+  },
+  {
+    "i": 255,
+    "id": "SPEC_FULL:8",
+    "source": "SPEC_FULL",
+    "section": "8",
+    "title": "Mobile responsive",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0255__SPEC_FULL_8.md"
+  },
+  {
+    "i": 256,
+    "id": "SPEC_FULL:9",
+    "source": "SPEC_FULL",
+    "section": "9",
+    "title": "Typ: export function StepDaneSprawy({ ocrData, onSubmit }: Props)",
+    "tags": [
+      "ocr"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0256__SPEC_FULL_9.md"
+  },
+  {
+    "i": 257,
+    "id": "SPEC_FULL:10",
+    "source": "SPEC_FULL",
+    "section": "10",
+    "title": "Zod schema eksportowana osobno (do reuse w API route)",
+    "tags": [
+      "frontend",
+      "database",
+      "ai-engine",
+      "ocr",
+      "payments",
+      "security",
+      "devops"
+    ],
+    "char_len": 1352,
+    "file": "knowledge-base/chunks/0257__SPEC_FULL_10.md"
+  },
+  {
+    "i": 258,
+    "id": "SPEC_BRAND:3",
+    "source": "SPEC_BRAND",
+    "section": "3",
+    "title": "DŁUGOMAT",
+    "tags": [
+      "frontend"
+    ],
+    "char_len": 50,
+    "file": "knowledge-base/chunks/0258__SPEC_BRAND_3.md"
+  },
+  {
+    "i": 259,
+    "id": "SPEC_BRAND:3.1",
+    "source": "SPEC_BRAND",
+    "section": "3.1",
+    "title": "TOŻSAMOŚĆ MARKI",
+    "tags": [
+      "frontend",
+      "notifications",
+      "modules",
+      "security",
+      "brand",
+      "strategy"
+    ],
+    "char_len": 1821,
+    "file": "knowledge-base/chunks/0259__SPEC_BRAND_3.1.md"
+  },
+  {
+    "i": 260,
+    "id": "SPEC_BRAND:3.2",
+    "source": "SPEC_BRAND",
+    "section": "3.2",
+    "title": "SYSTEM KOLORÓW",
+    "tags": [
+      "frontend",
+      "security"
+    ],
+    "char_len": 256,
+    "file": "knowledge-base/chunks/0260__SPEC_BRAND_3.2.md"
+  },
+  {
+    "i": 261,
+    "id": "SPEC_BRAND:3.2.1",
+    "source": "SPEC_BRAND",
+    "section": "3.2.1",
+    "title": "Paleta Primary — Shield Navy",
+    "tags": [
+      "frontend",
+      "brand"
+    ],
+    "char_len": 1343,
+    "file": "knowledge-base/chunks/0261__SPEC_BRAND_3.2.1.md"
+  },
+  {
+    "i": 262,
+    "id": "SPEC_BRAND:3.2.2",
+    "source": "SPEC_BRAND",
+    "section": "3.2.2",
+    "title": "Paleta Accent — Controlled Hope Green",
+    "tags": [
+      "frontend",
+      "database",
+      "security",
+      "brand"
+    ],
+    "char_len": 805,
+    "file": "knowledge-base/chunks/0262__SPEC_BRAND_3.2.2.md"
+  },
+  {
+    "i": 263,
+    "id": "SPEC_BRAND:3.2.3",
+    "source": "SPEC_BRAND",
+    "section": "3.2.3",
+    "title": "Paleta Status — Temporal Signals",
+    "tags": [
+      "frontend",
+      "brand"
+    ],
+    "char_len": 558,
+    "file": "knowledge-base/chunks/0263__SPEC_BRAND_3.2.3.md"
+  },
+  {
+    "i": 264,
+    "id": "SPEC_BRAND:3.2.4",
+    "source": "SPEC_BRAND",
+    "section": "3.2.4",
+    "title": "Paleta Neutral — Iron",
+    "tags": [
+      "frontend",
+      "brand"
+    ],
+    "char_len": 771,
+    "file": "knowledge-base/chunks/0264__SPEC_BRAND_3.2.4.md"
+  },
+  {
+    "i": 265,
+    "id": "SPEC_BRAND:3.2.5",
+    "source": "SPEC_BRAND",
+    "section": "3.2.5",
+    "title": "Reguły użycia kolorów — bezwzględne",
+    "tags": [
+      "frontend",
+      "database"
+    ],
+    "char_len": 945,
+    "file": "knowledge-base/chunks/0265__SPEC_BRAND_3.2.5.md"
+  },
+  {
+    "i": 266,
+    "id": "SPEC_BRAND:3.2.6",
+    "source": "SPEC_BRAND",
+    "section": "3.2.6",
+    "title": "Prohibited Colors",
+    "tags": [
+      "frontend"
+    ],
+    "char_len": 539,
+    "file": "knowledge-base/chunks/0266__SPEC_BRAND_3.2.6.md"
+  },
+  {
+    "i": 267,
+    "id": "SPEC_BRAND:3.3",
+    "source": "SPEC_BRAND",
+    "section": "3.3",
+    "title": "TYPOGRAFIA",
+    "tags": [
+      "frontend"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0267__SPEC_BRAND_3.3.md"
+  },
+  {
+    "i": 268,
+    "id": "SPEC_BRAND:3.3.1",
+    "source": "SPEC_BRAND",
+    "section": "3.3.1",
+    "title": "Hierarchia fontów",
+    "tags": [
+      "frontend"
+    ],
+    "char_len": 1006,
+    "file": "knowledge-base/chunks/0268__SPEC_BRAND_3.3.1.md"
+  },
+  {
+    "i": 269,
+    "id": "SPEC_BRAND:3.3.2",
+    "source": "SPEC_BRAND",
+    "section": "3.3.2",
+    "title": "Skala typograficzna — fluid typography z clamp()",
+    "tags": [
+      "frontend"
+    ],
+    "char_len": 1354,
+    "file": "knowledge-base/chunks/0269__SPEC_BRAND_3.3.2.md"
+  },
+  {
+    "i": 270,
+    "id": "SPEC_BRAND:3.3.3",
+    "source": "SPEC_BRAND",
+    "section": "3.3.3",
+    "title": "Reguły typograficzne — bezwzględne",
+    "tags": [
+      "frontend",
+      "payments",
+      "strategy"
+    ],
+    "char_len": 922,
+    "file": "knowledge-base/chunks/0270__SPEC_BRAND_3.3.3.md"
+  },
+  {
+    "i": 271,
+    "id": "SPEC_BRAND:3.4",
+    "source": "SPEC_BRAND",
+    "section": "3.4",
+    "title": "SYSTEM PRZESTRZENI I KSZTAŁTÓW",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0271__SPEC_BRAND_3.4.md"
+  },
+  {
+    "i": 272,
+    "id": "SPEC_BRAND:3.4.1",
+    "source": "SPEC_BRAND",
+    "section": "3.4.1",
+    "title": "Grid bazowy",
+    "tags": [
+      "brand",
+      "strategy"
+    ],
+    "char_len": 1025,
+    "file": "knowledge-base/chunks/0272__SPEC_BRAND_3.4.1.md"
+  },
+  {
+    "i": 273,
+    "id": "SPEC_BRAND:3.4.2",
+    "source": "SPEC_BRAND",
+    "section": "3.4.2",
+    "title": "Border radius",
+    "tags": [
+      "payments"
+    ],
+    "char_len": 562,
+    "file": "knowledge-base/chunks/0273__SPEC_BRAND_3.4.2.md"
+  },
+  {
+    "i": 274,
+    "id": "SPEC_BRAND:3.4.3",
+    "source": "SPEC_BRAND",
+    "section": "3.4.3",
+    "title": "System cieni",
+    "tags": [
+      "misc"
+    ],
+    "char_len": 1082,
+    "file": "knowledge-base/chunks/0274__SPEC_BRAND_3.4.3.md"
+  },
+  {
+    "i": 275,
+    "id": "SPEC_BRAND:3.5",
+    "source": "SPEC_BRAND",
+    "section": "3.5",
+    "title": "LAYOUT I STRUKTURA STRON",
+    "tags": [
+      "frontend"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0275__SPEC_BRAND_3.5.md"
+  },
+  {
+    "i": 276,
+    "id": "SPEC_BRAND:3.5.1",
+    "source": "SPEC_BRAND",
+    "section": "3.5.1",
+    "title": "Landing page — architektura sekcji",
+    "tags": [
+      "frontend",
+      "database",
+      "ai-engine",
+      "payments",
+      "modules",
+      "security",
+      "brand"
+    ],
+    "char_len": 5926,
+    "file": "knowledge-base/chunks/0276__SPEC_BRAND_3.5.1.md"
+  },
+  {
+    "i": 277,
+    "id": "SPEC_BRAND:3.5.2#p1",
+    "source": "SPEC_BRAND",
+    "section": "3.5.2#p1",
+    "title": "Dashboard — architektura (part 1)",
+    "tags": [
+      "frontend",
+      "ocr",
+      "payments"
+    ],
+    "char_len": 3245,
+    "file": "knowledge-base/chunks/0277__SPEC_BRAND_3.5.2_p1.md"
+  },
+  {
+    "i": 278,
+    "id": "SPEC_BRAND:3.5.2#p2",
+    "source": "SPEC_BRAND",
+    "section": "3.5.2#p2",
+    "title": "Dashboard — architektura (part 2)",
+    "tags": [
+      "frontend",
+      "notifications",
+      "modules",
+      "brand",
+      "strategy"
+    ],
+    "char_len": 1158,
+    "file": "knowledge-base/chunks/0278__SPEC_BRAND_3.5.2_p2.md"
+  },
+  {
+    "i": 279,
+    "id": "SPEC_BRAND:3.6",
+    "source": "SPEC_BRAND",
+    "section": "3.6",
+    "title": "WIZARD — SYSTEM KROKÓW",
+    "tags": [
+      "frontend"
+    ],
+    "char_len": 205,
+    "file": "knowledge-base/chunks/0279__SPEC_BRAND_3.6.md"
+  },
+  {
+    "i": 280,
+    "id": "SPEC_BRAND:3.6.1",
+    "source": "SPEC_BRAND",
+    "section": "3.6.1",
+    "title": "Struktura WizardShell",
+    "tags": [
+      "frontend",
+      "modules",
+      "brand",
+      "strategy"
+    ],
+    "char_len": 5793,
+    "file": "knowledge-base/chunks/0280__SPEC_BRAND_3.6.1.md"
+  },
+  {
+    "i": 281,
+    "id": "SPEC_BRAND:3.6.2",
+    "source": "SPEC_BRAND",
+    "section": "3.6.2",
+    "title": "Animacje przejść między krokami",
+    "tags": [
+      "frontend"
+    ],
+    "char_len": 1813,
+    "file": "knowledge-base/chunks/0281__SPEC_BRAND_3.6.2.md"
+  },
+  {
+    "i": 282,
+    "id": "SPEC_BRAND:3.6.3",
+    "source": "SPEC_BRAND",
+    "section": "3.6.3",
+    "title": "Walidacja w wizardzie",
+    "tags": [
+      "frontend",
+      "ai-engine",
+      "brand",
+      "strategy"
+    ],
+    "char_len": 1055,
+    "file": "knowledge-base/chunks/0282__SPEC_BRAND_3.6.3.md"
+  },
+  {
+    "i": 283,
+    "id": "SPEC_BRAND:3.6.4#p1",
+    "source": "SPEC_BRAND",
+    "section": "3.6.4#p1",
+    "title": "Typowe kroki wizarda (przykład: Sprzeciw EPU — moduł D2) (part 1)",
+    "tags": [
+      "frontend",
+      "ai-engine",
+      "ocr",
+      "modules",
+      "brand"
+    ],
+    "char_len": 3992,
+    "file": "knowledge-base/chunks/0283__SPEC_BRAND_3.6.4_p1.md"
+  },
+  {
+    "i": 284,
+    "id": "SPEC_BRAND:3.6.4#p2",
+    "source": "SPEC_BRAND",
+    "section": "3.6.4#p2",
+    "title": "Typowe kroki wizarda (przykład: Sprzeciw EPU — moduł D2) (part 2)",
+    "tags": [
+      "frontend",
+      "ai-engine",
+      "payments",
+      "notifications",
+      "modules",
+      "brand",
+      "strategy"
+    ],
+    "char_len": 3761,
+    "file": "knowledge-base/chunks/0284__SPEC_BRAND_3.6.4_p2.md"
+  },
+  {
+    "i": 285,
+    "id": "SPEC_BRAND:3.7",
+    "source": "SPEC_BRAND",
+    "section": "3.7",
+    "title": "MODUŁY — IDENTYFIKACJA WIZUALNA",
+    "tags": [
+      "frontend",
+      "modules",
+      "brand"
+    ],
+    "char_len": 1308,
+    "file": "knowledge-base/chunks/0285__SPEC_BRAND_3.7.md"
+  },
+  {
+    "i": 286,
+    "id": "SPEC_BRAND:3.8#p1",
+    "source": "SPEC_BRAND",
+    "section": "3.8#p1",
+    "title": "PRICING SECTION — DESIGN (part 1)",
+    "tags": [
+      "frontend",
+      "ai-engine",
+      "ocr",
+      "payments",
+      "modules",
+      "strategy"
+    ],
+    "char_len": 3246,
+    "file": "knowledge-base/chunks/0286__SPEC_BRAND_3.8_p1.md"
+  },
+  {
+    "i": 287,
+    "id": "SPEC_BRAND:3.8#p2",
+    "source": "SPEC_BRAND",
+    "section": "3.8#p2",
+    "title": "PRICING SECTION — DESIGN (part 2)",
+    "tags": [
+      "payments",
+      "modules"
+    ],
+    "char_len": 1438,
+    "file": "knowledge-base/chunks/0287__SPEC_BRAND_3.8_p2.md"
+  },
+  {
+    "i": 288,
+    "id": "SPEC_BRAND:3.9",
+    "source": "SPEC_BRAND",
+    "section": "3.9",
+    "title": "KOMPONENTY UNIKALNE DLA DŁUGOMAT",
+    "tags": [
+      "frontend"
+    ],
+    "char_len": 0,
+    "file": "knowledge-base/chunks/0288__SPEC_BRAND_3.9.md"
+  },
+  {
+    "i": 289,
+    "id": "SPEC_BRAND:3.9.1",
+    "source": "SPEC_BRAND",
+    "section": "3.9.1",
+    "title": "Kalkulator kwoty wolnej",
+    "tags": [
+      "frontend",
+      "modules"
+    ],
+    "char_len": 2062,
+    "file": "knowledge-base/chunks/0289__SPEC_BRAND_3.9.1.md"
+  },
+  {
+    "i": 290,
+    "id": "SPEC_BRAND:3.9.2",
+    "source": "SPEC_BRAND",
+    "section": "3.9.2",
+    "title": "Deadline Countdown Widget",
+    "tags": [
+      "frontend",
+      "notifications",
+      "brand"
+    ],
+    "char_len": 1391,
+    "file": "knowledge-base/chunks/0290__SPEC_BRAND_3.9.2.md"
+  },
+  {
+    "i": 291,
+    "id": "SPEC_BRAND:3.9.3",
+    "source": "SPEC_BRAND",
+    "section": "3.9.3",
+    "title": "AI Success Estimator",
+    "tags": [
+      "frontend",
+      "strategy"
+    ],
+    "char_len": 1726,
+    "file": "knowledge-base/chunks/0291__SPEC_BRAND_3.9.3.md"
+  },
+  {
+    "i": 292,
+    "id": "SPEC_BRAND:3.9.4",
+    "source": "SPEC_BRAND",
+    "section": "3.9.4",
+    "title": "Document Timeline",
+    "tags": [
+      "frontend"
+    ],
+    "char_len": 1938,
+    "file": "knowledge-base/chunks/0292__SPEC_BRAND_3.9.4.md"
+  },
+  {
+    "i": 293,
+    "id": "SPEC_BRAND:3.9.5",
+    "source": "SPEC_BRAND",
+    "section": "3.9.5",
+    "title": "OCR Confidence Indicator",
+    "tags": [
+      "frontend",
+      "ocr"
+    ],
+    "char_len": 686,
+    "file": "knowledge-base/chunks/0293__SPEC_BRAND_3.9.5.md"
+  },
+  {
+    "i": 294,
+    "id": "SPEC_BRAND:3.9.6",
+    "source": "SPEC_BRAND",
+    "section": "3.9.6",
+    "title": "PDF Preview Component",
+    "tags": [
+      "frontend",
+      "payments"
+    ],
+    "char_len": 1016,
+    "file": "knowledge-base/chunks/0294__SPEC_BRAND_3.9.6.md"
+  },
+  {
+    "i": 295,
+    "id": "SPEC_BRAND:3.10",
+    "source": "SPEC_BRAND",
+    "section": "3.10",
+    "title": "DARK MODE",
+    "tags": [
+      "frontend",
+      "brand"
+    ],
+    "char_len": 1632,
+    "file": "knowledge-base/chunks/0295__SPEC_BRAND_3.10.md"
+  },
+  {
+    "i": 296,
+    "id": "SPEC_BRAND:3.11",
+    "source": "SPEC_BRAND",
+    "section": "3.11",
+    "title": "RESPONSYWNOŚĆ",
+    "tags": [
+      "frontend",
+      "database",
+      "payments",
+      "brand"
+    ],
+    "char_len": 1889,
+    "file": "knowledge-base/chunks/0296__SPEC_BRAND_3.11.md"
+  },
+  {
+    "i": 297,
+    "id": "SPEC_BRAND:3.12",
+    "source": "SPEC_BRAND",
+    "section": "3.12",
+    "title": "STANY PUSTE I BŁĘDY",
+    "tags": [
+      "frontend",
+      "brand"
+    ],
+    "char_len": 2202,
+    "file": "knowledge-base/chunks/0297__SPEC_BRAND_3.12.md"
+  },
+  {
+    "i": 298,
+    "id": "SPEC_BRAND:3.13",
+    "source": "SPEC_BRAND",
+    "section": "3.13",
+    "title": "ILUSTRACJE I GRAFIKA",
+    "tags": [
+      "frontend",
+      "ocr",
+      "brand"
+    ],
+    "char_len": 1260,
+    "file": "knowledge-base/chunks/0298__SPEC_BRAND_3.13.md"
+  },
+  {
+    "i": 299,
+    "id": "SPEC_BRAND:3.14",
+    "source": "SPEC_BRAND",
+    "section": "3.14",
+    "title": "IKONY",
+    "tags": [
+      "frontend",
+      "payments",
+      "notifications",
+      "modules",
+      "brand"
+    ],
+    "char_len": 1278,
+    "file": "knowledge-base/chunks/0299__SPEC_BRAND_3.14.md"
+  },
+  {
+    "i": 300,
+    "id": "SPEC_BRAND:3.15#p1",
+    "source": "SPEC_BRAND",
+    "section": "3.15#p1",
+    "title": "FORMULARZE — SZCZEGÓŁOWE STYLE KOMPONENTÓW (part 1)",
+    "tags": [
+      "frontend",
+      "brand"
+    ],
+    "char_len": 3995,
+    "file": "knowledge-base/chunks/0300__SPEC_BRAND_3.15_p1.md"
+  },
+  {
+    "i": 301,
+    "id": "SPEC_BRAND:3.15#p2",
+    "source": "SPEC_BRAND",
+    "section": "3.15#p2",
+    "title": "FORMULARZE — SZCZEGÓŁOWE STYLE KOMPONENTÓW (part 2)",
+    "tags": [
+      "frontend",
+      "brand",
+      "strategy"
+    ],
+    "char_len": 3688,
+    "file": "knowledge-base/chunks/0301__SPEC_BRAND_3.15_p2.md"
+  },
+  {
+    "i": 302,
+    "id": "SPEC_BRAND:3.15#p3",
+    "source": "SPEC_BRAND",
+    "section": "3.15#p3",
+    "title": "FORMULARZE — SZCZEGÓŁOWE STYLE KOMPONENTÓW (part 3)",
+    "tags": [
+      "frontend",
+      "notifications",
+      "strategy"
+    ],
+    "char_len": 3918,
+    "file": "knowledge-base/chunks/0302__SPEC_BRAND_3.15_p3.md"
+  },
+  {
+    "i": 303,
+    "id": "SPEC_BRAND:3.15#p4",
+    "source": "SPEC_BRAND",
+    "section": "3.15#p4",
+    "title": "FORMULARZE — SZCZEGÓŁOWE STYLE KOMPONENTÓW (part 4)",
+    "tags": [
+      "frontend",
+      "ai-engine",
+      "ocr",
+      "notifications",
+      "modules",
+      "strategy"
+    ],
+    "char_len": 3739,
+    "file": "knowledge-base/chunks/0303__SPEC_BRAND_3.15_p4.md"
+  },
+  {
+    "i": 304,
+    "id": "SPEC_BRAND:3.15#p5",
+    "source": "SPEC_BRAND",
+    "section": "3.15#p5",
+    "title": "FORMULARZE — SZCZEGÓŁOWE STYLE KOMPONENTÓW (part 5)",
+    "tags": [
+      "frontend",
+      "database",
+      "ai-engine"
+    ],
+    "char_len": 3900,
+    "file": "knowledge-base/chunks/0304__SPEC_BRAND_3.15_p5.md"
+  },
+  {
+    "i": 305,
+    "id": "SPEC_BRAND:3.15#p6",
+    "source": "SPEC_BRAND",
+    "section": "3.15#p6",
+    "title": "FORMULARZE — SZCZEGÓŁOWE STYLE KOMPONENTÓW (part 6)",
+    "tags": [
+      "frontend",
+      "ocr",
+      "payments",
+      "modules",
+      "strategy"
+    ],
+    "char_len": 3936,
+    "file": "knowledge-base/chunks/0305__SPEC_BRAND_3.15_p6.md"
+  },
+  {
+    "i": 306,
+    "id": "SPEC_BRAND:3.15#p7",
+    "source": "SPEC_BRAND",
+    "section": "3.15#p7",
+    "title": "FORMULARZE — SZCZEGÓŁOWE STYLE KOMPONENTÓW (part 7)",
+    "tags": [
+      "frontend",
+      "notifications",
+      "modules"
+    ],
+    "char_len": 3487,
+    "file": "knowledge-base/chunks/0306__SPEC_BRAND_3.15_p7.md"
+  }
+]
