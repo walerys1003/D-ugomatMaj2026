@@ -1,105 +1,52 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Clock, MessageCircle, Plus } from "lucide-react";
+import { redirect } from "next/navigation";
+import { ArrowRight, Clock, Plus } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
 
 export const metadata: Metadata = {
   title: "Moje zgłoszenia — Wsparcie",
   description: "Lista wszystkich Twoich zgłoszeń do działu wsparcia Długomat.",
 };
+export const dynamic = "force-dynamic";
 
 interface Ticket {
   id: string;
   subject: string;
-  category: "Konto" | "Płatności" | "Sprawa" | "Techniczne" | "RODO";
-  status: "open" | "in_progress" | "waiting" | "resolved" | "closed";
-  priority: "low" | "normal" | "high";
+  category: string;
+  status: string;
+  priority: string;
   created_at: string;
-  last_response_at: string;
-  agent?: string;
-  unread: number;
+  updated_at: string;
 }
 
-const TICKETS: Ticket[] = [
-  {
-    id: "TIC-2026-0142",
-    subject: "Nie mogę dodać dokumentu PDF większego niż 10MB",
-    category: "Techniczne",
-    status: "in_progress",
-    priority: "normal",
-    created_at: "2026-05-09T11:18:00Z",
-    last_response_at: "2026-05-10T15:42:00Z",
-    agent: "Karolina (zespół techniczny)",
-    unread: 1,
-  },
-  {
-    id: "TIC-2026-0138",
-    subject: "Pytanie o fakturę za maj — brak NIP",
-    category: "Płatności",
-    status: "waiting",
-    priority: "normal",
-    created_at: "2026-05-07T09:24:00Z",
-    last_response_at: "2026-05-08T13:11:00Z",
-    agent: "Magda (księgowość)",
-    unread: 0,
-  },
-  {
-    id: "TIC-2026-0131",
-    subject: "Eksport danych RODO — kiedy otrzymam plik?",
-    category: "RODO",
-    status: "resolved",
-    priority: "high",
-    created_at: "2026-05-02T16:08:00Z",
-    last_response_at: "2026-05-04T10:22:00Z",
-    agent: "Marcin (compliance)",
-    unread: 0,
-  },
-  {
-    id: "TIC-2026-0124",
-    subject: "Zmiana adresu e-mail na koncie",
-    category: "Konto",
-    status: "closed",
-    priority: "low",
-    created_at: "2026-04-22T12:14:00Z",
-    last_response_at: "2026-04-22T14:48:00Z",
-    agent: "Bot Pomocnik",
-    unread: 0,
-  },
-  {
-    id: "TIC-2026-0118",
-    subject: "Sprawa case_007 — status nie aktualizuje się",
-    category: "Sprawa",
-    status: "open",
-    priority: "high",
-    created_at: "2026-05-10T19:02:00Z",
-    last_response_at: "2026-05-10T19:02:00Z",
-    unread: 0,
-  },
-];
-
-const STATUS_TONE: Record<Ticket["status"], "info" | "warning" | "danger" | "success" | "neutral"> = {
+const STATUS_TONE: Record<string, "info" | "warning" | "danger" | "success" | "neutral"> = {
   open: "danger",
   in_progress: "warning",
+  waiting_user: "info",
   waiting: "info",
   resolved: "success",
   closed: "neutral",
 };
 
-const STATUS_LABEL: Record<Ticket["status"], string> = {
+const STATUS_LABEL: Record<string, string> = {
   open: "nowe",
   in_progress: "w trakcie",
+  waiting_user: "czeka na Ciebie",
   waiting: "czeka na Ciebie",
   resolved: "rozwiązane",
   closed: "zamknięte",
 };
 
-const PRIORITY_TONE: Record<Ticket["priority"], "info" | "warning" | "danger"> = {
+const PRIORITY_TONE: Record<string, "info" | "warning" | "danger"> = {
   low: "info",
   normal: "warning",
   high: "danger",
+  urgent: "danger",
 };
 
 function fmtDate(iso: string): string {
@@ -109,9 +56,26 @@ function fmtDate(iso: string): string {
   }).format(new Date(iso));
 }
 
-export default function WsparcieZgloszeniaPage() {
+async function fetchTickets(): Promise<Ticket[]> {
+  const sb = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await sb.auth.getUser();
+  if (!user) redirect("/logowanie?next=/panel/wsparcie/zgloszenia");
+  const { data, error } = await sb
+    .from("support_tickets")
+    .select("id, subject, status, category, priority, created_at, updated_at")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false })
+    .limit(100);
+  if (error) return [];
+  return (data ?? []) as Ticket[];
+}
+
+export default async function WsparcieZgloszeniaPage() {
+  const TICKETS = await fetchTickets();
   const open = TICKETS.filter((t) => t.status === "open" || t.status === "in_progress").length;
-  const waiting = TICKETS.filter((t) => t.status === "waiting").length;
+  const waiting = TICKETS.filter((t) => t.status === "waiting_user" || t.status === "waiting").length;
   const resolved = TICKETS.filter((t) => t.status === "resolved" || t.status === "closed").length;
 
   return (
@@ -174,60 +138,59 @@ export default function WsparcieZgloszeniaPage() {
         </Card>
       </section>
 
-      <ul className="space-y-3" aria-label="Lista zgłoszeń">
-        {TICKETS.map((t) => (
-          <li key={t.id}>
-            <Link
-              href={`/panel/wsparcie/zgloszenia/${t.id}`}
-              className="group block rounded-lg border border-ink-200 bg-white p-5 shadow-card transition hover:shadow-pop focus-visible:outline-none focus-visible:shadow-shield-focus"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-mono text-xs text-ink-500">{t.id}</span>
-                    <Badge tone={STATUS_TONE[t.status]} withDot>
-                      {STATUS_LABEL[t.status]}
-                    </Badge>
-                    <Badge tone={PRIORITY_TONE[t.priority]}>
-                      priorytet: {t.priority}
-                    </Badge>
-                    <Badge tone="neutral">{t.category}</Badge>
-                    {t.unread > 0 ? (
-                      <Badge tone="danger" withDot>
-                        {t.unread} nowa wiadomość
+      {TICKETS.length === 0 ? (
+        <Card>
+          <CardHeader>
+            <CardDescription>
+              Nie masz jeszcze żadnych zgłoszeń. Jeśli napotkasz problem, otwórz
+              nowe zgłoszenie — odpowiemy zwykle w ciągu 2 godzin w dni robocze.
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      ) : (
+        <ul className="space-y-3" aria-label="Lista zgłoszeń">
+          {TICKETS.map((t) => (
+            <li key={t.id}>
+              <Link
+                href={`/panel/wsparcie/zgloszenia/${t.id}`}
+                className="group block rounded-lg border border-ink-200 bg-white p-5 shadow-card transition hover:shadow-pop focus-visible:outline-none focus-visible:shadow-shield-focus"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-mono text-xs text-ink-500">
+                        {t.id.slice(0, 8)}
+                      </span>
+                      <Badge tone={STATUS_TONE[t.status] ?? "neutral"} withDot>
+                        {STATUS_LABEL[t.status] ?? t.status}
                       </Badge>
-                    ) : null}
+                      <Badge tone={PRIORITY_TONE[t.priority] ?? "info"}>
+                        priorytet: {t.priority}
+                      </Badge>
+                      <Badge tone="neutral">{t.category}</Badge>
+                    </div>
+                    <h3 className="mt-2 font-semibold text-dlugomat-950 group-hover:text-dlugomat-700">
+                      {t.subject}
+                    </h3>
+                    <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-ink-500">
+                      <span className="flex items-center gap-1">
+                        <Clock className="h-3 w-3" aria-hidden />
+                        Utworzone: {fmtDate(t.created_at)}
+                      </span>
+                      <span aria-hidden>·</span>
+                      <span>Aktualizacja: {fmtDate(t.updated_at)}</span>
+                    </div>
                   </div>
-                  <h3 className="mt-2 font-semibold text-dlugomat-950 group-hover:text-dlugomat-700">
-                    {t.subject}
-                  </h3>
-                  <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-ink-500">
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-3 w-3" aria-hidden />
-                      Utworzone: {fmtDate(t.created_at)}
-                    </span>
-                    <span aria-hidden>·</span>
-                    <span>Ostatnia odpowiedź: {fmtDate(t.last_response_at)}</span>
-                    {t.agent ? (
-                      <>
-                        <span aria-hidden>·</span>
-                        <span className="flex items-center gap-1">
-                          <MessageCircle className="h-3 w-3" aria-hidden />
-                          {t.agent}
-                        </span>
-                      </>
-                    ) : null}
-                  </div>
+                  <ArrowRight
+                    className="h-5 w-5 flex-shrink-0 text-ink-400 group-hover:text-dlugomat-700"
+                    aria-hidden
+                  />
                 </div>
-                <ArrowRight
-                  className="h-5 w-5 flex-shrink-0 text-ink-400 group-hover:text-dlugomat-700"
-                  aria-hidden
-                />
-              </div>
-            </Link>
-          </li>
-        ))}
-      </ul>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

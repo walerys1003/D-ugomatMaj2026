@@ -1,18 +1,19 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import {
   ArrowLeft,
-  Download,
+  Bell,
   FileText,
   Mail,
-  MessageSquare,
-  Phone,
-  Upload,
-  UserCheck,
+  Gavel,
+  Clock,
+  AlertTriangle,
+  CheckCircle2,
+  History,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -20,155 +21,83 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
+import { createSupabaseServerClient } from "@/lib/db/supabase-server";
+import {
+  buildCaseTimeline,
+  type TimelineEvent,
+  type TimelineEventKind,
+  type TimelineEventSeverity,
+} from "@/lib/cases/timeline";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Historia sprawy — Długomat",
-  description: "Pełna chronologia zdarzeń, korespondencji i dokumentów dla wybranej sprawy.",
+  description:
+    "Pełna chronologia zdarzeń, korespondencji i dokumentów dla wybranej sprawy.",
 };
 
 interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-interface HistoryEvent {
-  id: string;
-  ts: string;
-  type:
-    | "case_created"
-    | "status_changed"
-    | "doc_uploaded"
-    | "doc_generated"
-    | "email_sent"
-    | "email_received"
-    | "phone_call"
-    | "deadline_set"
-    | "deadline_met"
-    | "lawyer_assigned"
-    | "payment_received";
-  actor: string;
-  title: string;
-  detail?: string;
-  meta?: Record<string, string>;
-}
-
-const EVENTS: HistoryEvent[] = [
-  {
-    id: "h_021",
-    ts: "2026-05-10T16:24:00Z",
-    type: "status_changed",
-    actor: "Anna Sieradzka (kancelaria)",
-    title: "Status: W trakcie → Oczekuje na odpowiedź banku",
-    detail: "Bank ma 30 dni na ustosunkowanie się do wniosku.",
-  },
-  {
-    id: "h_020",
-    ts: "2026-05-10T15:42:00Z",
-    type: "email_sent",
-    actor: "System",
-    title: "Wysłano wniosek o korektę BIK do mBank",
-    detail: "Adresat: reklamacje@mbank.pl",
-    meta: { załącznik: "wniosek_BIK_2026-05-10.pdf" },
-  },
-  {
-    id: "h_019",
-    ts: "2026-05-10T15:38:00Z",
-    type: "doc_generated",
-    actor: "AI asystent",
-    title: "Wygenerowano wniosek o korektę BIK",
-    detail: "Szablon: art. 105a Prawa bankowego",
-  },
-  {
-    id: "h_018",
-    ts: "2026-05-09T11:18:00Z",
-    type: "doc_uploaded",
-    actor: "Anna Kowalska (Ty)",
-    title: "Dodano dokument: raport_BIK_2026-05.pdf",
-    meta: { rozmiar: "2.4 MB", strony: "8" },
-  },
-  {
-    id: "h_017",
-    ts: "2026-05-08T14:02:00Z",
-    type: "deadline_set",
-    actor: "Anna Sieradzka (kancelaria)",
-    title: "Ustawiono deadline: odpowiedź na pismo banku",
-    detail: "Termin: 2026-06-10 (30 dni od wysłania).",
-  },
-  {
-    id: "h_016",
-    ts: "2026-05-07T10:14:00Z",
-    type: "phone_call",
-    actor: "Anna Sieradzka (kancelaria)",
-    title: "Rozmowa telefoniczna z klientką",
-    detail: "Ustalenie strategii — wniosek BIK + ewentualne pismo do Rzecznika.",
-    meta: { czas: "22 min" },
-  },
-  {
-    id: "h_015",
-    ts: "2026-05-04T09:48:00Z",
-    type: "lawyer_assigned",
-    actor: "System (auto-przypisanie)",
-    title: "Przypisano prawnika: Anna Sieradzka",
-    detail: "Specjalizacja: prawo bankowe, BIK/KRD.",
-  },
-  {
-    id: "h_014",
-    ts: "2026-05-04T09:42:00Z",
-    type: "payment_received",
-    actor: "System (Stripe)",
-    title: "Płatność zaksięgowana: 399,00 PLN",
-    meta: { faktura: "FV/2026/05/0142", metoda: "Visa •••• 4242" },
-  },
-  {
-    id: "h_013",
-    ts: "2026-05-04T09:18:00Z",
-    type: "case_created",
-    actor: "Anna Kowalska (Ty)",
-    title: "Sprawa utworzona",
-    detail: "Typ: Korekta BIK · Bank: mBank · Kwota sporna: 12 400 PLN",
-  },
-];
-
-const TYPE_ICON = {
-  case_created: FileText,
-  status_changed: UserCheck,
-  doc_uploaded: Upload,
-  doc_generated: FileText,
-  email_sent: Mail,
-  email_received: Mail,
-  phone_call: Phone,
-  deadline_set: MessageSquare,
-  deadline_met: UserCheck,
-  lawyer_assigned: UserCheck,
-  payment_received: FileText,
-} as const;
-
-const TYPE_TONE: Record<HistoryEvent["type"], "info" | "success" | "warning" | "neutral"> = {
-  case_created: "info",
-  status_changed: "warning",
-  doc_uploaded: "info",
-  doc_generated: "success",
-  email_sent: "info",
-  email_received: "info",
-  phone_call: "neutral",
-  deadline_set: "warning",
-  deadline_met: "success",
-  lawyer_assigned: "success",
-  payment_received: "success",
+const SEVERITY_TONE: Record<
+  TimelineEventSeverity,
+  "info" | "success" | "warning" | "neutral" | "danger"
+> = {
+  info: "info",
+  success: "success",
+  warning: "warning",
+  error: "danger",
+  critical: "danger",
 };
 
-const TYPE_LABEL: Record<HistoryEvent["type"], string> = {
+const KIND_LABEL: Partial<Record<TimelineEventKind, string>> = {
   case_created: "Utworzono",
-  status_changed: "Status",
-  doc_uploaded: "Dokument",
-  doc_generated: "Wygenerowano",
-  email_sent: "E-mail wysłany",
-  email_received: "E-mail odebrany",
-  phone_call: "Rozmowa",
-  deadline_set: "Deadline",
-  deadline_met: "Deadline OK",
-  lawyer_assigned: "Przypisanie",
-  payment_received: "Płatność",
+  document_received: "Dokument",
+  document_generated: "Wygenerowano",
+  document_sent: "Wysłano",
+  deadline_set: "Termin",
+  deadline_due: "Termin",
+  deadline_missed: "Przekroczony",
+  hearing_scheduled: "Rozprawa",
+  hearing_held: "Rozprawa",
+  ruling_received: "Orzeczenie",
+  appeal_filed: "Środek zaskarżenia",
+  enforcement_started: "Egzekucja",
+  settlement_reached: "Ugoda",
+  case_closed: "Zamknięto",
+  ai_generation: "AI",
+  user_note: "Notatka",
 };
+
+function iconForKind(kind: TimelineEventKind) {
+  switch (kind) {
+    case "document_received":
+    case "document_generated":
+    case "ai_generation":
+      return FileText;
+    case "document_sent":
+      return Mail;
+    case "deadline_set":
+    case "deadline_due":
+      return Clock;
+    case "deadline_missed":
+      return AlertTriangle;
+    case "hearing_scheduled":
+    case "hearing_held":
+    case "ruling_received":
+    case "appeal_filed":
+    case "enforcement_started":
+      return Gavel;
+    case "settlement_reached":
+    case "case_closed":
+      return CheckCircle2;
+    default:
+      return History;
+  }
+}
 
 function fmtDate(iso: string): string {
   return new Intl.DateTimeFormat("pl-PL", {
@@ -179,6 +108,28 @@ function fmtDate(iso: string): string {
 
 export default async function SprawaHistoriaPage({ params }: PageProps) {
   const { id } = await params;
+
+  const sb = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await sb.auth.getUser();
+  if (!user) {
+    redirect(`/logowanie?next=/panel/sprawa/${id}/historia`);
+  }
+
+  const events: TimelineEvent[] = await buildCaseTimeline({
+    case_id: id,
+    user_id: user.id,
+    order: "desc",
+  }).catch(() => []);
+
+  const docsCount = events.filter(
+    (e) =>
+      e.kind === "document_received" ||
+      e.kind === "document_generated" ||
+      e.kind === "ai_generation",
+  ).length;
+  const corrCount = events.filter((e) => e.kind === "document_sent").length;
 
   return (
     <div className="space-y-8">
@@ -201,22 +152,18 @@ export default async function SprawaHistoriaPage({ params }: PageProps) {
             Historia zdarzeń
           </h1>
           <p className="max-w-2xl text-ink-600">
-            Każde zdarzenie jest niezmienne i podpisane kryptograficznie.
-            Historia stanowi dowód w razie sporu.
+            Oś zdarzeń budowana automatycznie z dokumentów, terminów i
+            powiadomień powiązanych ze sprawą.
           </p>
         </div>
-        <Button variant="secondary">
-          <Download className="mr-2 h-4 w-4" aria-hidden />
-          Eksportuj do PDF
-        </Button>
       </header>
 
-      <section className="grid gap-4 sm:grid-cols-4" aria-label="Podsumowanie">
+      <section className="grid gap-4 sm:grid-cols-3" aria-label="Podsumowanie">
         <Card>
           <CardHeader>
             <CardDescription>Zdarzeń łącznie</CardDescription>
             <CardTitle className="font-display text-fluid-h2 text-dlugomat-950">
-              {EVENTS.length}
+              {events.length}
             </CardTitle>
           </CardHeader>
         </Card>
@@ -224,7 +171,7 @@ export default async function SprawaHistoriaPage({ params }: PageProps) {
           <CardHeader>
             <CardDescription>Dokumentów</CardDescription>
             <CardTitle className="font-display text-fluid-h2 text-dlugomat-950">
-              {EVENTS.filter((e) => e.type === "doc_uploaded" || e.type === "doc_generated").length}
+              {docsCount}
             </CardTitle>
           </CardHeader>
         </Card>
@@ -232,15 +179,7 @@ export default async function SprawaHistoriaPage({ params }: PageProps) {
           <CardHeader>
             <CardDescription>Korespondencja</CardDescription>
             <CardTitle className="font-display text-fluid-h2 text-dlugomat-950">
-              {EVENTS.filter((e) => e.type === "email_sent" || e.type === "email_received" || e.type === "phone_call").length}
-            </CardTitle>
-          </CardHeader>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardDescription>Czas trwania</CardDescription>
-            <CardTitle className="font-display text-fluid-h4 text-dlugomat-950">
-              7 dni
+              {corrCount}
             </CardTitle>
           </CardHeader>
         </Card>
@@ -249,48 +188,54 @@ export default async function SprawaHistoriaPage({ params }: PageProps) {
       <Card>
         <CardHeader>
           <CardTitle>Pełna chronologia</CardTitle>
-          <CardDescription>Sortowanie: czas malejąco (najnowsze na górze)</CardDescription>
+          <CardDescription>
+            Sortowanie: czas malejąco (najnowsze na górze)
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <ol className="relative border-l border-ink-200 pl-6 space-y-5">
-            {EVENTS.map((ev) => {
-              const Icon = TYPE_ICON[ev.type];
-              return (
-                <li key={ev.id} className="relative">
-                  <span
-                    className="absolute -left-[31px] mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full border border-ink-200 bg-white"
-                    aria-hidden
-                  >
-                    <Icon className="h-3.5 w-3.5 text-dlugomat-700" />
-                  </span>
-                  <div className="space-y-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Badge tone={TYPE_TONE[ev.type]} withDot>
-                        {TYPE_LABEL[ev.type]}
-                      </Badge>
-                      <span className="text-xs text-ink-500">{fmtDate(ev.ts)}</span>
-                      <span aria-hidden className="text-ink-400">·</span>
-                      <span className="text-xs text-ink-600">{ev.actor}</span>
+          {events.length === 0 ? (
+            <EmptyState
+              icon={<Bell className="h-5 w-5" />}
+              title="Brak zdarzeń w tej sprawie"
+              description="Historia zacznie się wypełniać po dodaniu dokumentów, ustawieniu terminów lub wysłaniu pism."
+            />
+          ) : (
+            <ol className="relative border-l border-ink-200 pl-6 space-y-5">
+              {events.map((ev) => {
+                const Icon = iconForKind(ev.kind);
+                return (
+                  <li key={ev.id} className="relative">
+                    <span
+                      className="absolute -left-[31px] mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full border border-ink-200 bg-white"
+                      aria-hidden
+                    >
+                      <Icon className="h-3.5 w-3.5 text-dlugomat-700" />
+                    </span>
+                    <div className="space-y-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Badge tone={SEVERITY_TONE[ev.severity]} withDot>
+                          {KIND_LABEL[ev.kind] ?? ev.kind.replace(/_/g, " ")}
+                        </Badge>
+                        <span className="text-xs text-ink-500">
+                          {fmtDate(ev.occurred_at)}
+                        </span>
+                        <span aria-hidden className="text-ink-400">
+                          ·
+                        </span>
+                        <span className="text-xs text-ink-600">{ev.source}</span>
+                      </div>
+                      <p className="text-sm font-medium text-dlugomat-900">
+                        {ev.title}
+                      </p>
+                      {ev.description ? (
+                        <p className="text-sm text-ink-600">{ev.description}</p>
+                      ) : null}
                     </div>
-                    <p className="text-sm font-medium text-dlugomat-900">{ev.title}</p>
-                    {ev.detail ? (
-                      <p className="text-sm text-ink-600">{ev.detail}</p>
-                    ) : null}
-                    {ev.meta ? (
-                      <dl className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-ink-500">
-                        {Object.entries(ev.meta).map(([k, v]) => (
-                          <div key={k} className="inline-flex items-center gap-1">
-                            <dt className="uppercase tracking-wide">{k}:</dt>
-                            <dd className="text-ink-700">{v}</dd>
-                          </div>
-                        ))}
-                      </dl>
-                    ) : null}
-                  </div>
-                </li>
-              );
-            })}
-          </ol>
+                  </li>
+                );
+              })}
+            </ol>
+          )}
         </CardContent>
       </Card>
     </div>
